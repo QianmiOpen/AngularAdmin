@@ -1838,7 +1838,7 @@ angular.module('admin.component')
                 });
 
                 //
-                scope.removeAttr('name').removeAttr('model');
+                element.removeAttr('name').removeAttr('model');
             },
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.userselect.input', attrs);
@@ -1862,7 +1862,8 @@ angular.module('admin.component')
                 this.attrs = attrs;
                 this.format = null;
                 this.default = attrs.value;
-                this.mode = attrs.mode;
+                this.dateMode = attrs.mode ? attrs.mode.indexOf('date') != -1 : true;
+                this.timeMode = attrs.mode ? attrs.mode.indexOf('time') != -1 : true;
                 this.init();
                 this.render();
             };
@@ -1870,9 +1871,9 @@ angular.module('admin.component')
 
             init: function () {
                 var format = [];
-                if (!this.mode || this.mode == 'date')
+                if (this.dateMode)
                     format.push('yyyy-MM-dd');
-                if (!this.mode || this.mode == 'time')
+                if (this.timeMode)
                     format.push('HH:mm:ss');
                 this.format = format.join(' ');
                 this.val(this.default);
@@ -1884,9 +1885,9 @@ angular.module('admin.component')
             render: function () {
                 this.inputElement.datetimepicker({
                     language: 'zh-CN',
-                    pickDate: this.attrs.date !== undefined,
-                    pickTime: this.attrs.time !== undefined,
-                    useSeconds: this.attrs.time !== undefined
+                    pickDate: this.dateMode,
+                    pickTime: this.timeMode,
+                    useSeconds: this.timeMode
                 });
             },
 
@@ -2853,12 +2854,12 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
     .constant('userConfig', {
-        url: '/sysconfig/orguser/select',
+        url: '/',
         labelName: 'name',
         valueName: 'staffno'
     })
     .constant('tagConfig', {
-        url: '/sysconfig/orguser/select',
+        url: '/',
         labelName: 'name',
         valueName: 'staffno'
     })
@@ -5468,7 +5469,12 @@ angular.module('admin.component')
              */
             componentHelper.setTemplate('tpl.searchform.userselect.input', [
                 '<div class="input-inline search-item">',
-                   '<input class="form-control" name="{{name}}" placeholder="{{placeholder}}" {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}}/>',
+                    '<div class="input-group">',
+                        '{{#if label}}',
+                            '<div class="input-group-addon">{{label}}:</div>',
+                        '{{/if}}',
+                        '<input class="form-control" name="{{name}}" placeholder="{{placeholder}}" {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}}/>',
+                    '</div>',
                 '</div>'
             ].join(''));
 

@@ -7,12 +7,12 @@
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
     .constant('userConfig', {
-        url: '/sysconfig/orguser/select',
+        url: '/',
         labelName: 'name',
         valueName: 'staffno'
     })
     .constant('tagConfig', {
-        url: '/sysconfig/orguser/select',
+        url: '/',
         labelName: 'name',
         valueName: 'staffno'
     })

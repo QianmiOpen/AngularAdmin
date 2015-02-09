@@ -36,7 +36,12 @@
              */
             componentHelper.setTemplate('tpl.searchform.userselect.input', [
                 '<div class="input-inline search-item">',
-                   '<input class="form-control" name="{{name}}" placeholder="{{placeholder}}" {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}}/>',
+                    '<div class="input-group">',
+                        '{{#if label}}',
+                            '<div class="input-group-addon">{{label}}:</div>',
+                        '{{/if}}',
+                        '<input class="form-control" name="{{name}}" placeholder="{{placeholder}}" {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}}/>',
+                    '</div>',
                 '</div>'
             ].join(''));
 

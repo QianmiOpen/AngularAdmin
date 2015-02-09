@@ -107,6 +107,7 @@ module.exports = function (grunt) {
                         './demo/assets/js/bootstrap-datetimepicker/js/moment.js',
                         './demo/assets/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js',
                         './demo/assets/js/bootstrap-daterangepicker/js/daterangepicker.js',
+                        './demo/assets/plugins/bootstrap-switch/js/bootstrap-switch.min.js',
                         './demo/assets/js/select2/select2.min.js',
                         './demo/assets/js/jquery.blockui.min.js',
                         './demo/assets/js/metronic.js',
@@ -115,7 +116,7 @@ module.exports = function (grunt) {
                         './demo/assets/js/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js',
                         './demo/assets/js/bootstrap-modal/js/bootstrap-modal.js',
                         './demo/assets/js/bootstrap-modal/js/bootstrap-modalmanager.js',
-                        './demo/assets/js/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js',
+                        './demo/assets/js/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js'
                     ]
                 }
             }

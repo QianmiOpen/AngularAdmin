@@ -46,32 +46,25 @@
 
         <div class="col-md-8">
             <ui-search-form>
-                <ui-search-input label="测试" name="test"></ui-search-input>
-
+                <ui-search-input class="input-medium" label="测试" name="test"></ui-search-input>
                 <ui-search-select name="test2">
                     <option value="aaa">创建人</option>
                     <option value="bbbb">沟通人</option>
                 </ui-search-select>
-
                 <ui-search-input-select>
                     <option value="aaa">联系方式</option>
                     <option value="bbbb">客户姓名</option>
                 </ui-search-input-select>
-
                 <ui-search-multi-select tip="xxxxx">
                     <option value="aaa">联系方式</option>
                     <option value="bbbb">客户姓名</option>
                     <option value="ccc">联系方式</option>
                     <option value="ddd">客户姓名</option>
                 </ui-search-multi-select>
-
-                <ui-search-date label="日期" name="test3"></ui-search-date>
-
+                <ui-search-date class="input-medium" label="日期" name="test3"></ui-search-date>
                 <ui-search-region mode="c" label="区域" name="asdasd22"></ui-search-region>
-
+                <ui-search-user-select class="input-medium" label="用户"></ui-search-user-select>
                 <ui-search-date-range label="注册时间"></ui-search-date-range>
-
-                <ui-search-user-select label="用户"></ui-search-user-select>
             </ui-search-form>
 
             <ui-tool-bar-table blank="6" add del editable>
@@ -124,16 +117,7 @@
         url: '/test',
         response: function () {
             var aa = [],
-                    m = 10;
-            if ((a % 2) == 0) {
-                m = 10;
-                i = 0;
-            }
-            else {
-                m = 20;
-                i = 10;
-            }
-            a++;
+                    m = 5;
             for (; i < m; i++) {
                 aa.push({
                     a: i,

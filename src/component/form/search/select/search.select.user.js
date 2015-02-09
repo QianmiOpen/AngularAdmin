@@ -19,7 +19,7 @@ angular.module('admin.component')
                 });
 
                 //
-                scope.removeAttr('name').removeAttr('model');
+                element.removeAttr('name').removeAttr('model');
             },
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.userselect.input', attrs);
