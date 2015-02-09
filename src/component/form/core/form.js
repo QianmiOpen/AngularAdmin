@@ -1,0 +1,35 @@
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .constant('defaultCol', '4:8')
+    .directive('uiForm', function (uiFormFactory, componentHelper) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: false,
+            transclude: true,
+            compile: function () {
+                var form = null;
+                return {
+                    pre: function (scope, element, attrs, controller, transclude) {
+                        form = uiFormFactory(scope, element, attrs, transclude(scope));
+                        form.layout();
+                        var ref = attrs.ref || '$Form';
+                        scope[ref] = form;
+                        componentHelper.tiggerComplete(scope, ref, form);
+                    },
+                    post: function () {
+                        form.initValidation();
+                    }
+                };
+            },
+            templateUrl: 'tpl.form'
+        };
+    });
+
+

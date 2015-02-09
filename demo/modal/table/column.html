@@ -1,0 +1,18 @@
+<div class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">最强大的列</h4>
+        </div>
+        <div class="modal-body">
+            <ui-form ref="searchInputForm" column="1">
+                <ui-form-input label="标题:" name="head"></ui-form-input>
+                <ui-form-input label="数据项:" name="name"></ui-form-input>
+                <ui-form-textarea label="自定义内容" name="__content" help="超级强大"></ui-form-textarea>
+            </ui-form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-primary" ng-click="create('$table', 'ui-table-column', searchInputForm.formData())">生成</button>
+        </div>
+    </div>
+</div>

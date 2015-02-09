@@ -1,0 +1,17 @@
+<div class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">查询输入框</h4>
+        </div>
+        <div class="modal-body">
+            <ui-form ref="searchInputForm" column="1">
+                <ui-form-input label="label:" name="label"></ui-form-input>
+                <ui-form-input label="name:" name="name"></ui-form-input>
+            </ui-form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-primary" ng-click="create('$searchForm', 'ui-search-input', searchInputForm.formData())">生成</button>
+        </div>
+    </div>
+</div>

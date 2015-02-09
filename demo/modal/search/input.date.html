@@ -1,0 +1,22 @@
+<div class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">插入日期范围框</h4>
+        </div>
+        <div class="modal-body">
+            <ui-form ref="searchInputForm" column="1">
+                <ui-form-input label="label:" name="label"></ui-form-input>
+                <ui-form-input label="name:" name="name"></ui-form-input>
+                <ui-form-select label="模式:" name="mode">
+                    <option value="">日期+时间</option>
+                    <option value="date">日期</option>
+                    <option value="time">时间</option>
+                </ui-form-select>
+            </ui-form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-primary" ng-click="create('$searchForm', 'ui-search-date', searchInputForm.formData())">生成</button>
+        </div>
+    </div>
+</div>

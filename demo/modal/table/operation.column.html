@@ -1,0 +1,44 @@
+<div class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">操作列</h4>
+        </div>
+        <div class="modal-body">
+            <ui-form ref="searchInputForm" column="1" ng-init="dds = []">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div>
+                            <button ng-click="dds.push({})" class="btn btn-primary">添加操作按钮</button>
+                        </div>
+                        <div ng-repeat="dd in dds">
+                           <input  ng-model="dd.icon" placeholder="图标" size="10"/> <input ng-model="dd.key" placeholder="名称" /> <input ng-model="dd.text" placeholder="点击触发事件名称"/> <button class="btn btn-danger" ng-click="dds.splice($index, 1)">-</button>
+                        </div>
+                    </div>
+                </div>
+            </ui-form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-primary" ng-click="doAdd()">生成</button>
+        </div>
+    </div>
+    <script>
+        function SIS($scope){
+            $scope.doAdd = function(){
+                var dd = $scope.searchInputForm.formData();
+                var c = [];
+                $.each($scope.dds, function(i, item){
+                    if(item.icon){
+                        var $i = $('<i class="fa"/>').addClass(item.icon).html(item.key);
+                        c.push($('<div/>').append($('<a class="btn btn-default"/>').attr('ng-click', item.text).append($i)).html());
+                    }
+                    else{
+                        c.push($('<div/>').append($('<a class="btn btn-default"/>').attr('ng-click', item.text).html(item.key)).html());
+                    }
+                })
+                dd = dd.concat([{name: '__content', value: c.join('\n')}])
+                $scope.create('$table', 'ui-table-operation-column', dd);
+            }
+        }
+    </script>
+</div>

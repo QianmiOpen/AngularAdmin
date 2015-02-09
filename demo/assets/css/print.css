@@ -1,0 +1,38 @@
+body {
+    background-color: #fff !important;
+}
+
+.header {
+	display: none;
+}
+
+.page-sidebar {
+	display: none;
+}
+
+.theme-panel {
+	display: none;
+}
+
+.hidden-print {
+	display: none;
+}
+
+.footer {
+	display: none;
+}
+
+.no-page-break {
+	page-break-after: avoid;
+}
+
+.page-container {
+	margin: 0px !important;
+	padding: 0px !important;
+}
+
+.page-content {
+	min-height: auto !important;
+	padding: 0px 20px 20px !important;
+	margin: 0 !important;
+}

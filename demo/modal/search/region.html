@@ -1,0 +1,26 @@
+<div class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">查询输入框</h4>
+        </div>
+        <div class="modal-body">
+            <ui-form ref="searchInputForm" column="1">
+                <ui-form-input label="label:" name="label"></ui-form-input>
+                <ui-form-input label="name:" name="name"></ui-form-input>
+                <ui-form-select label="模式:" name="mode">
+                    <option value="">省 + 市 + 区</option>
+                    <option value="c">省 + 市</option>
+                    <option value="p">省</option>
+                </ui-form-select>
+                <ui-form-select label="提交数据为汉子还是id:" name="value-type">
+                    <option value="text">汉字</option>
+                    <option value="id">id</option>
+                </ui-form-select>
+            </ui-form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-primary" ng-click="create('$searchForm', 'ui-search-region', searchInputForm.formData())">生成</button>
+        </div>
+    </div>
+</div>

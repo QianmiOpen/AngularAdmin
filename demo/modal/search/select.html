@@ -1,0 +1,40 @@
+<div class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">下拉单选框</h4>
+        </div>
+        <div class="modal-body">
+            <ui-form ref="searchInputForm" column="1" ng-init="dds = []">
+                <ui-form-input label="label:" name="label"></ui-form-input>
+                <ui-form-input label="name:" name="name" ></ui-form-input>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div>
+                            <button ng-click="dds.push({})" class="btn btn-primary">添加下拉选项</button>
+                        </div>
+                        <div ng-repeat="dd in dds">
+                            <input ng-model="dd.key" placeholder="数值" /> <input ng-model="dd.text" placeholder="显示"/> <button class="btn btn-danger" ng-click="dds.splice($index, 1)">-</button>
+                        </div>
+                    </div>
+                </div>
+            </ui-form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-primary" ng-click="doAdd()">生成</button>
+        </div>
+    </div>
+    <script>
+        function SIS($scope){
+            $scope.doAdd = function(){
+                var dd = $scope.searchInputForm.formData();
+                var c = [];
+                $.each($scope.dds, function(i, item){
+                    c.push($('<div/>').append($('<option/>').attr('value', item.key).html(item.text)).html());
+                })
+                dd = dd.concat([{name: '__content', value: c.join('\n')}])
+                $scope.create('$searchForm', 'ui-search-select', dd);
+            }
+        }
+    </script>
+</div>
