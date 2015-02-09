@@ -40,7 +40,7 @@
         </div>
 
         <div class="col-md-2">
-            <!--<ui-tree region expand="1" on-click="treeTwoClick"></ui-tree>-->
+            <ui-tree url="/region" expand="1" on-click="treeTwoClick"></ui-tree>
         </div>
 
 
@@ -72,27 +72,20 @@
 
             <ui-table url="/test" edit-url="/test">
                 <ui-table-check-column name="a"></ui-table-check-column>
-                <ui-table-column head="普通" name="a" editable="region"></ui-table-column>
-                <ui-table-progress-column head="测试" name="a"></ui-table-progress-column>
-                <ui-table-image-column head="图片" name="ww"></ui-table-image-column>
-                <ui-table-date-column head="日期" name="e" ></ui-table-date-column>
-                <ui-table-state-column hred="状态" name="f" default="0" >
-                    <span class='label label-sm label-default' state="0"
-                          style='background-color:red !important'>0</span>
-                    <span class='label label-sm label-default' state="1"
-                          style='background-color:green !important'>1</span>
+                <ui-table-column head="checkbox" name="a" editable="region"></ui-table-column>
+                <ui-table-progress-column head="progress" name="a"></ui-table-progress-column>
+                <ui-table-image-column head="image" name="ww"></ui-table-image-column>
+                <ui-table-date-column head="date" name="e" ></ui-table-date-column>
+                <ui-table-state-column hred="state" name="f" default="0" >
+                    <span class='label label-sm label-default' state="0" style='background-color:red !important'>0</span>
+                    <span class='label label-sm label-default' state="1" style='background-color:green !important'>1</span>
                 </ui-table-state-column>
-                <ui-table-operation-column head="操作">
-                    <a title="管理用户" class="btn btn-sm default" href="javascript:;" ng-click="managePotential()"><i
-                            class="fa fa-cogs"></i></a>
-                    <a title="分配客户" class="btn btn-sm default" href="javascript:;" ng-click="assignPotential()"
-                       ng-if="isShow"><i class="fa fa-hand-o-right"></i></a>
-                    <a title="沟通记录" class="btn btn-sm default" href="javascript:;" ng-click="editContact()"
-                       ng-if="isShow"><i class="fa fa-comments-o"></i></a>
-                    <a title="认领" class="btn btn-sm default" href="javascript:;" ng-click="assignClaim()"
-                       ng-if="isShow"><i class=" fa fa-chain"></i></a>
-                    <a title="释放" class="btn btn-sm default " href="javascript:;" ng-click="assignRelease()"
-                       ng-if="isShow"><i class=" fa fa-chain-broken"></i></a>
+                <ui-table-operation-column head="opertion">
+                    <a class="btn btn-sm default" href="javascript:;" ng-click="managePotential()"><iclass="fa fa-cogs"></i></a>
+                    <a class="btn btn-sm default" href="javascript:;" ng-click="assignPotential()"><i class="fa fa-hand-o-right"></i></a>
+                    <a class="btn btn-sm default" href="javascript:;" ng-click="editContact()"><i class="fa fa-comments-o"></i></a>
+                    <a class="btn btn-sm default" href="javascript:;" ng-click="assignClaim()"><i class=" fa fa-chain"></i></a>
+                    <a class="btn btn-sm default " href="javascript:;" ng-click="assignRelease()"><i class=" fa fa-chain-broken"></i></a>
                 </ui-table-operation-column>
             </ui-table>
         </div>
