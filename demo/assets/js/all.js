@@ -1400,24 +1400,12 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormSwitch', function (util, uiSwitchFacotry, componentHelper, defaultCol) {
+    .directive('uiFormSwitch', function (uiSwitchFactory, componentHelper, defaultCol) {
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                var _switch = uiSwitchFacotry(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formSwitch', _switch);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    _switch.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
+            link: uiSwitchFactory,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.switch', $.extend({
@@ -3165,53 +3153,52 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiSwitchFacotry', function (msg, uiInputMaskMap, Event) {
+    .factory('uiSwitchFactory', function (msg, uiFormControl) {
         var m = new msg('Switch'),
-            Switch = function (element, attrs) {
-                Event.call(this);
-                this.element = element.find('input');
+            Switch = function (scope, element, attrs) {
+                this.inputElement = element.find('input');
                 this.onValue = attrs.onValue || 'on';
                 this.offValue = attrs.offValue || 'off';
                 this.attrs = attrs;
-                this.render();
+                uiFormControl.apply(this, arguments);
             };
-        Switch.prototype = {
+        Switch.prototype = $.extend(new uiFormControl(), {
 
             render: function () {
                 if ($.fn.bootstrapSwitch) {
-                    this.element.bootstrapSwitch({
+                    this.inputElement.bootstrapSwitch({
                         size: 'small',
                         onSwitchChange: this.onChangeHandler.bind(this)
                     });
 
                     //初始值
-                    this.element.bootstrapSwitch('state', this.attrs.value == this.onValue);
+                    this.inputElement.bootstrapSwitch('state', this.attrs.value == this.onValue);
                 }
-                this.element[0].checked = true;
+                this.inputElement[0].checked = true;
             },
 
             onChangeHandler: function (evt, state) {
                 var v = state ? this.onValue : this.offValue;
-                this.element.val(v);
-                this.element[0].checked = true;
+                this.inputElement.val(v);
+                this.inputElement[0].checked = true;
             },
 
             reset: function () {
-                this.element.val();
+                this.inputElement.val();
             },
 
             val: function (isOn) {
                 if (isOn != undefined) {
-                    this.element.bootstrapSwitch('state', isOn);
+                    this.inputElement.bootstrapSwitch('state', isOn);
                     return this;
                 }
                 else {
-                    return this.element.val();
+                    return this.inputElement.val();
                 }
             }
-        };
-        return function (element, attrs) {
-            return new Switch(element, attrs);
+        });
+        return function(s, e, a, c, t){
+            return new Switch(s, e, a, c, t);
         };
     });
 //------------------------------------------------------
