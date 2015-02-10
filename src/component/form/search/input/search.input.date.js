@@ -12,16 +12,13 @@ angular.module('admin.component')
             replace: true,
             link: function (scope, element, attrs) {
                 //
-                var inputDate = uiDateFacotry(element, attrs);
+                var inputDate =  new uiDateFacotry(scope, element, attrs);
                 componentHelper.tiggerComplete(scope, attrs.ref || '$searchDate', inputDate);
 
                 //
                 scope.$on('uisearchform.reset', function () {
                     inputDate.reset();
                 });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
             },
             template: function (element, attrs) {
                 var format = [];

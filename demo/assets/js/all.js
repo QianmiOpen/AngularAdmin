@@ -1,4 +1,4 @@
-/*! zk - v0.0.1 - 2015-02-09 */
+/*! zk - v0.0.1 - 2015-02-10 */
 (function(){
 //-----------------------------------------------------------------------------------------------
 //
@@ -1078,17 +1078,13 @@ angular.module('admin.component')
             restrict: 'E',
             replace: true,
             link: function (scope, element, attrs) {
-                //
-                var inputDate = uiDateFacotry(element, attrs);
+                var inputDate = new uiDateFacotry(scope, element, attrs);
                 componentHelper.tiggerComplete(scope, attrs.ref || '$formDate', inputDate);
 
                 //
                 scope.$on('uiform.reset', function () {
                     inputDate.reset();
                 });
-
-                //
-                element.removeAttr('name').removeAttr('model');
             },
             template: function (element, attrs) {
                 //
@@ -1124,16 +1120,13 @@ angular.module('admin.component')
             replace: true,
             link: function (scope, element, attrs) {
                 //
-                var inputDate = uiDateRangeService(element, attrs);
+                var inputDate = new uiDateRangeService(scope, element, attrs);
                 componentHelper.tiggerComplete(scope, attrs.ref || '$formDateRange', inputDate);
 
                 //
                 scope.$on('uiform.reset', function () {
                     inputDate.reset();
                 });
-
-                //
-                element.removeAttr('name').removeAttr('model');
             },
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
@@ -1505,16 +1498,13 @@ angular.module('admin.component')
             replace: true,
             link: function (scope, element, attrs) {
                 //
-                var inputDate = uiDateFacotry(element, attrs);
+                var inputDate =  new uiDateFacotry(scope, element, attrs);
                 componentHelper.tiggerComplete(scope, attrs.ref || '$searchDate', inputDate);
 
                 //
                 scope.$on('uisearchform.reset', function () {
                     inputDate.reset();
                 });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
             },
             template: function (element, attrs) {
                 var format = [];
@@ -1544,17 +1534,13 @@ angular.module('admin.component')
             restrict: 'E',
             replace: true,
             link: function (scope, $element, $attrs) {
-                var dateRange = uiDateRangeService($element, $attrs);
-                dateRange.render();
+                var dateRange = new uiDateRangeService(scope, $element, $attrs);
                 componentHelper.tiggerComplete(scope, $attrs.ref || '$searchDateRange', dateRange);
 
                 //
                 scope.$on('uisearchform.reset', function () {
                     dateRange.reset();
                 });
-
-                //
-                $element.removeAttr('name').removeAttr('readonly').removeAttr('model');
             },
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.daterange', attrs);
@@ -1845,6 +1831,76 @@ angular.module('admin.component')
             }
         };
     });
+/**
+ * 表单控件
+ */
+angular.module('admin.component')
+    .factory('uiFormControl', function (msg, Event) {
+        var FormControl = function (scope, element, attrs) {
+            if (!scope) {
+                return;
+            }
+            Event.call(this);
+            this.scope = scope;
+            this.element = element;
+            this.attrs = attrs;
+            this._init();
+            this._cleanElement();
+            this.render();
+        };
+        FormControl.prototype = {
+
+            /**
+             *
+             */
+            _init: function () {
+            },
+
+            /**
+             *
+             * @private
+             */
+            _cleanElement: function () {
+                this.element.removeAttr('name').removeAttr('model').removeAttr('readonly');
+            },
+
+            /**
+             *
+             */
+            render: function () {
+            },
+
+            /**
+             *
+             */
+            destroy: function () {
+                delete this.listenerMap;
+            },
+
+            /**
+             *
+             */
+            reset: function () {
+            },
+
+            /**
+             *
+             * @param fn
+             */
+            change: function (fn) {
+                this.$on('change', fn);
+            },
+
+            /**
+             *
+             * @param v
+             * @returns {*}
+             */
+            val: function (v) {
+            }
+        };
+        return FormControl;
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -1853,23 +1909,19 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiDateFacotry', function (msg, Event) {
+    .factory('uiDateFacotry', function (msg, uiFormControl) {
         var m = new msg('Date'),
-            InputDate = function (element, attrs) {
-                Event.call(this);
-                this.element = element;
+            InputDate = function (scope, element, attrs) {
                 this.inputElement = element.find('input');
-                this.attrs = attrs;
                 this.format = null;
                 this.default = attrs.value;
                 this.dateMode = attrs.mode ? attrs.mode.indexOf('date') != -1 : true;
                 this.timeMode = attrs.mode ? attrs.mode.indexOf('time') != -1 : true;
-                this.init();
-                this.render();
+                uiFormControl.apply(this, arguments);
             };
-        InputDate.prototype = {
+        InputDate.prototype = $.extend(new uiFormControl(), {
 
-            init: function () {
+            _init: function () {
                 var format = [];
                 if (this.dateMode)
                     format.push('yyyy-MM-dd');
@@ -1889,13 +1941,7 @@ angular.module('admin.component')
                     pickTime: this.timeMode,
                     useSeconds: this.timeMode
                 });
-            },
-
-            /**
-             *
-             */
-            destroy: function(){
-                delete this.listenerMap;
+                return this;
             },
 
             /**
@@ -1903,6 +1949,7 @@ angular.module('admin.component')
              */
             reset: function () {
                 this.inputElement.val('');
+                return this;
             },
 
             /**
@@ -1911,6 +1958,7 @@ angular.module('admin.component')
              */
             change: function(fn){
                 this.inputElement.change(fn);
+                return this;
             },
 
             /**
@@ -1927,10 +1975,8 @@ angular.module('admin.component')
                     return this.inputElement.val();
                 }
             }
-        };
-        return function (element, attrs) {
-            return new InputDate(element, attrs);
-        };
+        });
+        return InputDate;
     });
 //-----------------------------------------------------------------------------------------------
 //
@@ -1972,10 +2018,9 @@ angular.module('admin.component')
             firstDay: 1
         }
     })
-    .factory('uiDateRangeService', function (msg, uiDateRangeDefaultConfig, uiDateRangeDefaultRange, Event) {
+    .factory('uiDateRangeService', function (msg, uiDateRangeDefaultConfig, uiDateRangeDefaultRange, uiFormControl) {
         var m = new msg('DateRange'),
-            DateRange = function (element, attrs) {
-                Event.call(this);
+            DateRange = function (scope, element, attrs) {
                 this.element = element;
                 this.startDateElement = element.find('.input-group').find('input:first');
                 this.endDateElement = element.find('.input-group').find('input:last');
@@ -1987,16 +2032,17 @@ angular.module('admin.component')
                 this.defaultStartDate = attrs.fromValue || dateRange[0];
                 this.defaultEndDate = attrs.toValue || dateRange[1];
                 this.limit = attrs.limit;
-                this.init();
+                uiFormControl.apply(this, arguments);
             };
-        DateRange.prototype = {
-            init: function () {
+        DateRange.prototype = $.extend(new uiFormControl(), {
+            _init: function () {
                 this.config = $.extend({}, uiDateRangeDefaultConfig, {
                     ranges: uiDateRangeDefaultRange,
                     timePicker: this.attrs.time !== undefined,
                     format: this.format
                 });
 
+                //要小心设置这个值
                 if (this.limit) {
                     this.config.dateLimit = {days: this.limit};
                 }
@@ -2006,8 +2052,6 @@ angular.module('admin.component')
                     this.config.startDate = this.defaultStartDate;
                     this.config.endDate = this.defaultEndDate;
                 }
-
-                this.render();
             },
 
             render: function () {
@@ -2018,10 +2062,6 @@ angular.module('admin.component')
                     this.endDateElement.val(end);
                     this.$emit('change', this, start, end);
                 }.bind(this));
-            },
-
-            change: function (fn) {
-                this.$on('change', fn);
             },
 
             reset: function () {
@@ -2043,10 +2083,8 @@ angular.module('admin.component')
                     return this;
                 }
             }
-        };
-        return function ($element, $attrs) {
-            return new DateRange($element, $attrs);
-        };
+        });
+        return DateRange;
     });
 //------------------------------------------------------
 //
@@ -2797,16 +2835,52 @@ angular.module('admin.component')
              * @param data
              * @param isClean
              */
-            setData: function (data, isClean) {
+            setData: function (data, isClean, dataName, dataValue) {
+                dataName = dataName || 'key';
+                dataValue = dataValue || 'text';
                 if (isClean) {
                     this.element.html();
                 }
-                else {
+                if ($.isArray(data)) {
                     $.each(data, function (i, item) {
-                        this.element.push($('<option/>').attr('value', item.key).html(item.text))
+                        this.element.append(this.toOption(item, dataName, dataValue));
+                    }.bind(this));
+                }
+                else {
+                    $.each(data, function (group, items) {
+                        var $optiongroup = this.toOptionGroup(group);
+                        $.each(items, function (i, item) {
+                            $optiongroup.append(this.toOption(item, dataName, dataValue))
+                        }.bind(this));
+                        this.element.append($optiongroup);
                     }.bind(this));
                 }
                 this.reset();
+            },
+
+            /**
+             *
+             * @param item
+             * @param dataName
+             * @param dataValue
+             * @returns {*|jQuery}
+             */
+            toOption: function (item, dataName, dataValue) {
+                var isString = angular.isString(item),
+                    itemName = isString ? item : item[dataName],
+                    itemValue = isString ? item : item[dataValue];
+                var $option = $('<option/>').attr('value', itemName).html(itemValue);
+                return $option;
+            },
+
+            /**
+             *
+             * @param name
+             * @returns {*|jQuery}
+             */
+            toOptionGroup: function (name) {
+                var $option = $('<optgroup/>').attr('label', name);
+                return $option;
             },
 
             /**

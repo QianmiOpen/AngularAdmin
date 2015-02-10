@@ -11,17 +11,13 @@ angular.module('admin.component')
             restrict: 'E',
             replace: true,
             link: function (scope, $element, $attrs) {
-                var dateRange = uiDateRangeService($element, $attrs);
-                dateRange.render();
+                var dateRange = new uiDateRangeService(scope, $element, $attrs);
                 componentHelper.tiggerComplete(scope, $attrs.ref || '$searchDateRange', dateRange);
 
                 //
                 scope.$on('uisearchform.reset', function () {
                     dateRange.reset();
                 });
-
-                //
-                $element.removeAttr('name').removeAttr('readonly').removeAttr('model');
             },
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.daterange', attrs);

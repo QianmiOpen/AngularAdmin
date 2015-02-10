@@ -12,16 +12,13 @@ angular.module('admin.component')
             replace: true,
             link: function (scope, element, attrs) {
                 //
-                var inputDate = uiDateRangeService(element, attrs);
+                var inputDate = new uiDateRangeService(scope, element, attrs);
                 componentHelper.tiggerComplete(scope, attrs.ref || '$formDateRange', inputDate);
 
                 //
                 scope.$on('uiform.reset', function () {
                     inputDate.reset();
                 });
-
-                //
-                element.removeAttr('name').removeAttr('model');
             },
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');

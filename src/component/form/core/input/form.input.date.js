@@ -11,17 +11,13 @@ angular.module('admin.component')
             restrict: 'E',
             replace: true,
             link: function (scope, element, attrs) {
-                //
-                var inputDate = uiDateFacotry(element, attrs);
+                var inputDate = new uiDateFacotry(scope, element, attrs);
                 componentHelper.tiggerComplete(scope, attrs.ref || '$formDate', inputDate);
 
                 //
                 scope.$on('uiform.reset', function () {
                     inputDate.reset();
                 });
-
-                //
-                element.removeAttr('name').removeAttr('model');
             },
             template: function (element, attrs) {
                 //
