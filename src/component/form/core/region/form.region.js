@@ -24,16 +24,13 @@ angular.module('admin.component')
             link: function (scope, element, attrs) {
                 //
                 attrs.autoWidth = false;
-                var region = uiRegionService(element, attrs);
+                var region = new uiRegionService(scope, element, attrs);
                 componentHelper.tiggerComplete(scope, attrs.ref || '$formRegion', region);
 
                 //
                 scope.$on('uiform.reset', function () {
                     region.reset();
                 });
-
-                //
-                element.removeAttr('name').removeAttr('model');
             },
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');

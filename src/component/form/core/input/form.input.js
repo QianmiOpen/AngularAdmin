@@ -11,13 +11,10 @@ angular.module('admin.component')
             restrict: 'E',
             replace: true,
             link: function (scope, element, attrs) {
-                var input = uiInputFacotry(element, attrs);
+                var input = new uiInputFacotry(element, attrs);
                 scope.$on('uiform.reset', function () {
                     input.reset();
                 });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
             },
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');

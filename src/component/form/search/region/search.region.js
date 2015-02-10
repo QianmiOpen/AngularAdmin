@@ -12,7 +12,7 @@ angular.module('admin.component')
             replace: true,
             link: function (scope, element, attrs) {
                 attrs.autoWidth = true;
-                var region = uiRegionService(element, attrs);
+                var region = new uiRegionService(scope, element, attrs);
                 componentHelper.tiggerComplete(scope, attrs.ref || '$searchRegion', region);
 
                 //
