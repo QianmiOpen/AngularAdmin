@@ -48,5 +48,7 @@ angular.module('admin.component')
                 }
             }
         });
-        return Input;
+        return function(s, e, a, c, t){
+            return new Input(s, e, a, c, t);
+        };
     });

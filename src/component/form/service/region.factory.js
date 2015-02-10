@@ -103,5 +103,7 @@ angular.module('admin.component')
                 this.$sDom.val('').select2({data: []});
             }
         });
-        return Region;
+        return function(s, e, a, c, t){
+            return new Region(s, e, a, c, t);
+        };
     });

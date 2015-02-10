@@ -1150,12 +1150,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                var input = new uiInputFactory(element, attrs);
-                scope.$on('uiform.reset', function () {
-                    input.reset();
-                });
-            },
+            link: uiInputFactory,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.input', $.extend({
@@ -1223,17 +1218,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                //
-                attrs.autoWidth = false;
-                var region = new uiRegionService(scope, element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formRegion', region);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    region.reset();
-                });
-            },
+            link: uiRegionService,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.region', $.extend({
@@ -1521,16 +1506,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                var ref = attrs.ref || '$searchInput',
-                    input = new uiInputFactory(scope, element, attrs);
-                componentHelper.tiggerComplete(scope, ref, input);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    input.reset();
-                });
-            },
+            link: uiInputFactory,
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.input', attrs);
             }
@@ -1631,19 +1607,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                attrs.autoWidth = true;
-                var region = new uiRegionService(scope, element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchRegion', region);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    region.reset();
-                });
-
-                //
-                element.removeAttr('model');
-            },
+            link: uiRegionService,
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.region', attrs);
             }
@@ -2264,7 +2228,9 @@ angular.module('admin.component')
                 }
             }
         });
-        return Input;
+        return function(s, e, a, c, t){
+            return new Input(s, e, a, c, t);
+        };
     });
 //-----------------------------------------------------------------------------------------------
 //
@@ -2696,7 +2662,9 @@ angular.module('admin.component')
                 this.$sDom.val('').select2({data: []});
             }
         });
-        return Region;
+        return function(s, e, a, c, t){
+            return new Region(s, e, a, c, t);
+        };
     });
 //------------------------------------------------------
 //
@@ -5559,7 +5527,7 @@ angular.module('admin.component')
              *
              */
             componentHelper.setTemplate('tpl.searchform.region', [
-                '<div class="input-inline search-item" id="searchformregion">',
+                '<div class="input-inline search-item" auto-width="true">',
                     '<div class="input-group">',
                         '{{#if label}}<div class="input-group-addon">{{{label}}}:</div>{{/if}}',
                         '<input type="hidden" {{#if model}}ng-value="{{model}}"{{/if}} {{#if name}}name="{{name}}"{{/if}}  value="{{value}}"/>',

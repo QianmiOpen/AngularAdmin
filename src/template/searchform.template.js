@@ -74,7 +74,7 @@
              *
              */
             componentHelper.setTemplate('tpl.searchform.region', [
-                '<div class="input-inline search-item" id="searchformregion">',
+                '<div class="input-inline search-item" auto-width="true">',
                     '<div class="input-group">',
                         '{{#if label}}<div class="input-group-addon">{{{label}}}:</div>{{/if}}',
                         '<input type="hidden" {{#if model}}ng-value="{{model}}"{{/if}} {{#if name}}name="{{name}}"{{/if}}  value="{{value}}"/>',

@@ -10,12 +10,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                var input = new uiInputFactory(element, attrs);
-                scope.$on('uiform.reset', function () {
-                    input.reset();
-                });
-            },
+            link: uiInputFactory,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.input', $.extend({
