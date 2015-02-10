@@ -1091,11 +1091,11 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormDate', function (uiDateFacotry, componentHelper, defaultCol) {
+    .directive('uiFormDate', function (uiDateFactory, componentHelper, defaultCol) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiDateFacotry,
+            link: uiDateFactory,
             template: function (element, attrs) {
                 //
                 var format = [],
@@ -1128,16 +1128,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                //
-                var inputDate = new uiDateRangeService(scope, element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formDateRange', inputDate);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    inputDate.reset();
-                });
-            },
+            link: uiDateRangeService,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.input.daterange', $.extend({
@@ -1480,11 +1471,11 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchDate', function (uiDateFacotry, componentHelper) {
+    .directive('uiSearchDate', function (uiDateFactory, componentHelper) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiDateFacotry,
+            link: uiDateFactory,
             template: function (element, attrs) {
                 var format = [];
                 if (!attrs.date)
@@ -1508,19 +1499,11 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchDateRange', function (componentHelper, uiDateRangeService) {
+    .directive('uiSearchDateRange', function (uiDateRangeService, componentHelper) {
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, $element, $attrs) {
-                var dateRange = new uiDateRangeService(scope, $element, $attrs);
-                componentHelper.tiggerComplete(scope, $attrs.ref || '$searchDateRange', dateRange);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    dateRange.reset();
-                });
-            },
+            link: uiDateRangeService,
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.daterange', attrs);
             }
@@ -1805,7 +1788,7 @@ angular.module('admin.component')
             this.attrs = attrs
             this.isSearchControl = element.parents('.ui-search-form').length > 0;
             this.formPrefix = this.isSearchControl ? '$search' : '$form';
-            this.formResetEventName = this.isSearchControl ? 'uisearch.reset' : 'uiform.reset';
+            this.formResetEventName = this.isSearchControl ? 'uisearchform.reset' : 'uiform.reset';
             this._init();
             this._cleanElement();
             this.render();
@@ -1884,7 +1867,7 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiDateFacotry', function (msg, uiFormControl) {
+    .factory('uiDateFactory', function (msg, uiFormControl) {
         var m = new msg('Date'),
             InputDate = function (scope, element, attrs) {
                 this.className = 'Date';
@@ -1999,6 +1982,7 @@ angular.module('admin.component')
     .factory('uiDateRangeService', function (msg, uiDateRangeDefaultConfig, uiDateRangeDefaultRange, uiFormControl) {
         var m = new msg('DateRange'),
             DateRange = function (scope, element, attrs) {
+                this.className = 'DateRange';
                 this.element = element;
                 this.startDateElement = element.find('.input-group').find('input:first');
                 this.endDateElement = element.find('.input-group').find('input:last');
@@ -2062,7 +2046,9 @@ angular.module('admin.component')
                 }
             }
         });
-        return DateRange;
+        return function(s, e, a, c, t){
+            return new DateRange(s, e, a, c, t);
+        };
     });
 //------------------------------------------------------
 //

@@ -6,11 +6,11 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormDate', function (uiDateFacotry, componentHelper, defaultCol) {
+    .directive('uiFormDate', function (uiDateFactory, componentHelper, defaultCol) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiDateFacotry,
+            link: uiDateFactory,
             template: function (element, attrs) {
                 //
                 var format = [],

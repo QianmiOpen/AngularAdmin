@@ -41,6 +41,7 @@ angular.module('admin.component')
     .factory('uiDateRangeService', function (msg, uiDateRangeDefaultConfig, uiDateRangeDefaultRange, uiFormControl) {
         var m = new msg('DateRange'),
             DateRange = function (scope, element, attrs) {
+                this.className = 'DateRange';
                 this.element = element;
                 this.startDateElement = element.find('.input-group').find('input:first');
                 this.endDateElement = element.find('.input-group').find('input:last');
@@ -104,5 +105,7 @@ angular.module('admin.component')
                 }
             }
         });
-        return DateRange;
+        return function(s, e, a, c, t){
+            return new DateRange(s, e, a, c, t);
+        };
     });

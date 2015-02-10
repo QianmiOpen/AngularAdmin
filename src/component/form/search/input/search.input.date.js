@@ -6,11 +6,11 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchDate', function (uiDateFacotry, componentHelper) {
+    .directive('uiSearchDate', function (uiDateFactory, componentHelper) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiDateFacotry,
+            link: uiDateFactory,
             template: function (element, attrs) {
                 var format = [];
                 if (!attrs.date)

@@ -6,7 +6,7 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiDateFacotry', function (msg, uiFormControl) {
+    .factory('uiDateFactory', function (msg, uiFormControl) {
         var m = new msg('Date'),
             InputDate = function (scope, element, attrs) {
                 this.className = 'Date';
