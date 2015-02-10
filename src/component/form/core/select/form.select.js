@@ -6,21 +6,12 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormSelect', function (util, uiSelectFactory, componentHelper, defaultCol) {
+    .directive('uiFormSelect', function (uiSelectFactory, componentHelper, defaultCol) {
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                var select = new uiSelectFactory(scope, element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formSelect', select);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    select.reset();
-                });
-            },
+            link: uiSelectFactory,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.select', $.extend({

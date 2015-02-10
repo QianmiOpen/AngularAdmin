@@ -134,5 +134,7 @@ angular.module('admin.component')
                 }
             }
         });
-        return Select;
+        return function(s, e, a, c, t){
+            return new Select(s, e, a, c, t);
+        };;
     });
