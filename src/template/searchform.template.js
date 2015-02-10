@@ -90,14 +90,14 @@
              */
             componentHelper.setTemplate('tpl.searchform.select', [
                 '{{#if label}}',
-                    '<div class="input-inline input-medium search-item">',
+                    '<div class="input-inline input-medium search-item" {{#if isMulti}}is-multi="true"{{/if}}>',
                         '<div class="input-group">',
                             '<div class="input-group-addon">{{label}}:</div>',
                             '<select class="form-control" name="{{name}}" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
                         '</div>',
                     '</div>',
                 '{{else}}',
-                    '<div class="input-small search-item input-inline">',
+                    '<div class="input-small search-item input-inline" {{#if isMulti}}is-multi="true"{{/if}}>',
                         '<select name="{{name}}" class="form-control" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
                     '</div>',
                 '{{/if}}'

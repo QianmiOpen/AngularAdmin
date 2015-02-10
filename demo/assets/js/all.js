@@ -1340,22 +1340,11 @@ angular.module('admin.component')
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                attrs.isMulti = true;
-
-                //
-                var select = new uiSelectFactory(scope, element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formSelect', select);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    select.reset();
-                });
-            },
+            link: uiSelectFactory,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.select', $.extend({
+                    isMulti: true,
                     leftCol: cc[0],
                     rightCol: cc[1],
                     other: [
@@ -1669,21 +1658,10 @@ angular.module('admin.component')
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                attrs.isMulti = true;
-                var select = new uiSelectFactory(scope, element, attrs);
-
-                //
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchSelect', select);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    select.reset();
-                });
-            },
+            link: uiSelectFactory,
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.select', $.extend({
+                    isMulti: true,
                     other: [
                         {key: 'multiple', val: ''},
                         {key: 'title', val: attrs.tip || '请选择'}
@@ -5346,7 +5324,7 @@ angular.module('admin.component')
              *
              */
             componentHelper.setTemplate('tpl.form.select', [
-                '<div class="form-group">',
+                '<div class="form-group" {{#if isMulti}}is-multi="true"{{/if}}>',
                     '<label class="col-md-{{leftCol}} control-label">{{{label}}}</label>',
                     '<div class="col-md-{{rightCol}}">',
                         '<select class="form-control" name="{{name}}" placeholder="{{placeholder}}" {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}} ng-transclude></select>',
@@ -5528,14 +5506,14 @@ angular.module('admin.component')
              */
             componentHelper.setTemplate('tpl.searchform.select', [
                 '{{#if label}}',
-                    '<div class="input-inline input-medium search-item">',
+                    '<div class="input-inline input-medium search-item" {{#if isMulti}}is-multi="true"{{/if}}>',
                         '<div class="input-group">',
                             '<div class="input-group-addon">{{label}}:</div>',
                             '<select class="form-control" name="{{name}}" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
                         '</div>',
                     '</div>',
                 '{{else}}',
-                    '<div class="input-small search-item input-inline">',
+                    '<div class="input-small search-item input-inline" {{#if isMulti}}is-multi="true"{{/if}}>',
                         '<select name="{{name}}" class="form-control" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
                     '</div>',
                 '{{/if}}'
