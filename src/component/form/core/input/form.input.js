@@ -6,12 +6,12 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormInput', function (uiInputFacotry, componentHelper, defaultCol) {
+    .directive('uiFormInput', function (uiInputFactory, componentHelper, defaultCol) {
         return {
             restrict: 'E',
             replace: true,
             link: function (scope, element, attrs) {
-                var input = new uiInputFacotry(element, attrs);
+                var input = new uiInputFactory(element, attrs);
                 scope.$on('uiform.reset', function () {
                     input.reset();
                 });

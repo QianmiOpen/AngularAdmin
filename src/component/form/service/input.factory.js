@@ -9,7 +9,7 @@ angular.module('admin.component')
     .constant('uiInputMaskMap', {
         'backcard': '9999 9999 9999 9999'
     })
-    .factory('uiInputFacotry', function (msg, uiInputMaskMap, uiFormControl) {
+    .factory('uiInputFactory', function (msg, uiInputMaskMap, uiFormControl) {
         var m = new msg('Input'),
             Input = function (scope, element, attrs) {
                 this.inputElement = element.find('input');
@@ -27,6 +27,15 @@ angular.module('admin.component')
 
             reset: function () {
                 this.inputElement.val('');
+            },
+
+            attr: function (k, v) {
+                if (v) {
+                    this.inputElement.attr(k, v);
+                }
+                else {
+                    return this.inputElement.attr(k);
+                }
             },
 
             val: function (v) {

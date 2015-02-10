@@ -6,13 +6,13 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchInput', function (uiInputFacotry, componentHelper) {
+    .directive('uiSearchInput', function (uiInputFactory, componentHelper) {
         return {
             restrict: 'E',
             replace: true,
             link: function (scope, element, attrs) {
                 var ref = attrs.ref || '$searchInput',
-                    input = new uiInputFacotry(element, attrs);
+                    input = new uiInputFactory(scope, element, attrs);
                 componentHelper.tiggerComplete(scope, ref, input);
 
                 //
