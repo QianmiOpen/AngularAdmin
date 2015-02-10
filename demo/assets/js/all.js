@@ -1095,15 +1095,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                var inputDate = new uiDateFacotry(scope, element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formDate', inputDate);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    inputDate.reset();
-                });
-            },
+            link: uiDateFacotry,
             template: function (element, attrs) {
                 //
                 var format = [],
@@ -1492,16 +1484,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                //
-                var inputDate =  new uiDateFacotry(scope, element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchDate', inputDate);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    inputDate.reset();
-                });
-            },
+            link: uiDateFacotry,
             template: function (element, attrs) {
                 var format = [];
                 if (!attrs.date)
@@ -1811,7 +1794,7 @@ angular.module('admin.component')
  * 表单控件
  */
 angular.module('admin.component')
-    .factory('uiFormControl', function (msg, Event) {
+    .factory('uiFormControl', function (msg, Event, componentHelper) {
         var FormControl = function (scope, element, attrs) {
             if (!scope) {
                 return;
@@ -1819,10 +1802,14 @@ angular.module('admin.component')
             Event.call(this);
             this.scope = scope;
             this.element = element;
-            this.attrs = attrs;
+            this.attrs = attrs
+            this.isSearchControl = element.parents('.ui-search-form').length > 0;
+            this.formPrefix = this.isSearchControl ? '$search' : '$form';
+            this.formResetEventName = this.isSearchControl ? 'uisearch.reset' : 'uiform.reset';
             this._init();
             this._cleanElement();
             this.render();
+            this._complete();
         };
         FormControl.prototype = {
 
@@ -1842,6 +1829,17 @@ angular.module('admin.component')
 
             /**
              *
+             * @private
+             */
+            _complete: function () {
+                componentHelper.tiggerComplete(this.scope, this.attrs.ref || '$' + this.formPrefix + this.className, this);
+                this.resetListener = this.scope.$on(this.formResetEventName, function () {
+                    this.reset();
+                }.bind(this));
+            },
+
+            /**
+             *
              */
             render: function () {
             },
@@ -1851,6 +1849,7 @@ angular.module('admin.component')
              */
             destroy: function () {
                 delete this.listenerMap;
+                this.resetListener();
             },
 
             /**
@@ -1888,6 +1887,7 @@ angular.module('admin.component')
     .factory('uiDateFacotry', function (msg, uiFormControl) {
         var m = new msg('Date'),
             InputDate = function (scope, element, attrs) {
+                this.className = 'Date';
                 this.inputElement = element.find('input');
                 this.format = null;
                 this.default = attrs.value;
@@ -1952,7 +1952,9 @@ angular.module('admin.component')
                 }
             }
         });
-        return InputDate;
+        return function(s, e, a, c, t){
+            return new InputDate(s, e, a, c, t);
+        };
     });
 //-----------------------------------------------------------------------------------------------
 //

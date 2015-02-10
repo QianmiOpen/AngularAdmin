@@ -9,6 +9,7 @@ angular.module('admin.component')
     .factory('uiDateFacotry', function (msg, uiFormControl) {
         var m = new msg('Date'),
             InputDate = function (scope, element, attrs) {
+                this.className = 'Date';
                 this.inputElement = element.find('input');
                 this.format = null;
                 this.default = attrs.value;
@@ -73,5 +74,7 @@ angular.module('admin.component')
                 }
             }
         });
-        return InputDate;
+        return function(s, e, a, c, t){
+            return new InputDate(s, e, a, c, t);
+        };
     });

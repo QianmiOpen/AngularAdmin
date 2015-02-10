@@ -10,15 +10,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                var inputDate = new uiDateFacotry(scope, element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formDate', inputDate);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    inputDate.reset();
-                });
-            },
+            link: uiDateFacotry,
             template: function (element, attrs) {
                 //
                 var format = [],
