@@ -13,9 +13,10 @@
     </style>
 </head>
 <body style="background-color: #fff !important;" ng-app="admin">
+<div class="container">
 <div class="row">
     <div class="col-md-2">
-        <ul class="nav nav-pills nav-stacked" style="position: fixed;top: 0px;">
+        <ul class="nav nav-pills nav-stacked" style="position: fixed;top: 0px;width: 150px">
             <li class="active">
                 <a href="#searchForm">查询控件</a>
                 <ul class="list-group">
@@ -43,19 +44,36 @@
                     <li class="list-group-item">
                         <a href="#searchMultiSelect">下拉多选</a>
                     </li>
+                </ul>
+            </li>
+            <li class="active">
+                <a href="#table">数据表格</a>
+                <ul class="list-group">
                     <li class="list-group-item">
-                        <a href="#searchUserSelect">用户选择</a>
+                        <a href="#tableCheckColumn">选择列</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#tableDateColumn">日期列</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#tableImageColumn">图片列</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#tableProgressColumn">进度条列</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#tableStateColumn">状态列</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="#tableColumn">自定义列</a>
                     </li>
                 </ul>
             </li>
-            <li>
-                <a href="#">数据表格 和 工具栏</a>
+            <li class="active">
+                <a href="#tree">树控件</a>
             </li>
-            <li>
-                <a href="#">树控件</a>
-            </li>
-            <li>
-                <a href="#">表单控件</a>
+            <li class="active">
+                <a href="#form">表单控件</a>
             </li>
         </ul>
     </div>
@@ -323,25 +341,25 @@
                                 <td>类似id, 用于在scope中获取</td>
                             </tr>
                             <tr>
-                                <td>formName</td>
+                                <td>form-name</td>
                                 <td></td>
                                 <td>是</td>
                                 <td>开始时间的name</td>
                             </tr>
                             <tr>
-                                <td>toName</td>
+                                <td>to-name</td>
                                 <td></td>
                                 <td>是</td>
                                 <td>结束时间的name</td>
                             </tr>
                             <tr>
-                                <td>fromModel</td>
+                                <td>from-model</td>
                                 <td></td>
                                 <td>否</td>
                                 <td>开始时间的ng-model</td>
                             </tr>
                             <tr>
-                                <td>toModel</td>
+                                <td>to-model</td>
                                 <td></td>
                                 <td>否</td>
                                 <td>结束时间的ng-model</td>
@@ -487,13 +505,13 @@
                                 <td>类似id, 用于在scope中获取</td>
                             </tr>
                             <tr>
-                                <td>selectName</td>
+                                <td>select-name</td>
                                 <td></td>
                                 <td>否</td>
                                 <td>和inputName必须同时设置, 获取同时不设置(那么input的name将会设置为select的value)</td>
                             </tr>
                             <tr>
-                                <td>inputName</td>
+                                <td>input-name</td>
                                 <td></td>
                                 <td>否</td>
                                 <td>和inputName必须同时设置, 获取同时不设置(那么input的name将会设置为select的value)</td>
@@ -523,7 +541,6 @@
                 </div>
             </div>
         </div>
-
 
         <div id="searchRegion" class="panel panel-success">
             <div class="panel-heading">UISearchRegion</div>
@@ -675,9 +692,598 @@
             </div>
         </div>
 
+        <div id="searchMultiSelect" class="panel panel-success">
+            <div class="panel-heading">UISearchMultiSelect</div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">使用</h4>
+                        <p class="list-group-item-text">
+                            <code>
+                                &lt;ui-search-multi-select&gt;&lt;/ui-search-multi-select&gt;
+                            </code>
+                        </p>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">属性</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>属性名</th>
+                                <th>默认值</th>
+                                <th>是否必须</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>ref</td>
+                                <td>$searchMultiSelect</td>
+                                <td>否</td>
+                                <td>类似id, 用于在scope中获取</td>
+                            </tr>
+                            <tr>
+                                <td>name</td>
+                                <td></td>
+                                <td>是</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>model</td>
+                                <td></td>
+                                <td>否</td>
+                                <td>转换为ng-model</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">方法</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>方法名</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>setData(data[下拉数据], isClean[是否清空之前])</td>
+                                <td>动态设置下拉显示的数据</td>
+                            </tr>
+                            <tr>
+                                <td>change(callback[回调函数])</td>
+                                <td>监听数据变动事件</td>
+                            </tr>
+                            <tr>
+                                <td>val(v)</td>
+                                <td>类似jquery的val</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </div>
+            </div>
+        </div>
 
+        <div id="table" class="panel panel-success">
+            <div class="panel-heading">UITable</div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">使用</h4>
+                        <p class="list-group-item-text">
+                            <code>
+                                &lt;ui-table&gt;&lt;/ui-table&gt;
+                            </code>
+                        </p>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">属性</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>属性名</th>
+                                <th>默认值</th>
+                                <th>是否必须</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>ref</td>
+                                <td>$table</td>
+                                <td>否</td>
+                                <td>类似id, 用于在scope中获取</td>
+                            </tr>
+                            <tr>
+                                <td>state-key</td>
+                                <td></td>
+                                <td>否</td>
+                                <td>如果设置这个, 将会把表格的排序, 列选择给缓存, 保证下次访问</td>
+                            </tr>
+                            <tr>
+                                <td>nopage</td>
+                                <td>false</td>
+                                <td>否</td>
+                                <td>是否分页</td>
+                            </tr>
+                            <tr>
+                                <td>manual</td>
+                                <td>false</td>
+                                <td>否</td>
+                                <td>false为手动请求数据, true为自动请求数据</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">方法</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>方法名</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>getDataAtIndex(rowIndex)</td>
+                                <td>获取某行的数据</td>
+                            </tr>
+                            <tr>
+                                <td>getIdByIndex(rowIndex)</td>
+                                <td>获取某行主键值(只有添加了选择列才会获取的到)</td>
+                            </tr>
+                            <tr>
+                                <td>getIdByData(rowData)</td>
+                                <td>获取数据的主键值(只有添加了选择列才会获取的到)</td>
+                            </tr>
+                            <tr>
+                                <td>containItem(rowData)</td>
+                                <td>当然数据集中是否包含该数据</td>
+                            </tr>
+                            <tr>
+                                <td>getDomsByColumnIndex(rowIndex)</td>
+                                <td>获取某一列的所有td</td>
+                            </tr>
+                            <tr>
+                                <td>refresh(params[查询参数], url[换一个请求地址])</td>
+                                <td>只会刷新当前页</td>
+                            </tr>
+                            <tr>
+                                <td>jumpTo(index[页数])</td>
+                                <td>跳转指定页面</td>
+                            </tr>
+                            <tr>
+                                <td>getCurrentPage()</td>
+                                <td>获取当前页</td>
+                            </tr>
+                            <tr>
+                                <td>search(params[查询参数], url[换一个请求地址])</td>
+                                <td>刷新跳转到第一页</td>
+                            </tr>
+                            <tr>
+                                <td>cleanSelect(isAll[是否情况全选包括跨页的])</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>selectItems</td>
+                                <td>获取选中的数据集合</td>
+                            </tr>
+                            <tr>
+                                <td>selectValues</td>
+                                <td>获取选中的数据ID集合</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">事件</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>事件名</th>
+                                <th>参数</th>
+                                <th>触发</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>uitable.dataSuccess</td>
+                                <td>(evt)</td>
+                                <td>当数据加载成功触发</td>
+                            </tr>
+                            <tr>
+                                <td>uitable.renderSuccess</td>
+                                <td>(evt)</td>
+                                <td>当数据渲染完成触发</td>
+                            </tr>
+                            <tr>
+                                <td>uitable.dateFail</td>
+                                <td>(evt)</td>
+                                <td>当数据加载失败触发</td>
+                            </tr>
+                            <tr>
+                                <td>uitable.refreshData</td>
+                                <td>(evt)</td>
+                                <td>当刷新数据之前时候触发</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </div>
+            </div>
+        </div>
+
+        <div id="tableCheckColumn" class="panel panel-success">
+            <div class="panel-heading">UITableCheckColumn</div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">使用</h4>
+                        <p class="list-group-item-text">
+                            <code>
+                                &lt;ui-table-check-column&gt;&lt;/ui-table-check-column&gt;
+                            </code>
+                        </p>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">属性</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>属性名</th>
+                                <th>默认值</th>
+                                <th>是否必须</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>name</td>
+                                <td></td>
+                                <td>是</td>
+                                <td>数据的键名</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </div>
+            </div>
+        </div>
+
+        <div id="tableDateColumn" class="panel panel-success">
+            <div class="panel-heading">UITableDateColumn</div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">使用</h4>
+                        <p class="list-group-item-text">
+                            <code>
+                                &lt;ui-table-date-column&gt;&lt;/ui-table-date-column&gt;
+                            </code>
+                        </p>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">属性</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>属性名</th>
+                                <th>默认值</th>
+                                <th>是否必须</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>name</td>
+                                <td></td>
+                                <td>是</td>
+                                <td>数据的键名</td>
+                            </tr>
+                            <tr>
+                                <td>format</td>
+                                <td>yyyy-MM-dd HH:mm:ss</td>
+                                <td>否</td>
+                                <td>日期格式化</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </div>
+            </div>
+        </div>
+
+        <div id="tableImageColumn" class="panel panel-success">
+            <div class="panel-heading">UITableImageColumn</div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">使用</h4>
+                        <p class="list-group-item-text">
+                            <code>
+                                &lt;ui-table-image-column&gt;&lt;/ui-table-image-column&gt;
+                            </code>
+                        </p>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">属性</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>属性名</th>
+                                <th>默认值</th>
+                                <th>是否必须</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>name</td>
+                                <td></td>
+                                <td>是</td>
+                                <td>数据的键名</td>
+                            </tr>
+                            <tr>
+                                <td>placeholder</td>
+                                <td></td>
+                                <td>否</td>
+                                <td>默认图片</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </div>
+            </div>
+        </div>
+
+        <div id="tableProgressColumn" class="panel panel-success">
+            <div class="panel-heading">UITableProgressColumn</div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">使用</h4>
+                        <p class="list-group-item-text">
+                            <code>
+                                &lt;ui-table-progress-column&gt;&lt;/ui-table-progress-column&gt;
+                            </code>
+                        </p>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">属性</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>属性名</th>
+                                <th>默认值</th>
+                                <th>是否必须</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>name</td>
+                                <td></td>
+                                <td>是</td>
+                                <td>数据的键名</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </div>
+            </div>
+        </div>
+
+        <div id="tableStateColumn" class="panel panel-success">
+            <div class="panel-heading">UITableStateColumn</div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">使用</h4>
+                        <p class="list-group-item-text">
+                            <code>
+                                &lt;ui-table-state-column&gt;<br/>
+                                &nbsp;&nbsp;&lt;span class="red" state="0"&gt;0&lt;/span&gt;<br/>
+                                &nbsp;&nbsp;&lt;span class="red" state="1"&gt;1&lt;/span&gt;<br/>
+                                &lt;/ui-table-state-column&gt;<br/>
+                            </code>
+                        </p>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">属性</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>属性名</th>
+                                <th>默认值</th>
+                                <th>是否必须</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>name</td>
+                                <td></td>
+                                <td>是</td>
+                                <td>数据的键名</td>
+                            </tr>
+                            <tr>
+                                <td>default</td>
+                                <td></td>
+                                <td>否</td>
+                                <td>如果所有状态列都找不到的话,默认用这个值找状态列</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </div>
+            </div>
+        </div>
+
+        <div id="tableColumn" class="panel panel-success">
+            <div class="panel-heading">UITableColumn</div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">使用</h4>
+                        <p class="list-group-item-text">
+                            <code>
+                                &lt;ui-table-column&gt;<br/>
+                                &nbsp;&nbsp;支持angular的表达式, 内置属性data<br/>
+                                &lt;/ui-table-column&gt;<br/>
+                            </code>
+                        </p>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">属性</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>属性名</th>
+                                <th>默认值</th>
+                                <th>是否必须</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>name</td>
+                                <td></td>
+                                <td>是</td>
+                                <td>数据的键名</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </div>
+            </div>
+        </div>
+
+        <div id="tree" class="panel panel-success">
+            <div class="panel-heading">UITree</div>
+            <div class="panel-body">
+                <div class="list-group">
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">使用</h4>
+                        <p class="list-group-item-text">
+                            <code>
+                                &lt;ui-tree&gt;<br/>
+                                &lt;/ui-tree&gt;<br/>
+                            </code>
+                        </p>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">属性</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>属性名</th>
+                                <th>默认值</th>
+                                <th>是否必须</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>url</td>
+                                <td></td>
+                                <td>是</td>
+                                <td>获取树的数据</td>
+                            </tr>
+                            <tr>
+                                <td>on-before-click</td>
+                                <td></td>
+                                <td>否</td>
+                                <td>判断是否可以点击, 回调函数名称, 要挂载在顶层controller里面</td>
+                            </tr>
+                            <tr>
+                                <td>on-click</td>
+                                <td></td>
+                                <td>否</td>
+                                <td>点击时触发, 回调函数名称, 要挂载在顶层controller里面</td>
+                            </tr>
+                            <tr>
+                                <td>on-before-check</td>
+                                <td></td>
+                                <td>否</td>
+                                <td>判断是否可以选中, 回调函数名称, 要挂载在顶层controller里面</td>
+                            </tr>
+                            <tr>
+                                <td>on-check</td>
+                                <td></td>
+                                <td>否</td>
+                                <td>选中时触发, 回调函数名称, 要挂载在顶层controller里面</td>
+                            </tr>
+                            <tr>
+                                <td>add</td>
+                                <td>false</td>
+                                <td>否</td>
+                                <td>当移动到树节点的时候会显示一个添加按钮</td>
+                            </tr>
+                            <tr>
+                                <td>edit</td>
+                                <td>false</td>
+                                <td>否</td>
+                                <td>当移动到树节点的时候会显示一个编辑按钮</td>
+                            </tr>
+                            <tr>
+                                <td>del</td>
+                                <td>false</td>
+                                <td>否</td>
+                                <td>当移动到树节点的时候会显示一个删除按钮</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">方法</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>方法名</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>addTreeNodeBtn(label[标题], className[class名称], handler[点击后回调])</td>
+                                <td>添加一个当移动到数节点上面的额外按钮</td>
+                            </tr>
+                            <tr>
+                                <td>addTreeNodeBtnAtIndex(index[位置],label[标题], className[class名称], handler[点击后回调])</td>
+                                <td>添加一个当移动到数节点上面的额外按钮到指定的位置</td>
+                            </tr>
+                            <tr>
+                                <td>setData(data)</td>
+                                <td>手动设置树的数据</td>
+                            </tr>
+                            <tr>
+                                <td>expand(level[级别])</td>
+                                <td>按级别展开树</td>
+                            </tr>
+                            <tr>
+                                <td>expandById(id)</td>
+                                <td>按id展开树</td>
+                            </tr>
+                            <tr>
+                                <td>selectItems</td>
+                                <td>获取树选中的数据集合</td>
+                            </tr>
+                            <tr>
+                                <td>selectValues</td>
+                                <td>获取树选中的数据ID集合</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </div>
+            </div>
+        </div>
 
     </div>
+</div>
 </div>
 </body>
 <script src="assets/js/lib.min.js"></script>

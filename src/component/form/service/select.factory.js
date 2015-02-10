@@ -39,16 +39,52 @@ angular.module('admin.component')
              * @param data
              * @param isClean
              */
-            setData: function (data, isClean) {
+            setData: function (data, isClean, dataName, dataValue) {
+                dataName = dataName || 'key';
+                dataValue = dataValue || 'text';
                 if (isClean) {
                     this.element.html();
                 }
-                else {
+                if ($.isArray(data)) {
                     $.each(data, function (i, item) {
-                        this.element.push($('<option/>').attr('value', item.key).html(item.text))
+                        this.element.append(this.toOption(item, dataName, dataValue));
+                    }.bind(this));
+                }
+                else {
+                    $.each(data, function (group, items) {
+                        var $optiongroup = this.toOptionGroup(group);
+                        $.each(items, function (i, item) {
+                            $optiongroup.append(this.toOption(item, dataName, dataValue))
+                        }.bind(this));
+                        this.element.append($optiongroup);
                     }.bind(this));
                 }
                 this.reset();
+            },
+
+            /**
+             *
+             * @param item
+             * @param dataName
+             * @param dataValue
+             * @returns {*|jQuery}
+             */
+            toOption: function (item, dataName, dataValue) {
+                var isString = angular.isString(item),
+                    itemName = isString ? item : item[dataName],
+                    itemValue = isString ? item : item[dataValue];
+                var $option = $('<option/>').attr('value', itemName).html(itemValue);
+                return $option;
+            },
+
+            /**
+             *
+             * @param name
+             * @returns {*|jQuery}
+             */
+            toOptionGroup: function (name) {
+                var $option = $('<optgroup/>').attr('label', name);
+                return $option;
             },
 
             /**
