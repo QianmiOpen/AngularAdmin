@@ -10,19 +10,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                //
-                var inputDate = uiDateRangeService(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formDateRange', inputDate);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    inputDate.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
+            link: uiDateRangeService,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.input.daterange', $.extend({

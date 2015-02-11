@@ -1,4 +1,4 @@
-/*! zk - v0.0.1 - 2015-02-09 */
+/*! zk - v0.0.1 - 2015-02-10 */
 (function(){
 //-----------------------------------------------------------------------------------------------
 //
@@ -831,6 +831,24 @@ angular.module('admin.service')
             }
         };
     });
+/**
+ *
+ */
+angular.module('admin.service')
+    .factory('ValueService', function ($parse) {
+        return {
+            set: function (scope, express, value) {
+                var getter = $parse(express);
+                getter.assign(scope, value);
+            },
+
+            get: function (scope, express) {
+                var getter = $parse(express);
+                return getter(scope);
+            }
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -983,7 +1001,7 @@ angular.module('admin.component')
                 var form = null;
                 return {
                     pre: function (scope, element, attrs, controller, transclude) {
-                        form = uiFormFactory(scope, element, attrs, transclude(scope));
+                        form = new uiFormFactory(scope, element, attrs, transclude(scope));
                         form.layout();
                         var ref = attrs.ref || '$Form';
                         scope[ref] = form;
@@ -1073,23 +1091,11 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormDate', function (uiDateFacotry, componentHelper, defaultCol) {
+    .directive('uiFormDate', function (uiDateFactory, componentHelper, defaultCol) {
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                //
-                var inputDate = uiDateFacotry(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formDate', inputDate);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    inputDate.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
+            link: uiDateFactory,
             template: function (element, attrs) {
                 //
                 var format = [],
@@ -1122,19 +1128,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                //
-                var inputDate = uiDateRangeService(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formDateRange', inputDate);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    inputDate.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
+            link: uiDateRangeService,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.input.daterange', $.extend({
@@ -1152,19 +1146,11 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormInput', function (uiInputFacotry, componentHelper, defaultCol) {
+    .directive('uiFormInput', function (uiInputFactory, componentHelper, defaultCol) {
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                var input = uiInputFacotry(element, attrs);
-                scope.$on('uiform.reset', function () {
-                    input.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
-            },
+            link: uiInputFactory,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.input', $.extend({
@@ -1232,20 +1218,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                //
-                attrs.autoWidth = false;
-                var region = uiRegionService(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formRegion', region);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    region.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
+            link: uiRegionService,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.region', $.extend({
@@ -1338,29 +1311,12 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormSelect', function (util, uiSelectFactory, componentHelper, defaultCol) {
+    .directive('uiFormSelect', function (uiSelectFactory, componentHelper, defaultCol) {
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                var select = uiSelectFactory(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formSelect', select);
-
-                //
-                if (attrs.model) {
-                    scope[attrs.model] = select.val();
-                }
-
-                //
-                scope.$on('uiform.reset', function () {
-                    select.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
+            link: uiSelectFactory,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.select', $.extend({
@@ -1384,30 +1340,11 @@ angular.module('admin.component')
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                attrs.isMulti = true;
-
-                //
-                var select = uiSelectFactory(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formSelect', select);
-
-                //
-                if (attrs.model) {
-                    scope[attrs.model] = select.val();
-                }
-
-                //
-                scope.$on('uiform.reset', function () {
-                    select.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
+            link: uiSelectFactory,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.select', $.extend({
+                    isMulti: true,
                     leftCol: cc[0],
                     rightCol: cc[1],
                     other: [
@@ -1463,24 +1400,12 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormSwitch', function (util, uiSwitchFacotry, componentHelper, defaultCol) {
+    .directive('uiFormSwitch', function (uiSwitchFactory, componentHelper, defaultCol) {
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                var _switch = uiSwitchFacotry(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formSwitch', _switch);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    _switch.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
+            link: uiSwitchFactory,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.switch', $.extend({
@@ -1499,23 +1424,11 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchDate', function (uiDateFacotry, componentHelper) {
+    .directive('uiSearchDate', function (uiDateFactory, componentHelper) {
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                //
-                var inputDate = uiDateFacotry(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchDate', inputDate);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    inputDate.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
-            },
+            link: uiDateFactory,
             template: function (element, attrs) {
                 var format = [];
                 if (!attrs.date)
@@ -1539,23 +1452,11 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchDateRange', function (componentHelper, uiDateRangeService) {
+    .directive('uiSearchDateRange', function (uiDateRangeService, componentHelper) {
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, $element, $attrs) {
-                var dateRange = uiDateRangeService($element, $attrs);
-                dateRange.render();
-                componentHelper.tiggerComplete(scope, $attrs.ref || '$searchDateRange', dateRange);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    dateRange.reset();
-                });
-
-                //
-                $element.removeAttr('name').removeAttr('readonly').removeAttr('model');
-            },
+            link: uiDateRangeService,
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.daterange', attrs);
             }
@@ -1569,25 +1470,11 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchInput', function (componentHelper) {
+    .directive('uiSearchInput', function (uiInputFactory, componentHelper) {
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                var ref = attrs.ref || '$searchInput',
-                    $input = element.find('input');
-
-                //
-                componentHelper.tiggerComplete(scope, ref, $input);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    $input.val('');
-                });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
-            },
+            link: uiInputFactory,
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.input', attrs);
             }
@@ -1633,7 +1520,7 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchInputSelect', function (uiSelectFactory, componentHelper, msg) {
+    .directive('uiSearchInputSelect', function (uiSelectFactory, uiInputFactory, componentHelper, msg) {
         var m = new msg('SearchInputSelect');
         return {
             restrict: 'E',
@@ -1643,16 +1530,13 @@ angular.module('admin.component')
 
                 //
                 var hasName = attrs.selectName && attrs.inputName,
-                    $input = element.find('input');
-
-                //
-                var select = uiSelectFactory(element, attrs);
-                select.render();
+                    input = new uiInputFactory(scope, element, attrs),
+                    select = new uiSelectFactory(scope, element, attrs);
 
                 //
                 componentHelper.tiggerComplete(scope, attrs.ref || '$searchInputSelect', {
                     select: select,
-                    input: $input
+                    input: input
                 });
 
                 //
@@ -1660,9 +1544,9 @@ angular.module('admin.component')
                 }
                 else if (!!!attrs.selectName && !!!attrs.inputName) {
                     select.element.change(function () {
-                        $input.attr('name', select.element.val());
+                        input.attr('name', select.element.val());
                     });
-                    $input.attr('name', select.element.val());
+                    input.attr('name', select.element.val());
                 }
                 else {
                     m.error('必须同时设置select-name和input-name, 要么不设置, 要么全设置');
@@ -1671,11 +1555,8 @@ angular.module('admin.component')
                 //
                 scope.$on('uisearchform.reset', function () {
                     select.reset();
-                    $input.val('');
+                    input.reset();
                 });
-
-                //
-                element.removeAttr('model');
             },
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.input.select', attrs);
@@ -1694,19 +1575,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                attrs.autoWidth = true;
-                var region = uiRegionService(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchRegion', region);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    region.reset();
-                });
-
-                //
-                element.removeAttr('model');
-            },
+            link: uiRegionService,
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.region', attrs);
             }
@@ -1726,13 +1595,10 @@ angular.module('admin.component')
             replace: true,
             transclude: true,
             link: function (scope, element, attrs) {
-
-                //
                 var ref = componentHelper.getComponentRef(element.parent().find('.ui-table'), '$table');
 
-
                 //
-                var searchForm = uiSearchFormFactory(scope, ref, element, attrs),
+                var searchForm = new uiSearchFormFactory(scope, element, attrs, ref),
                     thisRef = attrs.ref || '$searchForm';
                 scope[thisRef] = searchForm;
                 componentHelper.tiggerComplete(scope, thisRef, searchForm);
@@ -1762,18 +1628,7 @@ angular.module('admin.component')
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: function (scope, element, attrs) {
-                var select = uiSelectFactory(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchSelect', select);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    select.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
+            link: uiSelectFactory,
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.select', attrs);
             }
@@ -1791,24 +1646,10 @@ angular.module('admin.component')
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                attrs.isMulti = true;
-                var select = uiSelectFactory(element, attrs);
-
-                //
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchSelect', select);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    select.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
+            link: uiSelectFactory,
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.select', $.extend({
+                    isMulti: true,
                     other: [
                         {key: 'multiple', val: ''},
                         {key: 'title', val: attrs.tip || '请选择'}
@@ -1845,6 +1686,92 @@ angular.module('admin.component')
             }
         };
     });
+/**
+ * 表单控件
+ */
+angular.module('admin.component')
+    .factory('uiFormControl', function (msg, Event, componentHelper) {
+        var FormControl = function (scope, element, attrs) {
+            if (!scope) {
+                return;
+            }
+            Event.call(this);
+            this.scope = scope;
+            this.element = element;
+            this.attrs = attrs
+            this.isSearchControl = element.parents('.ui-search-form').length > 0;
+            this.formPrefix = this.isSearchControl ? '$search' : '$form';
+            this.formResetEventName = this.isSearchControl ? 'uisearchform.reset' : 'uiform.reset';
+            this._init();
+            this._cleanElement();
+            this.render();
+            this._complete();
+        };
+        FormControl.prototype = {
+
+            /**
+             *
+             */
+            _init: function () {
+            },
+
+            /**
+             *
+             * @private
+             */
+            _cleanElement: function () {
+                this.element.removeAttr('name').removeAttr('model').removeAttr('readonly');
+            },
+
+            /**
+             *
+             * @private
+             */
+            _complete: function () {
+                componentHelper.tiggerComplete(this.scope, this.attrs.ref || '$' + this.formPrefix + this.className, this);
+                this.resetListener = this.scope.$on(this.formResetEventName, function () {
+                    this.reset();
+                }.bind(this));
+            },
+
+            /**
+             *
+             */
+            render: function () {
+            },
+
+            /**
+             *
+             */
+            destroy: function () {
+                delete this.listenerMap;
+                this.resetListener();
+            },
+
+            /**
+             *
+             */
+            reset: function () {
+            },
+
+            /**
+             *
+             * @param fn
+             */
+            change: function (fn) {
+                this.$on('change', fn);
+            },
+
+            /**
+             *
+             * @param v
+             * @returns {*}
+             */
+            val: function (v) {
+            }
+        };
+        return FormControl;
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -1853,23 +1780,20 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiDateFacotry', function (msg, Event) {
+    .factory('uiDateFactory', function (msg, uiFormControl) {
         var m = new msg('Date'),
-            InputDate = function (element, attrs) {
-                Event.call(this);
-                this.element = element;
+            InputDate = function (scope, element, attrs) {
+                this.className = 'Date';
                 this.inputElement = element.find('input');
-                this.attrs = attrs;
                 this.format = null;
                 this.default = attrs.value;
                 this.dateMode = attrs.mode ? attrs.mode.indexOf('date') != -1 : true;
                 this.timeMode = attrs.mode ? attrs.mode.indexOf('time') != -1 : true;
-                this.init();
-                this.render();
+                uiFormControl.apply(this, arguments);
             };
-        InputDate.prototype = {
+        InputDate.prototype = $.extend(new uiFormControl(), {
 
-            init: function () {
+            _init: function () {
                 var format = [];
                 if (this.dateMode)
                     format.push('yyyy-MM-dd');
@@ -1889,13 +1813,7 @@ angular.module('admin.component')
                     pickTime: this.timeMode,
                     useSeconds: this.timeMode
                 });
-            },
-
-            /**
-             *
-             */
-            destroy: function(){
-                delete this.listenerMap;
+                return this;
             },
 
             /**
@@ -1903,6 +1821,7 @@ angular.module('admin.component')
              */
             reset: function () {
                 this.inputElement.val('');
+                return this;
             },
 
             /**
@@ -1911,6 +1830,7 @@ angular.module('admin.component')
              */
             change: function(fn){
                 this.inputElement.change(fn);
+                return this;
             },
 
             /**
@@ -1927,9 +1847,9 @@ angular.module('admin.component')
                     return this.inputElement.val();
                 }
             }
-        };
-        return function (element, attrs) {
-            return new InputDate(element, attrs);
+        });
+        return function(s, e, a, c, t){
+            return new InputDate(s, e, a, c, t);
         };
     });
 //-----------------------------------------------------------------------------------------------
@@ -1972,10 +1892,10 @@ angular.module('admin.component')
             firstDay: 1
         }
     })
-    .factory('uiDateRangeService', function (msg, uiDateRangeDefaultConfig, uiDateRangeDefaultRange, Event) {
+    .factory('uiDateRangeService', function (msg, uiDateRangeDefaultConfig, uiDateRangeDefaultRange, uiFormControl) {
         var m = new msg('DateRange'),
-            DateRange = function (element, attrs) {
-                Event.call(this);
+            DateRange = function (scope, element, attrs) {
+                this.className = 'DateRange';
                 this.element = element;
                 this.startDateElement = element.find('.input-group').find('input:first');
                 this.endDateElement = element.find('.input-group').find('input:last');
@@ -1987,16 +1907,17 @@ angular.module('admin.component')
                 this.defaultStartDate = attrs.fromValue || dateRange[0];
                 this.defaultEndDate = attrs.toValue || dateRange[1];
                 this.limit = attrs.limit;
-                this.init();
+                uiFormControl.apply(this, arguments);
             };
-        DateRange.prototype = {
-            init: function () {
+        DateRange.prototype = $.extend(new uiFormControl(), {
+            _init: function () {
                 this.config = $.extend({}, uiDateRangeDefaultConfig, {
                     ranges: uiDateRangeDefaultRange,
                     timePicker: this.attrs.time !== undefined,
                     format: this.format
                 });
 
+                //要小心设置这个值
                 if (this.limit) {
                     this.config.dateLimit = {days: this.limit};
                 }
@@ -2006,8 +1927,6 @@ angular.module('admin.component')
                     this.config.startDate = this.defaultStartDate;
                     this.config.endDate = this.defaultEndDate;
                 }
-
-                this.render();
             },
 
             render: function () {
@@ -2018,10 +1937,6 @@ angular.module('admin.component')
                     this.endDateElement.val(end);
                     this.$emit('change', this, start, end);
                 }.bind(this));
-            },
-
-            change: function (fn) {
-                this.$on('change', fn);
             },
 
             reset: function () {
@@ -2043,9 +1958,9 @@ angular.module('admin.component')
                     return this;
                 }
             }
-        };
-        return function ($element, $attrs) {
-            return new DateRange($element, $attrs);
+        });
+        return function(s, e, a, c, t){
+            return new DateRange(s, e, a, c, t);
         };
     });
 //------------------------------------------------------
@@ -2076,25 +1991,23 @@ angular.module('admin.component')
                 $(error).appendTo($(element).parent());
             }
         })
-        .factory('uiFormFactory', function (msg, ajax, uiFormValidateConfig, Event) {
+        .factory('uiFormFactory', function (msg, ajax, uiFormValidateConfig, uiFormControl) {
             var m = new msg('Form'),
                 Form = function (scope, element, attrs, formItems) {
-                    Event.call(this);
-                    this.element = element;
-                    this.attrs = attrs;
-                    this.scope = scope;
                     this.column = attrs.column;
                     this.formItems = formItems;
                     this.action = attrs.action.replace(/#/g, '');
                     this.formName = attrs.formName;
+                    uiFormControl.apply(this, arguments);
                 };
-            Form.prototype = {
+            Form.prototype = $.extend(new uiFormControl(), {
 
                 /**
                  *
                  */
                 addFormItem: function (formItem) {
                     this.formItems.push(formItem);
+                    this.layout();
                 },
 
                 /**
@@ -2162,7 +2075,7 @@ angular.module('admin.component')
                         }.bind(this));
                     }
                     else {
-                        this.element.submit(this.submit.bind(this));
+                        this.element.submit(this._submit.bind(this));
                     }
                 },
 
@@ -2173,7 +2086,7 @@ angular.module('admin.component')
                 setRules: function (rules) {
                     this.element.validate($.extend({}, uiFormValidateConfig, {
                         rules: rules,
-                        submitHandler: this.submit.bind(this)
+                        submitHandler: this._submit.bind(this)
                     }));
                 },
 
@@ -2188,7 +2101,10 @@ angular.module('admin.component')
                 /**
                  *
                  */
-                submit: function (other) {
+                submit: function (fn) {
+                    this.$on('uiForm.doSubmit', fn);
+                },
+                _submit: function(other){
                     if (this.action) {
                         ajax.post(this.action, this.formData(other)).then(function () {
                             this.$emit('uiForm.completeSubmit', this);
@@ -2200,16 +2116,15 @@ angular.module('admin.component')
                     return false;
                 },
 
+
                 /**
                  *
                  */
                 reset: function () {
                     this.scope.$broadcast('uiform.reset');
                 }
-            };
-            return function (scope, element, attrs, formItems) {
-                return new Form(scope, element, attrs, formItems);
-            };
+            });
+            return Form;
         });
 })(jQuery);
 //-----------------------------------------------------------------------------------------------
@@ -2223,39 +2138,47 @@ angular.module('admin.component')
     .constant('uiInputMaskMap', {
         'backcard': '9999 9999 9999 9999'
     })
-    .factory('uiInputFacotry', function (msg, uiInputMaskMap, Event) {
+    .factory('uiInputFactory', function (msg, uiInputMaskMap, uiFormControl) {
         var m = new msg('Input'),
-            Input = function (element, attrs) {
-                Event.call(this);
-                this.element = element.find('input');
+            Input = function (scope, element, attrs) {
+                this.inputElement = element.find('input');
                 this.attrs = attrs;
                 this.mask = attrs.mask || uiInputMaskMap[attrs.type];
-                this.render();
+                uiFormControl.apply(this, arguments);
             };
-        Input.prototype = {
+        Input.prototype = $.extend(new uiFormControl(), {
 
             render: function () {
-                if (this.mask) {
-                    this.element.inputmask(this.mask);
+                if (this.mask && $.fn.inputmask) {
+                    this.inputElement.inputmask(this.mask);
                 }
             },
 
             reset: function () {
-                this.element.val('');
+                this.inputElement.val('');
+            },
+
+            attr: function (k, v) {
+                if (v) {
+                    this.inputElement.attr(k, v);
+                }
+                else {
+                    return this.inputElement.attr(k);
+                }
             },
 
             val: function (v) {
                 if (v != undefined) {
-                    this.element.val(v);
+                    this.inputElement.val(v);
                     return this;
                 }
                 else {
-                    return this.element.val();
+                    return this.inputElement.val();
                 }
             }
-        };
-        return function (element, attrs) {
-            return new Input(element, attrs);
+        });
+        return function(s, e, a, c, t){
+            return new Input(s, e, a, c, t);
         };
     });
 //-----------------------------------------------------------------------------------------------
@@ -2591,13 +2514,10 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiRegionService', function (uiRegionHelper, msg, Event) {
+    .factory('uiRegionService', function (uiRegionHelper, msg, uiFormControl) {
         var m = new msg('Region'),
-            Region = function (element, attrs) {
-                Event.call(this);
+            Region = function (scope, element, attrs) {
                 var $doms = element.find('input');
-                this.element = element;
-                this.attrs = attrs;
                 this.$inputDom = $($doms[0]);
                 this.$pDom = $($doms[1]);
                 this.$cDom = $($doms[2]);
@@ -2606,13 +2526,11 @@ angular.module('admin.component')
                 this.autoWidth = attrs.autoWidth;
                 this.mode = attrs.mode || 's';
                 this.valueType = attrs.valueType || 't'; //保存的是文字还是ID
-                this.init();
-                this.initMode();
-                this.initEvent();
+                uiFormControl.apply(this, arguments);
             };
-        Region.prototype = {
+        Region.prototype = $.extend(new uiFormControl(), {
 
-            init: function () {
+            _init: function () {
                 if (/^\d+$/g.test(this.codeValue)) {  //有区域ID
                     uiRegionHelper.htmlById(this.codeValue).then(function (ts) {
                     }.bind(this));
@@ -2623,6 +2541,8 @@ angular.module('admin.component')
                         this.$pDom.select2({data: data});
                     }.bind(this));
                 }
+                this.initMode();
+                this.initEvent();
             },
 
             initMode: function () {
@@ -2690,9 +2610,9 @@ angular.module('admin.component')
                 this.$cDom.val('').select2({data: []});
                 this.$sDom.val('').select2({data: []});
             }
-        };
-        return function (element, attrs) {
-            return new Region(element, attrs);
+        });
+        return function(s, e, a, c, t){
+            return new Region(s, e, a, c, t);
         };
     });
 //------------------------------------------------------
@@ -2703,38 +2623,38 @@ angular.module('admin.component')
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiSearchFormFactory', function (msg, Event) {
+    .factory('uiSearchFormFactory', function (msg, uiFormControl) {
         var m = new msg('SearchForm'),
-            SearchForm = function (scope, tableId, element, attrs) {
-                Event.call(this);
-                this.element = element;
+            SearchForm = function (scope, element, attrs, tableId) {
                 this.elementContainer = element.find('.row > div:eq(0)');
-                this.attrs = attrs;
-                this.scope = scope;
                 this.tableId = tableId;
-                this.initEvent();
+                uiFormControl.apply(this, arguments);
             };
-        SearchForm.prototype = {
-            addFormItem: function (formItem) {
-                this.elementContainer.append(formItem);
-            },
-            initEvent: function () {
+        SearchForm.prototype = $.extend(new uiFormControl(), {
+            _init: function () {
                 $(document).keydown(function (evt) {
                     if (evt.keyCode == 13) {
                         this.search();
                     }
                 }.bind(this));
-                this.element.submit(function(evt){
+                this.element.submit(function (evt) {
                     evt.preventDefault();
                     return false;
                 });
             },
+
+            addFormItem: function (formItem) {
+                this.elementContainer.append(formItem);
+            },
+
             formData: function () {
                 return this.element.serializeArray();
             },
-            formParamData: function(){
+
+            formParamData: function () {
                 return this.element.serialize();
             },
+
             search: function () {
                 var data = this.formData();
                 this.$emit('uisearchform.doSubmit', data);
@@ -2745,16 +2665,16 @@ angular.module('admin.component')
                     m.error('为发现ref为[' + this.tableId + ']的组件, 无法调用查询');
                 }
             },
+
             submit: function (fn) {
                 this.$on('uisearchform.doSubmit', fn);
             },
+
             reset: function () {
                 this.scope.$broadcast('uisearchform.reset');
             }
-        };
-        return function (scope, tableId, element, attrs) {
-            return new SearchForm(scope, tableId, element, attrs);
-        };
+        });
+        return SearchForm;
     });
 //-----------------------------------------------------------------------------------------------
 //
@@ -2764,27 +2684,42 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiSelectFactory', function (msg, Event) {
+    .factory('uiSelectFactory', function (msg, uiFormControl, ValueService) {
         var m = new msg('Select'),
-            Select = function (element, attrs) {
-                Event.call(this);
-                this.element = element.find('select');
-                this.attrs = attrs;
-                this.defaultResetValue = attrs.isMulti ? null : this.element.find('option:eq(0)').val();
+            Select = function (scope, element, attrs) {
+                this.selectElement = element.find('select');
+                this.defaultResetValue = attrs.isMulti ? null : this.selectElement.find('option:eq(0)').val();
+                this.model = attrs.model;
                 this.init = false;
-                this.render();
+                uiFormControl.apply(this, arguments);
             };
-        Select.prototype = {
+        Select.prototype = $.extend(new uiFormControl(), {
+
+            _init: function(){
+                if(this.model){
+
+                    //监听一下model的变化
+                    this.watch = this.scope.$watch(this.model, function(newValue){
+                        if(newValue)
+                            this.val(newValue);
+                    }.bind(this));
+
+                    //如果model没有值, 默认选择第一个
+                    if(!ValueService.get(this.scope, this.model)){
+                        this.scope[this.model] = this.defaultResetValue;
+                    }
+                }
+            },
 
             /**
              *
              */
             render: function () {
                 if (this.init) {
-                    this.element.selectpicker('refresh');
+                    this.selectElement.selectpicker('refresh');
                 }
                 else {
-                    this.element.selectpicker({
+                    this.selectElement.selectpicker({
                         iconBase: 'fa',
                         tickIcon: 'fa-check'
                     });
@@ -2797,13 +2732,24 @@ angular.module('admin.component')
              * @param data
              * @param isClean
              */
-            setData: function (data, isClean) {
+            setData: function (data, isClean, dataName, dataValue) {
+                dataName = dataName || 'key';
+                dataValue = dataValue || 'text';
                 if (isClean) {
-                    this.element.html();
+                    this.selectElement.html();
+                }
+                if ($.isArray(data)) {
+                    $.each(data, function (i, item) {
+                        this.selectElement.append(this.toOption(item, dataName, dataValue));
+                    }.bind(this));
                 }
                 else {
-                    $.each(data, function (i, item) {
-                        this.element.push($('<option/>').attr('value', item.key).html(item.text))
+                    $.each(data, function (group, items) {
+                        var $optiongroup = this.toOptionGroup(group);
+                        $.each(items, function (i, item) {
+                            $optiongroup.append(this.toOption(item, dataName, dataValue))
+                        }.bind(this));
+                        this.selectElement.append($optiongroup);
                     }.bind(this));
                 }
                 this.reset();
@@ -2811,9 +2757,34 @@ angular.module('admin.component')
 
             /**
              *
+             * @param item
+             * @param dataName
+             * @param dataValue
+             * @returns {*|jQuery}
+             */
+            toOption: function (item, dataName, dataValue) {
+                var isString = angular.isString(item),
+                    itemName = isString ? item : item[dataName],
+                    itemValue = isString ? item : item[dataValue];
+                var $option = $('<option/>').attr('value', itemName).html(itemValue);
+                return $option;
+            },
+
+            /**
+             *
+             * @param name
+             * @returns {*|jQuery}
+             */
+            toOptionGroup: function (name) {
+                var $option = $('<optgroup/>').attr('label', name);
+                return $option;
+            },
+
+            /**
+             *
              */
             reset: function () {
-                this.element.val(this.defaultResetValue);
+                this.selectElement.val(this.defaultResetValue);
                 this.render();
             },
 
@@ -2822,7 +2793,7 @@ angular.module('admin.component')
              * @param fn
              */
             change: function (fn) {
-                this.element.change(fn);
+                this.selectElement.change(fn);
             },
 
             /**
@@ -2832,18 +2803,18 @@ angular.module('admin.component')
              */
             val: function (v) {
                 if (v) {
-                    this.element.val(v);
+                    this.selectElement.val(v);
                     this.render();
                     return this;
                 }
                 else {
-                    return this.element.val();
+                    return this.selectElement.val();
                 }
             }
-        };
-        return function (element, attrs) {
-            return new Select(element, attrs);
-        };
+        });
+        return function(s, e, a, c, t){
+            return new Select(s, e, a, c, t);
+        };;
     });
 //-----------------------------------------------------------------------------------------------
 //
@@ -3182,53 +3153,52 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiSwitchFacotry', function (msg, uiInputMaskMap, Event) {
+    .factory('uiSwitchFactory', function (msg, uiFormControl) {
         var m = new msg('Switch'),
-            Switch = function (element, attrs) {
-                Event.call(this);
-                this.element = element.find('input');
+            Switch = function (scope, element, attrs) {
+                this.inputElement = element.find('input');
                 this.onValue = attrs.onValue || 'on';
                 this.offValue = attrs.offValue || 'off';
                 this.attrs = attrs;
-                this.render();
+                uiFormControl.apply(this, arguments);
             };
-        Switch.prototype = {
+        Switch.prototype = $.extend(new uiFormControl(), {
 
             render: function () {
                 if ($.fn.bootstrapSwitch) {
-                    this.element.bootstrapSwitch({
+                    this.inputElement.bootstrapSwitch({
                         size: 'small',
                         onSwitchChange: this.onChangeHandler.bind(this)
                     });
 
                     //初始值
-                    this.element.bootstrapSwitch('state', this.attrs.value == this.onValue);
+                    this.inputElement.bootstrapSwitch('state', this.attrs.value == this.onValue);
                 }
-                this.element[0].checked = true;
+                this.inputElement[0].checked = true;
             },
 
             onChangeHandler: function (evt, state) {
                 var v = state ? this.onValue : this.offValue;
-                this.element.val(v);
-                this.element[0].checked = true;
+                this.inputElement.val(v);
+                this.inputElement[0].checked = true;
             },
 
             reset: function () {
-                this.element.val();
+                this.inputElement.val();
             },
 
             val: function (isOn) {
                 if (isOn != undefined) {
-                    this.element.bootstrapSwitch('state', isOn);
+                    this.inputElement.bootstrapSwitch('state', isOn);
                     return this;
                 }
                 else {
-                    return this.element.val();
+                    return this.inputElement.val();
                 }
             }
-        };
-        return function (element, attrs) {
-            return new Switch(element, attrs);
+        });
+        return function(s, e, a, c, t){
+            return new Switch(s, e, a, c, t);
         };
     });
 //------------------------------------------------------
@@ -5341,7 +5311,7 @@ angular.module('admin.component')
              *
              */
             componentHelper.setTemplate('tpl.form.select', [
-                '<div class="form-group">',
+                '<div class="form-group" {{#if isMulti}}is-multi="true"{{/if}}>',
                     '<label class="col-md-{{leftCol}} control-label">{{{label}}}</label>',
                     '<div class="col-md-{{rightCol}}">',
                         '<select class="form-control" name="{{name}}" placeholder="{{placeholder}}" {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}} ng-transclude></select>',
@@ -5507,7 +5477,7 @@ angular.module('admin.component')
              *
              */
             componentHelper.setTemplate('tpl.searchform.region', [
-                '<div class="input-inline search-item" id="searchformregion">',
+                '<div class="input-inline search-item" auto-width="true">',
                     '<div class="input-group">',
                         '{{#if label}}<div class="input-group-addon">{{{label}}}:</div>{{/if}}',
                         '<input type="hidden" {{#if model}}ng-value="{{model}}"{{/if}} {{#if name}}name="{{name}}"{{/if}}  value="{{value}}"/>',
@@ -5523,14 +5493,14 @@ angular.module('admin.component')
              */
             componentHelper.setTemplate('tpl.searchform.select', [
                 '{{#if label}}',
-                    '<div class="input-inline input-medium search-item">',
+                    '<div class="input-inline input-medium search-item" {{#if isMulti}}is-multi="true"{{/if}}>',
                         '<div class="input-group">',
                             '<div class="input-group-addon">{{label}}:</div>',
                             '<select class="form-control" name="{{name}}" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
                         '</div>',
                     '</div>',
                 '{{else}}',
-                    '<div class="input-small search-item input-inline">',
+                    '<div class="input-small search-item input-inline" {{#if isMulti}}is-multi="true"{{/if}}>',
                         '<select name="{{name}}" class="form-control" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
                     '</div>',
                 '{{/if}}'

@@ -6,23 +6,20 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiDateFacotry', function (msg, Event) {
+    .factory('uiDateFactory', function (msg, uiFormControl) {
         var m = new msg('Date'),
-            InputDate = function (element, attrs) {
-                Event.call(this);
-                this.element = element;
+            InputDate = function (scope, element, attrs) {
+                this.className = 'Date';
                 this.inputElement = element.find('input');
-                this.attrs = attrs;
                 this.format = null;
                 this.default = attrs.value;
                 this.dateMode = attrs.mode ? attrs.mode.indexOf('date') != -1 : true;
                 this.timeMode = attrs.mode ? attrs.mode.indexOf('time') != -1 : true;
-                this.init();
-                this.render();
+                uiFormControl.apply(this, arguments);
             };
-        InputDate.prototype = {
+        InputDate.prototype = $.extend(new uiFormControl(), {
 
-            init: function () {
+            _init: function () {
                 var format = [];
                 if (this.dateMode)
                     format.push('yyyy-MM-dd');
@@ -42,13 +39,7 @@ angular.module('admin.component')
                     pickTime: this.timeMode,
                     useSeconds: this.timeMode
                 });
-            },
-
-            /**
-             *
-             */
-            destroy: function(){
-                delete this.listenerMap;
+                return this;
             },
 
             /**
@@ -56,6 +47,7 @@ angular.module('admin.component')
              */
             reset: function () {
                 this.inputElement.val('');
+                return this;
             },
 
             /**
@@ -64,6 +56,7 @@ angular.module('admin.component')
              */
             change: function(fn){
                 this.inputElement.change(fn);
+                return this;
             },
 
             /**
@@ -80,8 +73,8 @@ angular.module('admin.component')
                     return this.inputElement.val();
                 }
             }
-        };
-        return function (element, attrs) {
-            return new InputDate(element, attrs);
+        });
+        return function(s, e, a, c, t){
+            return new InputDate(s, e, a, c, t);
         };
     });

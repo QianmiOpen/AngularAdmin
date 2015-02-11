@@ -6,27 +6,42 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiSelectFactory', function (msg, Event) {
+    .factory('uiSelectFactory', function (msg, uiFormControl, ValueService) {
         var m = new msg('Select'),
-            Select = function (element, attrs) {
-                Event.call(this);
-                this.element = element.find('select');
-                this.attrs = attrs;
-                this.defaultResetValue = attrs.isMulti ? null : this.element.find('option:eq(0)').val();
+            Select = function (scope, element, attrs) {
+                this.selectElement = element.find('select');
+                this.defaultResetValue = attrs.isMulti ? null : this.selectElement.find('option:eq(0)').val();
+                this.model = attrs.model;
                 this.init = false;
-                this.render();
+                uiFormControl.apply(this, arguments);
             };
-        Select.prototype = {
+        Select.prototype = $.extend(new uiFormControl(), {
+
+            _init: function(){
+                if(this.model){
+
+                    //监听一下model的变化
+                    this.watch = this.scope.$watch(this.model, function(newValue){
+                        if(newValue)
+                            this.val(newValue);
+                    }.bind(this));
+
+                    //如果model没有值, 默认选择第一个
+                    if(!ValueService.get(this.scope, this.model)){
+                        this.scope[this.model] = this.defaultResetValue;
+                    }
+                }
+            },
 
             /**
              *
              */
             render: function () {
                 if (this.init) {
-                    this.element.selectpicker('refresh');
+                    this.selectElement.selectpicker('refresh');
                 }
                 else {
-                    this.element.selectpicker({
+                    this.selectElement.selectpicker({
                         iconBase: 'fa',
                         tickIcon: 'fa-check'
                     });
@@ -43,11 +58,11 @@ angular.module('admin.component')
                 dataName = dataName || 'key';
                 dataValue = dataValue || 'text';
                 if (isClean) {
-                    this.element.html();
+                    this.selectElement.html();
                 }
                 if ($.isArray(data)) {
                     $.each(data, function (i, item) {
-                        this.element.append(this.toOption(item, dataName, dataValue));
+                        this.selectElement.append(this.toOption(item, dataName, dataValue));
                     }.bind(this));
                 }
                 else {
@@ -56,7 +71,7 @@ angular.module('admin.component')
                         $.each(items, function (i, item) {
                             $optiongroup.append(this.toOption(item, dataName, dataValue))
                         }.bind(this));
-                        this.element.append($optiongroup);
+                        this.selectElement.append($optiongroup);
                     }.bind(this));
                 }
                 this.reset();
@@ -91,7 +106,7 @@ angular.module('admin.component')
              *
              */
             reset: function () {
-                this.element.val(this.defaultResetValue);
+                this.selectElement.val(this.defaultResetValue);
                 this.render();
             },
 
@@ -100,7 +115,7 @@ angular.module('admin.component')
              * @param fn
              */
             change: function (fn) {
-                this.element.change(fn);
+                this.selectElement.change(fn);
             },
 
             /**
@@ -110,16 +125,16 @@ angular.module('admin.component')
              */
             val: function (v) {
                 if (v) {
-                    this.element.val(v);
+                    this.selectElement.val(v);
                     this.render();
                     return this;
                 }
                 else {
-                    return this.element.val();
+                    return this.selectElement.val();
                 }
             }
-        };
-        return function (element, attrs) {
-            return new Select(element, attrs);
-        };
+        });
+        return function(s, e, a, c, t){
+            return new Select(s, e, a, c, t);
+        };;
     });

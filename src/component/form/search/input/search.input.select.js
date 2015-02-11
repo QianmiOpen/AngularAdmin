@@ -6,7 +6,7 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchInputSelect', function (uiSelectFactory, componentHelper, msg) {
+    .directive('uiSearchInputSelect', function (uiSelectFactory, uiInputFactory, componentHelper, msg) {
         var m = new msg('SearchInputSelect');
         return {
             restrict: 'E',
@@ -16,16 +16,13 @@ angular.module('admin.component')
 
                 //
                 var hasName = attrs.selectName && attrs.inputName,
-                    $input = element.find('input');
-
-                //
-                var select = uiSelectFactory(element, attrs);
-                select.render();
+                    input = new uiInputFactory(scope, element, attrs),
+                    select = new uiSelectFactory(scope, element, attrs);
 
                 //
                 componentHelper.tiggerComplete(scope, attrs.ref || '$searchInputSelect', {
                     select: select,
-                    input: $input
+                    input: input
                 });
 
                 //
@@ -33,9 +30,9 @@ angular.module('admin.component')
                 }
                 else if (!!!attrs.selectName && !!!attrs.inputName) {
                     select.element.change(function () {
-                        $input.attr('name', select.element.val());
+                        input.attr('name', select.element.val());
                     });
-                    $input.attr('name', select.element.val());
+                    input.attr('name', select.element.val());
                 }
                 else {
                     m.error('必须同时设置select-name和input-name, 要么不设置, 要么全设置');
@@ -44,11 +41,8 @@ angular.module('admin.component')
                 //
                 scope.$on('uisearchform.reset', function () {
                     select.reset();
-                    $input.val('');
+                    input.reset();
                 });
-
-                //
-                element.removeAttr('model');
             },
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.input.select', attrs);

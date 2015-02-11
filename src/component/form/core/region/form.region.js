@@ -21,20 +21,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                //
-                attrs.autoWidth = false;
-                var region = uiRegionService(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formRegion', region);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    region.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
+            link: uiRegionService,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.region', $.extend({

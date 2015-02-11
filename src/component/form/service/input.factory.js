@@ -9,38 +9,46 @@ angular.module('admin.component')
     .constant('uiInputMaskMap', {
         'backcard': '9999 9999 9999 9999'
     })
-    .factory('uiInputFacotry', function (msg, uiInputMaskMap, Event) {
+    .factory('uiInputFactory', function (msg, uiInputMaskMap, uiFormControl) {
         var m = new msg('Input'),
-            Input = function (element, attrs) {
-                Event.call(this);
-                this.element = element.find('input');
+            Input = function (scope, element, attrs) {
+                this.inputElement = element.find('input');
                 this.attrs = attrs;
                 this.mask = attrs.mask || uiInputMaskMap[attrs.type];
-                this.render();
+                uiFormControl.apply(this, arguments);
             };
-        Input.prototype = {
+        Input.prototype = $.extend(new uiFormControl(), {
 
             render: function () {
-                if (this.mask) {
-                    this.element.inputmask(this.mask);
+                if (this.mask && $.fn.inputmask) {
+                    this.inputElement.inputmask(this.mask);
                 }
             },
 
             reset: function () {
-                this.element.val('');
+                this.inputElement.val('');
+            },
+
+            attr: function (k, v) {
+                if (v) {
+                    this.inputElement.attr(k, v);
+                }
+                else {
+                    return this.inputElement.attr(k);
+                }
             },
 
             val: function (v) {
                 if (v != undefined) {
-                    this.element.val(v);
+                    this.inputElement.val(v);
                     return this;
                 }
                 else {
-                    return this.element.val();
+                    return this.inputElement.val();
                 }
             }
-        };
-        return function (element, attrs) {
-            return new Input(element, attrs);
+        });
+        return function(s, e, a, c, t){
+            return new Input(s, e, a, c, t);
         };
     });

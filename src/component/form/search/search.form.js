@@ -12,13 +12,10 @@ angular.module('admin.component')
             replace: true,
             transclude: true,
             link: function (scope, element, attrs) {
-
-                //
                 var ref = componentHelper.getComponentRef(element.parent().find('.ui-table'), '$table');
 
-
                 //
-                var searchForm = uiSearchFormFactory(scope, ref, element, attrs),
+                var searchForm = new uiSearchFormFactory(scope, element, attrs, ref),
                     thisRef = attrs.ref || '$searchForm';
                 scope[thisRef] = searchForm;
                 componentHelper.tiggerComplete(scope, thisRef, searchForm);

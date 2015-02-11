@@ -6,23 +6,11 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchDateRange', function (componentHelper, uiDateRangeService) {
+    .directive('uiSearchDateRange', function (uiDateRangeService, componentHelper) {
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, $element, $attrs) {
-                var dateRange = uiDateRangeService($element, $attrs);
-                dateRange.render();
-                componentHelper.tiggerComplete(scope, $attrs.ref || '$searchDateRange', dateRange);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    dateRange.reset();
-                });
-
-                //
-                $element.removeAttr('name').removeAttr('readonly').removeAttr('model');
-            },
+            link: uiDateRangeService,
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.daterange', attrs);
             }

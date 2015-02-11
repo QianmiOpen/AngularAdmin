@@ -6,23 +6,11 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormDate', function (uiDateFacotry, componentHelper, defaultCol) {
+    .directive('uiFormDate', function (uiDateFactory, componentHelper, defaultCol) {
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                //
-                var inputDate = uiDateFacotry(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formDate', inputDate);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    inputDate.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
+            link: uiDateFactory,
             template: function (element, attrs) {
                 //
                 var format = [],

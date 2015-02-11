@@ -6,24 +6,12 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormSwitch', function (util, uiSwitchFacotry, componentHelper, defaultCol) {
+    .directive('uiFormSwitch', function (uiSwitchFactory, componentHelper, defaultCol) {
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                var _switch = uiSwitchFacotry(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formSwitch', _switch);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    _switch.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
+            link: uiSwitchFactory,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.switch', $.extend({

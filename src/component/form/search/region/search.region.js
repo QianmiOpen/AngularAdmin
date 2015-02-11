@@ -10,19 +10,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                attrs.autoWidth = true;
-                var region = uiRegionService(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchRegion', region);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    region.reset();
-                });
-
-                //
-                element.removeAttr('model');
-            },
+            link: uiRegionService,
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.region', attrs);
             }

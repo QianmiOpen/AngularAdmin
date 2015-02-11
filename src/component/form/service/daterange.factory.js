@@ -38,10 +38,10 @@ angular.module('admin.component')
             firstDay: 1
         }
     })
-    .factory('uiDateRangeService', function (msg, uiDateRangeDefaultConfig, uiDateRangeDefaultRange, Event) {
+    .factory('uiDateRangeService', function (msg, uiDateRangeDefaultConfig, uiDateRangeDefaultRange, uiFormControl) {
         var m = new msg('DateRange'),
-            DateRange = function (element, attrs) {
-                Event.call(this);
+            DateRange = function (scope, element, attrs) {
+                this.className = 'DateRange';
                 this.element = element;
                 this.startDateElement = element.find('.input-group').find('input:first');
                 this.endDateElement = element.find('.input-group').find('input:last');
@@ -53,16 +53,17 @@ angular.module('admin.component')
                 this.defaultStartDate = attrs.fromValue || dateRange[0];
                 this.defaultEndDate = attrs.toValue || dateRange[1];
                 this.limit = attrs.limit;
-                this.init();
+                uiFormControl.apply(this, arguments);
             };
-        DateRange.prototype = {
-            init: function () {
+        DateRange.prototype = $.extend(new uiFormControl(), {
+            _init: function () {
                 this.config = $.extend({}, uiDateRangeDefaultConfig, {
                     ranges: uiDateRangeDefaultRange,
                     timePicker: this.attrs.time !== undefined,
                     format: this.format
                 });
 
+                //要小心设置这个值
                 if (this.limit) {
                     this.config.dateLimit = {days: this.limit};
                 }
@@ -72,8 +73,6 @@ angular.module('admin.component')
                     this.config.startDate = this.defaultStartDate;
                     this.config.endDate = this.defaultEndDate;
                 }
-
-                this.render();
             },
 
             render: function () {
@@ -84,10 +83,6 @@ angular.module('admin.component')
                     this.endDateElement.val(end);
                     this.$emit('change', this, start, end);
                 }.bind(this));
-            },
-
-            change: function (fn) {
-                this.$on('change', fn);
             },
 
             reset: function () {
@@ -109,8 +104,8 @@ angular.module('admin.component')
                     return this;
                 }
             }
-        };
-        return function ($element, $attrs) {
-            return new DateRange($element, $attrs);
+        });
+        return function(s, e, a, c, t){
+            return new DateRange(s, e, a, c, t);
         };
     });

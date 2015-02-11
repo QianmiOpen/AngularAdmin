@@ -6,13 +6,10 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiRegionService', function (uiRegionHelper, msg, Event) {
+    .factory('uiRegionService', function (uiRegionHelper, msg, uiFormControl) {
         var m = new msg('Region'),
-            Region = function (element, attrs) {
-                Event.call(this);
+            Region = function (scope, element, attrs) {
                 var $doms = element.find('input');
-                this.element = element;
-                this.attrs = attrs;
                 this.$inputDom = $($doms[0]);
                 this.$pDom = $($doms[1]);
                 this.$cDom = $($doms[2]);
@@ -21,13 +18,11 @@ angular.module('admin.component')
                 this.autoWidth = attrs.autoWidth;
                 this.mode = attrs.mode || 's';
                 this.valueType = attrs.valueType || 't'; //保存的是文字还是ID
-                this.init();
-                this.initMode();
-                this.initEvent();
+                uiFormControl.apply(this, arguments);
             };
-        Region.prototype = {
+        Region.prototype = $.extend(new uiFormControl(), {
 
-            init: function () {
+            _init: function () {
                 if (/^\d+$/g.test(this.codeValue)) {  //有区域ID
                     uiRegionHelper.htmlById(this.codeValue).then(function (ts) {
                     }.bind(this));
@@ -38,6 +33,8 @@ angular.module('admin.component')
                         this.$pDom.select2({data: data});
                     }.bind(this));
                 }
+                this.initMode();
+                this.initEvent();
             },
 
             initMode: function () {
@@ -105,8 +102,8 @@ angular.module('admin.component')
                 this.$cDom.val('').select2({data: []});
                 this.$sDom.val('').select2({data: []});
             }
-        };
-        return function (element, attrs) {
-            return new Region(element, attrs);
+        });
+        return function(s, e, a, c, t){
+            return new Region(s, e, a, c, t);
         };
     });

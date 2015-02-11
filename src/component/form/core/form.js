@@ -17,7 +17,7 @@ angular.module('admin.component')
                 var form = null;
                 return {
                     pre: function (scope, element, attrs, controller, transclude) {
-                        form = uiFormFactory(scope, element, attrs, transclude(scope));
+                        form = new uiFormFactory(scope, element, attrs, transclude(scope));
                         form.layout();
                         var ref = attrs.ref || '$Form';
                         scope[ref] = form;

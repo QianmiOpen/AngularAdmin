@@ -6,23 +6,11 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchDate', function (uiDateFacotry, componentHelper) {
+    .directive('uiSearchDate', function (uiDateFactory, componentHelper) {
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                //
-                var inputDate = uiDateFacotry(element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchDate', inputDate);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    inputDate.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
-            },
+            link: uiDateFactory,
             template: function (element, attrs) {
                 var format = [];
                 if (!attrs.date)

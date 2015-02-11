@@ -6,19 +6,11 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormInput', function (uiInputFacotry, componentHelper, defaultCol) {
+    .directive('uiFormInput', function (uiInputFactory, componentHelper, defaultCol) {
         return {
             restrict: 'E',
             replace: true,
-            link: function (scope, element, attrs) {
-                var input = uiInputFacotry(element, attrs);
-                scope.$on('uiform.reset', function () {
-                    input.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
-            },
+            link: uiInputFactory,
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.input', $.extend({
