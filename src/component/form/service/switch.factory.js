@@ -8,11 +8,12 @@
 angular.module('admin.component')
     .factory('uiSwitchFactory', function (msg, uiFormControl) {
         var m = new msg('Switch'),
-            Switch = function (scope, element, attrs) {
+            Switch = function (scope, element, attrs, ValueService) {
                 this.inputElement = element.find('input');
                 this.onValue = attrs.onValue || 'on';
                 this.offValue = attrs.offValue || 'off';
                 this.attrs = attrs;
+                this.model = attrs.model;
                 uiFormControl.apply(this, arguments);
             };
         Switch.prototype = $.extend(new uiFormControl(), {
@@ -28,6 +29,14 @@ angular.module('admin.component')
                     this.inputElement.bootstrapSwitch('state', this.attrs.value == this.onValue);
                 }
                 this.inputElement[0].checked = true;
+
+                if(this.model){
+                    this.scope.$watch(this.model, function(newValue){
+                        if(newValue){
+                            this.val(newValue);
+                        }
+                    }.bind(this));
+                }
             },
 
             onChangeHandler: function (evt, state) {
@@ -40,9 +49,9 @@ angular.module('admin.component')
                 this.inputElement.val();
             },
 
-            val: function (isOn) {
-                if (isOn != undefined) {
-                    this.inputElement.bootstrapSwitch('state', isOn);
+            val: function (val) {
+                if (val != undefined) {
+                    this.inputElement.bootstrapSwitch('state', val == this.onValue);
                     return this;
                 }
                 else {

@@ -18,7 +18,7 @@ angular.module('admin.component')
                     }.bind(this));
                 }
                 else if (this.editUrl) {
-                    m.error('开始编辑模式, 但是未提供form-name校验数据的地址');
+                    //m.error('开始编辑模式, 但是未提供form-name校验数据的地址');
                 }
 
                 this.toggleEdit = function (isEdit) {

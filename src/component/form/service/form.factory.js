@@ -31,6 +31,7 @@
                 Form = function (scope, element, attrs, formItems) {
                     this.column = attrs.column;
                     this.formItems = formItems;
+                    this.formControlMap = {};
                     this.action = attrs.action.replace(/#/g, '');
                     this.formName = attrs.formName;
                     uiFormControl.apply(this, arguments);
@@ -42,6 +43,13 @@
                  */
                 addFormItem: function (formItem) {
                     this.formItems.push(formItem);
+                    this.scope.$on('componentComplete', function (evt, o) {
+                        if (o && o.name) {
+                            this.formControlMap[o.name] = o;
+                        }
+                        else{
+                        }
+                    }.bind(this));
                     this.layout();
                 },
 
@@ -119,6 +127,7 @@
                  * @param rules
                  */
                 setRules: function (rules) {
+                    this.$emit('uiform.rules', rules);
                     this.element.validate($.extend({}, uiFormValidateConfig, {
                         rules: rules,
                         submitHandler: this._submit.bind(this)
@@ -131,6 +140,29 @@
                  */
                 formData: function (data) {
                     return this.element.serializeArray();
+                },
+
+                /**
+                 * 加载数据绑定到表单
+                 * @param url
+                 */
+                loadData: function(url){
+                    ajax.post(url).then(function(formData){
+                        this.setData(formData);
+                    }.bind(this));
+                },
+
+                /**
+                 * 给表单设置数据集
+                 * @param data
+                 */
+                setData: function(data){
+                    for(var k in data){
+                        var formControl = this.formControlMap[k];
+                        if(formControl){
+                            formControl.val(data[k]);
+                        }
+                    }
                 },
 
                 /**

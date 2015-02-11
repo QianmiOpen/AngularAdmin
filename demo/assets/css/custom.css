@@ -425,3 +425,7 @@ table-tool-bar
 .input-group .form-control {
     z-index: auto;
 }
+
+.search-item .select2-container{
+    width: 110px !important;
+}

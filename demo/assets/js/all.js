@@ -1,4 +1,4 @@
-/*! zk - v0.0.1 - 2015-02-10 */
+/*! zk - v0.0.1 - 2015-02-11 */
 (function(){
 //-----------------------------------------------------------------------------------------------
 //
@@ -307,7 +307,7 @@ jQuery.fn.editable.defaults.ajaxOptions = {
     dataType: 'json'
 };
 angular.module('admin.service')
-    .factory('uiEditableCommonFactory', function (msg) {
+    .factory('uiEditableCommonFactory', function (msg, util) {
         var m = new msg('EditableCommon'),
             EditableCommon = function (element, attrs, option) {
                 this.element = $(element);
@@ -1003,7 +1003,7 @@ angular.module('admin.component')
                     pre: function (scope, element, attrs, controller, transclude) {
                         form = new uiFormFactory(scope, element, attrs, transclude(scope));
                         form.layout();
-                        var ref = attrs.ref || '$Form';
+                        var ref = attrs.ref || '$form';
                         scope[ref] = form;
                         componentHelper.tiggerComplete(scope, ref, form);
                     },
@@ -1698,7 +1698,8 @@ angular.module('admin.component')
             Event.call(this);
             this.scope = scope;
             this.element = element;
-            this.attrs = attrs
+            this.attrs = attrs;
+            this.name = attrs.name;
             this.isSearchControl = element.parents('.ui-search-form').length > 0;
             this.formPrefix = this.isSearchControl ? '$search' : '$form';
             this.formResetEventName = this.isSearchControl ? 'uisearchform.reset' : 'uiform.reset';
@@ -1996,6 +1997,7 @@ angular.module('admin.component')
                 Form = function (scope, element, attrs, formItems) {
                     this.column = attrs.column;
                     this.formItems = formItems;
+                    this.formControlMap = {};
                     this.action = attrs.action.replace(/#/g, '');
                     this.formName = attrs.formName;
                     uiFormControl.apply(this, arguments);
@@ -2007,6 +2009,13 @@ angular.module('admin.component')
                  */
                 addFormItem: function (formItem) {
                     this.formItems.push(formItem);
+                    this.scope.$on('componentComplete', function (evt, o) {
+                        if (o && o.name) {
+                            this.formControlMap[o.name] = o;
+                        }
+                        else{
+                        }
+                    }.bind(this));
                     this.layout();
                 },
 
@@ -2084,6 +2093,7 @@ angular.module('admin.component')
                  * @param rules
                  */
                 setRules: function (rules) {
+                    this.$emit('uiform.rules', rules);
                     this.element.validate($.extend({}, uiFormValidateConfig, {
                         rules: rules,
                         submitHandler: this._submit.bind(this)
@@ -2096,6 +2106,29 @@ angular.module('admin.component')
                  */
                 formData: function (data) {
                     return this.element.serializeArray();
+                },
+
+                /**
+                 * 加载数据绑定到表单
+                 * @param url
+                 */
+                loadData: function(url){
+                    ajax.post(url).then(function(formData){
+                        this.setData(formData);
+                    }.bind(this));
+                },
+
+                /**
+                 * 给表单设置数据集
+                 * @param data
+                 */
+                setData: function(data){
+                    for(var k in data){
+                        var formControl = this.formControlMap[k];
+                        if(formControl){
+                            formControl.val(data[k]);
+                        }
+                    }
                 },
 
                 /**
@@ -2825,12 +2858,12 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
     .constant('userConfig', {
-        url: '/',
+        url: '/sysconfig/orguser/select',
         labelName: 'name',
         valueName: 'staffno'
     })
     .constant('tagConfig', {
-        url: '/',
+        url: '/sysconfig/orguser/select',
         labelName: 'name',
         valueName: 'staffno'
     })
@@ -3155,11 +3188,12 @@ angular.module('admin.component')
 angular.module('admin.component')
     .factory('uiSwitchFactory', function (msg, uiFormControl) {
         var m = new msg('Switch'),
-            Switch = function (scope, element, attrs) {
+            Switch = function (scope, element, attrs, ValueService) {
                 this.inputElement = element.find('input');
                 this.onValue = attrs.onValue || 'on';
                 this.offValue = attrs.offValue || 'off';
                 this.attrs = attrs;
+                this.model = attrs.model;
                 uiFormControl.apply(this, arguments);
             };
         Switch.prototype = $.extend(new uiFormControl(), {
@@ -3175,6 +3209,14 @@ angular.module('admin.component')
                     this.inputElement.bootstrapSwitch('state', this.attrs.value == this.onValue);
                 }
                 this.inputElement[0].checked = true;
+
+                if(this.model){
+                    this.scope.$watch(this.model, function(newValue){
+                        if(newValue){
+                            this.val(newValue);
+                        }
+                    }.bind(this));
+                }
             },
 
             onChangeHandler: function (evt, state) {
@@ -3187,9 +3229,9 @@ angular.module('admin.component')
                 this.inputElement.val();
             },
 
-            val: function (isOn) {
-                if (isOn != undefined) {
-                    this.inputElement.bootstrapSwitch('state', isOn);
+            val: function (val) {
+                if (val != undefined) {
+                    this.inputElement.bootstrapSwitch('state', val == this.onValue);
                     return this;
                 }
                 else {
@@ -3458,6 +3500,82 @@ angular.module('admin.component')
                     }
                 };
             },
+            templateUrl: 'tpl.tab'
+        };
+    });
+
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .factory('uiMenuFactory', function (msg, ajax, Event) {
+        var m = new msg('Menu'),
+            Menu = function (scope, element, attrs) {
+                Event.call(this);
+                this.element = element;
+                this.attrs = attrs;
+                this.scope = scope;
+                this.activeItem = null;
+            };
+        Menu.prototype = {
+
+            /**
+             *
+             */
+            init: function () {
+                this.scope.activeItem = null;
+                this.scope.menuItems = [];
+                this.scope.onClickHandler = this.onClickHandler.bind(this);
+                if (this.attrs.url) {
+                    this.setUrl(this.attrs.url);
+                }
+            },
+
+            /**
+             *
+             * @param url
+             */
+            setUrl: function (url) {
+                ajax.get(url).then(function(data){
+                    this.setData(data);
+                }.bind(this));
+            },
+
+            /**
+             *
+             */
+            setData: function (menuItems) {
+                this.scope.menuItems = menuItems;
+            },
+
+            /**
+             *
+             * @param menuItem
+             */
+            onClickHandler: function(menuItem){
+                if(this.scope.activeItem){
+                    this.scope.activeItem.active = false;
+                }
+                this.scope.activeItem = menuItem;
+                this.scope.activeItem.active = true;
+            }
+        };
+        return function (s, e, a, c, t) {
+            return new Menu(s, e, a, c, t);
+        };
+    });
+angular.module('admin.component')
+    .directive('uiMenu', function (uiMenuFactory) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: false,
+            link: uiMenuFactory,
             templateUrl: 'tpl.tab'
         };
     });
@@ -3846,7 +3964,6 @@ angular.module('admin.component')
             controller: function ($scope, $element, $attrs, $transclude) {
                 var ref = componentHelper.getComponentRef($element.parents('table').parent(), '$table'),
                     hasTransclude = $transclude().length > 0,
-                    index = $element.index(),
                     name = $attrs.name || '',
                     render = function (rowData) {
                         if (hasTransclude) {
@@ -3876,7 +3993,7 @@ angular.module('admin.component')
                             editor = $injector.get(editorName);
                         }
                         catch (e) {
-                            //m.error('未找到编辑器为' + editorName);
+                            editor = $injector.get('uiEditableInputFactory');
                         }
                     }
                     $scope[ref].addColumn(uiTableColumnService(ref, $scope, $attrs, render, editor));
@@ -4155,7 +4272,7 @@ angular.module('admin.component')
                     }.bind(this));
                 }
                 else if (this.editUrl) {
-                    m.error('开始编辑模式, 但是未提供form-name校验数据的地址');
+                    //m.error('开始编辑模式, 但是未提供form-name校验数据的地址');
                 }
 
                 this.toggleEdit = function (isEdit) {
@@ -5383,6 +5500,36 @@ angular.module('admin.component')
             /**
              *
              */
+            componentHelper.setTemplate('tpl.menu', [
+                '<ul class="page-sidebar-menu">',
+                    '<ng-tranclude></ng-tranclude>',
+                    '<li ng-class="{\'active open\': menuItem.active}" ng-click="onClickHandler(menuItem)" ng-repeat="menuItem in menuItems">',
+                        '<a href="javascript:">',
+                            '<i ng-class="menuItem.icon"></i>',
+                            '<span class="title" ng-bind="menuItem.title"></span>',
+                            '<span class="arrow"></span>',
+                        '</a>',
+                        '<ul class="sub-menu" ng-if="menuItem.children">',
+                            '<li ng-class="{\'active\': menuItem.active}" ng-repeat="submenuItem in menuItem.children">',
+                                '<a ng-href="submenuItem.url">',
+                                    '<i ng-class="submenuItem.icon"></i>',
+                                    '{{submenuItem.title}}',
+                                '</a>',
+                            '</li>',
+                        '</ul>',
+                    '</li>',
+                '</ul>'
+            ].join(''));
+
+        });
+})(jQuery);
+(function ($) {
+    angular.module('admin.template')
+        .run(function(componentHelper){
+
+            /**
+             *
+             */
             componentHelper.setTemplate('tpl.portal',[
                 '<div class="row ui-sortable">',
                     '<div class="column sortable col-md-{{eachColumn}}" ng-repeat="column in columns">',
@@ -5439,7 +5586,7 @@ angular.module('admin.component')
              */
             componentHelper.setTemplate('tpl.searchform.userselect.input', [
                 '<div class="input-inline search-item">',
-                    '<div class="input-group">',
+                    '<div class="input-group input-small">',
                         '{{#if label}}',
                             '<div class="input-group-addon">{{label}}:</div>',
                         '{{/if}}',

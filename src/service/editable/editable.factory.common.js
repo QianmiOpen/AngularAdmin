@@ -12,7 +12,7 @@ jQuery.fn.editable.defaults.ajaxOptions = {
     dataType: 'json'
 };
 angular.module('admin.service')
-    .factory('uiEditableCommonFactory', function (msg) {
+    .factory('uiEditableCommonFactory', function (msg, util) {
         var m = new msg('EditableCommon'),
             EditableCommon = function (element, attrs, option) {
                 this.element = $(element);

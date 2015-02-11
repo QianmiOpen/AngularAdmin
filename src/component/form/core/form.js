@@ -19,7 +19,7 @@ angular.module('admin.component')
                     pre: function (scope, element, attrs, controller, transclude) {
                         form = new uiFormFactory(scope, element, attrs, transclude(scope));
                         form.layout();
-                        var ref = attrs.ref || '$Form';
+                        var ref = attrs.ref || '$form';
                         scope[ref] = form;
                         componentHelper.tiggerComplete(scope, ref, form);
                     },

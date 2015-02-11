@@ -36,7 +36,7 @@
              */
             componentHelper.setTemplate('tpl.searchform.userselect.input', [
                 '<div class="input-inline search-item">',
-                    '<div class="input-group">',
+                    '<div class="input-group input-small">',
                         '{{#if label}}',
                             '<div class="input-group-addon">{{label}}:</div>',
                         '{{/if}}',

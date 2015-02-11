@@ -10,7 +10,8 @@ angular.module('admin.component')
             Event.call(this);
             this.scope = scope;
             this.element = element;
-            this.attrs = attrs
+            this.attrs = attrs;
+            this.name = attrs.name;
             this.isSearchControl = element.parents('.ui-search-form').length > 0;
             this.formPrefix = this.isSearchControl ? '$search' : '$form';
             this.formResetEventName = this.isSearchControl ? 'uisearchform.reset' : 'uiform.reset';
