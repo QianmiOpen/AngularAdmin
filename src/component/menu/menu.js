@@ -6,6 +6,6 @@ angular.module('admin.component')
             transclude: true,
             scope: false,
             link: uiMenuFactory,
-            templateUrl: 'tpl.tab'
+            templateUrl: 'tpl.menu'
         };
     });

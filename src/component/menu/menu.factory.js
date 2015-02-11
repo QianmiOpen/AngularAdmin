@@ -14,6 +14,7 @@ angular.module('admin.component')
                 this.attrs = attrs;
                 this.scope = scope;
                 this.activeItem = null;
+                this.init();
             };
         Menu.prototype = {
 
