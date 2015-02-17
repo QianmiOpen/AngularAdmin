@@ -10,7 +10,7 @@
 
                     '<div class="btn-group pull-left">',
                         '{{#if editable}}',
-                            '<button type="button" class="btn btn-sm btn-info" ng-click="{{ref}}.toggleEdit()"><i class="fa fa-edit"></i> <ng-bind>{{ref.editText}}</ng-bind> 快速编辑</button>&nbsp;&nbsp;',
+                            '<button type="button" class="btn btn-sm btn-info" ng-click="{{ref}}.toggleEdit()"><i class="fa fa-edit"></i> <span ng-bind="{{ref}}.editText"></span>快速编辑</button>&nbsp;&nbsp;',
                         '{{/if}}',
                         '{{#if add}}',
                             '<button type="button" class="btn btn-sm btn-primary" ng-click="{{ref}}.doAddItem()"><i class="fa fa-plus-circle"></i> 新增{{tip}}</button>&nbsp;&nbsp;',

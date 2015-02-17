@@ -23,6 +23,7 @@ angular.module('admin.component')
                 if (this.mask && $.fn.inputmask) {
                     this.inputElement.inputmask(this.mask);
                 }
+                this.element.removeAttr('type');
             },
 
             reset: function () {

@@ -7,14 +7,14 @@
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
     .constant('userConfig', {
-        url: '/',
+        url: '/sysconfig/orguser/select',
         labelName: 'name',
         valueName: 'staffno'
     })
     .constant('tagConfig', {
-        url: '/',
+        url: '/sysconfig/tag/list?classify=',
         labelName: 'name',
-        valueName: 'staffno'
+        valueName: 'id'
     })
     .factory('uiMultiSelectFactory', function ($q, ajax, logger, msg, util, Event) {
         var m = new msg('MultiSelect'),
@@ -297,12 +297,23 @@ angular.module('admin.component')
              *
              * @param v
              */
-            val: function () {
-                if (this.attrs.multi) {
-                    return this.selectValues;
+            val: function (vals) {
+                if(vals){
+                    this.inputElement.select2('val', vals);
+                    if (this.attrs.multi){
+                        this.selectValues = vals;
+                    }
+                    else{
+                        this.selectValues = [vals];
+                    }
                 }
-                else {
-                    return this.selectValues[0];
+                else{
+                    if (this.attrs.multi) {
+                        return this.selectValues;
+                    }
+                    else {
+                        return this.selectValues[0];
+                    }
                 }
             },
 

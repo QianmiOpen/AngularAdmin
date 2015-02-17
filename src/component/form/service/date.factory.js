@@ -6,7 +6,7 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiDateFactory', function (msg, uiFormControl) {
+    .factory('uiDateFactory', function (msg, uiFormControl, util) {
         var m = new msg('Date'),
             InputDate = function (scope, element, attrs) {
                 this.className = 'Date';
@@ -66,7 +66,7 @@ angular.module('admin.component')
              */
             val: function (v) {
                 if (v != undefined) {
-                    this.inputElement.val(util.dateFormatStr(v, this.format));
+                    this.inputElement.val(v ? util.dateFormatStr(v, this.format) : '');
                     return this;
                 }
                 else {

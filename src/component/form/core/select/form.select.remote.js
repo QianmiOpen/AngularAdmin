@@ -6,14 +6,14 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormUserSelect', function (uiMultiSelectFactory, componentHelper, userConfig, defaultCol) {
+    .directive('uiFormRemoteSelect', function (uiMultiSelectFactory, componentHelper, tagConfig, defaultCol) {
         return {
             restrict: 'E',
             replace: false,
             transclude: true,
             link: function (scope, element, attrs) {
                 //
-                var select = uiMultiSelectFactory(scope, element, $.extend({}, userConfig, attrs));
+                var select = uiMultiSelectFactory(scope, element, attrs);
                 componentHelper.tiggerComplete(scope, attrs.ref || '$formUserSelect', select);
 
                 //

@@ -12,7 +12,7 @@ angular.module('admin.component')
                 Event.call(this);
                 this.columns = [];
                 this.nopageMode = attrs.nopage !== undefined;
-                this.idName = null;
+                this.idName = attrs.idName;
                 this.pageResult = {};
                 this.selectValues = [];
                 this.selectItems = [];
@@ -151,7 +151,7 @@ angular.module('admin.component')
                     }
                 });
 
-                this.scope.$broadcast('uitable.selectAllChecked', sn == this.pageResult.aaData.length && sn != 0);
+                this.scope.$broadcast('uitable.selectAllChecked', this.pageResult.aaData&&sn == this.pageResult.aaData.length && sn != 0);
                 this.$emit('uitable.renderSuccess', result);
             },
 

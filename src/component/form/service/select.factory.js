@@ -31,6 +31,19 @@ angular.module('admin.component')
                         this.scope[this.model] = this.defaultResetValue;
                     }
                 }
+
+                if(this.attrs.value){
+                    this.val(this.attrs.value);
+                }
+                this.element.removeAttr('value');
+            },
+
+            /**
+             *
+             */
+            disabled: function(open){
+                this.selectElement.prop('disabled', open);
+                this.render();
             },
 
             /**

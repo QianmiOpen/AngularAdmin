@@ -29,10 +29,10 @@ angular.module('admin.component')
                 if (hasName) { //没有设置name, 那么当select的值变动的时候, 自动设置input的name为select的value
                 }
                 else if (!!!attrs.selectName && !!!attrs.inputName) {
-                    select.element.change(function () {
-                        input.attr('name', select.element.val());
+                    select.change(function () {
+                        input.attr('name', select.val());
                     });
-                    input.attr('name', select.element.val());
+                    input.attr('name', select.val());
                 }
                 else {
                     m.error('必须同时设置select-name和input-name, 要么不设置, 要么全设置');

@@ -9,16 +9,17 @@ angular.module('admin.component')
     .factory('uiTableEditableFactory', function (msg) {
         var m = new msg('TableEditable'),
             TableEditable = function () {
-                this.editUrl = this.attrs.editUrl;
+                this.editUrl = this.attrs.editUrl || '';
+                this.editUrl = this.editUrl + (this.editUrl.indexOf('?') == -1 ? '?' : '&') + 'idName=' + this.attrs.idName;
                 this.editFormName = this.attrs.formName;
                 this.editRuleMap = {};
                 if (this.editFormName) {
-                    $.getJSON('/validator?cm=' + this.formName, function (rules) {
+                    $.getJSON('/validator?cm=' + this.editFormName, function (rules) {
                         this.editRuleMap = rules;
                     }.bind(this));
                 }
                 else if (this.editUrl) {
-                    m.error('开始编辑模式, 但是未提供form-name校验数据的地址');
+                    //m.error('开始编辑模式, 但是未提供form-name校验数据的地址');
                 }
 
                 this.toggleEdit = function (isEdit) {

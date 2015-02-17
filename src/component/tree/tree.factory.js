@@ -205,6 +205,17 @@ angular.module('admin.component')
             },
 
             /**
+             *  清空选中
+             */
+            cleanChecked: function(){
+                var self = this;
+                $.each(this.selectItems, function(i, selectItem){
+                    var node = self.instance.getNodeByParam("id", selectItem.id, null);
+                    self.instance.checkNode(node, false, true);
+                });
+            },
+
+            /**
              * 设置选中的数据
              * @param data
              */

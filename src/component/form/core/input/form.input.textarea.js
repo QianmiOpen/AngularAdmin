@@ -19,10 +19,10 @@ angular.module('admin.component')
                 });
 
                 //
-                $textarea.html(transclude().html());
+                $textarea.html(transclude().text());
 
                 //
-                element.removeAttr('name').removeAttr('model');
+                element.removeAttr('name').removeAttr('model').removeAttr('rows').removeAttr('cols');
             },
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');

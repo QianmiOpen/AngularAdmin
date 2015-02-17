@@ -6,7 +6,7 @@
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .constant('defaultCol', '4:8')
+    .constant('defaultCol', '2:10')
     .directive('uiForm', function (uiFormFactory, componentHelper) {
         return {
             restrict: 'E',
@@ -19,7 +19,7 @@ angular.module('admin.component')
                     pre: function (scope, element, attrs, controller, transclude) {
                         form = new uiFormFactory(scope, element, attrs, transclude(scope));
                         form.layout();
-                        var ref = attrs.ref || '$Form';
+                        var ref = attrs.ref || '$form';
                         scope[ref] = form;
                         componentHelper.tiggerComplete(scope, ref, form);
                     },

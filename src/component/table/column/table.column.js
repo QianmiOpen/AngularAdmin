@@ -15,7 +15,6 @@ angular.module('admin.component')
             controller: function ($scope, $element, $attrs, $transclude) {
                 var ref = componentHelper.getComponentRef($element.parents('table').parent(), '$table'),
                     hasTransclude = $transclude().length > 0,
-                    index = $element.index(),
                     name = $attrs.name || '',
                     render = function (rowData) {
                         if (hasTransclude) {
@@ -39,13 +38,13 @@ angular.module('admin.component')
                 //
                 if ($scope[ref] && $scope[ref].addColumn) {
                     var editor = null;
-                    if ($attrs.editable) {
+                    if ($attrs.editable != undefined) {
                         var editorName = 'uiEditable' + $attrs.editable.charAt(0).toUpperCase() + $attrs.editable.substring(1) + 'Factory';
                         try {
                             editor = $injector.get(editorName);
                         }
                         catch (e) {
-                            //m.error('未找到编辑器为' + editorName);
+                            editor = $injector.get('uiEditableInputFactory');
                         }
                     }
                     $scope[ref].addColumn(uiTableColumnService(ref, $scope, $attrs, render, editor));

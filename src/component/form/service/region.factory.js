@@ -14,18 +14,56 @@ angular.module('admin.component')
                 this.$pDom = $($doms[1]);
                 this.$cDom = $($doms[2]);
                 this.$sDom = $($doms[3]);
-                this.codeValue = attrs.value;
+                this.$aDom = $($doms[$doms.length - 1]);
+                this.codeValue = attrs.sValue;
                 this.autoWidth = attrs.autoWidth;
                 this.mode = attrs.mode || 's';
-                this.valueType = attrs.valueType || 't'; //保存的是文字还是ID
+                this.valueType = attrs.valueType || 'text'; //保存的是文字还是ID
                 uiFormControl.apply(this, arguments);
             };
         Region.prototype = $.extend(new uiFormControl(), {
 
             _init: function () {
+                var self = this;
                 if (/^\d+$/g.test(this.codeValue)) {  //有区域ID
-                    uiRegionHelper.htmlById(this.codeValue).then(function (ts) {
-                    }.bind(this));
+                    var p, c, s;
+                    uiRegionHelper.htmlById(this.codeValue)
+                        .then(function (ts) {
+                            p = ts[2];
+                            c = ts[1];
+                            s = ts[0];
+                            return uiRegionHelper.getProvince();
+                        })
+                        .then(function(data){
+                            self.$pDom.select2({data: data});
+                            if(p){
+                                self.$pDom.select2('val', p.id)
+                                return uiRegionHelper.getCity(p.id);
+                            }
+                            else{
+                                return null;
+                            }
+                        })
+                        .then(function(data){
+                            if(data){
+                                self.$cDom.select2({data: data});
+                                if(c){
+                                    self.$cDom.select2('val', c.id)
+                                    return uiRegionHelper.getStreet(c.id);
+                                }
+                                else{
+                                    return null;
+                                }
+                            }
+                        })
+                        .then(function(data){
+                            if(data){
+                                self.$sDom.select2({data: data});
+                                if(s){
+                                    self.$sDom.select2('val', s.id)
+                                }
+                            }
+                        });
                     this.$inputDom.val(this.codeValue);
                 }
                 else { //没有则直接加载省
@@ -33,6 +71,12 @@ angular.module('admin.component')
                         this.$pDom.select2({data: data});
                     }.bind(this));
                 }
+
+                //
+                if(this.attrs.aValue){
+                    this.$aDom.val(this.attrs.aValue);
+                }
+
                 this.initMode();
                 this.initEvent();
             },

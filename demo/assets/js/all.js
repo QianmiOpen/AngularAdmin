@@ -1,4 +1,4 @@
-/*! zk - v0.0.1 - 2015-02-10 */
+/*! zk - v0.0.1 - 2015-02-17 */
 (function(){
 //-----------------------------------------------------------------------------------------------
 //
@@ -307,7 +307,7 @@ jQuery.fn.editable.defaults.ajaxOptions = {
     dataType: 'json'
 };
 angular.module('admin.service')
-    .factory('uiEditableCommonFactory', function (msg) {
+    .factory('uiEditableCommonFactory', function (msg, util) {
         var m = new msg('EditableCommon'),
             EditableCommon = function (element, attrs, option) {
                 this.element = $(element);
@@ -329,6 +329,7 @@ angular.module('admin.service')
                     }.bind(this),
                     validate: this.validation.bind(this),
                     success: function (json, value) {
+                        json = json || {};
                         if (json.result == 'ok') {
                             return true;
                         }
@@ -356,7 +357,7 @@ angular.module('admin.service')
                 var inputVal = this.element.data('editableContainer').$form.find('[name="' + this.name + '"]').val();
                 val = inputVal != undefined ? inputVal : val;
                 if (this.rule) {
-                    return util.checkValueUseRules(this.name, val, this.rules);
+                    return util.checkValueUseRules(this.name, val, this.rule);
                 }
                 return null;
             },
@@ -669,6 +670,223 @@ angular.module('admin.service')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.service')
+    .factory('ShortcutFactory', function ($window, $timeout) {
+        var keyboardManagerService = {};
+
+        var defaultOpt = {
+            'type': 'keydown',
+            'propagate': false,
+            'inputDisabled': false,
+            'target': $window.document,
+            'keyCode': false
+        };
+
+        //
+        keyboardManagerService.keyboardEvent = {}
+        keyboardManagerService.bind = function (label, callback, opt) {
+            var fct, elt, code, k;
+            opt = angular.extend({}, defaultOpt, opt);
+            label = label.toLowerCase();
+            elt = opt.target;
+            if (typeof opt.target == 'string') elt = document.getElementById(opt.target);
+
+            fct = function (e) {
+                e = e || $window.event;
+
+                //表单输入框放弃
+                if (opt['inputDisabled']) {
+                    var elt;
+                    if (e.target) elt = e.target;
+                    else if (e.srcElement) elt = e.srcElement;
+                    if (elt.nodeType == 3) elt = elt.parentNode;
+                    if (elt.tagName == 'INPUT' || elt.tagName == 'TEXTAREA') return;
+                }
+
+                // 找按键
+                if (e.keyCode) code = e.keyCode;
+                else if (e.which) code = e.which;
+                var character = String.fromCharCode(code).toLowerCase();
+
+                if (code == 188) character = ",";
+                if (code == 190) character = ".";
+
+                var keys = label.split("+");
+                var kp = 0;
+                var shift_nums = {
+                    "`": "~",
+                    "1": "!",
+                    "2": "@",
+                    "3": "#",
+                    "4": "$",
+                    "5": "%",
+                    "6": "^",
+                    "7": "&",
+                    "8": "*",
+                    "9": "(",
+                    "0": ")",
+                    "-": "_",
+                    "=": "+",
+                    ";": ":",
+                    "'": "\"",
+                    ",": "<",
+                    ".": ">",
+                    "/": "?",
+                    "\\": "|"
+                };
+                var special_keys = {
+                    'esc': 27,
+                    'escape': 27,
+                    'tab': 9,
+                    'space': 32,
+                    'return': 13,
+                    'enter': 13,
+                    'backspace': 8,
+
+                    'scrolllock': 145,
+                    'scroll_lock': 145,
+                    'scroll': 145,
+                    'capslock': 20,
+                    'caps_lock': 20,
+                    'caps': 20,
+                    'numlock': 144,
+                    'num_lock': 144,
+                    'num': 144,
+
+                    'pause': 19,
+                    'break': 19,
+
+                    'insert': 45,
+                    'home': 36,
+                    'delete': 46,
+                    'end': 35,
+
+                    'pageup': 33,
+                    'page_up': 33,
+                    'pu': 33,
+
+                    'pagedown': 34,
+                    'page_down': 34,
+                    'pd': 34,
+
+                    'left': 37,
+                    'up': 38,
+                    'right': 39,
+                    'down': 40,
+
+                    'f1': 112,
+                    'f2': 113,
+                    'f3': 114,
+                    'f4': 115,
+                    'f5': 116,
+                    'f6': 117,
+                    'f7': 118,
+                    'f8': 119,
+                    'f9': 120,
+                    'f10': 121,
+                    'f11': 122,
+                    'f12': 123
+                };
+                var modifiers = {
+                    shift: {
+                        wanted: false,
+                        pressed: e.shiftKey ? true : false
+                    },
+                    ctrl: {
+                        wanted: false,
+                        pressed: e.ctrlKey ? true : false
+                    },
+                    alt: {
+                        wanted: false,
+                        pressed: e.altKey ? true : false
+                    },
+                    meta: { //Meta is Mac specific
+                        wanted: false,
+                        pressed: e.metaKey ? true : false
+                    }
+                };
+                for (var i = 0, l = keys.length; k = keys[i], i < l; i++) {
+                    switch (k) {
+                        case 'ctrl':
+                        case 'control':
+                            kp++;
+                            modifiers.ctrl.wanted = true;
+                            break;
+                        case 'shift':
+                        case 'alt':
+                        case 'meta':
+                            kp++;
+                            modifiers[k].wanted = true;
+                            break;
+                    }
+
+                    if (k.length > 1) {
+                        if (special_keys[k] == code) kp++;
+                    } else if (opt['keyCode']) {
+                        if (opt['keyCode'] == code) kp++;
+                    } else {
+                        if (character == k) kp++;
+                        else {
+                            if (shift_nums[character] && e.shiftKey) {
+                                character = shift_nums[character];
+                                if (character == k) kp++;
+                            }
+                        }
+                    }
+                }
+
+                if (kp == keys.length &&
+                    modifiers.ctrl.pressed == modifiers.ctrl.wanted &&
+                    modifiers.shift.pressed == modifiers.shift.wanted &&
+                    modifiers.alt.pressed == modifiers.alt.wanted &&
+                    modifiers.meta.pressed == modifiers.meta.wanted) {
+                    $timeout(function () {
+                        callback(e);
+                    }, 1);
+
+                    if (!opt['propagate']) {
+                        e.cancelBubble = true;
+                        e.returnValue = false;
+
+                        if (e.stopPropagation) {
+                            e.stopPropagation();
+                            e.preventDefault();
+                        }
+                        return false;
+                    }
+                }
+
+            };
+            keyboardManagerService.keyboardEvent[label] = {
+                'callback': fct,
+                'target': elt,
+                'event': opt['type']
+            };
+            if (elt.addEventListener) elt.addEventListener(opt['type'], fct, false);
+            else if (elt.attachEvent) elt.attachEvent('on' + opt['type'], fct);
+            else elt['on' + opt['type']] = fct;
+        };
+        keyboardManagerService.unbind = function (label) {
+            label = label.toLowerCase();
+            var binding = keyboardManagerService.keyboardEvent[label];
+            delete(keyboardManagerService.keyboardEvent[label]);
+            if (!binding) return;
+            var type = binding['event'],
+                elt = binding['target'],
+                callback = binding['callback'];
+            if (elt.detachEvent) elt.detachEvent('on' + type, callback);
+            else if (elt.removeEventListener) elt.removeEventListener(type, callback, false);
+            else elt['on' + type] = false;
+        };
+        return keyboardManagerService;
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.service')
     .factory('util', function ($rootScope, $compile, $filter, $parse, $q) {
         return {
 
@@ -840,6 +1058,9 @@ angular.module('admin.service')
             set: function (scope, express, value) {
                 var getter = $parse(express);
                 getter.assign(scope, value);
+                if (!scope.$$phase) {
+                    scope.$apply();
+                }
             },
 
             get: function (scope, express) {
@@ -990,7 +1211,7 @@ angular.module('admin.component')
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .constant('defaultCol', '4:8')
+    .constant('defaultCol', '2:10')
     .directive('uiForm', function (uiFormFactory, componentHelper) {
         return {
             restrict: 'E',
@@ -1003,7 +1224,7 @@ angular.module('admin.component')
                     pre: function (scope, element, attrs, controller, transclude) {
                         form = new uiFormFactory(scope, element, attrs, transclude(scope));
                         form.layout();
-                        var ref = attrs.ref || '$Form';
+                        var ref = attrs.ref || '$form';
                         scope[ref] = form;
                         componentHelper.tiggerComplete(scope, ref, form);
                     },
@@ -1181,10 +1402,10 @@ angular.module('admin.component')
                 });
 
                 //
-                $textarea.html(transclude().html());
+                $textarea.html(transclude().text());
 
                 //
-                element.removeAttr('name').removeAttr('model');
+                element.removeAttr('name').removeAttr('model').removeAttr('rows').removeAttr('cols');
             },
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
@@ -1228,81 +1449,6 @@ angular.module('admin.component')
             }
         };
     });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  特定组件 - BOSS 员工选择
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSelectTag', function (uiMultiSelectFactory, util) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: false,
-            controller: function ($scope, $element, $attrs, ajax, msg) {
-                var selectHelper = new uiMultiSelectFactory($scope, $element, $attrs);
-                util.setTag($attrs.tag || 'selectTag', selectHelper, $scope);
-
-                var classifyId = $attrs.classify,
-                    usercode = $attrs.usercode; //分类ID
-                $scope.$on('uiSelect.doAdd', function(evt, addObj, tag){
-                    ajax.post('/sysconfig/tag/rel/add', {name: addObj.name, classify: classifyId, id: addObj.isNew ? '': addObj.id, usercode: usercode}).then(function(data){
-                        addObj.id = data;
-                        delete addObj.isNew;
-                        msg.success('添加成功');
-                    });
-                });
-                $scope.$on('uiSelect.doDel', function(evt, delObj, tag){
-                    if(!delObj.isNew){ //新的
-                        ajax.post('/sysconfig/tag/rel/del', {name: delObj.name, classify: classifyId, id: delObj.id, usercode: usercode}).then(function(){
-                            msg.success('删除成功');
-                        });
-                    }
-                });
-            },
-            template: function (element, attrs) {
-                var labelConfig = attrs.labelName ? '' : 'label-name="name"',
-                    valueConfig = attrs.valueName ? '' : 'label-name="name"',
-                    classifyId = attrs.classify,
-                    allConfig = labelConfig + valueConfig;
-                return '<input multi data-url="/sysconfig/tag/list?classify=' + classifyId  + '" search=""  ' + allConfig + '/>';
-            }
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  特定组件 - BOSS 员工选择
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSelectUser', function (uiMultiSelectFactory, util) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: false,
-            controller: function ($scope, $element, $attrs) {
-                util.setTag('bossUser', new uiMultiSelectFactory($scope, $element, $attrs), $scope);
-            },
-            template: function (element, attrs) {
-                var labelConfig = attrs.labelName ? '' : 'label-name="name"',
-                    valueConfig = attrs.valueName ? '' : 'label-name="name"',
-                    allConfig = labelConfig + valueConfig,
-                    department = attrs.department||"";
-                if (attrs.multi) {
-                    return '<input data-url="/sysconfig/orguser?'+ (department?('department='+department):'') +'" minmum="1" search=""  ' + allConfig + '/>';
-                }
-                else {
-                    return '<input type="hidden" data-url="/sysconfig/orguser?'+ (department?('department='+department):'') +'" search=""  ' + allConfig + '/>';
-                }
-            }
-        };
-    });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -1364,14 +1510,14 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormUserSelect', function (uiMultiSelectFactory, componentHelper, userConfig, defaultCol) {
+    .directive('uiFormRemoteSelect', function (uiMultiSelectFactory, componentHelper, tagConfig, defaultCol) {
         return {
             restrict: 'E',
             replace: false,
             transclude: true,
             link: function (scope, element, attrs) {
                 //
-                var select = uiMultiSelectFactory(scope, element, $.extend({}, userConfig, attrs));
+                var select = uiMultiSelectFactory(scope, element, attrs);
                 componentHelper.tiggerComplete(scope, attrs.ref || '$formUserSelect', select);
 
                 //
@@ -1543,10 +1689,10 @@ angular.module('admin.component')
                 if (hasName) { //没有设置name, 那么当select的值变动的时候, 自动设置input的name为select的value
                 }
                 else if (!!!attrs.selectName && !!!attrs.inputName) {
-                    select.element.change(function () {
-                        input.attr('name', select.element.val());
+                    select.change(function () {
+                        input.attr('name', select.val());
                     });
-                    input.attr('name', select.element.val());
+                    input.attr('name', select.val());
                 }
                 else {
                     m.error('必须同时设置select-name和input-name, 要么不设置, 要么全设置');
@@ -1658,34 +1804,6 @@ angular.module('admin.component')
             }
         };
     });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchUserSelect', function (uiMultiSelectFactory, componentHelper, userConfig) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: function (scope, element, attrs) {
-                var select = uiMultiSelectFactory(scope, element, $.extend({}, userConfig, attrs));
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchUserSelect', select);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    select.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.userselect.input', attrs);
-            }
-        };
-    });
 /**
  * 表单控件
  */
@@ -1698,7 +1816,8 @@ angular.module('admin.component')
             Event.call(this);
             this.scope = scope;
             this.element = element;
-            this.attrs = attrs
+            this.attrs = attrs;
+            this.name = attrs.name;
             this.isSearchControl = element.parents('.ui-search-form').length > 0;
             this.formPrefix = this.isSearchControl ? '$search' : '$form';
             this.formResetEventName = this.isSearchControl ? 'uisearchform.reset' : 'uiform.reset';
@@ -1720,7 +1839,7 @@ angular.module('admin.component')
              * @private
              */
             _cleanElement: function () {
-                this.element.removeAttr('name').removeAttr('model').removeAttr('readonly');
+                this.element.removeAttr('name').removeAttr('model').removeAttr('readonly').removeAttr('disabled');
             },
 
             /**
@@ -1732,6 +1851,12 @@ angular.module('admin.component')
                 this.resetListener = this.scope.$on(this.formResetEventName, function () {
                     this.reset();
                 }.bind(this));
+            },
+
+            /**
+             *
+             */
+            disabled: function(){
             },
 
             /**
@@ -1780,7 +1905,7 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiDateFactory', function (msg, uiFormControl) {
+    .factory('uiDateFactory', function (msg, uiFormControl, util) {
         var m = new msg('Date'),
             InputDate = function (scope, element, attrs) {
                 this.className = 'Date';
@@ -1840,7 +1965,7 @@ angular.module('admin.component')
              */
             val: function (v) {
                 if (v != undefined) {
-                    this.inputElement.val(util.dateFormatStr(v, this.format));
+                    this.inputElement.val(v ? util.dateFormatStr(v, this.format) : '');
                     return this;
                 }
                 else {
@@ -1996,6 +2121,7 @@ angular.module('admin.component')
                 Form = function (scope, element, attrs, formItems) {
                     this.column = attrs.column;
                     this.formItems = formItems;
+                    this.formControlMap = {};
                     this.action = attrs.action.replace(/#/g, '');
                     this.formName = attrs.formName;
                     uiFormControl.apply(this, arguments);
@@ -2007,6 +2133,13 @@ angular.module('admin.component')
                  */
                 addFormItem: function (formItem) {
                     this.formItems.push(formItem);
+                    this.scope.$on('componentComplete', function (evt, o) {
+                        if (o && o.name) {
+                            this.formControlMap[o.name] = o;
+                        }
+                        else{
+                        }
+                    }.bind(this));
                     this.layout();
                 },
 
@@ -2084,6 +2217,7 @@ angular.module('admin.component')
                  * @param rules
                  */
                 setRules: function (rules) {
+                    this.$emit('uiform.rules', rules);
                     this.element.validate($.extend({}, uiFormValidateConfig, {
                         rules: rules,
                         submitHandler: this._submit.bind(this)
@@ -2096,6 +2230,29 @@ angular.module('admin.component')
                  */
                 formData: function (data) {
                     return this.element.serializeArray();
+                },
+
+                /**
+                 * 加载数据绑定到表单
+                 * @param url
+                 */
+                loadData: function(url){
+                    ajax.post(url).then(function(formData){
+                        this.setData(formData);
+                    }.bind(this));
+                },
+
+                /**
+                 * 给表单设置数据集
+                 * @param data
+                 */
+                setData: function(data){
+                    for(var k in data){
+                        var formControl = this.formControlMap[k];
+                        if(formControl){
+                            formControl.val(data[k]);
+                        }
+                    }
                 },
 
                 /**
@@ -2152,6 +2309,7 @@ angular.module('admin.component')
                 if (this.mask && $.fn.inputmask) {
                     this.inputElement.inputmask(this.mask);
                 }
+                this.element.removeAttr('type');
             },
 
             reset: function () {
@@ -2522,18 +2680,56 @@ angular.module('admin.component')
                 this.$pDom = $($doms[1]);
                 this.$cDom = $($doms[2]);
                 this.$sDom = $($doms[3]);
-                this.codeValue = attrs.value;
+                this.$aDom = $($doms[$doms.length - 1]);
+                this.codeValue = attrs.sValue;
                 this.autoWidth = attrs.autoWidth;
                 this.mode = attrs.mode || 's';
-                this.valueType = attrs.valueType || 't'; //保存的是文字还是ID
+                this.valueType = attrs.valueType || 'text'; //保存的是文字还是ID
                 uiFormControl.apply(this, arguments);
             };
         Region.prototype = $.extend(new uiFormControl(), {
 
             _init: function () {
+                var self = this;
                 if (/^\d+$/g.test(this.codeValue)) {  //有区域ID
-                    uiRegionHelper.htmlById(this.codeValue).then(function (ts) {
-                    }.bind(this));
+                    var p, c, s;
+                    uiRegionHelper.htmlById(this.codeValue)
+                        .then(function (ts) {
+                            p = ts[2];
+                            c = ts[1];
+                            s = ts[0];
+                            return uiRegionHelper.getProvince();
+                        })
+                        .then(function(data){
+                            self.$pDom.select2({data: data});
+                            if(p){
+                                self.$pDom.select2('val', p.id)
+                                return uiRegionHelper.getCity(p.id);
+                            }
+                            else{
+                                return null;
+                            }
+                        })
+                        .then(function(data){
+                            if(data){
+                                self.$cDom.select2({data: data});
+                                if(c){
+                                    self.$cDom.select2('val', c.id)
+                                    return uiRegionHelper.getStreet(c.id);
+                                }
+                                else{
+                                    return null;
+                                }
+                            }
+                        })
+                        .then(function(data){
+                            if(data){
+                                self.$sDom.select2({data: data});
+                                if(s){
+                                    self.$sDom.select2('val', s.id)
+                                }
+                            }
+                        });
                     this.$inputDom.val(this.codeValue);
                 }
                 else { //没有则直接加载省
@@ -2541,6 +2737,12 @@ angular.module('admin.component')
                         this.$pDom.select2({data: data});
                     }.bind(this));
                 }
+
+                //
+                if(this.attrs.aValue){
+                    this.$aDom.val(this.attrs.aValue);
+                }
+
                 this.initMode();
                 this.initEvent();
             },
@@ -2709,6 +2911,19 @@ angular.module('admin.component')
                         this.scope[this.model] = this.defaultResetValue;
                     }
                 }
+
+                if(this.attrs.value){
+                    this.val(this.attrs.value);
+                }
+                this.element.removeAttr('value');
+            },
+
+            /**
+             *
+             */
+            disabled: function(open){
+                this.selectElement.prop('disabled', open);
+                this.render();
             },
 
             /**
@@ -2825,14 +3040,14 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
     .constant('userConfig', {
-        url: '/',
+        url: '/sysconfig/orguser/select',
         labelName: 'name',
         valueName: 'staffno'
     })
     .constant('tagConfig', {
-        url: '/',
+        url: '/sysconfig/tag/list?classify=',
         labelName: 'name',
-        valueName: 'staffno'
+        valueName: 'id'
     })
     .factory('uiMultiSelectFactory', function ($q, ajax, logger, msg, util, Event) {
         var m = new msg('MultiSelect'),
@@ -3115,12 +3330,23 @@ angular.module('admin.component')
              *
              * @param v
              */
-            val: function () {
-                if (this.attrs.multi) {
-                    return this.selectValues;
+            val: function (vals) {
+                if(vals){
+                    this.inputElement.select2('val', vals);
+                    if (this.attrs.multi){
+                        this.selectValues = vals;
+                    }
+                    else{
+                        this.selectValues = [vals];
+                    }
                 }
-                else {
-                    return this.selectValues[0];
+                else{
+                    if (this.attrs.multi) {
+                        return this.selectValues;
+                    }
+                    else {
+                        return this.selectValues[0];
+                    }
                 }
             },
 
@@ -3153,13 +3379,14 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiSwitchFactory', function (msg, uiFormControl) {
+    .factory('uiSwitchFactory', function (msg, uiFormControl, ValueService) {
         var m = new msg('Switch'),
             Switch = function (scope, element, attrs) {
                 this.inputElement = element.find('input');
                 this.onValue = attrs.onValue || 'on';
                 this.offValue = attrs.offValue || 'off';
                 this.attrs = attrs;
+                this.model = attrs.model;
                 uiFormControl.apply(this, arguments);
             };
         Switch.prototype = $.extend(new uiFormControl(), {
@@ -3175,21 +3402,44 @@ angular.module('admin.component')
                     this.inputElement.bootstrapSwitch('state', this.attrs.value == this.onValue);
                 }
                 this.inputElement[0].checked = true;
+
+                if(this.model){
+                    this.scope.$watch(this.model, function(newValue){
+                        if(newValue != this.val()){
+                            this.val(newValue);
+                        }
+                    }.bind(this));
+
+                    //如果model没有值, 默认选择第一个
+                    if(!ValueService.get(this.scope, this.model)){
+                        var val = this.val();
+                        ValueService.set(this.scope, this.model, val || this.offValue);
+                    }
+                }
             },
 
             onChangeHandler: function (evt, state) {
                 var v = state ? this.onValue : this.offValue;
                 this.inputElement.val(v);
                 this.inputElement[0].checked = true;
+                this.$emit('change');
+                if(this.model){
+                    ValueService.set(this.scope, this.model, v);
+                }
             },
 
             reset: function () {
                 this.inputElement.val();
             },
 
-            val: function (isOn) {
-                if (isOn != undefined) {
-                    this.inputElement.bootstrapSwitch('state', isOn);
+            disabled: function (open) {
+                this.inputElement.bootstrapSwitch('disabled',open=='true');
+            },
+
+
+            val: function (val) {
+                if (val != undefined) {
+                    this.inputElement.bootstrapSwitch('state', val == this.onValue);
                     return this;
                 }
                 else {
@@ -3459,6 +3709,83 @@ angular.module('admin.component')
                 };
             },
             templateUrl: 'tpl.tab'
+        };
+    });
+
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .factory('uiMenuFactory', function (msg, ajax, Event) {
+        var m = new msg('Menu'),
+            Menu = function (scope, element, attrs) {
+                Event.call(this);
+                this.element = element;
+                this.attrs = attrs;
+                this.scope = scope;
+                this.activeItem = null;
+                this.init();
+            };
+        Menu.prototype = {
+
+            /**
+             *
+             */
+            init: function () {
+                this.scope.activeItem = null;
+                this.scope.menuItems = [];
+                this.scope.onClickHandler = this.onClickHandler.bind(this);
+                if (this.attrs.url) {
+                    this.setUrl(this.attrs.url);
+                }
+            },
+
+            /**
+             *
+             * @param url
+             */
+            setUrl: function (url) {
+                ajax.get(url).then(function(data){
+                    this.setData(data);
+                }.bind(this));
+            },
+
+            /**
+             *
+             */
+            setData: function (menuItems) {
+                this.scope.menuItems = menuItems;
+            },
+
+            /**
+             *
+             * @param menuItem
+             */
+            onClickHandler: function(menuItem){
+                if(this.scope.activeItem){
+                    this.scope.activeItem.active = false;
+                }
+                this.scope.activeItem = menuItem;
+                this.scope.activeItem.active = true;
+            }
+        };
+        return function (s, e, a, c, t) {
+            return new Menu(s, e, a, c, t);
+        };
+    });
+angular.module('admin.component')
+    .directive('uiMenu', function (uiMenuFactory) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: false,
+            link: uiMenuFactory,
+            templateUrl: 'tpl.menu'
         };
     });
 
@@ -3846,7 +4173,6 @@ angular.module('admin.component')
             controller: function ($scope, $element, $attrs, $transclude) {
                 var ref = componentHelper.getComponentRef($element.parents('table').parent(), '$table'),
                     hasTransclude = $transclude().length > 0,
-                    index = $element.index(),
                     name = $attrs.name || '',
                     render = function (rowData) {
                         if (hasTransclude) {
@@ -3870,13 +4196,13 @@ angular.module('admin.component')
                 //
                 if ($scope[ref] && $scope[ref].addColumn) {
                     var editor = null;
-                    if ($attrs.editable) {
+                    if ($attrs.editable != undefined) {
                         var editorName = 'uiEditable' + $attrs.editable.charAt(0).toUpperCase() + $attrs.editable.substring(1) + 'Factory';
                         try {
                             editor = $injector.get(editorName);
                         }
                         catch (e) {
-                            //m.error('未找到编辑器为' + editorName);
+                            editor = $injector.get('uiEditableInputFactory');
                         }
                     }
                     $scope[ref].addColumn(uiTableColumnService(ref, $scope, $attrs, render, editor));
@@ -4146,16 +4472,17 @@ angular.module('admin.component')
     .factory('uiTableEditableFactory', function (msg) {
         var m = new msg('TableEditable'),
             TableEditable = function () {
-                this.editUrl = this.attrs.editUrl;
+                this.editUrl = this.attrs.editUrl || '';
+                this.editUrl = this.editUrl + (this.editUrl.indexOf('?') == -1 ? '?' : '&') + 'idName=' + this.attrs.idName;
                 this.editFormName = this.attrs.formName;
                 this.editRuleMap = {};
                 if (this.editFormName) {
-                    $.getJSON('/validator?cm=' + this.formName, function (rules) {
+                    $.getJSON('/validator?cm=' + this.editFormName, function (rules) {
                         this.editRuleMap = rules;
                     }.bind(this));
                 }
                 else if (this.editUrl) {
-                    m.error('开始编辑模式, 但是未提供form-name校验数据的地址');
+                    //m.error('开始编辑模式, 但是未提供form-name校验数据的地址');
                 }
 
                 this.toggleEdit = function (isEdit) {
@@ -4186,7 +4513,7 @@ angular.module('admin.component')
                 Event.call(this);
                 this.columns = [];
                 this.nopageMode = attrs.nopage !== undefined;
-                this.idName = null;
+                this.idName = attrs.idName;
                 this.pageResult = {};
                 this.selectValues = [];
                 this.selectItems = [];
@@ -4325,7 +4652,7 @@ angular.module('admin.component')
                     }
                 });
 
-                this.scope.$broadcast('uitable.selectAllChecked', sn == this.pageResult.aaData.length && sn != 0);
+                this.scope.$broadcast('uitable.selectAllChecked', this.pageResult.aaData&&sn == this.pageResult.aaData.length && sn != 0);
                 this.$emit('uitable.renderSuccess', result);
             },
 
@@ -5059,6 +5386,17 @@ angular.module('admin.component')
             },
 
             /**
+             *  清空选中
+             */
+            cleanChecked: function(){
+                var self = this;
+                $.each(this.selectItems, function(i, selectItem){
+                    var node = self.instance.getNodeByParam("id", selectItem.id, null);
+                    self.instance.checkNode(node, false, true);
+                });
+            },
+
+            /**
              * 设置选中的数据
              * @param data
              */
@@ -5261,6 +5599,7 @@ angular.module('admin.component')
     angular.module('admin.template', []);
 })(jQuery);
 
+
 (function ($) {
     angular.module('admin.template')
         .run(function(componentHelper){
@@ -5282,7 +5621,7 @@ angular.module('admin.component')
                 '<div class="form-group">',
                     '<label class="col-md-{{leftCol}} control-label">{{{label}}}</label>',
                     '<div class="col-md-{{rightCol}}">',
-                        '<input type="text" class="form-control" name="{{name}}" placeholder="{{placeholder}}"  {{#if value}}value="{{value}}"{{/if}} {{#if readonly}}readonly="{{readonly}}"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}}/>',
+                        '<input {{#if type}}type="{{type}}"{{else}}type="text"{{/if}} class="form-control" name="{{name}}" placeholder="{{placeholder}}"  {{#if value}}value="{{value}}"{{/if}} {{#if readonly}}readonly="{{readonly}}"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}}/>',
                         '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',
                     '</div>',
                 '</div>'
@@ -5297,7 +5636,7 @@ angular.module('admin.component')
                     '<div class="col-md-{{rightCol}}">',
                         '<div class="input-date-range input-inline">',
                             '<div class="input-group">',
-                                '<input type="text" class="form-control"  name="{{formName}}" {{#if formModel}}ng-model="{{formModel}}"{{/if}} {{#if formValue}}value="{{formValue}}"{{/if}} readonly>',
+                                '<input type="text" class="form-control" name="{{fromName}}" {{#if fromModel}}ng-model="{{fromModel}}"{{/if}} {{#if fromValue}}value="{{fromValue}}"{{/if}} readonly>',
                                 '<span class="input-group-addon">至</span>',
                                 '<input type="text" class="form-control" name="{{toName}}" {{#if toModel}}ng-model="{{toModel}}"{{/if}} {{#if toValue}}value="{{toValue}}"{{/if}} readonly>',
                             '</div>',
@@ -5314,7 +5653,7 @@ angular.module('admin.component')
                 '<div class="form-group" {{#if isMulti}}is-multi="true"{{/if}}>',
                     '<label class="col-md-{{leftCol}} control-label">{{{label}}}</label>',
                     '<div class="col-md-{{rightCol}}">',
-                        '<select class="form-control" name="{{name}}" placeholder="{{placeholder}}" {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}} ng-transclude></select>',
+                        '<select class="form-control" name="{{name}}" placeholder="{{placeholder}}" {{#if disabled}}disabled="disabled"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}} ng-transclude></select>',
                         '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',
                     '</div>',
                 '</div>'
@@ -5354,9 +5693,9 @@ angular.module('admin.component')
              */
             componentHelper.setTemplate('tpl.form.textarea', [
                 '<div class="form-group">',
-                    '<label class="control-label col-md-4">{{{label}}}</label>',
-                    '<div class="col-md-8">',
-                        '<textarea {{#if model}}ng-model="{{model}}"{{/if}} {{#if name}}name="{{name}}"{{/if}} class="form-control" ></textarea>',
+                    '<label class="control-label col-md-{{leftCol}}">{{{label}}}</label>',
+                    '<div class="col-md-{{rightCol}}">',
+                        '<textarea {{#if rows}}rows="{{rows}}"{{/if}} {{#if style}}style="{{style}}"{{/if}} {{#if cols}}cols="{{cols}}"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#if name}}name="{{name}}"{{/if}} class="form-control"></textarea>',
                         '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',
                     '</div>',
                 '</div>'
@@ -5367,13 +5706,45 @@ angular.module('admin.component')
              */
             componentHelper.setTemplate('tpl.form.switch', [
                 '<div class="form-group">',
-                    '<label class="control-label col-md-4">{{{label}}}</label>',
-                    '<div class="col-md-8">',
-                         '<input type="checkbox" {{#if model}}ng-model="{{model}}"{{/if}} {{#if value}}value="{{value}}"{{/if}} {{#if name}}name="{{name}}"{{/if}} {{#if onText}}data-on-text="{{onText}}"{{/if}}  {{#if offText}}data-off-text="{{offText}}"{{/if}}/>',
+                    '<label class="control-label col-md-{{leftCol}}">{{{label}}}</label>',
+                    '<div class="col-md-{{rightCol}}">',
+                         '<input type="checkbox"  {{#if disabled}}disabled="{{disabled}}"{{/if}} {{#if value}}value="{{value}}"{{/if}} {{#if name}}name="{{name}}"{{/if}} {{#if onText}}data-on-text="{{onText}}"{{/if}}  {{#if offText}}data-off-text="{{offText}}"{{/if}}/>',
                          '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',
                     '</div>',
                 '</div>'
             ].join(''));
+        });
+})(jQuery);
+(function ($) {
+    angular.module('admin.template')
+        .run(function(componentHelper){
+
+            /**
+             *
+             */
+            componentHelper.setTemplate('tpl.menu', [
+                '<div class="page-sidebar navbar-collapse collapse">',
+                    '<ul class="page-sidebar-menu">',
+                        '<ng-tranclude></ng-tranclude>',
+                        '<li ng-class="{\'active open\': menuItem.active}" ng-click="onClickHandler(menuItem)" ng-repeat="menuItem in menuItems">',
+                            '<a href="javascript:">',
+                                '<i ng-class="menuItem.icon"></i>',
+                                '<span class="title" ng-bind="menuItem.title"></span>',
+                                '<span class="arrow"></span>',
+                            '</a>',
+                            '<ul class="sub-menu" ng-if="menuItem.children">',
+                                '<li ng-class="{\'active\': menuItem.active}" ng-repeat="submenuItem in menuItem.children">',
+                                    '<a ng-href="submenuItem.url">',
+                                        '<i ng-class="submenuItem.icon"></i>',
+                                        '{{submenuItem.title}}',
+                                    '</a>',
+                                '</li>',
+                            '</ul>',
+                        '</li>',
+                    '</ul>',
+                '</div>'
+            ].join(''));
+
         });
 })(jQuery);
 (function ($) {
@@ -5439,7 +5810,7 @@ angular.module('admin.component')
              */
             componentHelper.setTemplate('tpl.searchform.userselect.input', [
                 '<div class="input-inline search-item">',
-                    '<div class="input-group">',
+                    '<div class="input-group input-small">',
                         '{{#if label}}',
                             '<div class="input-group-addon">{{label}}:</div>',
                         '{{/if}}',
@@ -5595,7 +5966,7 @@ angular.module('admin.component')
 
                     '<div class="btn-group pull-left">',
                         '{{#if editable}}',
-                            '<button type="button" class="btn btn-sm btn-info" ng-click="{{ref}}.toggleEdit()"><i class="fa fa-edit"></i> <ng-bind>{{ref.editText}}</ng-bind> 快速编辑</button>&nbsp;&nbsp;',
+                            '<button type="button" class="btn btn-sm btn-info" ng-click="{{ref}}.toggleEdit()"><i class="fa fa-edit"></i> <span ng-bind="{{ref}}.editText"></span>快速编辑</button>&nbsp;&nbsp;',
                         '{{/if}}',
                         '{{#if add}}',
                             '<button type="button" class="btn btn-sm btn-primary" ng-click="{{ref}}.doAddItem()"><i class="fa fa-plus-circle"></i> 新增{{tip}}</button>&nbsp;&nbsp;',
