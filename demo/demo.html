@@ -40,7 +40,7 @@
         </div>
 
         <div class="col-md-2">
-            <ui-tree url="/region" expand="1" on-click="treeTwoClick"></ui-tree>
+            <ui-menu url="/menu"></ui-menu>
         </div>
 
 
@@ -104,6 +104,31 @@
         type="text/javascript"></script>
 
 <script>
+    $.mockjax({
+        url: '/menu',
+        response: function () {
+            this.responseText = {
+                data: [
+                    {
+                        title: '首页',
+                        icon: 'icon-home',
+                        children: [
+                            {
+                                title: 'A',
+                                icon: 'icon-home'
+                            },
+                            {
+                                title: 'A',
+                                icon: 'icon-home'
+                            }
+                        ]
+                    }
+                ],
+                result: 1
+            }
+        }
+    });
+
     var i = 0;
     var a = 0;
     $.mockjax({
