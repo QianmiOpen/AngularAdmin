@@ -34,6 +34,7 @@ angular.module('admin.service')
                     }.bind(this),
                     validate: this.validation.bind(this),
                     success: function (json, value) {
+                        json = json || {};
                         if (json.result == 'ok') {
                             return true;
                         }
@@ -61,7 +62,7 @@ angular.module('admin.service')
                 var inputVal = this.element.data('editableContainer').$form.find('[name="' + this.name + '"]').val();
                 val = inputVal != undefined ? inputVal : val;
                 if (this.rule) {
-                    return util.checkValueUseRules(this.name, val, this.rules);
+                    return util.checkValueUseRules(this.name, val, this.rule);
                 }
                 return null;
             },

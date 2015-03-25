@@ -1,0 +1,120 @@
+<div id="tree" class="panel panel-success">
+    <div class="panel-heading">UITree</div>
+    <div class="panel-body">
+        <div class="list-group">
+            <li class="list-group-item">
+                <h4 class="list-group-item-heading">使用</h4>
+                <p class="list-group-item-text">
+                    <code>
+                        &lt;ui-tree&gt;<br/>
+                        &lt;/ui-tree&gt;<br/>
+                    </code>
+                </p>
+            </li>
+            <li class="list-group-item">
+                <h4 class="list-group-item-heading">属性</h4>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>属性名</th>
+                        <th>默认值</th>
+                        <th>是否必须</th>
+                        <th>描述</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>url</td>
+                        <td></td>
+                        <td>是</td>
+                        <td>获取树的数据</td>
+                    </tr>
+                    <tr>
+                        <td>on-before-click</td>
+                        <td></td>
+                        <td>否</td>
+                        <td>判断是否可以点击, 回调函数名称, 要挂载在顶层controller里面</td>
+                    </tr>
+                    <tr>
+                        <td>on-click</td>
+                        <td></td>
+                        <td>否</td>
+                        <td>点击时触发, 回调函数名称, 要挂载在顶层controller里面</td>
+                    </tr>
+                    <tr>
+                        <td>on-before-check</td>
+                        <td></td>
+                        <td>否</td>
+                        <td>判断是否可以选中, 回调函数名称, 要挂载在顶层controller里面</td>
+                    </tr>
+                    <tr>
+                        <td>on-check</td>
+                        <td></td>
+                        <td>否</td>
+                        <td>选中时触发, 回调函数名称, 要挂载在顶层controller里面</td>
+                    </tr>
+                    <tr>
+                        <td>add</td>
+                        <td>false</td>
+                        <td>否</td>
+                        <td>当移动到树节点的时候会显示一个添加按钮</td>
+                    </tr>
+                    <tr>
+                        <td>edit</td>
+                        <td>false</td>
+                        <td>否</td>
+                        <td>当移动到树节点的时候会显示一个编辑按钮</td>
+                    </tr>
+                    <tr>
+                        <td>del</td>
+                        <td>false</td>
+                        <td>否</td>
+                        <td>当移动到树节点的时候会显示一个删除按钮</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </li>
+            <li class="list-group-item">
+                <h4 class="list-group-item-heading">方法</h4>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>方法名</th>
+                        <th>描述</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>addTreeNodeBtn(label[标题], className[class名称], handler[点击后回调])</td>
+                        <td>添加一个当移动到数节点上面的额外按钮</td>
+                    </tr>
+                    <tr>
+                        <td>addTreeNodeBtnAtIndex(index[位置],label[标题], className[class名称], handler[点击后回调])</td>
+                        <td>添加一个当移动到数节点上面的额外按钮到指定的位置</td>
+                    </tr>
+                    <tr>
+                        <td>setData(data)</td>
+                        <td>手动设置树的数据</td>
+                    </tr>
+                    <tr>
+                        <td>expand(level[级别])</td>
+                        <td>按级别展开树</td>
+                    </tr>
+                    <tr>
+                        <td>expandById(id)</td>
+                        <td>按id展开树</td>
+                    </tr>
+                    <tr>
+                        <td>selectItems</td>
+                        <td>获取树选中的数据集合</td>
+                    </tr>
+                    <tr>
+                        <td>selectValues</td>
+                        <td>获取树选中的数据ID集合</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </li>
+        </div>
+    </div>
+</div>

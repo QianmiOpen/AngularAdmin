@@ -3,79 +3,48 @@
 <head>
     <meta charset="utf-8"/>
     <title>如何使用</title>
-    <link rel="stylesheet" href="assets/css/lib.min.css"/>
+    <link rel="stylesheet" href="../output/css/all.css"/>
     <link href="http://pic.ofcard.com/themes/admin/plugins/zTree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet"
           type="text/css"/>
-    <link rel="stylesheet" href="assets/css/animate.css">
+    <link rel="stylesheet" href="../output/assets/css/animate.css">
 </head>
 <body style="background-color: #fff !important;" ng-app="admin">
     <div class="container">
         <h1 data-wow-duration="0.5s" class="wow fadeIn animated">
             首先感谢您使用该框架 O(∩_∩)O
         </h1>
-        <div class="alert alert-success wow bounceInLeft animated">
-            <h2>第<b data-wow-iteration="infinite" class="wow pulse animated" style="color: #ff1d71;margin:0 4px;">1</b>步 <a href="assets.rar">下载</a>该代码</h2>
-        </div>
 
         <div class="alert alert-success wow bounceInLeft animated" data-wow-delay="1s">
-            <h2>第<b data-wow-iteration="infinite" class="wow pulse animated"  style="color: #ff1d71;margin:0 4px;">2</b>步 解压到你的工程下, 并且给html元素加上ng-app="admin"</h2>
-        </div>
-
-        <div class="alert alert-success wow bounceInLeft animated" data-wow-delay="2s">
-            <h2>第<b data-wow-iteration="infinite" class="wow pulse animated" style="color: #ff1d71;margin:0 4px;">3</b>步 加入下列代码到你的head, 修改lib.min.css里面批量替换/demo/assets为你存放的目录</h2>
+            <h2>第<b data-wow-iteration="infinite" class="wow pulse animated" style="color: #ff1d71;margin:0 4px;">1</b>步 加入下列代码到你的head</h2>
             <code>
-&lt;link rel="stylesheet" href="assets/css/lib.min.css"/&gt;<br/>
+&lt;link rel="stylesheet" href="http://172.21.4.38/css/all.css"/&gt;<br/>
 &lt;link href="http://pic.ofcard.com/themes/admin/plugins/zTree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet" type="text/css"/&gt;
             </code>
         </div>
 
-        <div class="alert alert-success wow bounceInLeft animated" data-wow-delay="3s">
-            <h2>第<b data-wow-iteration="infinite" class="wow pulse animated" style="color: #ff1d71;margin:0 4px;">4</b>步 加入下列代码到你的body的下面</h2>
+        <div class="alert alert-success wow bounceInLeft animated" data-wow-delay="2s">
+            <h2>第<b data-wow-iteration="infinite" class="wow pulse animated" style="color: #ff1d71;margin:0 4px;">2</b>步 加入下列代码到你的body的下面</h2>
             <code>
-                &lt;script src="assets/js/lib.min.js"&gt;&lt;/script&gt;<br/>
+                &lt;script src="http://172.21.4.38/js/lib.js"&gt;&lt;/script&gt;<br/>
                 &lt;script src="http://pic.ofcard.com/themes/admin/plugins/zTree/jquery.ztree.core-3.5.min.js" type="text/javascript"&gt;&lt;/script&gt;<br/>
                 &lt;script src="http://pic.ofcard.com/themes/admin/plugins/zTree/jquery.ztree.excheck-3.5.js" type="text/javascript"&gt;&lt;/script&gt;<br/>
                 &lt;script src="http://pic.ofcard.com/themes/admin/plugins/zTree/jquery.ztree.exedit-3.5.js" type="text/javascript"&gt;&lt;/script&gt;<br/>
-                &lt;script src="assets/js/angular.1.3.8.min.js"&gt;&lt;script&gt;<br/>
-                &lt;script src="assets/js/all.js"&gt;&lt;/script&gt;<br/>
-            </code>
-        </div>
-
-        <div class="alert alert-success wow bounceInLeft animated" data-wow-delay="4s">
-            <h2>第<b data-wow-iteration="infinite" class="wow pulse animated" style="color: #ff1d71;margin:0 4px;">5</b>步 复制下面的代码到你的body里面</h2>
-            <code>
-                &lt;ui-container&gt;<br/>
-                &nbsp;&nbsp;&lt;ui-search-form&gt;<br/>
-                &nbsp;&nbsp;&lt;/ui-search-form&gt;<br/>
-                &nbsp;&nbsp;&lt;ui-toolbar-table&gt;<br/>
-                &nbsp;&nbsp;&lt;/ui-toolbar-table&gt;<br/>
-                &nbsp;&nbsp;&lt;ui-table&gt;<br/>
-                &nbsp;&nbsp;&lt;/ui-table&gt;<br/>
-                &lt;/ui-container&gt;<br/>
+                &lt;script src="http://172.21.4.38/js/all.js"&gt;&lt;script&gt;<br/>
             </code>
         </div>
 
         <div class="row" style="margin-bottom: 40px" >
             <div class="col-md-6">
-                <a href="doc.html" data-wow-delay="5s" class="wow flipInX animated btn btn-success btn-block btn-lg">点我见文档</a>
+                <a href="doc.html" data-wow-delay="3s" class="wow flipInX animated btn btn-success btn-block btn-lg">点我见文档</a>
             </div>
             <div class="col-md-6">
-                <a href="setup.html" data-wow-delay="5s" class="wow flipInX animated btn btn-info btn-block btn-lg">点我见装配</a>
+                <a href="setup.html" data-wow-delay="3s" class="wow flipInX animated btn btn-info btn-block btn-lg">点我见装配</a>
             </div>
         </div>
     </div>
 </body>
-<script src="assets/js/lib.min.js"></script>
-<script src="assets/js/jquery.mockjax.js"></script>
-<script src="http://pic.ofcard.com/themes/admin/plugins/zTree/jquery.ztree.core-3.5.min.js"
-        type="text/javascript"></script>
-<script src="http://pic.ofcard.com/themes/admin/plugins/zTree/jquery.ztree.excheck-3.5.js"
-        type="text/javascript"></script>
-<script src="http://pic.ofcard.com/themes/admin/plugins/zTree/jquery.ztree.exedit-3.5.js"
-        type="text/javascript"></script>
-<script src="assets/js/angular.1.3.8.min.js"></script>
-<script src="assets/js/all.js"></script>
-<script src="assets/js/wow.js"></script>
+
+<script src="../output/assets/js/wow.js"></script>
 <script>
     var wow = new WOW(
             {

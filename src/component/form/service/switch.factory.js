@@ -6,9 +6,9 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiSwitchFactory', function (msg, uiFormControl) {
+    .factory('uiSwitchFactory', function (msg, uiFormControl, ValueService) {
         var m = new msg('Switch'),
-            Switch = function (scope, element, attrs, ValueService) {
+            Switch = function (scope, element, attrs) {
                 this.inputElement = element.find('input');
                 this.onValue = attrs.onValue || 'on';
                 this.offValue = attrs.offValue || 'off';
@@ -32,10 +32,16 @@ angular.module('admin.component')
 
                 if(this.model){
                     this.scope.$watch(this.model, function(newValue){
-                        if(newValue){
+                        if(newValue != this.val()){
                             this.val(newValue);
                         }
                     }.bind(this));
+
+                    //如果model没有值, 默认选择第一个
+                    if(!ValueService.get(this.scope, this.model)){
+                        var val = this.val();
+                        ValueService.set(this.scope, this.model, val || this.offValue);
+                    }
                 }
             },
 
@@ -43,11 +49,20 @@ angular.module('admin.component')
                 var v = state ? this.onValue : this.offValue;
                 this.inputElement.val(v);
                 this.inputElement[0].checked = true;
+                this.$emit('change');
+                if(this.model){
+                    ValueService.set(this.scope, this.model, v);
+                }
             },
 
             reset: function () {
                 this.inputElement.val();
             },
+
+            disabled: function (open) {
+                this.inputElement.bootstrapSwitch('disabled',open=='true');
+            },
+
 
             val: function (val) {
                 if (val != undefined) {

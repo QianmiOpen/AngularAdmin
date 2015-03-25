@@ -6,7 +6,7 @@
              *
              */
             componentHelper.setTemplate('tpl.tab', [
-                '<div class="">',
+                '<div class="tabbable-custom{{#if close}} tabbable-close{{/if}}">',
                     '<ul class="nav nav-tabs" ng-transclude>',
                     '</ul>',
                     '<div class="tab-content" style="min-height: 100px;">',
@@ -19,7 +19,7 @@
              */
             componentHelper.setTemplate('tpl.tab.item', [
                 '<li>',
-                    '<a href="javascript:;" ng-click="$tabItem.onClickHandler()" >{{{head}}}</a>',
+                    '<a href="javascript:;" ng-click="$tabItem.onClickHandler()" ><span>{{{head}}}</span><i class="fa fa-times" ng-click="$tabItem.onRemoveHandler($event)"></i></a>',
                 '</li>'
             ].join(''));
 

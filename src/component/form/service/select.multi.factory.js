@@ -12,9 +12,9 @@ angular.module('admin.component')
         valueName: 'staffno'
     })
     .constant('tagConfig', {
-        url: '/sysconfig/orguser/select',
+        url: '/sysconfig/tag/list?classify=',
         labelName: 'name',
-        valueName: 'staffno'
+        valueName: 'id'
     })
     .factory('uiMultiSelectFactory', function ($q, ajax, logger, msg, util, Event) {
         var m = new msg('MultiSelect'),
@@ -213,19 +213,25 @@ angular.module('admin.component')
              * @param o
              */
             filterData: function (o) {
-                var sfs = (this.attrs.search || '').toLowerCase().split(','),
+                var self = this,
+                    sfs = (this.attrs.search || '').toLowerCase().split(','),
                     keyword = o.term.toLowerCase();
                 this.loadData().then(function (rs) {
                     var os = [];
                     $.each(rs, function (i, r) {
                         var isC = false;
-                        if (sfs.length == 0 || sfs[0] == '') { //说明查所有属性
-                            isC = r.__string.indexOf(keyword) != -1;
+                        if (o.init) { //初始化, 那么只会根据
+                            isC = self.formatId(r) == o.term;
                         }
-                        else {   //针对特定属性
-                            $.each(sfs, function (ii, sf) {
-                                isC = (r[sf] || '').toString().toLowerCase().indexOf(keyword) != -1;
-                            });
+                        else { //根据属性过滤
+                            if (sfs.length == 0 || sfs[0] == '') {
+                                isC = r.__string.indexOf(keyword) != -1;
+                            }
+                            else {   //针对特定属性
+                                $.each(sfs, function (ii, sf) {
+                                    isC = (r[sf] || '').toString().toLowerCase().indexOf(keyword) != -1;
+                                });
+                            }
                         }
                         if (isC) {
                             os.push(r);
@@ -259,6 +265,7 @@ angular.module('admin.component')
                     self.isInit = false;
                     this.filterData({
                         term: element.val(),
+                        init: true,
                         callback: handler
                     });
                 }
@@ -297,12 +304,23 @@ angular.module('admin.component')
              *
              * @param v
              */
-            val: function () {
-                if (this.attrs.multi) {
-                    return this.selectValues;
+            val: function (vals) {
+                if (vals) {
+                    this.inputElement.select2('val', vals);
+                    if (this.attrs.multi) {
+                        this.selectValues = vals;
+                    }
+                    else {
+                        this.selectValues = [vals];
+                    }
                 }
                 else {
-                    return this.selectValues[0];
+                    if (this.attrs.multi) {
+                        return this.selectValues;
+                    }
+                    else {
+                        return this.selectValues[0];
+                    }
                 }
             },
 

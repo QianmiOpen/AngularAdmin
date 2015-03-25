@@ -6,7 +6,7 @@
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .constant('defaultCol', '4:8')
+    .constant('defaultCol', '2:10')
     .directive('uiForm', function (uiFormFactory, componentHelper) {
         return {
             restrict: 'E',

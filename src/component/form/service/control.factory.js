@@ -33,7 +33,7 @@ angular.module('admin.component')
              * @private
              */
             _cleanElement: function () {
-                this.element.removeAttr('name').removeAttr('model').removeAttr('readonly');
+                this.element.removeAttr('name').removeAttr('model').removeAttr('readonly').removeAttr('disabled');
             },
 
             /**
@@ -45,6 +45,12 @@ angular.module('admin.component')
                 this.resetListener = this.scope.$on(this.formResetEventName, function () {
                     this.reset();
                 }.bind(this));
+            },
+
+            /**
+             *
+             */
+            disabled: function(){
             },
 
             /**

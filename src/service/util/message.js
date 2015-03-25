@@ -6,8 +6,7 @@
 //
 //-----------------------------------------------------------------------------------------------
 (function () {
-
-    if(window.toastr){
+    if (window.toastr) {
         toastr.options = {
             "closeButton": true,
             "debug": false,
@@ -22,7 +21,7 @@
             "hideMethod": "fadeOut"
         };
     }
-    else{
+    else {
         console.error('需要 toastr库 支持, 请导入...');
     }
 
@@ -48,7 +47,23 @@
      * 导出
      */
     angular.module('admin.service')
-        .factory('msg', function () {
-            return P;
+        .provider('msg', function () {
+            return {
+
+                /**
+                 * 设置位置
+                 */
+                setPostion: function (v, h) {
+                    toastr.options.positionClass = 'toast-' + v + '-' + h;
+                },
+
+                /**
+                 *
+                 * @returns {Function}
+                 */
+                $get: function () {
+                    return P;
+                }
+            }
         });
 })();

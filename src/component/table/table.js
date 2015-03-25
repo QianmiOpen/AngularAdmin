@@ -10,6 +10,7 @@ angular.module('admin.component')
             restrict: 'E',
             replace: true,
             transclude: true,
+
             compile: function () {
                 var uiTable = null;
                 return {

@@ -105,7 +105,7 @@ angular.module('admin.component')
                                         fnCallback(result);
                                         table.afterDataHandler(result);
                                     }, function (json) {
-                                        table.errorHandleData(json);
+                                        table.errorDataHandler(json);
                                     })
                                     .finally(function (json) {
                                         table.$emit('uitable.requestComplete');

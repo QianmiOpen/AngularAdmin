@@ -8,6 +8,16 @@
     * template   custom control template
     * admin.js   entry file
 
+
+## component list
+![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/doc/componens.jpg)
+
+## template list
+![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/doc/template.jpg)
+
+## service list
+![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/doc/service.jpg)
+
 ## Form UI
 ![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/doc/form.png)
 ```javascript

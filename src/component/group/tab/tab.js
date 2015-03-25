@@ -18,6 +18,8 @@ angular.module('admin.component')
                     }
                 };
             },
-            templateUrl: 'tpl.tab'
+            template: function (element, attrs) {
+                return componentHelper.getTemplate('tpl.tab', attrs);
+            }
         };
     });

@@ -6,7 +6,7 @@ module.exports = function (grunt) {
 
         watch: {
             scripts: {
-                tasks: ['concat'],
+                tasks: ['concat:build'],
                 files: ['./src/**/*.js']
             }
         },
@@ -24,7 +24,7 @@ module.exports = function (grunt) {
         //    },
         //    build: {
         //        files: {
-        //            './demo/all.min.js': [
+        //            './output/all.min.js': [
         //
         //                './src/filter/index.js',
         //                './src/filter/**/*.js',
@@ -52,24 +52,24 @@ module.exports = function (grunt) {
             },
             target: {
                 files: {
-                    './demo/assets/css/lib.min.css': [
-                        './demo/assets/plugins/font-awesome/css/font-awesome.min.css',
-                        './demo/assets/plugins/simple-line-icons/simple-line-icons.min.css',
-                        './demo/assets/plugins/bootstrap/css/bootstrap.min.css',
-                        './demo/assets/plugins/bootstrap-switch/css/bootstrap-switch.min.css',
-                        './demo/assets/plugins/uniform/css/uniform.default.css',
-                        './demo/assets/css/components.css',
-                        './demo/assets/css/plugins.css',
-                        './demo/assets/css/layout.css',
-                        './demo/assets/css/themes/blue.css',
-                        './demo/assets/js/bootstrap-toastr/toastr.min.css',
-                        './demo/assets/js/bootstrap-select/bootstrap-select.min.css',
-                        './demo/assets/js/data-tables/DT_bootstrap.css',
-                        './demo/assets/js/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css',
-                        './demo/assets/js/bootstrap-daterangepicker/css/daterangepicker-bs3.css',
-                        './demo/assets/js/select2/select2.css',
-                        './demo/assets/js/select2/select2-metronic.css',
-                        './demo/assets/css/custom.css'
+                    './output/css/all.css': [
+                        './output/assets/plugins/font-awesome/css/font-awesome.min.css',
+                        './output/assets/plugins/simple-line-icons/simple-line-icons.min.css',
+                        './output/assets/plugins/bootstrap/css/bootstrap.min.css',
+                        './output/assets/plugins/bootstrap-switch/css/bootstrap-switch.min.css',
+                        './output/assets/plugins/uniform/css/uniform.default.css',
+                        './output/assets/css/components.css',
+                        './output/assets/css/plugins.css',
+                        './output/assets/css/layout.css',
+                        './output/assets/css/themes/grey.css',
+                        './output/assets/js/bootstrap-toastr/toastr.min.css',
+                        './output/assets/js/bootstrap-select/bootstrap-select.min.css',
+                        './output/assets/js/data-tables/DT_bootstrap.css',
+                        './output/assets/js/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css',
+                        './output/assets/js/bootstrap-daterangepicker/css/daterangepicker-bs3.css',
+                        './output/assets/js/select2/select2.css',
+                        './output/assets/js/select2/select2-metronic.css',
+                        './output/assets/css/custom.css'
                     ]
                 }
             }
@@ -83,7 +83,7 @@ module.exports = function (grunt) {
             },
             build: {
                 files: {
-                    './demo/assets/js/all.js': [
+                    './output/js/all.js': [
 
                         './src/filter/index.js',
                         './src/filter/**/*.js',
@@ -98,25 +98,33 @@ module.exports = function (grunt) {
                         './src/template/**/*.js',
 
                         './src/admin.js'
-                    ],
-                    './demo/assets/js/lib.min.js': [
-                        './demo/assets/js/handlebars.js',
-                        './demo/assets/js/jquery-1.10.2.min.js',
-                        './demo/assets/js/bootstrap/js/bootstrap.min.js',
-                        './demo/assets/js/bootstrap-select/bootstrap-select.min.js',
-                        './demo/assets/js/bootstrap-datetimepicker/js/moment.js',
-                        './demo/assets/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js',
-                        './demo/assets/js/bootstrap-daterangepicker/js/daterangepicker.js',
-                        './demo/assets/plugins/bootstrap-switch/js/bootstrap-switch.min.js',
-                        './demo/assets/js/select2/select2.min.js',
-                        './demo/assets/js/jquery.blockui.min.js',
-                        './demo/assets/js/metronic.js',
-                        './demo/assets/js/jquery.dataTables.min.js',
-                        './demo/assets/js/bootstrap-toastr/toastr.min.js',
-                        './demo/assets/js/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js',
-                        './demo/assets/js/bootstrap-modal/js/bootstrap-modal.js',
-                        './demo/assets/js/bootstrap-modal/js/bootstrap-modalmanager.js',
-                        './demo/assets/js/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js'
+                    ]
+                }
+            },
+            build_lib: {
+                files: {
+                    './output/js/lib.js': [
+                        './output/assets/js/handlebars.js',
+                        './output/assets/js/jquery-1.10.2.min.js',
+                        './output/assets/js/bootstrap/js/bootstrap.min.js',
+                        './output/assets/js/angular.1.3.8.min.js',
+                        './output/assets/js/angular-ui-router.min.js',
+                        './output/assets/js/bootstrap-select/bootstrap-select.min.js',
+                        './output/assets/js/bootstrap-datetimepicker/js/moment.js',
+                        './output/assets/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js',
+                        './output/assets/js/bootstrap-daterangepicker/js/daterangepicker.js',
+                        './output/assets/plugins/bootstrap-switch/js/bootstrap-switch.min.js',
+                        './output/assets/plugins/uniform/jquery.uniform.min.js',
+                        './output/assets/js/select2/select2.min.js',
+                        './output/assets/js/jquery.blockui.min.js',
+                        './output/assets/js/metronic.js',
+                        './output/assets/js/jquery.dataTables.min.js',
+                        './output/assets/js/bootstrap-toastr/toastr.min.js',
+                        './output/assets/js/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js',
+                        './output/assets/js/bootstrap-modal/js/bootstrap-modal.js',
+                        './output/assets/js/bootstrap-modal/js/bootstrap-modalmanager.js',
+                        './output/assets/js/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js',
+                        './output/assets/js/highcharts/js/highcharts.js'
                     ]
                 }
             }

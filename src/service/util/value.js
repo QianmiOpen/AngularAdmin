@@ -7,6 +7,9 @@ angular.module('admin.service')
             set: function (scope, express, value) {
                 var getter = $parse(express);
                 getter.assign(scope, value);
+                if (!scope.$$phase) {
+                    scope.$apply();
+                }
             },
 
             get: function (scope, express) {

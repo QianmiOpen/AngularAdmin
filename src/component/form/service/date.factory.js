@@ -6,7 +6,7 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiDateFactory', function (msg, uiFormControl) {
+    .factory('uiDateFactory', function (msg, uiFormControl, util) {
         var m = new msg('Date'),
             InputDate = function (scope, element, attrs) {
                 this.className = 'Date';
@@ -54,7 +54,7 @@ angular.module('admin.component')
              *
              * @param fn
              */
-            change: function(fn){
+            change: function (fn) {
                 this.inputElement.change(fn);
                 return this;
             },
@@ -66,7 +66,7 @@ angular.module('admin.component')
              */
             val: function (v) {
                 if (v != undefined) {
-                    this.inputElement.val(util.dateFormatStr(v, this.format));
+                    this.inputElement.val(v ? util.dateFormatStr(v, this.format) : '');
                     return this;
                 }
                 else {
@@ -74,7 +74,7 @@ angular.module('admin.component')
                 }
             }
         });
-        return function(s, e, a, c, t){
+        return function (s, e, a, c, t) {
             return new InputDate(s, e, a, c, t);
         };
     });

@@ -10,8 +10,8 @@
                     '<div class="row">',
                         '<div class="col-md-{{leftCol}}" ng-transclude></div>',
                         '<div class="text-right col-md-{{rightCol}}">',
-                            '<a title="回车键也可触发搜索" class="btn blue-chambray" ng-click="{{ref}}.search()"><i class="fa fa-search"></i></button>',
-                            '<a title="重置搜索选项" class="btn default" ng-click="{{ref}}.reset()" style="width: 41px"><i class="fa fa-undo font-blue-chambray"></i></a>',
+                            '<a title="回车键也可触发搜索" class="btn blue-chambray btn-sm" ng-click="{{ref}}.search()" style="width: 30px"><i class="fa fa-search"></i></button>',
+                            '<a title="重置搜索选项" class="btn default btn-sm" ng-click="{{ref}}.reset()" style="width: 30px"><i class="fa fa-undo font-blue-chambray"></i></a>',
                         '</div>',
                     '</div>',
                 '</form>'

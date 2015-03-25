@@ -38,7 +38,7 @@ angular.module('admin.component')
                 //
                 if ($scope[ref] && $scope[ref].addColumn) {
                     var editor = null;
-                    if ($attrs.editable) {
+                    if ($attrs.editable != undefined) {
                         var editorName = 'uiEditable' + $attrs.editable.charAt(0).toUpperCase() + $attrs.editable.substring(1) + 'Factory';
                         try {
                             editor = $injector.get(editorName);

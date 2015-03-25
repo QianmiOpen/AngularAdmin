@@ -1,0 +1,198 @@
+<div class="col-md-10">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="form" class="panel panel-success">
+        <div class="panel-heading">UIForm</div>
+        <div class="panel-body">
+            <div class="list-group">
+                <li class="list-group-item">
+                    <h4 class="list-group-item-heading">使用</h4>
+                    <p class="list-group-item-text">
+                        <code>
+                            &lt;ui-form&gt;<br/>
+                            &lt;/ui-form&gt;<br/>
+                        </code>
+                    </p>
+                </li>
+                <li class="list-group-item">
+                    <h4 class="list-group-item-heading">属性</h4>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>属性名</th>
+                            <th>默认值</th>
+                            <th>是否必须</th>
+                            <th>描述</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>ref</td>
+                            <td>$form</td>
+                            <td>否</td>
+                            <td>类似id,用于scope</td>
+                        </tr>
+                        <tr>
+                            <td>url</td>
+                            <td></td>
+                            <td>否</td>
+                            <td>适用于编辑场景, 远程获取表单数据</td>
+                        </tr>
+                        <tr>
+                            <td>action</td>
+                            <td></td>
+                            <td>否</td>
+                            <td>如果设置了该值, 那么将会自动提交</td>
+                        </tr>
+                        <tr>
+                            <td>form-name</td>
+                            <td></td>
+                            <td>否</td>
+                            <td>表单的验证规则, 远程对象</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </li>
+                <li class="list-group-item">
+                    <h4 class="list-group-item-heading">方法</h4>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>方法名</th>
+                            <th>描述</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>setData(data[表单数据])</td>
+                            <td>设置表单数据</td>
+                        </tr>
+                        <tr>
+                            <td>setUrl(url)</td>
+                            <td>远程获取表单数据</td>
+                        </tr>
+                        <tr>
+                            <td>layout(column[一行几列])</td>
+                            <td>自动布局</td>
+                        </tr>
+                        <tr>
+                            <td>submit(callback[回调])</td>
+                            <td>提交数据触发</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </li>
+                <li class="list-group-item">
+                    <h4 class="list-group-item-heading">事件</h4>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>事件名</th>
+                            <th>参数</th>
+                            <th>触发</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>uiform.reset</td>
+                            <td>(evt)</td>
+                            <td>当点击清空按钮触发</td>
+                        </tr>
+                        <tr>
+                            <td>uiform.doSubmit</td>
+                            <td>(evt, formData)</td>
+                            <td>当点击提交按钮触发</td>
+                        </tr>
+                        <tr>
+                            <td>uiform.rules</td>
+                            <td>(evt, rule)</td>
+                            <td>当获取到验证规则触发, 用于动态修改验证规则</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </li>
+            </div>
+        </div>
+    </div>
+
+    <div id="menu" class="panel panel-success">
+        <div class="panel-heading">UIMenu</div>
+        <div class="panel-body">
+            <div class="list-group">
+                <li class="list-group-item">
+                    <h4 class="list-group-item-heading">使用</h4>
+                    <p class="list-group-item-text">
+                        <code>
+                            &lt;ui-menu&gt;<br/>
+                            &lt;/ui-menu&gt;<br/>
+                        </code>
+                    </p>
+                </li>
+                <li class="list-group-item">
+                    <h4 class="list-group-item-heading">属性</h4>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>属性名</th>
+                            <th>默认值</th>
+                            <th>是否必须</th>
+                            <th>描述</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>url</td>
+                            <td></td>
+                            <td>否</td>
+                            <td>类似id,用于scope</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </li>
+                <li class="list-group-item">
+                    <h4 class="list-group-item-heading">方法</h4>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>方法名</th>
+                            <th>描述</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </li>
+            </div>
+        </div>
+    </div>
+</div>

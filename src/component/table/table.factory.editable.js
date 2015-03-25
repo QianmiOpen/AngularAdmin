@@ -9,11 +9,12 @@ angular.module('admin.component')
     .factory('uiTableEditableFactory', function (msg) {
         var m = new msg('TableEditable'),
             TableEditable = function () {
-                this.editUrl = this.attrs.editUrl;
+                this.editUrl = this.attrs.editUrl || '';
+                this.editUrl = this.editUrl + (this.editUrl.indexOf('?') == -1 ? '?' : '&') + 'idName=' + this.attrs.idName;
                 this.editFormName = this.attrs.formName;
                 this.editRuleMap = {};
                 if (this.editFormName) {
-                    $.getJSON('/validator?cm=' + this.formName, function (rules) {
+                    $.getJSON('/validator?cm=' + this.editFormName, function (rules) {
                         this.editRuleMap = rules;
                     }.bind(this));
                 }

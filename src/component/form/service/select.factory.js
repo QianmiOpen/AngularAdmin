@@ -6,7 +6,7 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiSelectFactory', function (msg, uiFormControl, ValueService) {
+    .factory('uiSelectFactory', function (msg, ajax, uiFormControl, ValueService) {
         var m = new msg('Select'),
             Select = function (scope, element, attrs) {
                 this.selectElement = element.find('select');
@@ -18,6 +18,7 @@ angular.module('admin.component')
         Select.prototype = $.extend(new uiFormControl(), {
 
             _init: function(){
+                var self = this;
                 if(this.model){
 
                     //监听一下model的变化
@@ -28,9 +29,30 @@ angular.module('admin.component')
 
                     //如果model没有值, 默认选择第一个
                     if(!ValueService.get(this.scope, this.model)){
-                        this.scope[this.model] = this.defaultResetValue;
+                        var val = this.attrs.value ? this.attrs.value : this.defaultResetValue;
+                        ValueService.set(this.scope, this.model, val);
                     }
                 }
+
+                //远程加载数据
+                if(this.attrs.url){
+                    ajax.post(this.attrs.url).then(function(responseData){
+                        self.setData(responseData, false);
+                    });
+                }
+
+                if(!this.model && this.attrs.value){
+                    this.val(this.attrs.value);
+                }
+                this.element.removeAttr('value');
+            },
+
+            /**
+             *
+             */
+            disabled: function(open){
+                this.selectElement.prop('disabled', open);
+                this.render();
             },
 
             /**
@@ -58,7 +80,7 @@ angular.module('admin.component')
                 dataName = dataName || 'key';
                 dataValue = dataValue || 'text';
                 if (isClean) {
-                    this.selectElement.html();
+                    this.selectElement.html('');
                 }
                 if ($.isArray(data)) {
                     $.each(data, function (i, item) {

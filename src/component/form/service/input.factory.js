@@ -23,10 +23,15 @@ angular.module('admin.component')
                 if (this.mask && $.fn.inputmask) {
                     this.inputElement.inputmask(this.mask);
                 }
+                this.element.removeAttr('type');
             },
 
             reset: function () {
                 this.inputElement.val('');
+            },
+
+            disabled: function (open) {
+                this.attr('disabled', open);
             },
 
             attr: function (k, v) {
@@ -48,7 +53,7 @@ angular.module('admin.component')
                 }
             }
         });
-        return function(s, e, a, c, t){
+        return function (s, e, a, c, t) {
             return new Input(s, e, a, c, t);
         };
     });

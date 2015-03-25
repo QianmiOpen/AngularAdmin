@@ -40,16 +40,21 @@
 
                 /**
                  *
+                 * @private
                  */
-                addFormItem: function (formItem) {
-                    this.formItems.push(formItem);
+                _init: function () {
                     this.scope.$on('componentComplete', function (evt, o) {
                         if (o && o.name) {
                             this.formControlMap[o.name] = o;
                         }
-                        else{
-                        }
                     }.bind(this));
+                },
+
+                /**
+                 *
+                 */
+                addFormItem: function (formItem) {
+                    this.formItems.push(formItem);
                     this.layout();
                 },
 
@@ -65,10 +70,10 @@
                         $body.html();
                         for (var i = 0, dom; dom = this.formItems[i]; i++) { //过滤一下
                             if (dom.innerHTML != undefined) {
-                                if(dom.type == 'hidden'){
+                                if (dom.type == 'hidden') {
                                     $body.append(dom);
                                 }
-                                else{
+                                else {
                                     doms.push(dom);
                                 }
                             }
@@ -91,9 +96,9 @@
                                     $rowDom.append($cellDom);
                                 }
                                 tempColumn++;
-                            };
+                            }
                             $body.append($rowDom);
-                            $.each(other, function(i, dom){
+                            $.each(other, function (i, dom) {
                                 $body.append(dom);
                             });
                         }
@@ -127,9 +132,11 @@
                  * @param rules
                  */
                 setRules: function (rules) {
-                    this.$emit('uiform.rules', rules);
+                    var messages = {};
+                    this.$emit('uiform.rules', rules, messages);
                     this.element.validate($.extend({}, uiFormValidateConfig, {
                         rules: rules,
+                        messages: messages,
                         submitHandler: this._submit.bind(this)
                     }));
                 },
@@ -138,7 +145,7 @@
                  *
                  * @returns {*}
                  */
-                formData: function (data) {
+                formData: function () {
                     return this.element.serializeArray();
                 },
 
@@ -146,20 +153,21 @@
                  * 加载数据绑定到表单
                  * @param url
                  */
-                loadData: function(url){
-                    ajax.post(url).then(function(formData){
-                        this.setData(formData);
-                    }.bind(this));
+                loadData: function (url) {
+                    var self = this;
+                    return ajax.post(url).then(function (formData) {
+                        self.setData(formData);
+                    });
                 },
 
                 /**
                  * 给表单设置数据集
                  * @param data
                  */
-                setData: function(data){
-                    for(var k in data){
+                setData: function (data) {
+                    for (var k in data) {
                         var formControl = this.formControlMap[k];
-                        if(formControl){
+                        if (formControl) {
                             formControl.val(data[k]);
                         }
                     }
@@ -171,7 +179,7 @@
                 submit: function (fn) {
                     this.$on('uiForm.doSubmit', fn);
                 },
-                _submit: function(other){
+                _submit: function (other) {
                     if (this.action) {
                         ajax.post(this.action, this.formData(other)).then(function () {
                             this.$emit('uiForm.completeSubmit', this);
@@ -182,7 +190,6 @@
                     }
                     return false;
                 },
-
 
                 /**
                  *

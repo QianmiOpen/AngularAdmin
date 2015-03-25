@@ -38,7 +38,7 @@ angular.module('admin.component')
                     }.bind(this));
                 }
                 else {
-                    m.error('未发现数据源');
+                    //
                 }
 
                 //
@@ -201,6 +201,17 @@ angular.module('admin.component')
                 }
                 this.selectValues = $.map(this.selectItems, function (item) {
                     return item.id;
+                });
+            },
+
+            /**
+             *  清空选中
+             */
+            cleanChecked: function(){
+                var self = this;
+                $.each(this.selectItems, function(i, selectItem){
+                    var node = self.instance.getNodeByParam("id", selectItem.id, null);
+                    self.instance.checkNode(node, false, true);
                 });
             },
 
