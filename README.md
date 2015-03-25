@@ -10,16 +10,16 @@
 
 
 ## component list
-![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/doc/componens.jpg)
+![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/docs/components.jpg)
 
 ## template list
-![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/doc/template.jpg)
+![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/docs/template.jpg)
 
 ## service list
-![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/doc/service.jpg)
+![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/docs/service.jpg)
 
 ## Form UI
-![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/doc/form.png)
+![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/docs/form.png)
 ```javascript
 <ui-form column="1">
     <ui-form-input label="normal" placeholder="abc" help="help" model="ccc" ></ui-form-input>
@@ -36,7 +36,7 @@
 ```
 
 ## SearchForm
-![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/doc/searchform.png)
+![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/docs/searchform.png)
 ```javascript
 <ui-search-form>
     <ui-search-input class="input-medium" label="测试" name="test"></ui-search-input>
@@ -62,7 +62,7 @@
 ```
 
 ## Toolbar And Table
-![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/doc/toolbar_table.png)
+![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/docs/toolbar_table.png)
 ```javascript
 <ui-table url="/test" edit-url="/test">
     <ui-table-check-column name="a"></ui-table-check-column>
@@ -85,7 +85,7 @@
 ```
 
 ## Tree
-![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/doc/tree.png)
+![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/docs/tree.png)
 ```javascript
 <ui-tree url="/region" expand="1" on-click="treeTwoClick"></ui-tree>
 ```
