@@ -1,0 +1,95 @@
+<div id="searchDateRange" class="panel panel-success">
+    <div class="panel-body">
+        <div class="list-group">
+            <li class="list-group-item">
+                <h4 class="list-group-item-heading">案例</h4>
+                <p class="list-group-item-text">
+                    <ui-search-date-range label="年月日时分秒"></ui-search-date-range>
+                </p>
+                <p class="list-group-item-text">
+                    <ui-search-date-range mode="date" label="年月日"></ui-search-date-range>
+                </p>
+            </li>
+            <li class="list-group-item">
+                <h4 class="list-group-item-heading">使用</h4>
+                <p class="list-group-item-text">
+                    <code>
+                        &lt;ui-search-date-range&gt;&lt;/ui-search-date-range&gt;
+                    </code>
+                </p>
+            </li>
+            <li class="list-group-item">
+                <h4 class="list-group-item-heading">属性</h4>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>属性名</th>
+                        <th>默认值</th>
+                        <th>是否必须</th>
+                        <th>描述</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>ref</td>
+                        <td>$searchDateRange</td>
+                        <td>否</td>
+                        <td>类似id, 用于在scope中获取</td>
+                    </tr>
+                    <tr>
+                        <td>form-name</td>
+                        <td></td>
+                        <td>是</td>
+                        <td>开始时间的name</td>
+                    </tr>
+                    <tr>
+                        <td>to-name</td>
+                        <td></td>
+                        <td>是</td>
+                        <td>结束时间的name</td>
+                    </tr>
+                    <tr>
+                        <td>from-model</td>
+                        <td></td>
+                        <td>否</td>
+                        <td>开始时间的ng-model</td>
+                    </tr>
+                    <tr>
+                        <td>to-model</td>
+                        <td></td>
+                        <td>否</td>
+                        <td>结束时间的ng-model</td>
+                    </tr>
+                    <tr>
+                        <td>mode</td>
+                        <td>datetime</td>
+                        <td>否</td>
+                        <td>date为日期,time为事件,datetime为日期+时间</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </li>
+            <li class="list-group-item">
+                <h4 class="list-group-item-heading">方法</h4>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>方法名</th>
+                        <th>描述</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>val(v)</td>
+                        <td>和jquery的val类似</td>
+                    </tr>
+                    <tr>
+                        <td>change(callback[回调函数])</td>
+                        <td>监听数据变动事件</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </li>
+        </div>
+    </div>
+</div>

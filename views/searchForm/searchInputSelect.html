@@ -1,0 +1,81 @@
+<div id="searchInputSelect" class="panel panel-success">
+    <div class="panel-body">
+        <div class="list-group">
+            <li class="list-group-item">
+                <h4 class="list-group-item-heading">案例</h4>
+                <p class="list-group-item-text">
+                    <ui-search-input-select label="我的选中值就是输入框的name">
+                        <option value="userid">name为userid</option>
+                        <option value="username">name为username</option>
+                    </ui-search-input-select>
+                </p>
+                <p class="list-group-item-text">
+                    <ui-search-input-select label="选中值和输入框都有name" select-name="selectName" input-name="inputName">
+                        <option value="1">id</option>
+                        <option value="2">name</option>
+                    </ui-search-input-select>
+                </p>
+            </li>
+            <li class="list-group-item">
+                <h4 class="list-group-item-heading">使用</h4>
+                <p class="list-group-item-text">
+                    <code>
+                        &lt;ui-search-input-select&gt;&lt;/ui-search-input-select&gt;
+                    </code>
+                </p>
+            </li>
+            <li class="list-group-item">
+                <h4 class="list-group-item-heading">属性</h4>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>属性名</th>
+                        <th>默认值</th>
+                        <th>是否必须</th>
+                        <th>描述</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>ref</td>
+                        <td>$searchInputSelect</td>
+                        <td>否</td>
+                        <td>类似id, 用于在scope中获取</td>
+                    </tr>
+                    <tr>
+                        <td>select-name</td>
+                        <td></td>
+                        <td>否</td>
+                        <td>和inputName必须同时设置, 获取同时不设置(那么input的name将会设置为select的value)</td>
+                    </tr>
+                    <tr>
+                        <td>input-name</td>
+                        <td></td>
+                        <td>否</td>
+                        <td>和inputName必须同时设置, 获取同时不设置(那么input的name将会设置为select的value)</td>
+                    </tr>
+                    <tr>
+                        <td>mode</td>
+                        <td>datetime</td>
+                        <td>否</td>
+                        <td>date为日期,time为事件,datetime为日期+时间</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </li>
+            <li class="list-group-item" style="display: none">
+                <h4 class="list-group-item-heading">方法</h4>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>方法名</th>
+                        <th>描述</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </li>
+        </div>
+    </div>
+</div>

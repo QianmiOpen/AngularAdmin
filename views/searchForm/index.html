@@ -1,0 +1,123 @@
+<div class="row">
+    <div class="col-md-3">
+        <div class="panel">
+            <div class="panel-body">
+                <ul class="nav nav-pills nav-stacked">
+                    <li ui-sref-active="active">
+                        <a ui-sref="searchform.input">输入</a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="searchform.date">日期</a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="searchform.daterange">日期范围</a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="searchform.number">数字输入</a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="searchform.inputselect">下拉输入</a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="searchform.region">区域</a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="searchform.select">下拉</a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="searchform.multiselect">下拉多选</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9" ui-view>
+        <div class="panel panel-success">
+            <div class="panel-body">
+                <div class="list-group">
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">使用</h4>
+                        <p class="list-group-item-text">
+                            <code>
+                                &lt;ui-search-form&gt;&lt;/ui-search-form&gt;
+                            </code>
+                        </p>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">属性</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>属性名</th>
+                                <th>默认值</th>
+                                <th>是否必须</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>ref</td>
+                                <td>$searchForm</td>
+                                <td>否</td>
+                                <td>类似id, 用于在scope中获取</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">方法</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>方法名</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>search(other[额外的查询数据, json格式])</td>
+                                <td>调用$table.search方法, 进行查询数据</td>
+                            </tr>
+                            <tr>
+                                <td>reset()</td>
+                                <td>情况所有查询控件的数据</td>
+                            </tr>
+                            <tr>
+                                <td>formData()</td>
+                                <td>返回<code>[{name: .., value:..}...]</code>类型的数据</td>
+                            </tr>
+                            <tr>
+                                <td>formParamData()</td>
+                                <td>返回<code>name=value&name=value...</code>类型的数据</td>
+                            </tr>
+                            <tr>
+                                <td>submit(callback[回调函数])</td>
+                                <td>监听提交事件</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">事件</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>事件名</th>
+                                <th>参数</th>
+                                <th>触发</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>uisearchform.doSubmit</td>
+                                <td>(evt, formData[表单数据])</td>
+                                <td>当点击查询按钮触发</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
