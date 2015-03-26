@@ -48,7 +48,7 @@ angular.module('admin.component')
                 this.attrs = attrs;
 
                 this.hasDefaultDateRange = !!this.attrs.range;
-                this.isDateTimeMode = attrs.mode != 'time';
+                this.isDateTimeMode = attrs.mode != 'date' || attr.time != undefined;
                 this.format = attrs.format || (this.isDateTimeMode ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD');
                 var dateRange = uiDateRangeDefaultRange[this.attrs.range] || [];
                 this.defaultStartDate = attrs.fromValue || dateRange[0];

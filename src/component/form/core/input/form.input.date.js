@@ -15,11 +15,18 @@ angular.module('admin.component')
                 //
                 var format = [],
                     cc = (attrs.col || defaultCol).split(':');
-                if (!attrs.mode || attrs.mode.indexOf('date') != -1)
-                    format.push('YYYY-MM-DD');
-                if (!attrs.mode || attrs.mode.indexOf('time') != -1)
-                    format.push('HH:mm:ss');
-
+                if(attrs.mode){
+                    if (!attrs.mode || attrs.mode.indexOf('date') != -1)
+                        format.push('YYYY-MM-DD');
+                    if (!attrs.mode || attrs.mode.indexOf('time') != -1)
+                        format.push('HH:mm:ss');
+                }
+                else{ //兼容老属性
+                    if (!attrs.date)
+                        format.push('YYYY-MM-DD');
+                    if (!attrs.time)
+                        format.push('HH:mm:ss');
+                }
                 return componentHelper.getTemplate('tpl.form.input', $.extend({
                     leftCol: cc[0],
                     rightCol: cc[1],
