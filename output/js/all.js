@@ -1,4 +1,4 @@
-/*! zk - v0.0.1 - 2015-03-24 */
+/*! zk - v0.0.1 - 2015-03-26 */
 (function(){
 //-----------------------------------------------------------------------------------------------
 //
@@ -1791,11 +1791,18 @@ angular.module('admin.component')
                 //
                 var format = [],
                     cc = (attrs.col || defaultCol).split(':');
-                if (!attrs.date)
-                    format.push('YYYY-MM-DD');
-                if (!attrs.time)
-                    format.push('HH:mm:ss');
-
+                if(attrs.mode){
+                    if (!attrs.mode || attrs.mode.indexOf('date') != -1)
+                        format.push('YYYY-MM-DD');
+                    if (!attrs.mode || attrs.mode.indexOf('time') != -1)
+                        format.push('HH:mm:ss');
+                }
+                else{ //兼容老属性
+                    if (!attrs.date)
+                        format.push('YYYY-MM-DD');
+                    if (!attrs.time)
+                        format.push('HH:mm:ss');
+                }
                 return componentHelper.getTemplate('tpl.form.input', $.extend({
                     leftCol: cc[0],
                     rightCol: cc[1],
@@ -1919,81 +1926,6 @@ angular.module('admin.component')
             }
         };
     });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  特定组件 - BOSS 员工选择
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSelectTag', function (uiMultiSelectFactory, util) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: false,
-            controller: function ($scope, $element, $attrs, ajax, msg) {
-                var selectHelper = new uiMultiSelectFactory($scope, $element, $attrs);
-                util.setTag($attrs.tag || 'selectTag', selectHelper, $scope);
-
-                var classifyId = $attrs.classify,
-                    usercode = $attrs.usercode; //分类ID
-                $scope.$on('uiSelect.doAdd', function(evt, addObj, tag){
-                    ajax.post('/sysconfig/tag/rel/add', {name: addObj.name, classify: classifyId, id: addObj.isNew ? '': addObj.id, usercode: usercode}).then(function(data){
-                        addObj.id = data;
-                        delete addObj.isNew;
-                        msg.success('添加成功');
-                    });
-                });
-                $scope.$on('uiSelect.doDel', function(evt, delObj, tag){
-                    if(!delObj.isNew){ //新的
-                        ajax.post('/sysconfig/tag/rel/del', {name: delObj.name, classify: classifyId, id: delObj.id, usercode: usercode}).then(function(){
-                            msg.success('删除成功');
-                        });
-                    }
-                });
-            },
-            template: function (element, attrs) {
-                var labelConfig = attrs.labelName ? '' : 'label-name="name"',
-                    valueConfig = attrs.valueName ? '' : 'label-name="name"',
-                    classifyId = attrs.classify,
-                    allConfig = labelConfig + valueConfig;
-                return '<input multi data-url="/sysconfig/tag/list?classify=' + classifyId  + '" search=""  ' + allConfig + '/>';
-            }
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  特定组件 - BOSS 员工选择
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSelectUser', function (uiMultiSelectFactory, util) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: false,
-            controller: function ($scope, $element, $attrs) {
-                util.setTag('bossUser', new uiMultiSelectFactory($scope, $element, $attrs), $scope);
-            },
-            template: function (element, attrs) {
-                var labelConfig = attrs.labelName ? '' : 'label-name="name"',
-                    valueConfig = attrs.valueName ? '' : 'label-name="name"',
-                    allConfig = labelConfig + valueConfig,
-                    department = attrs.department||"";
-                if (attrs.multi) {
-                    return '<input data-url="/sysconfig/orguser?'+ (department?('department='+department):'') +'" minmum="1" search=""  ' + allConfig + '/>';
-                }
-                else {
-                    return '<input type="hidden" data-url="/sysconfig/orguser?'+ (department?('department='+department):'') +'" search=""  ' + allConfig + '/>';
-                }
-            }
-        };
-    });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -2155,42 +2087,6 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormUserSelect', function (uiMultiSelectFactory, componentHelper, userConfig, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: false,
-            transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                var select = uiMultiSelectFactory(scope, element, $.extend({}, userConfig, attrs));
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formUserSelect', select);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    select.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
-            },
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.input', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
     .directive('uiFormSwitch', function (uiSwitchFactory, componentHelper, defaultCol) {
         return {
             restrict: 'E',
@@ -2222,10 +2118,18 @@ angular.module('admin.component')
             link: uiDateFactory,
             template: function (element, attrs) {
                 var format = [];
-                if (!attrs.date)
-                    format.push('YYYY-MM-DD');
-                if (!attrs.time)
-                    format.push('HH:mm:ss');
+                if(attrs.mode){
+                    if (!attrs.mode || attrs.mode.indexOf('date') != -1)
+                        format.push('YYYY-MM-DD');
+                    if (!attrs.mode || attrs.mode.indexOf('time') != -1)
+                        format.push('HH:mm:ss');
+                }
+                else{ //兼容老属性
+                    if (!attrs.date)
+                        format.push('YYYY-MM-DD');
+                    if (!attrs.time)
+                        format.push('HH:mm:ss');
+                }
                 return componentHelper.getTemplate('tpl.searchform.input', $.extend({
                     other: [
                         {key: 'data-date-format', val: format.join(' ')},
@@ -2446,34 +2350,6 @@ angular.module('admin.component')
                         {key: 'title', val: attrs.tip || '请选择'}
                     ]
                 }, attrs));
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchUserSelect', function (uiMultiSelectFactory, componentHelper, userConfig) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: function (scope, element, attrs) {
-                var select = uiMultiSelectFactory(scope, element, $.extend({}, userConfig, attrs));
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchUserSelect', select);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    select.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.userselect.input', attrs);
             }
         };
     });
@@ -2700,7 +2576,8 @@ angular.module('admin.component')
                 this.attrs = attrs;
 
                 this.hasDefaultDateRange = !!this.attrs.range;
-                this.format = attrs.format || (attrs.time != undefined ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD');
+                this.isDateTimeMode = attrs.mode != 'date' || attr.time != undefined;
+                this.format = attrs.format || (this.isDateTimeMode ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD');
                 var dateRange = uiDateRangeDefaultRange[this.attrs.range] || [];
                 this.defaultStartDate = attrs.fromValue || dateRange[0];
                 this.defaultEndDate = attrs.toValue || dateRange[1];
@@ -2711,7 +2588,7 @@ angular.module('admin.component')
             _init: function () {
                 this.config = $.extend({}, uiDateRangeDefaultConfig, {
                     ranges: uiDateRangeDefaultRange,
-                    timePicker: this.attrs.time !== undefined,
+                    timePicker: this.isDateTimeMode,
                     format: this.format
                 });
 
