@@ -1,122 +1,66 @@
 <!DOCTYPE html>
-<html>
-
-  <head>
+<html ng-app="demoApp">
+<head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="description" content="Angular Admin UI : angular admin manage">
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
+    <link rel="stylesheet" href="https://rawgit.com/binlaniua/AngularAdmin/master/output/css/all.css"/>
     <title>Angular Admin UI</title>
-  </head>
+</head>
+<body>
 
-  <body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li ui-sref-active="active">
+                    <a ui-sref="start">开始</a>
+                </li>
+                <li ui-sref-active="active">
+                    <a ui-sref="searchform">查询组件</a>
+                </li>
+                <li ui-sref-active="active">
+                    <a ui-sref="table">表格组件</a>
+                </li>
+                <li ui-sref-active="active">
+                    <a ui-sref="form">表单组件</a>
+                </li>
+                <li ui-sref-active="active">
+                    <a ui-sref="tree">树</a>
+                </li>
+                <li ui-sref-active="active">
+                    <a ui-sref="tab" >Tab</a>
+                </li>
+                <li ui-sref-active="active">
+                    <a ui-sref="protal" >Portal</a>
+                </li>
+                <li ui-sref-active="active">
+                    <a ui-sref="chart" >图表</a>
+                </li>
+            </ul>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/binlaniua/AngularAdmin">View on GitHub</a>
-
-          <h1 id="project_title">Angular Admin UI</h1>
-          <h2 id="project_tagline">angular admin manage</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/binlaniua/AngularAdmin/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/binlaniua/AngularAdmin/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
     </div>
+</nav>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h2>
-<a id="form-ui" class="anchor" href="#form-ui" aria-hidden="true"><span class="octicon octicon-link"></span></a>Form UI</h2>
+<div class="container-fluid" ui-view>
+</div>
 
-<p><img src="https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/doc/form.png" alt="Image text"></p>
 
-<div class="highlight highlight-javascript"><pre><span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>form column<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>1<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>form<span class="pl-k">-</span>input label<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>normal<span class="pl-pds">"</span></span> placeholder<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>abc<span class="pl-pds">"</span></span> help<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>help<span class="pl-pds">"</span></span> model<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>ccc<span class="pl-pds">"</span></span> <span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>form<span class="pl-k">-</span>input<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>form<span class="pl-k">-</span>date label<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span> placeholder<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>abc<span class="pl-pds">"</span></span> help<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>help<span class="pl-pds">"</span></span> model<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>aaa<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>form<span class="pl-k">-</span>date<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>form<span class="pl-k">-</span>select label<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>select<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>option value<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>aa<span class="pl-k">&lt;</span>/option<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>option value<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>aa<span class="pl-k">&lt;</span>/option<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>/ui<span class="pl-k">-</span>form<span class="pl-k">-</span>select<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>form<span class="pl-k">-</span><span class="pl-k">switch</span> label<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>switch<span class="pl-pds">"</span></span> name<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>qqq<span class="pl-pds">"</span></span> on<span class="pl-k">-</span>value<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>1<span class="pl-pds">"</span></span> off<span class="pl-k">-</span>value<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>2<span class="pl-pds">"</span></span> on<span class="pl-k">-</span>text<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>123<span class="pl-pds">"</span></span> off<span class="pl-k">-</span>text<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>321<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>form<span class="pl-k">-</span><span class="pl-k">switch</span><span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>form<span class="pl-k">-</span>region  label<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>region<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>form<span class="pl-k">-</span>region<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>form<span class="pl-k">-</span>textarea label<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>&amp;lt;span style='color:red'&amp;gt;*&amp;lt;/span&amp;gt; textarea：<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>form<span class="pl-k">-</span>textarea<span class="pl-k">&gt;</span>
-<span class="pl-k">&lt;</span>/ui<span class="pl-k">-</span>form<span class="pl-k">&gt;</span></pre></div>
+<!-- 库包 -->
+<script src="https://rawgit.com/binlaniua/AngularAdmin/master/output/js/lib.js"></script>
 
-<h2>
-<a id="searchform" class="anchor" href="#searchform" aria-hidden="true"><span class="octicon octicon-link"></span></a>SearchForm</h2>
+<!-- Tree包 -->
+<script src="http://pic.ofcard.com/themes/admin/plugins/zTree/jquery.ztree.core-3.5.min.js" type="text/javascript"></script>
+<script src="http://pic.ofcard.com/themes/admin/plugins/zTree/jquery.ztree.excheck-3.5.js" type="text/javascript"></script>
+<script src="http://pic.ofcard.com/themes/admin/plugins/zTree/jquery.ztree.exedit-3.5.js" type="text/javascript"></script>
 
-<p><img src="https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/doc/searchform.png" alt="Image text"></p>
+<!-- 组件包 -->
+<script src="https://rawgit.com/binlaniua/AngularAdmin/master/output/js/all.js"></script>
 
-<div class="highlight highlight-javascript"><pre><span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>search<span class="pl-k">-</span>form<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>search<span class="pl-k">-</span>input <span class="pl-st">class</span><span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>input-medium<span class="pl-pds">"</span></span> label<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>测试<span class="pl-pds">"</span></span> name<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>test<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>search<span class="pl-k">-</span>input<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>search<span class="pl-k">-</span>select name<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>test2<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>option value<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>aaa<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>创建人<span class="pl-k">&lt;</span>/option<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>option value<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>bbbb<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>沟通人<span class="pl-k">&lt;</span>/option<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>/ui<span class="pl-k">-</span>search<span class="pl-k">-</span>select<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>search<span class="pl-k">-</span>input<span class="pl-k">-</span>select<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>option value<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>aaa<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>联系方式<span class="pl-k">&lt;</span>/option<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>option value<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>bbbb<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>客户姓名<span class="pl-k">&lt;</span>/option<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>/ui<span class="pl-k">-</span>search<span class="pl-k">-</span>input<span class="pl-k">-</span>select<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>search<span class="pl-k">-</span>multi<span class="pl-k">-</span>select tip<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>xxxxx<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>option value<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>aaa<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>联系方式<span class="pl-k">&lt;</span>/option<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>option value<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>bbbb<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>客户姓名<span class="pl-k">&lt;</span>/option<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>option value<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>ccc<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>联系方式<span class="pl-k">&lt;</span>/option<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>option value<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>ddd<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>客户姓名<span class="pl-k">&lt;</span>/option<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>/ui<span class="pl-k">-</span>search<span class="pl-k">-</span>multi<span class="pl-k">-</span>select<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>search<span class="pl-k">-</span>date <span class="pl-st">class</span><span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>input-medium<span class="pl-pds">"</span></span> label<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>日期<span class="pl-pds">"</span></span> name<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>test3<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>search<span class="pl-k">-</span>date<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>search<span class="pl-k">-</span>region mode<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>c<span class="pl-pds">"</span></span> label<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>区域<span class="pl-pds">"</span></span> name<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>asdasd22<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>search<span class="pl-k">-</span>region<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>search<span class="pl-k">-</span>user<span class="pl-k">-</span>select <span class="pl-st">class</span><span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>input-medium<span class="pl-pds">"</span></span> label<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>用户<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>search<span class="pl-k">-</span>user<span class="pl-k">-</span>select<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>search<span class="pl-k">-</span>date<span class="pl-k">-</span>range label<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>注册时间<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>search<span class="pl-k">-</span>date<span class="pl-k">-</span>range<span class="pl-k">&gt;</span>
-<span class="pl-k">&lt;</span>/ui<span class="pl-k">-</span>search<span class="pl-k">-</span>form<span class="pl-k">&gt;</span></pre></div>
-
-<h2>
-<a id="toolbar-and-table" class="anchor" href="#toolbar-and-table" aria-hidden="true"><span class="octicon octicon-link"></span></a>Toolbar And Table</h2>
-
-<p><img src="https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/doc/toolbar_table.png" alt="Image text"></p>
-
-<div class="highlight highlight-javascript"><pre><span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>table url<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>/test<span class="pl-pds">"</span></span> edit<span class="pl-k">-</span>url<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>/test<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>table<span class="pl-k">-</span>check<span class="pl-k">-</span>column name<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>table<span class="pl-k">-</span>check<span class="pl-k">-</span>column<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>table<span class="pl-k">-</span>column head<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>checkbox<span class="pl-pds">"</span></span> name<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span> editable<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>region<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>table<span class="pl-k">-</span>column<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>table<span class="pl-k">-</span>progress<span class="pl-k">-</span>column head<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>progress<span class="pl-pds">"</span></span> name<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>a<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>table<span class="pl-k">-</span>progress<span class="pl-k">-</span>column<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>table<span class="pl-k">-</span>image<span class="pl-k">-</span>column head<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>image<span class="pl-pds">"</span></span> name<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>ww<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>table<span class="pl-k">-</span>image<span class="pl-k">-</span>column<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>table<span class="pl-k">-</span>date<span class="pl-k">-</span>column head<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>date<span class="pl-pds">"</span></span> name<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>e<span class="pl-pds">"</span></span> <span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>table<span class="pl-k">-</span>date<span class="pl-k">-</span>column<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>table<span class="pl-k">-</span>state<span class="pl-k">-</span>column hred<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>state<span class="pl-pds">"</span></span> name<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>f<span class="pl-pds">"</span></span> <span class="pl-k">default</span><span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span> <span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>span <span class="pl-st">class</span><span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'</span>label label-sm label-default<span class="pl-pds">'</span></span> state<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>0<span class="pl-pds">"</span></span> style<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'</span>background-color:red !important<span class="pl-pds">'</span></span><span class="pl-k">&gt;</span><span class="pl-c1">0</span><span class="pl-k">&lt;</span>/span<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>span <span class="pl-st">class</span><span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'</span>label label-sm label-default<span class="pl-pds">'</span></span> state<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>1<span class="pl-pds">"</span></span> style<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">'</span>background-color:green !important<span class="pl-pds">'</span></span><span class="pl-k">&gt;</span><span class="pl-c1">1</span><span class="pl-k">&lt;</span>/span<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>/ui<span class="pl-k">-</span>table<span class="pl-k">-</span>state<span class="pl-k">-</span>column<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>table<span class="pl-k">-</span>operation<span class="pl-k">-</span>column head<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>opertion<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>a <span class="pl-st">class</span><span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>btn btn-sm default<span class="pl-pds">"</span></span> href<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>javascript:;<span class="pl-pds">"</span></span> ng<span class="pl-k">-</span>click<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>managePotential()<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>iclass<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>fa fa-cogs<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/i<span class="pl-k">&gt;&lt;</span>/a<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>a <span class="pl-st">class</span><span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>btn btn-sm default<span class="pl-pds">"</span></span> href<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>javascript:;<span class="pl-pds">"</span></span> ng<span class="pl-k">-</span>click<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>assignPotential()<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>i <span class="pl-st">class</span><span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>fa fa-hand-o-right<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/i<span class="pl-k">&gt;&lt;</span>/a<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>a <span class="pl-st">class</span><span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>btn btn-sm default<span class="pl-pds">"</span></span> href<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>javascript:;<span class="pl-pds">"</span></span> ng<span class="pl-k">-</span>click<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>editContact()<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>i <span class="pl-st">class</span><span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>fa fa-comments-o<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/i<span class="pl-k">&gt;&lt;</span>/a<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>a <span class="pl-st">class</span><span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>btn btn-sm default<span class="pl-pds">"</span></span> href<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>javascript:;<span class="pl-pds">"</span></span> ng<span class="pl-k">-</span>click<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>assignClaim()<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>i <span class="pl-st">class</span><span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span> fa fa-chain<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/i<span class="pl-k">&gt;&lt;</span>/a<span class="pl-k">&gt;</span>
-        <span class="pl-k">&lt;</span>a <span class="pl-st">class</span><span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>btn btn-sm default <span class="pl-pds">"</span></span> href<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>javascript:;<span class="pl-pds">"</span></span> ng<span class="pl-k">-</span>click<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>assignRelease()<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>i <span class="pl-st">class</span><span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span> fa fa-chain-broken<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/i<span class="pl-k">&gt;&lt;</span>/a<span class="pl-k">&gt;</span>
-    <span class="pl-k">&lt;</span>/ui<span class="pl-k">-</span>table<span class="pl-k">-</span>operation<span class="pl-k">-</span>column<span class="pl-k">&gt;</span>
-<span class="pl-k">&lt;</span>/ui<span class="pl-k">-</span>table<span class="pl-k">&gt;</span></pre></div>
-
-<h2>
-<a id="tree" class="anchor" href="#tree" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tree</h2>
-
-<p><img src="https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/doc/tree.png" alt="Image text"></p>
-
-<div class="highlight highlight-javascript"><pre><span class="pl-k">&lt;</span>ui<span class="pl-k">-</span>tree url<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>/region<span class="pl-pds">"</span></span> expand<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>1<span class="pl-pds">"</span></span> on<span class="pl-k">-</span>click<span class="pl-k">=</span><span class="pl-s1"><span class="pl-pds">"</span>treeTwoClick<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span>/ui<span class="pl-k">-</span>tree<span class="pl-k">&gt;</span></pre></div>
-      </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Angular Admin UI maintained by <a href="https://github.com/binlaniua">binlaniua</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-    
-
-  </body>
+<!-- -->
+<script src="javascripts/main.js"></script>
+</body>
 </html>
