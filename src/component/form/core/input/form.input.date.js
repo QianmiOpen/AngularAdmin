@@ -15,9 +15,9 @@ angular.module('admin.component')
                 //
                 var format = [],
                     cc = (attrs.col || defaultCol).split(':');
-                if (!attrs.date)
+                if (!attrs.mode || attrs.mode.indexOf('date') != -1)
                     format.push('YYYY-MM-DD');
-                if (!attrs.time)
+                if (!attrs.mode || attrs.mode.indexOf('time') != -1)
                     format.push('HH:mm:ss');
 
                 return componentHelper.getTemplate('tpl.form.input', $.extend({

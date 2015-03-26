@@ -13,9 +13,9 @@ angular.module('admin.component')
             link: uiDateFactory,
             template: function (element, attrs) {
                 var format = [];
-                if (!attrs.date)
+                if (!attrs.mode || attrs.mode.indexOf('date') != -1)
                     format.push('YYYY-MM-DD');
-                if (!attrs.time)
+                if (!attrs.mode || attrs.mode.indexOf('time') != -1)
                     format.push('HH:mm:ss');
                 return componentHelper.getTemplate('tpl.searchform.input', $.extend({
                     other: [
