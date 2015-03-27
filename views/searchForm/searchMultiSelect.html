@@ -60,6 +60,24 @@
                         <td>否</td>
                         <td>转换为ng-model</td>
                     </tr>
+                    <tr>
+                        <td>url</td>
+                        <td></td>
+                        <td>否</td>
+                        <td>如果要远程加载数据的话</td>
+                    </tr>
+                    <tr>
+                        <td>key-name</td>
+                        <td>key</td>
+                        <td>否</td>
+                        <td>如果远程加载数据, 那么拿这个属性作为数据条目的value</td>
+                    </tr>
+                    <tr>
+                        <td>value-name</td>
+                        <td>text</td>
+                        <td>否</td>
+                        <td>如果远程加载数据, 那么拿这个属性作为数据条目的label</td>
+                    </tr>
                     </tbody>
                 </table>
             </li>
@@ -74,7 +92,11 @@
                     </thead>
                     <tbody>
                     <tr>
-                        <td>setData(data[下拉数据], isClean[是否清空之前])</td>
+                        <td>load(url)</td>
+                        <td>远程加载数据</td>
+                    </tr>
+                    <tr>
+                        <td>setData(data[下拉数据, 如果要分组显示就传json, 如果不分组就传list], isClean[是否清空之前], keyName[数值kye的名称], valueName[数值显示的名称])</td>
                         <td>动态设置下拉显示的数据</td>
                     </tr>
                     <tr>
