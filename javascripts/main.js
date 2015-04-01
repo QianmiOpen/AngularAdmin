@@ -15,6 +15,13 @@ angular.module('demoApp', ['admin', 'ui.router'])
             .state('searchform.region', {url: '/searchform/region', templateUrl: basePath + 'searchForm/searchRegion.html'})
             .state('searchform.select', {url: '/searchform/select', templateUrl: basePath + 'searchForm/searchSelect.html'})
             .state('searchform.multiselect', {url: '/searchform/multiselect', templateUrl: basePath + 'searchForm/searchMultiSelect.html'})
+
+
+            .state('portal', {url: '/portal', templateUrl: basePath + 'portal/index.html'})
+            .state('portal.portlet', {url: '/portal/portlet', templateUrl: basePath + 'portal/portlet.html'})
+            .state('portal.portletaction', {url: '/portal/portlet/action', templateUrl: basePath + 'portal/portletaction.html'})
+            .state('portal.portletactionsearch', {url: '/portal/portlet/action/search', templateUrl: basePath + 'portal/portletactionsearch.html'})
+            .state('portal.portletactionpagination', {url: '/portal/portlet/action/pagination', templateUrl: basePath + 'portal/portletactionpagination.html'})
             ;
         $urlRouterProvider.otherwise('/start');
     });

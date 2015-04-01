@@ -1,0 +1,93 @@
+<div class="row">
+    <div class="col-md-3">
+        <div class="panel">
+            <div class="panel-body">
+                <ul class="nav nav-pills nav-stacked">
+                    <li ui-sref-active="active">
+                        <a ui-sref="portal.portlet">简单的portlet</a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="portal.portletaction">带工具条的portlet</a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="portal.portletactionsearch">带查询框的portlet</a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="portal.portletactionpagination">带分页的portlet</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-9" ui-view>
+        <div class="panel panel-success">
+            <div class="panel-body">
+                <div class="list-group">
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">使用</h4>
+                        <p class="list-group-item-text">
+                            <code>
+                                &lt;ui-portal&gt;
+                                &lt;/ui-portal&gt;
+                            </code>
+                        </p>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">属性</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>属性名</th>
+                                <th>默认值</th>
+                                <th>是否必须</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>url</td>
+                                <td>获取portlet信息的地址</td>
+                                <td>否</td>
+                                <td>返回结果集为
+                                    <code>
+                                    [
+                                        {url: '/static/portlet/portlet-1.jsp', row: 0[第几行], col: 0[第几列]}, ...
+                                    ]
+                                    </code>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">方法</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>方法名</th>
+                                <th>描述</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading">事件</h4>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>事件名</th>
+                                <th>参数</th>
+                                <th>触发</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </li>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

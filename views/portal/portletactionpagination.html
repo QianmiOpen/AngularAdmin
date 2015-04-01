@@ -1,0 +1,128 @@
+<div id="searchDate" class="panel panel-success">
+    <div class="panel-body">
+        <div class="list-group">
+            <li class="list-group-item">
+                <h4 class="list-group-item-heading">案例</h4>
+                <p class="list-group-item-text">
+                    <ui-portlet title="我是标题" class="light" caption-class="">
+                        <ui-portlet-action-pagination>
+                        </ui-portlet-action-pagination>
+                        {{dataList}}
+                    </ui-portlet>
+                </p>
+            </li>
+            <li class="list-group-item">
+                <h4 class="list-group-item-heading">使用</h4>
+                <p class="list-group-item-text">
+                    <code>
+                        &lt;ui-portlet title="" class="" caption-class="" &gt;<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&lt;ui-portlet-action-pagination page-limit="10" page-size="20" page-index="0" page-data-name="data" page-total-name="total" &gt;<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&lt;/ui-portlet-action-pagination&gt;<br/>
+
+                        &nbsp;&nbsp;&nbsp;&nbsp;&lt;div ng-repeat="data in dataList" ng-bind="data"&gt;<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&lt;/div&gt;<br/>
+                        &lt;/ui-portlet&gt;
+                    </code>
+                </p>
+            </li>
+            <li class="list-group-item">
+                <h4 class="list-group-item-heading">属性</h4>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>属性名</th>
+                        <th>默认值</th>
+                        <th>是否必须</th>
+                        <th>描述</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>ref</td>
+                        <td>$portlet</td>
+                        <td>否</td>
+                        <td>类似id, 用于在scope中获取</td>
+                    </tr>
+                    <tr>
+                        <td>title</td>
+                        <td></td>
+                        <td>否</td>
+                        <td>标题</td>
+                    </tr>
+                    <tr>
+                        <td>caption-class</td>
+                        <td></td>
+                        <td>否</td>
+                        <td>标题样式</td>
+                    </tr>
+                    <tr>
+                        <td>url</td>
+                        <td></td>
+                        <td>是</td>
+                        <td>数据地址</td>
+                    </tr>
+                    <tr>
+                        <td>page-limit</td>
+                        <td>10</td>
+                        <td>否</td>
+                        <td>最多显示多少个数字按钮</td>
+                    </tr>
+                    <tr>
+                        <td>page-size</td>
+                        <td>20</td>
+                        <td>否</td>
+                        <td>一页显示多少条</td>
+                    </tr>
+                    <tr>
+                        <td>page-index</td>
+                        <td>0</td>
+                        <td>否</td>
+                        <td>从第几页开始</td>
+                    </tr>
+                    <tr>
+                        <td>page-data-name</td>
+                        <td>datas</td>
+                        <td>否</td>
+                        <td>返回的数据中，那个字段是数据集合</td>
+                    </tr>
+                    <tr>
+                        <td>page-total-name</td>
+                        <td>total</td>
+                        <td>否</td>
+                        <td>返回的数据中，哪个字段是数据的总数</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </li>
+            <li class="list-group-item">
+                <h4 class="list-group-item-heading">方法</h4>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>方法名</th>
+                        <th>描述</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>setUrl(新的地址)</td>
+                        <td>设置新的地址</td>
+                    </tr>
+                    <tr>
+                        <td>load(第几页)</td>
+                        <td>查询第几页</td>
+                    </tr>
+                    <tr>
+                        <td>loadFirst()</td>
+                        <td>查询首页</td>
+                    </tr>
+                    <tr>
+                        <td>loadLast()</td>
+                        <td>查询最后一页</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </li>
+        </div>
+    </div>
+</div>
