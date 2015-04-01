@@ -17,6 +17,9 @@ angular.module('admin.component')
                 this.selectItems = [];
                 this.selectValues = [];
                 this.treeNodeBtns = [];
+                this.searchModel = attrs.searchModel;
+                this.searchMode = attrs.searchMode;
+                this.checkedValues = (attrs.setCheck || '').split(',');
                 this.init();
             };
 
@@ -38,7 +41,7 @@ angular.module('admin.component')
                     }.bind(this));
                 }
                 else {
-                    //
+                    //說明是手動拉
                 }
 
                 //
@@ -50,6 +53,16 @@ angular.module('admin.component')
                 }
                 if (this.attrs.onDel != undefined) {
                     this.addTreeNodeBtn('删除', 'remove', this.onTreeNodeDelClickHandler.bind(this));
+                }
+
+                //
+                if (this.searchModel) {
+                    var self = this;
+                    this.scope.$watch(this.searchModel, function (nv) {
+                        if (nv != undefined) {
+                            self.filter(nv);
+                        }
+                    });
                 }
             },
 
@@ -66,6 +79,28 @@ angular.module('admin.component')
                 else {
                     m.error('未设置url, 无法请求');
                 }
+            },
+
+            /**
+             *
+             */
+            filter: function (filterText) {
+                if (!this.dataList) //没数据, 玩个毛~
+                    return;
+                var searchList = this.dataList;
+                if (filterText) {
+                    filterText = filterText.toLowerCase();
+                    var self = this;
+                    searchList = [];
+                    $.each(this.dataList, function (dataIndex, data) {
+                        if (data.name.toLowerCase().indexOf(filterText) != -1) {
+                            searchList = searchList.concat(self.getHierarchyDataById(data.id));
+                        }
+                    });
+                    searchList = $.unique(searchList);
+                }
+                this.setData(searchList, null, true);
+                this.expandAll(true);
             },
 
             /**
@@ -134,16 +169,82 @@ angular.module('admin.component')
             /**
              *
              */
-            setData: function (resData, pid) {
+            setData: function (resData, pid, isFilter) {
+                //
                 resData = resData.menuTreeList || resData || [];
+                if (!!!isFilter) {
+                    this.dataList = resData;
+                    this.dataMap = {};
+                    $.each(resData, function(nn, data){
+                        this.dataMap[data.id] = data;
+                    }.bind(this));
+                }
                 if (this.attrs.root != undefined) {
                     var rootLabel = this.attrs.root || '根目录',
                         rootId = this.attrs.rootId || '0';
                     resData.push({"id": rootId, "open": "true", "pid": null, "name": rootLabel, "type": "1"});
                 }
+
+                //
+                this.$emit('dataSuccess', resData);
+
+                //
                 this.instance = $.fn.zTree.init(this.element, uiTreeConfig(this), resData);
                 this.expand(pid);
-                this.checked((this.attrs.setCheck || '').split(','));
+                if(this.checkedValues){
+                    this.checked(this.checkedValues);
+                }
+                var r = $.grep(resData, function(data){
+                    return data.checked + '' ==  'true';
+                });
+                this.item(this.selectItems.concat(r));
+            },
+
+            /**
+             * 获取层级关系
+             */
+            getHierarchyById: function (id) {
+                var r = [],
+                    node = this.getById(id);
+                if (node) {
+                    r.push(node);
+                    while (node = node.getParentNode()) {
+                        r.unshift(node);
+                    }
+                }
+                return r;
+            },
+
+            /**
+             *
+             * @param id
+             */
+            getHierarchyDataById: function(id){
+                var r = [],
+                    node = this.getDataById(id);
+                if (node) {
+                    r.push(node);
+                    while (node = this.getDataById(node.pid)) {
+                        r.unshift(node);
+                    }
+                }
+                return r;
+            },
+
+            /**
+             *
+             * @param id
+             * @returns {*}
+             */
+            getById: function (id) {
+                return this.instance.getNodeByParam('id', id);
+            },
+
+            /**
+             *
+             */
+            getDataById: function(id){
+                return this.dataMap[id];
             },
 
             /**
@@ -152,6 +253,9 @@ angular.module('admin.component')
              */
             expand: function (level) {
                 level = level || this.attrs.expand;
+                if (level == undefined) {
+                    return;
+                }
                 var instance = this.instance,
                     root = instance.getNodes()[0],
                     expandInternal = function (n, l) {
@@ -173,11 +277,18 @@ angular.module('admin.component')
 
             /**
              *
+             */
+            expandAll: function (isExpand) {
+                this.instance.expandAll(isExpand);
+            },
+
+            /**
+             *
              * @param id
              */
             expandById: function (id) {
-                var findNodes = this.instance.getNodeByParam('id', id);
-                if (findNodes ){
+                var findNodes = this.getById(id);
+                if (findNodes) {
                     this.instance.expandNode(findNodes, true, false, false);
                 }
                 else {
@@ -194,22 +305,43 @@ angular.module('admin.component')
                     this.selectItems = [];
                     this.selectValues = [];
                 }
+                var r = [];
                 for (var i = 0, c; c = cs[i]; i++) {
                     var node = this.instance.getNodeByParam("id", c, null);
                     this.instance.checkNode(node, true, true);
-                    this.selectItems.push(node);
+                    r.push(node);
                 }
-                this.selectValues = $.map(this.selectItems, function (item) {
-                    return item.id;
-                });
+                this.item(r);
+            },
+
+            /**
+             *
+             */
+            item: function(item){
+                if(item){
+                    this.selectItems = item;
+                    this.selectValues = $.map(this.selectItems, function (item) {
+                        return item.id;
+                    });
+                }
+                else{
+                    return this.selectItems;
+                }
+            },
+
+            /**
+             *
+             */
+            val: function(){
+                //NOT SUPPORTED
             },
 
             /**
              *  清空选中
              */
-            cleanChecked: function(){
+            cleanChecked: function () {
                 var self = this;
-                $.each(this.selectItems, function(i, selectItem){
+                $.each(this.selectItems, function (i, selectItem) {
                     var node = self.instance.getNodeByParam("id", selectItem.id, null);
                     self.instance.checkNode(node, false, true);
                 });

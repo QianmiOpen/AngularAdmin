@@ -28,7 +28,7 @@
             componentHelper.setTemplate('tpl.portal.portlet',[
                 '<div class="portlet">',
                     '<div class="portlet-title tabbable-line">',
-                        '<div class="caption"><span class="caption-subject">{{title}}</span></div>',
+                        '<div class="caption"><span class="caption-subject {{captionClass}}">{{title}}</span></div>',
                     '</div>',
                     '<div class="portlet-body">',
                     '</div>',

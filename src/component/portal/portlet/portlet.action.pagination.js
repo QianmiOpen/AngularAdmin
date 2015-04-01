@@ -25,6 +25,11 @@ angular.module('admin.component')
                     };
 
                 //
+                scope.setUrl = function (url) {
+                    paginationFactory.url = url;
+                };
+
+                //
                 scope.load = function (index) {
                     index--;
                     if (index != paginationFactory.pageIndex || !init) {
@@ -38,7 +43,6 @@ angular.module('admin.component')
                 scope.loadLast = function () {
                     paginationFactory.nextPage().then(handler);
                 };
-
 
                 //
                 scope.load(1);

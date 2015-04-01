@@ -30,7 +30,7 @@
                     }
                     else {
                         defer.reject(resData);
-                        self.m.error(resData.msg);
+                        self.m.error(resData.msg || resData.data);
                     }
                 },
                 error: function (xhr, status, err) {

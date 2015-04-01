@@ -12,19 +12,19 @@ angular.module('admin.component')
             transclude: true,
             scope: false,
             controller: function ($scope, $attrs, $element, $transclude) {
-                if($attrs.sameScope != undefined){
-                    $element.append($transclude($scope));
-                }
                 $scope.$on('componentComplete', function (evt, o) {
                     if (o) {
                         $scope[o.ref] = o.component;
                     }
                 });
+                if($attrs.sameScope != undefined){
+                    $element.append($transclude($scope));
+                }
             },
             link: function (scope, element, attrs) {
                 element.show();
                 $timeout(function(){
-                    if (attrs.controller) {
+                    if (attrs.controller && window[attrs.controller]) {
                         var ctrlArgs = /\(([^\)]+)\)/.exec(window[attrs.controller].toString())[1],
                             args = {$scope: scope};
                         ctrlArgs = ctrlArgs.split(',');
@@ -32,6 +32,9 @@ angular.module('admin.component')
                             args[arg] = $injector.get(arg);
                         }
                         $controller(window[attrs.controller], args);
+                    }
+                    else if(attrs.controller){
+                        $controller(attrs.controller, {$scope: scope});
                     }
                     else {
                         scope.$emit('uicontainer.ready'); // 触发

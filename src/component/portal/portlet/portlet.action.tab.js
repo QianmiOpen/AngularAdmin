@@ -6,7 +6,7 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiPortletActionTab', function (uiTabFactory, componentHelper) {
+    .directive('uiPortletActionTab', function (uiTabFactory, componentHelper, $timeout) {
         return {
             restrict: 'E',
             replace: true,
@@ -20,6 +20,13 @@ angular.module('admin.component')
                             return element.parents('.portlet').find('.portlet-body');
                         };
                         scope[attrs.ref] = tab;
+                    },
+                    post: function(){
+                        if(tab.items.length > 0){
+                            $timeout(function(){
+                                tab.showAtIndex(0);
+                            });
+                        }
                     }
                 };
             },

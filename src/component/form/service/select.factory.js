@@ -10,6 +10,8 @@ angular.module('admin.component')
         var m = new msg('Select'),
             Select = function (scope, element, attrs) {
                 this.selectElement = element.find('select');
+                this.dataKeyName = attrs.keyName || 'key';
+                this.dataValueName = attrs.valueName || 'text';
                 this.defaultResetValue = attrs.isMulti ? null : this.selectElement.find('option:eq(0)').val();
                 this.model = attrs.model;
                 this.init = false;
@@ -17,40 +19,45 @@ angular.module('admin.component')
             };
         Select.prototype = $.extend(new uiFormControl(), {
 
-            _init: function(){
+            _init: function () {
                 var self = this;
-                if(this.model){
+                if (this.model) {
 
                     //监听一下model的变化
-                    this.watch = this.scope.$watch(this.model, function(newValue){
-                        if(newValue)
+                    this.watch = this.scope.$watch(this.model, function (newValue) {
+                        if (newValue)
                             this.val(newValue);
                     }.bind(this));
 
                     //如果model没有值, 默认选择第一个
-                    if(!ValueService.get(this.scope, this.model)){
+                    if (!ValueService.get(this.scope, this.model)) {
                         var val = this.attrs.value ? this.attrs.value : this.defaultResetValue;
                         ValueService.set(this.scope, this.model, val);
                     }
                 }
 
                 //远程加载数据
-                if(this.attrs.url){
-                    ajax.post(this.attrs.url).then(function(responseData){
-                        self.setData(responseData, false);
-                    });
+                if (this.attrs.url) {
+                    this.load(this.attrs.url);
                 }
 
-                if(!this.model && this.attrs.value){
+                if (!this.model && this.attrs.value) {
                     this.val(this.attrs.value);
                 }
                 this.element.removeAttr('value');
             },
 
+            load: function (url) {
+                var self = this;
+                ajax.post(url).then(function (responseData) {
+                    self.setData(responseData, false);
+                });
+            },
+
             /**
              *
              */
-            disabled: function(open){
+            disabled: function (open) {
                 this.selectElement.prop('disabled', open);
                 this.render();
             },
@@ -77,8 +84,8 @@ angular.module('admin.component')
              * @param isClean
              */
             setData: function (data, isClean, dataName, dataValue) {
-                dataName = dataName || 'key';
-                dataValue = dataValue || 'text';
+                dataName = dataName || this.dataKeyName;
+                dataValue = dataValue || this.dataValueName;
                 if (isClean) {
                     this.selectElement.html('');
                 }
@@ -156,7 +163,8 @@ angular.module('admin.component')
                 }
             }
         });
-        return function(s, e, a, c, t){
+        return function (s, e, a, c, t) {
             return new Select(s, e, a, c, t);
-        };;
+        };
+        ;
     });
