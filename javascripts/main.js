@@ -16,6 +16,9 @@ angular.module('demoApp', ['admin', 'ui.router'])
             .state('searchform.select', {url: '/searchform/select', templateUrl: basePath + 'searchForm/searchSelect.html'})
             .state('searchform.multiselect', {url: '/searchform/multiselect', templateUrl: basePath + 'searchForm/searchMultiSelect.html'})
 
+            .state('tree', {url: '/tree', templateUrl: basePath + 'tree/index.html'})
+
+            .state('table', {url: '/table', templateUrl: basePath + 'table/index.html'})
 
             .state('portal', {url: '/portal', templateUrl: basePath + 'portal/index.html'})
             .state('portal.portlet', {url: '/portal/portlet', templateUrl: basePath + 'portal/portlet.html'})
