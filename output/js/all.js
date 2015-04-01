@@ -1,4 +1,4 @@
-/*! zk - v0.0.1 - 2015-03-26 */
+/*! zk - v0.0.1 - 2015-04-01 */
 (function(){
 //-----------------------------------------------------------------------------------------------
 //
@@ -63,7 +63,7 @@ angular.module('admin.service', []);
                     }
                     else {
                         defer.reject(resData);
-                        self.m.error(resData.msg);
+                        self.m.error(resData.msg || resData.data);
                     }
                 },
                 error: function (xhr, status, err) {
@@ -553,6 +553,42 @@ angular.module('admin.service')
         return function (element, attrs, option, other) {
             return new EditableUser(element, attrs, option, other);
         };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.service')
+    .factory('CascadeFactory', function (msg, Event) {
+        var m = new msg('CascadeFactory'),
+            T = {
+                U: 'url',
+                C: 'callback'
+            },
+            CascadeFactory = function(){
+                this.levelList = [];
+                Event.call(this);
+            };
+        CascadeFactory.prototype = {
+
+            addUrl: function(url, paramName){
+                return this.addUrlByIndex(-1, url, paramName);
+            },
+
+            addUrlByIndex: function(index, url, paramName){
+                paramName = paramName || 'id';
+                this.levelList.push({
+                    url: url,
+                    type: T.U,
+                    paramName: paramName
+                });
+                return this;
+            }
+        };
+        return CascadeFactory;
     });
 //-----------------------------------------------------------------------------------------------
 //
@@ -1611,19 +1647,19 @@ angular.module('admin.component')
             transclude: true,
             scope: false,
             controller: function ($scope, $attrs, $element, $transclude) {
-                if($attrs.sameScope != undefined){
-                    $element.append($transclude($scope));
-                }
                 $scope.$on('componentComplete', function (evt, o) {
                     if (o) {
                         $scope[o.ref] = o.component;
                     }
                 });
+                if($attrs.sameScope != undefined){
+                    $element.append($transclude($scope));
+                }
             },
             link: function (scope, element, attrs) {
                 element.show();
                 $timeout(function(){
-                    if (attrs.controller) {
+                    if (attrs.controller && window[attrs.controller]) {
                         var ctrlArgs = /\(([^\)]+)\)/.exec(window[attrs.controller].toString())[1],
                             args = {$scope: scope};
                         ctrlArgs = ctrlArgs.split(',');
@@ -1631,6 +1667,9 @@ angular.module('admin.component')
                             args[arg] = $injector.get(arg);
                         }
                         $controller(window[attrs.controller], args);
+                    }
+                    else if(attrs.controller){
+                        $controller(attrs.controller, {$scope: scope});
                     }
                     else {
                         scope.$emit('uicontainer.ready'); // 触发
@@ -2023,70 +2062,6 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormTagSelect', function (uiMultiSelectFactory, componentHelper, tagConfig, defaultCol, msg, ajax) {
-        return {
-            restrict: 'E',
-            replace: false,
-            transclude: true,
-            link: function (scope, element, attrs) {
-
-                //
-
-
-                //
-                var select = uiMultiSelectFactory(scope, element, $.extend({}, tagConfig, attrs, {
-                    url: tagConfig.url + attrs.classify,
-                    multi: true
-                }));
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formUserSelect', select);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    select.reset();
-                });
-
-                //
-                var classifyId = attrs.classify,
-                    manual = attrs.manual != undefined,
-                    usercode = attrs.usercode; //分类ID
-                if(!manual){
-                    select.$on('uiSelect.doAdd', function(addObj, tag){
-                        ajax.post('/sysconfig/tag/rel/add', {name: addObj.name, classify: classifyId, id: addObj.isNew ? '': addObj.id, usercode: usercode}).then(function(data){
-                            addObj.id = data;
-                            delete addObj.isNew;
-                            msg.success('添加成功');
-                        });
-                    });
-                    select.$on('uiSelect.doDel', function(delObj, tag){
-                        if(!delObj.isNew){ //新的
-                            ajax.post('/sysconfig/tag/rel/del', {name: delObj.name, classify: classifyId, id: delObj.id, usercode: usercode}).then(function(){
-                                msg.success('删除成功');
-                            });
-                        }
-                    });
-                }
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
-            },
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.input', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
     .directive('uiFormSwitch', function (uiSwitchFactory, componentHelper, defaultCol) {
         return {
             restrict: 'E',
@@ -2350,6 +2325,34 @@ angular.module('admin.component')
                         {key: 'title', val: attrs.tip || '请选择'}
                     ]
                 }, attrs));
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchUserSelect', function (uiMultiSelectFactory, componentHelper, userConfig) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: function (scope, element, attrs) {
+                var select = uiMultiSelectFactory(scope, element, $.extend({}, userConfig, attrs));
+                componentHelper.tiggerComplete(scope, attrs.ref || '$searchUserSelect', select);
+
+                //
+                scope.$on('uisearchform.reset', function () {
+                    select.reset();
+                });
+
+                //
+                element.removeAttr('name').removeAttr('model');
+            },
+            template: function (element, attrs) {
+                return componentHelper.getTemplate('tpl.searchform.userselect.input', attrs);
             }
         };
     });
@@ -3454,6 +3457,8 @@ angular.module('admin.component')
         var m = new msg('Select'),
             Select = function (scope, element, attrs) {
                 this.selectElement = element.find('select');
+                this.dataKeyName = attrs.keyName || 'key';
+                this.dataValueName = attrs.valueName || 'text';
                 this.defaultResetValue = attrs.isMulti ? null : this.selectElement.find('option:eq(0)').val();
                 this.model = attrs.model;
                 this.init = false;
@@ -3461,40 +3466,45 @@ angular.module('admin.component')
             };
         Select.prototype = $.extend(new uiFormControl(), {
 
-            _init: function(){
+            _init: function () {
                 var self = this;
-                if(this.model){
+                if (this.model) {
 
                     //监听一下model的变化
-                    this.watch = this.scope.$watch(this.model, function(newValue){
-                        if(newValue)
+                    this.watch = this.scope.$watch(this.model, function (newValue) {
+                        if (newValue)
                             this.val(newValue);
                     }.bind(this));
 
                     //如果model没有值, 默认选择第一个
-                    if(!ValueService.get(this.scope, this.model)){
+                    if (!ValueService.get(this.scope, this.model)) {
                         var val = this.attrs.value ? this.attrs.value : this.defaultResetValue;
                         ValueService.set(this.scope, this.model, val);
                     }
                 }
 
                 //远程加载数据
-                if(this.attrs.url){
-                    ajax.post(this.attrs.url).then(function(responseData){
-                        self.setData(responseData, false);
-                    });
+                if (this.attrs.url) {
+                    this.load(this.attrs.url);
                 }
 
-                if(!this.model && this.attrs.value){
+                if (!this.model && this.attrs.value) {
                     this.val(this.attrs.value);
                 }
                 this.element.removeAttr('value');
             },
 
+            load: function (url) {
+                var self = this;
+                ajax.post(url).then(function (responseData) {
+                    self.setData(responseData, false);
+                });
+            },
+
             /**
              *
              */
-            disabled: function(open){
+            disabled: function (open) {
                 this.selectElement.prop('disabled', open);
                 this.render();
             },
@@ -3521,8 +3531,8 @@ angular.module('admin.component')
              * @param isClean
              */
             setData: function (data, isClean, dataName, dataValue) {
-                dataName = dataName || 'key';
-                dataValue = dataValue || 'text';
+                dataName = dataName || this.dataKeyName;
+                dataValue = dataValue || this.dataValueName;
                 if (isClean) {
                     this.selectElement.html('');
                 }
@@ -3600,9 +3610,10 @@ angular.module('admin.component')
                 }
             }
         });
-        return function(s, e, a, c, t){
+        return function (s, e, a, c, t) {
             return new Select(s, e, a, c, t);
-        };;
+        };
+        ;
     });
 //-----------------------------------------------------------------------------------------------
 //
@@ -4707,6 +4718,11 @@ angular.module('admin.component')
                     };
 
                 //
+                scope.setUrl = function (url) {
+                    paginationFactory.url = url;
+                };
+
+                //
                 scope.load = function (index) {
                     index--;
                     if (index != paginationFactory.pageIndex || !init) {
@@ -4720,7 +4736,6 @@ angular.module('admin.component')
                 scope.loadLast = function () {
                     paginationFactory.nextPage().then(handler);
                 };
-
 
                 //
                 scope.load(1);
@@ -4761,7 +4776,7 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiPortletActionTab', function (uiTabFactory, componentHelper) {
+    .directive('uiPortletActionTab', function (uiTabFactory, componentHelper, $timeout) {
         return {
             restrict: 'E',
             replace: true,
@@ -4775,6 +4790,13 @@ angular.module('admin.component')
                             return element.parents('.portlet').find('.portlet-body');
                         };
                         scope[attrs.ref] = tab;
+                    },
+                    post: function(){
+                        if(tab.items.length > 0){
+                            $timeout(function(){
+                                tab.showAtIndex(0);
+                            });
+                        }
                     }
                 };
             },
@@ -4802,21 +4824,23 @@ angular.module('admin.component')
             replace: true,
             transclude: true,
             scope: true,
-            controller: function ($scope, $element, $transclude) {
+            controller: function ($scope, $element, $attrs, $transclude) {
                 var $content = $transclude($scope),
                     $toolbar = $content.filter('.portlet-tool-bar');
-                if($toolbar.length == 0){
-                    $.each($content, function(i, c){
-                        if(c.nodeName.indexOf('UI-PORTLET-ACTION') != -1){
+                if ($toolbar.length == 0) {
+                    $.each($content, function (i, c) {
+                        if (c.nodeName.indexOf('UI-PORTLET-ACTION') != -1) {
                             $toolbar = $(c);
                             return false;
                         }
                     });
                 }
                 $element.find('.portlet-body').append($content);
-                if($toolbar.length != 0){
+                if ($toolbar.length != 0) {
                     $toolbar.insertAfter($element.find('.caption'));
                 }
+
+                componentHelper.tiggerComplete($scope, $attrs.ref || '$portlet', $scope);
             },
             template: function (el, attrs) {
                 return componentHelper.getTemplate('tpl.portal.portlet', attrs);
@@ -6053,6 +6077,9 @@ angular.module('admin.component')
                 this.selectItems = [];
                 this.selectValues = [];
                 this.treeNodeBtns = [];
+                this.searchModel = attrs.searchModel;
+                this.searchMode = attrs.searchMode;
+                this.checkedValues = (attrs.setCheck || '').split(',');
                 this.init();
             };
 
@@ -6074,7 +6101,7 @@ angular.module('admin.component')
                     }.bind(this));
                 }
                 else {
-                    //
+                    //說明是手動拉
                 }
 
                 //
@@ -6086,6 +6113,16 @@ angular.module('admin.component')
                 }
                 if (this.attrs.onDel != undefined) {
                     this.addTreeNodeBtn('删除', 'remove', this.onTreeNodeDelClickHandler.bind(this));
+                }
+
+                //
+                if (this.searchModel) {
+                    var self = this;
+                    this.scope.$watch(this.searchModel, function (nv) {
+                        if (nv != undefined) {
+                            self.filter(nv);
+                        }
+                    });
                 }
             },
 
@@ -6102,6 +6139,28 @@ angular.module('admin.component')
                 else {
                     m.error('未设置url, 无法请求');
                 }
+            },
+
+            /**
+             *
+             */
+            filter: function (filterText) {
+                if (!this.dataList) //没数据, 玩个毛~
+                    return;
+                var searchList = this.dataList;
+                if (filterText) {
+                    filterText = filterText.toLowerCase();
+                    var self = this;
+                    searchList = [];
+                    $.each(this.dataList, function (dataIndex, data) {
+                        if (data.name.toLowerCase().indexOf(filterText) != -1) {
+                            searchList = searchList.concat(self.getHierarchyDataById(data.id));
+                        }
+                    });
+                    searchList = $.unique(searchList);
+                }
+                this.setData(searchList, null, true);
+                this.expandAll(true);
             },
 
             /**
@@ -6170,16 +6229,82 @@ angular.module('admin.component')
             /**
              *
              */
-            setData: function (resData, pid) {
+            setData: function (resData, pid, isFilter) {
+                //
                 resData = resData.menuTreeList || resData || [];
+                if (!!!isFilter) {
+                    this.dataList = resData;
+                    this.dataMap = {};
+                    $.each(resData, function(nn, data){
+                        this.dataMap[data.id] = data;
+                    }.bind(this));
+                }
                 if (this.attrs.root != undefined) {
                     var rootLabel = this.attrs.root || '根目录',
                         rootId = this.attrs.rootId || '0';
                     resData.push({"id": rootId, "open": "true", "pid": null, "name": rootLabel, "type": "1"});
                 }
+
+                //
+                this.$emit('dataSuccess', resData);
+
+                //
                 this.instance = $.fn.zTree.init(this.element, uiTreeConfig(this), resData);
                 this.expand(pid);
-                this.checked((this.attrs.setCheck || '').split(','));
+                if(this.checkedValues){
+                    this.checked(this.checkedValues);
+                }
+                var r = $.grep(resData, function(data){
+                    return data.checked + '' ==  'true';
+                });
+                this.item(this.selectItems.concat(r));
+            },
+
+            /**
+             * 获取层级关系
+             */
+            getHierarchyById: function (id) {
+                var r = [],
+                    node = this.getById(id);
+                if (node) {
+                    r.push(node);
+                    while (node = node.getParentNode()) {
+                        r.unshift(node);
+                    }
+                }
+                return r;
+            },
+
+            /**
+             *
+             * @param id
+             */
+            getHierarchyDataById: function(id){
+                var r = [],
+                    node = this.getDataById(id);
+                if (node) {
+                    r.push(node);
+                    while (node = this.getDataById(node.pid)) {
+                        r.unshift(node);
+                    }
+                }
+                return r;
+            },
+
+            /**
+             *
+             * @param id
+             * @returns {*}
+             */
+            getById: function (id) {
+                return this.instance.getNodeByParam('id', id);
+            },
+
+            /**
+             *
+             */
+            getDataById: function(id){
+                return this.dataMap[id];
             },
 
             /**
@@ -6188,6 +6313,9 @@ angular.module('admin.component')
              */
             expand: function (level) {
                 level = level || this.attrs.expand;
+                if (level == undefined) {
+                    return;
+                }
                 var instance = this.instance,
                     root = instance.getNodes()[0],
                     expandInternal = function (n, l) {
@@ -6209,11 +6337,18 @@ angular.module('admin.component')
 
             /**
              *
+             */
+            expandAll: function (isExpand) {
+                this.instance.expandAll(isExpand);
+            },
+
+            /**
+             *
              * @param id
              */
             expandById: function (id) {
-                var findNodes = this.instance.getNodeByParam('id', id);
-                if (findNodes ){
+                var findNodes = this.getById(id);
+                if (findNodes) {
                     this.instance.expandNode(findNodes, true, false, false);
                 }
                 else {
@@ -6230,22 +6365,43 @@ angular.module('admin.component')
                     this.selectItems = [];
                     this.selectValues = [];
                 }
+                var r = [];
                 for (var i = 0, c; c = cs[i]; i++) {
                     var node = this.instance.getNodeByParam("id", c, null);
                     this.instance.checkNode(node, true, true);
-                    this.selectItems.push(node);
+                    r.push(node);
                 }
-                this.selectValues = $.map(this.selectItems, function (item) {
-                    return item.id;
-                });
+                this.item(r);
+            },
+
+            /**
+             *
+             */
+            item: function(item){
+                if(item){
+                    this.selectItems = item;
+                    this.selectValues = $.map(this.selectItems, function (item) {
+                        return item.id;
+                    });
+                }
+                else{
+                    return this.selectItems;
+                }
+            },
+
+            /**
+             *
+             */
+            val: function(){
+                //NOT SUPPORTED
             },
 
             /**
              *  清空选中
              */
-            cleanChecked: function(){
+            cleanChecked: function () {
                 var self = this;
-                $.each(this.selectItems, function(i, selectItem){
+                $.each(this.selectItems, function (i, selectItem) {
                     var node = self.instance.getNodeByParam("id", selectItem.id, null);
                     self.instance.checkNode(node, false, true);
                 });
@@ -6675,7 +6831,7 @@ angular.module('admin.component')
             componentHelper.setTemplate('tpl.portal.portlet',[
                 '<div class="portlet">',
                     '<div class="portlet-title tabbable-line">',
-                        '<div class="caption"><span class="caption-subject">{{title}}</span></div>',
+                        '<div class="caption"><span class="caption-subject {{captionClass}}">{{title}}</span></div>',
                     '</div>',
                     '<div class="portlet-body">',
                     '</div>',
@@ -6961,5 +7117,4 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'admin.template']);
-angular.module('qianmi.all', ['admin.service', 'admin.filter', 'admin.component', 'admin.template']);
 })();
