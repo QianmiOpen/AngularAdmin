@@ -47,7 +47,7 @@ angular.module('admin.component')
                             editor = $injector.get('uiEditableInputFactory');
                         }
                     }
-                    $scope[ref].addColumn(uiTableColumnService(ref, $scope, $attrs, render, editor));
+                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render, editor), $attrs.index);
                 }
                 else {
                     m.error('uiTableColumn必须放在uiTable里面');

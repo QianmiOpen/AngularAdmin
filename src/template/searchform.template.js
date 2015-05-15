@@ -64,7 +64,7 @@
             componentHelper.setTemplate('tpl.searchform.input.select', [
                 '<div class="input-inline search-item">',
                     '<div class="input-group">',
-                        '<select class="input-xsmall form-control " {{#if model}}ng-model="{{model}}"{{/if}} {{#if selectName}}name="{{selectName}}"{{/if}} ng-transclude></select>',
+                        '<select class="input-xsmall form-control " {{#if buttonClass}}data-style="{{buttonClass}}"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#if selectName}}name="{{selectName}}"{{/if}} ng-transclude></select>',
                         '<input style="left:-1px;" class="form-control input-small pull-right" {{#if inputName}}name="{{inputName}}"{{/if}} placeholder="{{placeholder}}" ng-keydown="onChangeHandler($event)"/>',
                     '</div>',
                 '</div>'
@@ -74,7 +74,7 @@
              *
              */
             componentHelper.setTemplate('tpl.searchform.region', [
-                '<div class="input-inline search-item" auto-width="true">',
+                '<div class="input-inline search-item">',
                     '<div class="input-group">',
                         '{{#if label}}<div class="input-group-addon">{{{label}}}:</div>{{/if}}',
                         '<input type="hidden" {{#if model}}ng-value="{{model}}"{{/if}} {{#if name}}name="{{name}}"{{/if}}  value="{{value}}"/>',
@@ -93,12 +93,12 @@
                     '<div class="input-inline input-medium search-item" {{#if isMulti}}is-multi="true"{{/if}}>',
                         '<div class="input-group">',
                             '<div class="input-group-addon">{{label}}:</div>',
-                            '<select class="form-control" name="{{name}}" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
+                            '<select class="form-control" {{#if buttonClass}}data-style="{{buttonClass}}"{{/if}} name="{{name}}" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
                         '</div>',
                     '</div>',
                 '{{else}}',
                     '<div class="input-small search-item input-inline" {{#if isMulti}}is-multi="true"{{/if}}>',
-                        '<select name="{{name}}" class="form-control" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
+                        '<select name="{{name}}" {{#if buttonClass}}data-style="{{buttonClass}}"{{/if}} class="form-control" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
                     '</div>',
                 '{{/if}}'
             ].join(''));

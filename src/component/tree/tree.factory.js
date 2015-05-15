@@ -72,7 +72,7 @@ angular.module('admin.component')
             refresh: function (params, url) {
                 url = url || this.attrs.url;
                 if (url) {
-                    return ajax.post(this.attrs.url, params || {}).then(function (r) {
+                    return ajax.post(url, params || {}).then(function (r) {
                         this.setData(r);
                     }.bind(this));
                 }
@@ -97,7 +97,15 @@ angular.module('admin.component')
                             searchList = searchList.concat(self.getHierarchyDataById(data.id));
                         }
                     });
-                    searchList = $.unique(searchList);
+                    var r = [],
+                        m = {};
+                    $.each(searchList, function (index, data) {
+                        if (!m[data.id]) {
+                            r.push(data);
+                        }
+                        m[data.id] = data;
+                    });
+                    searchList = r;
                 }
                 this.setData(searchList, null, true);
                 this.expandAll(true);
@@ -175,7 +183,7 @@ angular.module('admin.component')
                 if (!!!isFilter) {
                     this.dataList = resData;
                     this.dataMap = {};
-                    $.each(resData, function(nn, data){
+                    $.each(resData, function (nn, data) {
                         this.dataMap[data.id] = data;
                     }.bind(this));
                 }
@@ -191,11 +199,11 @@ angular.module('admin.component')
                 //
                 this.instance = $.fn.zTree.init(this.element, uiTreeConfig(this), resData);
                 this.expand(pid);
-                if(this.checkedValues){
+                if (this.checkedValues) {
                     this.checked(this.checkedValues);
                 }
-                var r = $.grep(resData, function(data){
-                    return data.checked + '' ==  'true';
+                var r = $.grep(resData, function (data) {
+                    return data.checked + '' == 'true';
                 });
                 this.item(this.selectItems.concat(r));
             },
@@ -219,7 +227,7 @@ angular.module('admin.component')
              *
              * @param id
              */
-            getHierarchyDataById: function(id){
+            getHierarchyDataById: function (id) {
                 var r = [],
                     node = this.getDataById(id);
                 if (node) {
@@ -243,7 +251,7 @@ angular.module('admin.component')
             /**
              *
              */
-            getDataById: function(id){
+            getDataById: function (id) {
                 return this.dataMap[id];
             },
 
@@ -253,6 +261,10 @@ angular.module('admin.component')
              */
             expand: function (level) {
                 level = level || this.attrs.expand;
+                if (level == 'all') {
+                    this.expandAll(true);
+                    return;
+                }
                 if (level == undefined) {
                     return;
                 }
@@ -306,10 +318,15 @@ angular.module('admin.component')
                     this.selectValues = [];
                 }
                 var r = [];
-                for (var i = 0, c; c = cs[i]; i++) {
-                    var node = this.instance.getNodeByParam("id", c, null);
-                    this.instance.checkNode(node, true, true);
-                    r.push(node);
+                for (var i = 0, c; i < cs.length; i++) {
+                    c = cs[i];
+                    if (c) {
+                        var node = this.instance.getNodeByParam("id", c, null);
+                        if (node) {
+                            this.instance.checkNode(node, true, true);
+                            r.push(node);
+                        }
+                    }
                 }
                 this.item(r);
             },
@@ -317,14 +334,14 @@ angular.module('admin.component')
             /**
              *
              */
-            item: function(item){
-                if(item){
+            item: function (item) {
+                if (item) {
                     this.selectItems = item;
                     this.selectValues = $.map(this.selectItems, function (item) {
                         return item.id;
                     });
                 }
-                else{
+                else {
                     return this.selectItems;
                 }
             },
@@ -332,7 +349,7 @@ angular.module('admin.component')
             /**
              *
              */
-            val: function(){
+            val: function () {
                 //NOT SUPPORTED
             },
 

@@ -37,9 +37,9 @@ angular.module('admin.component')
                         }
                     }.bind(this));
 
-                    //如果model没有值, 默认选择第一个
+                    //如果model没有值, 默认选择offvalue
                     if(!ValueService.get(this.scope, this.model)){
-                        var val = this.val();
+                        var val = this.offValue;
                         ValueService.set(this.scope, this.model, val || this.offValue);
                     }
                 }

@@ -7,7 +7,7 @@
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiTableToolBarFactory', function (msg, ajax) {
+    .factory('uiTableToolBarFactory', function (msg, ajax, $injector) {
         var m = new msg('TableToolBar'),
             TableToolBar = function ($scope, tableId, $element, $attrs) {
                 this.scope = $scope;
@@ -49,7 +49,7 @@ angular.module('admin.component')
                 }
                 else {
                     if (this.attrs.add) {
-                        //TODO: 还没实现
+                        $injector.get('state').go(this.attrs.add);
                     }
                     else {
                         m.error('点击添加数据按钮，但是没有设置地址, 请在add="地址"');
@@ -62,9 +62,16 @@ angular.module('admin.component')
                 }
                 else {
                     if (this.attrs.add) {
-                        ajax.remove(this.attrs.del, {ids: values.join(',')}).then(function () {
-                            this.scope[this.tableId].refresh();
-                        }.bind(this));
+                        if (values.length > 1) {
+                            ajax.remove(this.attrs.del, {ids: values.join(',')}).then(function () {
+                                this.scope[this.tableId].refresh();
+                            }.bind(this));
+                        }
+                        else {
+                            ajax.remove(this.attrs.del + '/' + values[0]).then(function () {
+                                this.scope[this.tableId].refresh();
+                            }.bind(this));
+                        }
                     }
                     else {
                         m.error('点击删除数据按钮，但是没有设置地址, 请在del="地址"');

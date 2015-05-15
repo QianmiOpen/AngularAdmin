@@ -1,4 +1,4 @@
-/*! zk - v0.0.1 - 2015-04-01 */
+/*! zk - v0.0.1 - 2015-05-15 */
 (function(){
 //-----------------------------------------------------------------------------------------------
 //
@@ -234,7 +234,12 @@ angular.module('admin.service')
                 this.element.one('shown.bs.modal', function () {
                     if (this.ctrlName) {
                         $timeout(function () {
-                            $controller(window[this.ctrlName], this.resolve);
+                            try{
+                                $controller(window[this.ctrlName] || this.ctrlName, this.resolve);
+                            }
+                            catch (e){
+                                console.error('加载controller失败')
+                            }
                         }.bind(this));
                     }
                     this.$emit('uiDialog.doShow');
@@ -822,7 +827,9 @@ angular.module('admin.service')
                 }
                 return $.extend(r, {
                     dataList: r[this.dataName],
-                    pageList: pageList
+                    pageList: pageList,
+                    isFirst: this.pageIndex == 0,
+                    isLast: this.pageIndex == this.maxPage - 1
                 })
             },
 
@@ -841,7 +848,7 @@ angular.module('admin.service')
              */
             nextPage: function () {
                 this.pageIndex++;
-                this.pageIndex = this.pageIndex > this.maxPage ? this.maxPage : this.pageIndex++;
+                this.pageIndex = this.pageIndex > this.maxPage - 1 ? (this.maxPage - 1) : this.pageIndex;
                 return this.getPage(this.pageIndex);
             },
 
@@ -1457,8 +1464,19 @@ angular.module('admin.component')
             replace: true,
             transclude: true,
             scope: false,
-            link: function(scope, element, attrs){
-                new uiChartFactory(scope, element, attrs);
+            link: function (scope, element, attrs) {
+                var factory = new uiChartFactory(scope, element, attrs);
+                factory.setData = function (data) {
+                    this.config.series = [{
+                        type: 'pie',
+                        data: data.map(function (d) {
+                            for (var k in d) {
+                                return [k, d[k]];
+                            }
+                        })
+                    }];
+                    this.build();
+                };
             },
             templateUrl: 'tpl.chart.pie'
         };
@@ -1640,6 +1658,40 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
+    .directive('uiBreadcrumb', function () {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            template: function (el, attrs) {
+                var dataList = attrs.data.split(','),
+                    h = [];
+                for (var i = 0; i < dataList.length; i++) {
+                    var data = dataList[i].split(':');
+                    h.push([
+                        '<li>',
+                            '<a href="' + (data[1] || '#') + '">' + data[0] + '</a>',
+                            i != dataList.length - 1 ? '<i class="fa fa-angle-right"></i>' : '',
+                        '</li>'
+                    ].join(''));
+                }
+                return [
+                    '<div class="page-bar">',
+                        '<ul class="page-breadcrumb">',
+                            h.join(''),
+                        '</ul>',
+                    '</div>'
+                ].join('')
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
     .directive('uiContainer', function ($timeout, $controller, $injector) {
         return {
             restrict: 'E',
@@ -1738,7 +1790,9 @@ angular.module('admin.component')
                         componentHelper.tiggerComplete(scope, ref, form);
                     },
                     post: function () {
-                        form.initValidation();
+                        setTimeout(function(){
+                            form.initValidation();
+                        }, 300);
                     }
                 };
             },
@@ -2054,6 +2108,135 @@ angular.module('admin.component')
         };
     });
 
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormTagSelect', function (uiMultiSelectFactory, componentHelper, tagConfig, defaultCol, msg, ajax) {
+        return {
+            restrict: 'E',
+            replace: false,
+            transclude: true,
+            link: function (scope, element, attrs) {
+
+                //
+                var select = uiMultiSelectFactory(scope, element, $.extend({}, tagConfig, attrs, {
+                    url: tagConfig.url + attrs.classify,
+                    multi: true
+                }));
+                componentHelper.tiggerComplete(scope, attrs.ref || '$formTagSelect', select);
+
+                //
+                var classifyId = attrs.classify,
+                    manual = attrs.manual != undefined,
+                    usercode = attrs.usercode; //分类ID
+
+                //
+                select.setUserCode = function(uc){
+                    usercode = uc;
+                };
+                select.setClassify = function(c){
+                    classifyId = c;
+                };
+
+                //
+                scope.$on('uiform.reset', function () {
+                    select.reset();
+                });
+
+
+                if(!manual){
+                    select.$on('uiSelect.doAdd', function(addObj, tag){
+                        ajax.post('/sysconfig/tag/rel/add', {name: addObj.name, classify: classifyId, id: addObj.isNew ? '': addObj.id, usercode: usercode}).then(function(data){
+                            addObj.id = data;
+                            delete addObj.isNew;
+                            msg.success('添加成功');
+                        });
+                    });
+                    select.$on('uiSelect.doDel', function(delObj, tag){
+                        if(!delObj.isNew){ //新的
+                            ajax.post('/sysconfig/tag/rel/del', {name: delObj.name, classify: classifyId, id: delObj.id, usercode: usercode}).then(function(){
+                                msg.success('删除成功');
+                            });
+                        }
+                    });
+                }
+
+                //
+                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
+            },
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.form.input', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormUserSelect', function (uiMultiSelectFactory, componentHelper, userConfig, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: false,
+            transclude: true,
+            link: function (scope, element, attrs) {
+                //
+                var select = uiMultiSelectFactory(scope, element, $.extend({}, userConfig, attrs));
+                componentHelper.tiggerComplete(scope, attrs.ref || '$formUserSelect', select);
+
+                //
+                scope.$on('uiform.reset', function () {
+                    select.reset();
+                });
+
+                //
+                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
+            },
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.form.input', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSpinner', function (uiSpinnerFactory, componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: uiSpinnerFactory,
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.form.spinner', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -2487,6 +2670,7 @@ angular.module('admin.component')
                 this.inputElement.datetimepicker({
                     language: 'zh-CN',
                     pickDate: this.dateMode,
+                    useCurrent: false,
                     pickTime: this.timeMode,
                     useSeconds: this.timeMode
                 });
@@ -2543,7 +2727,8 @@ angular.module('admin.component')
         '最近7天': [moment().subtract('days', 6).startOf('day'), moment().endOf('day')],
         '最近30天': [moment().subtract('days', 29).startOf('day'), moment().endOf('day')],
         '当前月': [moment().startOf('month'), moment().endOf('month')],
-        '上个月': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+        '上个月': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+        '最近六个月': [moment().subtract('days', 182).startOf('day'), moment().endOf('day')]
     })
     .value('uiDateRangeDefaultConfig', {
         opens: ('right'),
@@ -2696,9 +2881,40 @@ angular.module('admin.component')
                 /**
                  *
                  */
+                changeValidateRule: function (ruleName, ruleConfig) {
+                    var validator = this.element.data().validator;
+                    if (validator) {
+                        var oldConfig = validator.settings.rules[ruleName];
+                        validator.settings.rules[ruleName] = $.extend(oldConfig, ruleConfig);
+                    }
+                },
+
+                /**
+                 *
+                 */
+                startValidate: function () {
+                    this.element.valid();
+                },
+
+                /**
+                 *
+                 */
                 addFormItem: function (formItem) {
                     this.formItems.push(formItem);
                     this.layout();
+                },
+
+                /**
+                 *
+                 */
+                formItemVal: function (formItemName, value) {
+                    var $el = this.element.find('[name="' + formItemName + '"]');
+                    if (value) {
+                        $el.val(value);
+                    }
+                    else {
+                        return $el.val();
+                    }
                 },
 
                 /**
@@ -2765,6 +2981,11 @@ angular.module('admin.component')
                             this.setRules(rules);
                         }.bind(this));
                     }
+                    else if (this.attrs.validateUrl) {
+                        $.getJSON(this.attrs.validateUrl, function (rules) {
+                            this.setRules(rules);
+                        }.bind(this));
+                    }
                     else {
                         this.element.submit(this._submit.bind(this));
                     }
@@ -2788,8 +3009,28 @@ angular.module('admin.component')
                  *
                  * @returns {*}
                  */
-                formData: function () {
-                    return this.element.serializeArray();
+                formData: function (isJson) {
+                    var r = this.element.serializeArray();
+                    if (isJson == true) {
+                        var o = {};
+                        $.each(r, function (i, item) {
+                            var n = item.name,
+                                v = item.value;
+                            if (o[n]) {
+                                if ($.isArray(o[n])) {
+                                    o[n].push(v);
+                                }
+                                else {
+                                    o[n] = [o[n], v];
+                                }
+                            }
+                            else {
+                                o[n] = v;
+                            }
+                        });
+                        r = o;
+                    }
+                    return r;
                 },
 
                 /**
@@ -3265,7 +3506,7 @@ angular.module('admin.component')
                             return uiRegionHelper.getProvince();
                         })
                         .then(function(data){
-                            self.$pDom.select2({data: data});
+                            self.$pDom.select2(self.toProvinceData(data));
                             if(p){
                                 self.$pDom.select2('val', p.id);
                                 self.$pDom.val(p[self.valueType]);
@@ -3277,7 +3518,7 @@ angular.module('admin.component')
                         })
                         .then(function(data){
                             if(data){
-                                self.$cDom.select2({data: data});
+                                self.$cDom.select2(self.toCityData(data));
                                 if(c){
                                     self.$cDom.select2('val', c.id);
                                     self.$cDom.val(c[self.valueType]);
@@ -3290,7 +3531,7 @@ angular.module('admin.component')
                         })
                         .then(function(data){
                             if(data){
-                                self.$sDom.select2({data: data});
+                                self.$sDom.select2(self.toStreetData(data));
                                 if(s){
                                     self.$sDom.select2('val', s.id);
                                     self.$sDom.val(s[self.valueType]);
@@ -3301,8 +3542,8 @@ angular.module('admin.component')
                 }
                 else { //没有则直接加载省
                     uiRegionHelper.getProvince().then(function (data) {
-                        this.$pDom.select2({data: data});
-                    }.bind(this));
+                        self.$pDom.select2(self.toProvinceData(data));
+                    });
                 }
 
                 //
@@ -3319,21 +3560,21 @@ angular.module('admin.component')
                 switch (this.attrs.mode) {
                     case 'p':
                         width = 120 * 1;
-                        this.$pDom.select2({data: []});
+                        this.$pDom.select2(this.toProvinceData());
                         this.$cDom.remove();
                         this.$sDom.remove();
                         break;
                     case 'c':
                         width = 120 * 2;
-                        this.$pDom.select2({data: []});
-                        this.$cDom.select2({data: []});
+                        this.$pDom.select2(this.toProvinceData());
+                        this.$cDom.select2(this.toCityData());
                         this.$sDom.remove();
                         break;
                     default:
                         width = 120 * 3;
-                        this.$pDom.select2({data: []});
-                        this.$cDom.select2({data: []});
-                        this.$sDom.select2({data: []});
+                        this.$pDom.select2(this.toProvinceData());
+                        this.$cDom.select2(this.toCityData());
+                        this.$sDom.select2(this.toStreetData());
                 }
                 if (this.autoWidth) {
                     this.element.width(width + 60);
@@ -3345,39 +3586,65 @@ angular.module('admin.component')
 
                 //
                 this.$pDom.change(function (evt) {
-                    uiRegionHelper.getCity(evt.val).then(function (data) {
-                        self.$cDom.select2({data: data});
-                        self.$sDom.select2({data: []});
-                    });
-
-                    //设置值
-                    this.$pDom.val(evt.added[this.valueType]);
-                    this.$inputDom.val(evt.val);
+                    if(evt.val){
+                        uiRegionHelper.getCity(evt.val).then(function (data) {
+                            self.$cDom.select2(self.toCityData(data));
+                            self.$sDom.select2(self.toStreetData());
+                        });
+                        this.$pDom.val(evt.added[this.valueType]);
+                        this.$inputDom.val(evt.val);
+                    }
+                    else{
+                        this.reset();
+                    }
                 }.bind(this));
 
                 //
                 this.$cDom.change(function (evt) {
-                    uiRegionHelper.getStreet(evt.val).then(function (data) {
-                        self.$sDom.select2({data: data});
-                    });
-
-                    //设置值
-                    this.$cDom.val(evt.added[this.valueType]);
-                    this.$inputDom.val(evt.val);
+                    if(evt.val){
+                        uiRegionHelper.getStreet(evt.val).then(function (data) {
+                            self.$sDom.select2(self.toStreetData(data));
+                        });
+                        this.$cDom.val(evt.added[this.valueType]);
+                        this.$inputDom.val(evt.val);
+                    }
+                    else{
+                        this.$sDom.select2(this.toStreetData());
+                        this.$cDom.val('');
+                        this.$inputDom.val('');
+                    }
                 }.bind(this));
 
                 //
                 this.$sDom.change(function (evt) {
-                    this.$sDom.val(evt.added[this.valueType]);
-                    this.$inputDom.val(evt.val);
+                    if(evt.val){
+                        this.$sDom.val(evt.added[this.valueType]);
+                        this.$inputDom.val(evt.val);
+                    }
+                    else{
+                        this.$sDom.val('');
+                        this.$inputDom.val('');
+                    }
                 }.bind(this));
+            },
+
+            toProvinceData: function(data){
+                return {data: data || [], allowClear: true, placeholder: '请选择省'}
+            },
+
+            toCityData: function(data){
+                return {data: data || [], allowClear: true, placeholder: '请选择市'}
+            },
+
+            toStreetData: function(data){
+                return {data: data || [], allowClear: true, placeholder: '请选择区'};
             },
 
             reset: function () {
                 this.$inputDom.val('');
                 this.$pDom.val('').select2('val', '');
-                this.$cDom.val('').select2({data: []});
-                this.$sDom.val('').select2({data: []});
+                this.$cDom.val('').select2(this.toCityData());
+                this.$sDom.val('').select2(this.toStreetData());
             }
         });
         return function(s, e, a, c, t){
@@ -3459,7 +3726,7 @@ angular.module('admin.component')
                 this.selectElement = element.find('select');
                 this.dataKeyName = attrs.keyName || 'key';
                 this.dataValueName = attrs.valueName || 'text';
-                this.defaultResetValue = attrs.isMulti ? null : this.selectElement.find('option:eq(0)').val();
+                this.defaultResetValue = attrs.isMulti ? '' : (this.selectElement.find('option:eq(0)')[0] ? this.selectElement.find('option:eq(0)').val() : '');
                 this.model = attrs.model;
                 this.init = false;
                 uiFormControl.apply(this, arguments);
@@ -3472,8 +3739,10 @@ angular.module('admin.component')
 
                     //监听一下model的变化
                     this.watch = this.scope.$watch(this.model, function (newValue) {
-                        if (newValue)
+                        if (newValue != undefined)
                             this.val(newValue);
+                        else
+                            this.val(this.defaultResetValue);
                     }.bind(this));
 
                     //如果model没有值, 默认选择第一个
@@ -3494,10 +3763,18 @@ angular.module('admin.component')
                 this.element.removeAttr('value');
             },
 
-            load: function (url) {
+            load: function (url, value) {
                 var self = this;
-                ajax.post(url).then(function (responseData) {
+                return ajax.post(url).then(function (responseData) {
                     self.setData(responseData, false);
+                    if (value) {
+                        self.val(value);
+                    }
+                    else{
+                        var val = self.val(),
+                            m = /^\?.+:(.+)\s+\?$/.exec(val);
+                        self.val(m ? m[1] : val);
+                    }
                 });
             },
 
@@ -3565,6 +3842,8 @@ angular.module('admin.component')
                     itemName = isString ? item : item[dataName],
                     itemValue = isString ? item : item[dataValue];
                 var $option = $('<option/>').attr('value', itemName).html(itemValue);
+                this.$emit('uiselect.onOption', $option, item);
+                $option.data('item', item);
                 return $option;
             },
 
@@ -3600,7 +3879,7 @@ angular.module('admin.component')
              * @returns {*}
              */
             val: function (v) {
-                if (v) {
+                if (v != undefined) {
                     this.selectElement.val(v);
                     this.render();
                     return this;
@@ -3613,7 +3892,6 @@ angular.module('admin.component')
         return function (s, e, a, c, t) {
             return new Select(s, e, a, c, t);
         };
-        ;
     });
 //-----------------------------------------------------------------------------------------------
 //
@@ -3633,7 +3911,7 @@ angular.module('admin.component')
         labelName: 'name',
         valueName: 'id'
     })
-    .factory('uiMultiSelectFactory', function ($q, ajax, logger, msg, util, Event) {
+    .factory('uiMultiSelectFactory', function ($q, ajax, logger, msg, util, Event, ValueService) {
         var m = new msg('MultiSelect'),
             MultiSelect = function (scope, element, attrs) {
                 Event.call(this);
@@ -3691,6 +3969,8 @@ angular.module('admin.component')
                     selectOption.maximumSelectionSize = attrs.maxSize;
                 }
 
+                selectOption.closeOnSelect = false;
+
 
                 //构造对象
                 this.inputElement.select2(selectOption);
@@ -3707,7 +3987,7 @@ angular.module('admin.component')
              * 初始化值
              */
             initValue: function () {
-                var ngModel = this.attrs.ngModel,
+                var ngModel = this.attrs.model,
                     self = this;
                 //
                 if (this.attrs.multi != undefined && this.attrs.setCheck) {
@@ -3729,7 +4009,7 @@ angular.module('admin.component')
                 if (!ngModel) {
                     return;
                 }
-                var v = util.getValue(this.scope, ngModel);
+                var v = ValueService.get(this.scope, ngModel);
                 if (v) {
                     this.element.select2('val', v);
                 }
@@ -3747,6 +4027,10 @@ angular.module('admin.component')
             initEvents: function () {
                 var self = this;
                 this.element.on('select2-selecting', function (evt) {
+                    if (evt.object.isNew && this.attrs.editable == 'false') {
+                        return false;
+                    }
+
                     if (this.attrs.multi != undefined) {
                         this.selectValues.push(evt.val);
                         this.selectItems.push(evt.object);
@@ -3756,6 +4040,10 @@ angular.module('admin.component')
                         this.selectItems = [evt.object];
                     }
                     this.$emit('uiSelect.doSelect', this.selectValues, this.selectItems);
+                    if (this.attrs.model) {
+                        ValueService.set(this.scope, this.attrs.model, this.attrs.multi != undefined ? this.selectValues : this.selectValues[0]);
+                    }
+                    return true;
                 }.bind(this));
                 this.element.on('select2-removing', function (evt) {
                     this.selectValues = $.grep(this.selectValues, function (value) {
@@ -3838,7 +4126,7 @@ angular.module('admin.component')
                     $.each(rs, function (i, r) {
                         var isC = false;
                         if (o.init) { //初始化, 那么只会根据
-                            isC = self.formatId(r) == o.term;
+                            isC = self.attrs.multi ? o.term.indexOf(self.formatId(r)) != -1 : self.formatId(r) == o.term;
                         }
                         else { //根据属性过滤
                             if (sfs.length == 0 || sfs[0] == '') {
@@ -3854,6 +4142,7 @@ angular.module('admin.component')
                             os.push(r);
                         }
                     });
+
                     o.callback({results: os});
                 });
             },
@@ -3878,7 +4167,7 @@ angular.module('admin.component')
                     self.isInit = false;
                     handler({results: self.selectItems});
                 }
-                else if (element.val()) {
+                else if (element.val() != undefined) {
                     self.isInit = false;
                     this.filterData({
                         term: element.val(),
@@ -3930,6 +4219,13 @@ angular.module('admin.component')
                     else {
                         this.selectValues = [vals];
                     }
+                    var values = ',' + this.selectValues.join(',') + ',',
+                        self = this;
+                    this.loadData().then(function (datas) {
+                        self.selectItems = $.grep(datas, function (data) {
+                            return values.indexOf(',' + self.formatId(data) + ',') != -1;
+                        });
+                    });
                 }
                 else {
                     if (this.attrs.multi) {
@@ -3960,6 +4256,77 @@ angular.module('admin.component')
 
         return function (scope, element, attrs) {
             return new MultiSelect(scope, element, attrs);
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .factory('uiSpinnerFactory', function (msg, uiFormControl, ValueService) {
+        var m = new msg('Spinner'),
+            Spinner = function (scope, element, attrs) {
+                this.inputElement = element.find('input');
+                this.spinner = null;
+                uiFormControl.apply(this, arguments);
+            };
+        Spinner.prototype = $.extend(new uiFormControl(), {
+
+            render: function () {
+                this.spinner = this.element.spinner(this.attrs);
+                if (this.attrs.model) {
+                    if (this.attrs.value) {
+                        ValueService.set(this.scope, this.attrs.model, this.attrs.value);
+                    }
+                    this.element.on('changed', function () {
+                        ValueService.set(this.scope, this.attrs.model, this.val());
+                        this.$emit('change', this.val())
+                    }.bind(this));
+
+                    this.scope.$watch(this.attrs.model, function(newValue){
+                        if(newValue != this.val()){
+                            this.val(newValue == undefined ? '0' : newValue);
+                        }
+                    }.bind(this));
+                }
+            },
+
+            change: function (fn) {
+                this.$on('change', fn);
+            },
+
+            reset: function () {
+                this.inputElement.val('');
+            },
+
+            disabled: function (open) {
+                this.attr('disabled', open);
+            },
+
+            attr: function (k, v) {
+                if (v) {
+                    this.inputElement.attr(k, v);
+                }
+                else {
+                    return this.inputElement.attr(k);
+                }
+            },
+
+            val: function (v) {
+                if (v != undefined) {
+                    this.inputElement.val(v);
+                    return this;
+                }
+                else {
+                    return this.inputElement.val();
+                }
+            }
+        });
+        return function (s, e, a, c, t) {
+            return new Spinner(s, e, a, c, t);
         };
     });
 //-----------------------------------------------------------------------------------------------
@@ -4001,9 +4368,9 @@ angular.module('admin.component')
                         }
                     }.bind(this));
 
-                    //如果model没有值, 默认选择第一个
+                    //如果model没有值, 默认选择offvalue
                     if(!ValueService.get(this.scope, this.model)){
-                        var val = this.val();
+                        var val = this.offValue;
                         ValueService.set(this.scope, this.model, val || this.offValue);
                     }
                 }
@@ -4475,18 +4842,41 @@ angular.module('admin.component')
             return new Menu(s, e, a, c, t);
         };
     });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiMenu', function (uiMenuFactory) {
+    .directive('uiMenu', function () {
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
-            scope: false,
-            link: uiMenuFactory,
+            link: function (scope, element) {
+                element.find(' li a').click(function (evt) {
+                    var $a = $(evt.target);
+                    $a.parent().parent().find('li').removeClass('active');
+                    $a.parent().parent().find('.arrow').removeClass('open');
+
+                    $a.parent().addClass('active');
+                    $a.find('.arrow').addClass('open');
+                });
+
+                //
+                var $a = element.find('a[href="' + window.location.hash + '"]');
+                $a = $a.length > 0 ? $a : element.find('a[href="' + window.location.hash.replace(/\/[^\/]+$/, '') + '"]');
+                $a.parents('li').each(function(i, li){
+                    var $li = $(li);
+                    $li.addClass('active');
+                    $li.find(' > a .arrow').addClass('open');
+                });
+            },
             templateUrl: 'tpl.menu'
         };
     });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4713,8 +5103,7 @@ angular.module('admin.component')
                     init = false,
                     paginationFactory = new PaginationFactory(url, pageIndex, pageSize, pageLimit, pageDataName, pageTotalName),
                     handler = function (r) {
-                        scope.pageList = r.pageList;
-                        scope.dataList = r.dataList;
+                        $.extend(scope, r);
                     };
 
                 //
@@ -4730,11 +5119,15 @@ angular.module('admin.component')
                         paginationFactory.getPage(index).then(handler);
                     }
                 };
-                scope.loadFirst = function () {
-                    paginationFactory.prePage().then(handler);
+                scope.loadFirst = function (isForce) {
+                    if(!scope.isFirst || isForce){
+                        paginationFactory.prePage().then(handler);
+                    }
                 };
-                scope.loadLast = function () {
-                    paginationFactory.nextPage().then(handler);
+                scope.loadLast = function (isForce) {
+                    if(!scope.isLast || isForce){
+                        paginationFactory.nextPage().then(handler);
+                    }
                 };
 
                 //
@@ -4759,6 +5152,15 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
+            link: function (scope, element, attrs) {
+                if (attrs.onEnter) {
+                    element.keydown(function (evt) {
+                        if (evt.keyCode == 13 && scope[attrs.onEnter]) {
+                            scope[attrs.onEnter](element.val());
+                        }
+                    });
+                }
+            },
             template: function (el, attrs) {
                 return componentHelper.getTemplate('tpl.portal.portlet.action.search', attrs);
             }
@@ -4933,7 +5335,7 @@ angular.module('admin.component')
                     });
 
                     //
-                    var $dom = $('<input type="checkbox"/>').val(rowData[name]).click(function (evt) {
+                    var $dom = $('<input type="checkbox" pk="' + rowData[name] + '"/>').val(rowData[name]).click(function (evt) {
                         $scope[ref].selectOneHandler(evt.target.checked, $attrs.name, rowData);
                         evt.stopPropagation();
                     });
@@ -4945,7 +5347,7 @@ angular.module('admin.component')
 
                 //
                 if ($scope[ref] && $scope[ref].addColumn) {
-                    $scope[ref].addColumn(uiTableColumnService(ref, $scope, $attrs, render));
+                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render), $attrs.index);
                     $scope[ref].idName = name;
                 }
                 else {
@@ -4983,7 +5385,7 @@ angular.module('admin.component')
 
                 //
                 if ($scope[ref] && $scope[ref].addColumn) {
-                    $scope[ref].addColumn(uiTableColumnService(ref, $scope, $attrs, render, uiEditableDateInputFactory));
+                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render, uiEditableDateInputFactory), $attrs.index);
                 }
                 else {
                     m.error('uiTableColumn必须放在uiTable里面');
@@ -5023,7 +5425,7 @@ angular.module('admin.component')
 
                 //
                 if ($scope[ref] && $scope[ref].addColumn) {
-                    $scope[ref].addColumn(uiTableColumnService(ref, $scope, $attrs, render));
+                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render), $attrs.index);
                 }
                 else {
                     m.error('uiTableColumn必须放在uiTable里面');
@@ -5083,7 +5485,7 @@ angular.module('admin.component')
                             editor = $injector.get('uiEditableInputFactory');
                         }
                     }
-                    $scope[ref].addColumn(uiTableColumnService(ref, $scope, $attrs, render, editor));
+                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render, editor), $attrs.index);
                 }
                 else {
                     m.error('uiTableColumn必须放在uiTable里面');
@@ -5122,7 +5524,7 @@ angular.module('admin.component')
 
                 //
                 if ($scope[ref] && $scope[ref].addColumn) {
-                    $scope[ref].addColumn(uiTableColumnService(ref, $scope, $attrs, render));
+                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render), $attrs.index);
                 }
                 else {
                     m.error('uiTableColumn必须放在uiTable里面');
@@ -5174,7 +5576,7 @@ angular.module('admin.component')
 
                 //
                 if ($scope[ref] && $scope[ref].addColumn) {
-                    $scope[ref].addColumn(uiTableColumnService(ref, $scope, $attrs, render));
+                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render), $attrs.index);
                 }
                 else {
                     m.error('uiTableProgressColumn必须放在uiTable里面');
@@ -5328,7 +5730,7 @@ angular.module('admin.component')
                             choosableData.push({value: key, text: val});
                         }
                     });
-                    $scope[ref].addColumn(uiTableColumnService(ref, $scope, $attrs, render, uiEditableChooseFactory, choosableData));
+                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render, uiEditableChooseFactory, choosableData), $attrs.index);
                 }
                 else {
                     m.error('uiTableColumn必须放在uiTable里面');
@@ -5385,7 +5787,7 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiTableFactory', function (uiTableDelegate, uiTableEditableFactory, util, logger, ajax, msg, Event) {
+    .factory('uiTableFactory', function (uiTableDelegate, uiTableEditableFactory, util, logger, ajax, msg, Event, $compile) {
         var m = new msg('table'),
             Table = function (scope, element, attrs) {
                 Event.call(this);
@@ -5430,9 +5832,63 @@ angular.module('admin.component')
              * 新增列
              * @param column
              */
-            addColumn: function (column) {
-                column.mIndex = this.columns.length;
-                this.columns.push(column);
+            setColumn: function (column, index){
+                index = parseInt(index);
+                if(index && !isNaN(index)){
+                    this.columns.splice(index, 0, column);
+                }
+                else{
+                    index = this.columns.length;
+                    this.columns.push(column);
+                }
+                if (this.instance) {
+                    var setting = this.instance.fnSettings(),
+                        headers = setting.aoHeader[0],
+                        th = this.element.find('th').eq(index)[0],
+                        columns = setting.aoColumns;
+                    column.fnGetData = column.mDataProp;
+                    column = $.extend({}, columns[columns.length - 1], column);
+                    headers.splice(index, 0, {cell: th, unique: true});
+                    columns.splice(index, 0, column);
+                }
+                $.each(this.columns, function(i, c){
+                    c.mIndex = i;
+                });
+            },
+
+            /**
+             *
+             * @param head
+             * @param name
+             */
+            addColumn: function (head, name, index) {
+                var def = '<ui-table-column head="' + head + '" name="' + name + '" data-index="' + index + '"></ui-table-column>';
+                this.addCustomColumn(def, index);
+            },
+
+            /**
+             *
+             * @param head
+             * @param name
+             * @param render
+             */
+            addCustomColumn: function (def, index) {
+                var $tr = this.element.find('tr:eq(0)'),
+                    $th = index == undefined ? $tr.find('th:last-child') : $tr.find('th:eq(' + index + ')'),
+                    $def = $(def);
+                $def.insertAfter($th);
+                $compile($def)(this.scope);
+            },
+
+            /**
+             *
+             */
+            removeColumnAtIndex: function (index) {
+                this.element.find('tr:eq(0) th:eq(' + index + ')').remove();
+                var setting = this.instance.fnSettings();
+                setting.aoHeader[0].splice(index, 1);
+                setting.aoColumns.splice(index, 1);
+                this.columns.splice(index, 1);
             },
 
             /**
@@ -5505,7 +5961,6 @@ angular.module('admin.component')
             beforeDataHandler: function (result) {
                 this.pageResult = result;
                 if (this.nopageMode) {
-                    this.selectValues = [];
                     this.selectItems = [];
                 }
                 this.pageSelectNum = [];
@@ -5530,7 +5985,7 @@ angular.module('admin.component')
                     }
                 });
 
-                this.scope.$broadcast('uitable.selectAllChecked', this.pageResult.aaData&&sn == this.pageResult.aaData.length && sn != 0);
+                this.scope.$broadcast('uitable.selectAllChecked', this.pageResult.aaData && sn == this.pageResult.aaData.length && sn != 0);
                 this.$emit('uitable.renderSuccess', result);
             },
 
@@ -5590,6 +6045,20 @@ angular.module('admin.component')
                 this.searchParams = params || this.searchParams;
                 this.url = url || this.url;
                 this.jumpTo(1);
+            },
+
+            /**
+             *
+             */
+            items: function (items, idName) {
+                idName = idName || this.idName;
+                var self = this;
+                this.selectItems = items;
+                this.selectValues = $.map(this.selectItems, function (selectItem) {
+                    var pk = selectItem[idName],
+                        $cDom = self.element.find('[pk="' + pk + '"]').attr('checked', true);
+                    return pk;
+                });
             },
 
             /**
@@ -5794,14 +6263,14 @@ angular.module('admin.component')
                                 }
                             },
                             "fnServerData": function (sSource, aoData, fnCallback) {
-                                if (!attrs.url || attrs.manual != undefined) {
+                                if ((!attrs.url && !table.url) || attrs.manual != undefined) {
                                     delete attrs.manual;
                                     fnCallback({aaData: [], iTotalRecords: 0, iTotalDisplayRecords: 0});
                                     return;
                                 }
 
                                 //请求参数
-                                var url = attrs.url;
+                                var url = table.url || attrs.url;
 
                                 //
                                 if (table.searchParams) {
@@ -5820,7 +6289,6 @@ angular.module('admin.component')
                                 //
                                 ajax.post(url, aoData)
                                     .then(function (result) {
-                                        table.beforeDataHandler(result);
                                         if ($.isArray(result)) {
                                             result = {
                                                 aaData: result,
@@ -5828,6 +6296,14 @@ angular.module('admin.component')
                                                 iTotalRecords: result.length
                                             };
                                         }
+                                        else if(attrs.nameData && attrs.nameTotal){
+                                            result = {
+                                                aaData: result[attrs.nameData],
+                                                iTotalDisplayRecords: result[attrs.nameTotal],
+                                                iTotalRecords: result[attrs.nameTotal]
+                                            }
+                                        }
+                                        table.beforeDataHandler(result);
                                         fnCallback(result);
                                         table.afterDataHandler(result);
                                     }, function (json) {
@@ -5915,7 +6391,7 @@ angular.module('admin.component')
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiTableToolBarFactory', function (msg, ajax) {
+    .factory('uiTableToolBarFactory', function (msg, ajax, $injector) {
         var m = new msg('TableToolBar'),
             TableToolBar = function ($scope, tableId, $element, $attrs) {
                 this.scope = $scope;
@@ -5957,7 +6433,7 @@ angular.module('admin.component')
                 }
                 else {
                     if (this.attrs.add) {
-                        //TODO: 还没实现
+                        $injector.get('state').go(this.attrs.add);
                     }
                     else {
                         m.error('点击添加数据按钮，但是没有设置地址, 请在add="地址"');
@@ -5970,9 +6446,16 @@ angular.module('admin.component')
                 }
                 else {
                     if (this.attrs.add) {
-                        ajax.remove(this.attrs.del, {ids: values.join(',')}).then(function () {
-                            this.scope[this.tableId].refresh();
-                        }.bind(this));
+                        if (values.length > 1) {
+                            ajax.remove(this.attrs.del, {ids: values.join(',')}).then(function () {
+                                this.scope[this.tableId].refresh();
+                            }.bind(this));
+                        }
+                        else {
+                            ajax.remove(this.attrs.del + '/' + values[0]).then(function () {
+                                this.scope[this.tableId].refresh();
+                            }.bind(this));
+                        }
                     }
                     else {
                         m.error('点击删除数据按钮，但是没有设置地址, 请在del="地址"');
@@ -6132,7 +6615,7 @@ angular.module('admin.component')
             refresh: function (params, url) {
                 url = url || this.attrs.url;
                 if (url) {
-                    return ajax.post(this.attrs.url, params || {}).then(function (r) {
+                    return ajax.post(url, params || {}).then(function (r) {
                         this.setData(r);
                     }.bind(this));
                 }
@@ -6157,7 +6640,15 @@ angular.module('admin.component')
                             searchList = searchList.concat(self.getHierarchyDataById(data.id));
                         }
                     });
-                    searchList = $.unique(searchList);
+                    var r = [],
+                        m = {};
+                    $.each(searchList, function (index, data) {
+                        if (!m[data.id]) {
+                            r.push(data);
+                        }
+                        m[data.id] = data;
+                    });
+                    searchList = r;
                 }
                 this.setData(searchList, null, true);
                 this.expandAll(true);
@@ -6235,7 +6726,7 @@ angular.module('admin.component')
                 if (!!!isFilter) {
                     this.dataList = resData;
                     this.dataMap = {};
-                    $.each(resData, function(nn, data){
+                    $.each(resData, function (nn, data) {
                         this.dataMap[data.id] = data;
                     }.bind(this));
                 }
@@ -6251,11 +6742,11 @@ angular.module('admin.component')
                 //
                 this.instance = $.fn.zTree.init(this.element, uiTreeConfig(this), resData);
                 this.expand(pid);
-                if(this.checkedValues){
+                if (this.checkedValues) {
                     this.checked(this.checkedValues);
                 }
-                var r = $.grep(resData, function(data){
-                    return data.checked + '' ==  'true';
+                var r = $.grep(resData, function (data) {
+                    return data.checked + '' == 'true';
                 });
                 this.item(this.selectItems.concat(r));
             },
@@ -6279,7 +6770,7 @@ angular.module('admin.component')
              *
              * @param id
              */
-            getHierarchyDataById: function(id){
+            getHierarchyDataById: function (id) {
                 var r = [],
                     node = this.getDataById(id);
                 if (node) {
@@ -6303,7 +6794,7 @@ angular.module('admin.component')
             /**
              *
              */
-            getDataById: function(id){
+            getDataById: function (id) {
                 return this.dataMap[id];
             },
 
@@ -6313,6 +6804,10 @@ angular.module('admin.component')
              */
             expand: function (level) {
                 level = level || this.attrs.expand;
+                if (level == 'all') {
+                    this.expandAll(true);
+                    return;
+                }
                 if (level == undefined) {
                     return;
                 }
@@ -6366,10 +6861,15 @@ angular.module('admin.component')
                     this.selectValues = [];
                 }
                 var r = [];
-                for (var i = 0, c; c = cs[i]; i++) {
-                    var node = this.instance.getNodeByParam("id", c, null);
-                    this.instance.checkNode(node, true, true);
-                    r.push(node);
+                for (var i = 0, c; i < cs.length; i++) {
+                    c = cs[i];
+                    if (c) {
+                        var node = this.instance.getNodeByParam("id", c, null);
+                        if (node) {
+                            this.instance.checkNode(node, true, true);
+                            r.push(node);
+                        }
+                    }
                 }
                 this.item(r);
             },
@@ -6377,14 +6877,14 @@ angular.module('admin.component')
             /**
              *
              */
-            item: function(item){
-                if(item){
+            item: function (item) {
+                if (item) {
                     this.selectItems = item;
                     this.selectValues = $.map(this.selectItems, function (item) {
                         return item.id;
                     });
                 }
-                else{
+                else {
                     return this.selectItems;
                 }
             },
@@ -6392,7 +6892,7 @@ angular.module('admin.component')
             /**
              *
              */
-            val: function(){
+            val: function () {
                 //NOT SUPPORTED
             },
 
@@ -6549,8 +7049,11 @@ angular.module('admin.component')
                     bc = this.tree.attrs[attrName],
                     scope = this.tree.scope;
                 if (bc) {
+
                     args = Array.prototype.slice.call(args, 1);
-                    return scope[bc].apply(scope, args);
+                    var r = scope[bc].apply(scope, args);
+                    try{ scope.$apply(); } catch(e){ }
+                    return r;
                 }
                 else {
                     return true;
@@ -6707,7 +7210,7 @@ angular.module('admin.component')
                 '<div class="form-group" {{#if isMulti}}is-multi="true"{{/if}}>',
                     '<label class="col-md-{{leftCol}} control-label">{{{label}}}</label>',
                     '<div class="col-md-{{rightCol}}">',
-                        '<select class="form-control" name="{{name}}" placeholder="{{placeholder}}" {{#if disabled}}disabled="disabled"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}} ng-transclude></select>',
+                        '<select class="form-control" {{#if buttonClass}}data-style="{{buttonClass}}"{{/if}} name="{{name}}" placeholder="{{placeholder}}" {{#if disabled}}disabled="disabled"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}} ng-transclude></select>',
                         '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',
                     '</div>',
                 '</div>'
@@ -6767,6 +7270,27 @@ angular.module('admin.component')
                     '</div>',
                 '</div>'
             ].join(''));
+
+            /**
+             *
+             */
+            componentHelper.setTemplate('tpl.form.spinner', [
+                '<div class="form-group">',
+                    '<label class="control-label col-md-{{leftCol}}">{{{label}}}</label>',
+                    '<div class="col-md-{{rightCol}}">',
+                        '<div class="input-group" style="width:150px;">',
+                            '<div class="spinner-buttons input-group-btn">',
+                                '<button type="button" class="btn spinner-up blue"><i class="fa fa-plus"></i></button>',
+                            '</div>',
+                            '<input type="text" class="spinner-input form-control" {{#if name}}name="{{name}}"{{/if}} {{#if value}}value="{{value}}"{{/if}} readonly>',
+                            '<div class="spinner-buttons input-group-btn">',
+                                '<button type="button" class="btn spinner-down red"><i class="fa fa-minus"></i></button>',
+                            '</div>',
+                        '</div>',
+                        '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',
+                    '</div>',
+                '</div>'
+            ].join(''));
         });
 })(jQuery);
 (function ($) {
@@ -6777,25 +7301,10 @@ angular.module('admin.component')
              *
              */
             componentHelper.setTemplate('tpl.menu', [
-                '<div class="page-sidebar navbar-collapse collapse">',
-                    '<ul class="page-sidebar-menu">',
-                        '<ng-tranclude></ng-tranclude>',
-                        '<li ng-class="{\'active open\': menuItem.active}" ng-click="onClickHandler(menuItem)" ng-repeat="menuItem in menuItems">',
-                            '<a href="javascript:">',
-                                '<i ng-class="menuItem.icon"></i>',
-                                '<span class="title" ng-bind="menuItem.title"></span>',
-                                '<span class="arrow"></span>',
-                            '</a>',
-                            '<ul class="sub-menu" ng-if="menuItem.children">',
-                                '<li ng-class="{\'active\': menuItem.active}" ng-repeat="submenuItem in menuItem.children">',
-                                    '<a ng-href="submenuItem.url">',
-                                        '<i ng-class="submenuItem.icon"></i>',
-                                        '{{submenuItem.title}}',
-                                    '</a>',
-                                '</li>',
-                            '</ul>',
-                        '</li>',
-                    '</ul>',
+                '<div class="page-sidebar-wrapper">',
+                    '<div class="page-sidebar navbar-collapse collapse">',
+                        '<ul class="page-sidebar-menu" ng-transclude></ul>',
+                    '</div>',
                 '</div>'
             ].join(''));
 
@@ -6851,9 +7360,9 @@ angular.module('admin.component')
              */
             componentHelper.setTemplate('tpl.portal.portlet.action.pagination',[
                 '<ul class="pagination pagination-circle portlet-tool-bar">',
-                    '<li><a href="javascript:;" ng-click="loadFirst()"><i class="fa fa-angle-left"></i></a></li>',
+                    '<li ng-class="{\'disabled\': isFirst}" ><a href="javascript:;" ng-click="loadFirst()"><i class="fa fa-angle-left"></i></a></li>',
                     '<li ng-repeat="page in pageList" ng-class="{\'active\': page.current}" ng-click="load(page.index)"><a href="javascript:;" ng-bind="page.index"></a></li>',
-                    '<li><a href="javascript:;" ng-click="loadLast()"><i class="fa fa-angle-right"></i></a></li>',
+                    '<li ng-class="{\'disabled\': isLast}" ><a href="javascript:;" ng-click="loadLast()"><i class="fa fa-angle-right"></i></a></li>',
                 '</ul>'
             ].join(''));
 
@@ -6946,7 +7455,7 @@ angular.module('admin.component')
             componentHelper.setTemplate('tpl.searchform.input.select', [
                 '<div class="input-inline search-item">',
                     '<div class="input-group">',
-                        '<select class="input-xsmall form-control " {{#if model}}ng-model="{{model}}"{{/if}} {{#if selectName}}name="{{selectName}}"{{/if}} ng-transclude></select>',
+                        '<select class="input-xsmall form-control " {{#if buttonClass}}data-style="{{buttonClass}}"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#if selectName}}name="{{selectName}}"{{/if}} ng-transclude></select>',
                         '<input style="left:-1px;" class="form-control input-small pull-right" {{#if inputName}}name="{{inputName}}"{{/if}} placeholder="{{placeholder}}" ng-keydown="onChangeHandler($event)"/>',
                     '</div>',
                 '</div>'
@@ -6956,7 +7465,7 @@ angular.module('admin.component')
              *
              */
             componentHelper.setTemplate('tpl.searchform.region', [
-                '<div class="input-inline search-item" auto-width="true">',
+                '<div class="input-inline search-item">',
                     '<div class="input-group">',
                         '{{#if label}}<div class="input-group-addon">{{{label}}}:</div>{{/if}}',
                         '<input type="hidden" {{#if model}}ng-value="{{model}}"{{/if}} {{#if name}}name="{{name}}"{{/if}}  value="{{value}}"/>',
@@ -6975,12 +7484,12 @@ angular.module('admin.component')
                     '<div class="input-inline input-medium search-item" {{#if isMulti}}is-multi="true"{{/if}}>',
                         '<div class="input-group">',
                             '<div class="input-group-addon">{{label}}:</div>',
-                            '<select class="form-control" name="{{name}}" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
+                            '<select class="form-control" {{#if buttonClass}}data-style="{{buttonClass}}"{{/if}} name="{{name}}" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
                         '</div>',
                     '</div>',
                 '{{else}}',
                     '<div class="input-small search-item input-inline" {{#if isMulti}}is-multi="true"{{/if}}>',
-                        '<select name="{{name}}" class="form-control" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
+                        '<select name="{{name}}" {{#if buttonClass}}data-style="{{buttonClass}}"{{/if}} class="form-control" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
                     '</div>',
                 '{{/if}}'
             ].join(''));
@@ -7117,4 +7626,10 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'admin.template']);
+
+//
+if($.fn.modal){
+    $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+}
+
 })();

@@ -48,9 +48,9 @@
              */
             componentHelper.setTemplate('tpl.portal.portlet.action.pagination',[
                 '<ul class="pagination pagination-circle portlet-tool-bar">',
-                    '<li><a href="javascript:;" ng-click="loadFirst()"><i class="fa fa-angle-left"></i></a></li>',
+                    '<li ng-class="{\'disabled\': isFirst}" ><a href="javascript:;" ng-click="loadFirst()"><i class="fa fa-angle-left"></i></a></li>',
                     '<li ng-repeat="page in pageList" ng-class="{\'active\': page.current}" ng-click="load(page.index)"><a href="javascript:;" ng-bind="page.index"></a></li>',
-                    '<li><a href="javascript:;" ng-click="loadLast()"><i class="fa fa-angle-right"></i></a></li>',
+                    '<li ng-class="{\'disabled\': isLast}" ><a href="javascript:;" ng-click="loadLast()"><i class="fa fa-angle-right"></i></a></li>',
                 '</ul>'
             ].join(''));
 

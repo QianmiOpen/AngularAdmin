@@ -6,7 +6,7 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiTableFactory', function (uiTableDelegate, uiTableEditableFactory, util, logger, ajax, msg, Event) {
+    .factory('uiTableFactory', function (uiTableDelegate, uiTableEditableFactory, util, logger, ajax, msg, Event, $compile) {
         var m = new msg('table'),
             Table = function (scope, element, attrs) {
                 Event.call(this);
@@ -51,9 +51,63 @@ angular.module('admin.component')
              * 新增列
              * @param column
              */
-            addColumn: function (column) {
-                column.mIndex = this.columns.length;
-                this.columns.push(column);
+            setColumn: function (column, index){
+                index = parseInt(index);
+                if(index && !isNaN(index)){
+                    this.columns.splice(index, 0, column);
+                }
+                else{
+                    index = this.columns.length;
+                    this.columns.push(column);
+                }
+                if (this.instance) {
+                    var setting = this.instance.fnSettings(),
+                        headers = setting.aoHeader[0],
+                        th = this.element.find('th').eq(index)[0],
+                        columns = setting.aoColumns;
+                    column.fnGetData = column.mDataProp;
+                    column = $.extend({}, columns[columns.length - 1], column);
+                    headers.splice(index, 0, {cell: th, unique: true});
+                    columns.splice(index, 0, column);
+                }
+                $.each(this.columns, function(i, c){
+                    c.mIndex = i;
+                });
+            },
+
+            /**
+             *
+             * @param head
+             * @param name
+             */
+            addColumn: function (head, name, index) {
+                var def = '<ui-table-column head="' + head + '" name="' + name + '" data-index="' + index + '"></ui-table-column>';
+                this.addCustomColumn(def, index);
+            },
+
+            /**
+             *
+             * @param head
+             * @param name
+             * @param render
+             */
+            addCustomColumn: function (def, index) {
+                var $tr = this.element.find('tr:eq(0)'),
+                    $th = index == undefined ? $tr.find('th:last-child') : $tr.find('th:eq(' + index + ')'),
+                    $def = $(def);
+                $def.insertAfter($th);
+                $compile($def)(this.scope);
+            },
+
+            /**
+             *
+             */
+            removeColumnAtIndex: function (index) {
+                this.element.find('tr:eq(0) th:eq(' + index + ')').remove();
+                var setting = this.instance.fnSettings();
+                setting.aoHeader[0].splice(index, 1);
+                setting.aoColumns.splice(index, 1);
+                this.columns.splice(index, 1);
             },
 
             /**
@@ -126,7 +180,6 @@ angular.module('admin.component')
             beforeDataHandler: function (result) {
                 this.pageResult = result;
                 if (this.nopageMode) {
-                    this.selectValues = [];
                     this.selectItems = [];
                 }
                 this.pageSelectNum = [];
@@ -151,7 +204,7 @@ angular.module('admin.component')
                     }
                 });
 
-                this.scope.$broadcast('uitable.selectAllChecked', this.pageResult.aaData&&sn == this.pageResult.aaData.length && sn != 0);
+                this.scope.$broadcast('uitable.selectAllChecked', this.pageResult.aaData && sn == this.pageResult.aaData.length && sn != 0);
                 this.$emit('uitable.renderSuccess', result);
             },
 
@@ -211,6 +264,20 @@ angular.module('admin.component')
                 this.searchParams = params || this.searchParams;
                 this.url = url || this.url;
                 this.jumpTo(1);
+            },
+
+            /**
+             *
+             */
+            items: function (items, idName) {
+                idName = idName || this.idName;
+                var self = this;
+                this.selectItems = items;
+                this.selectValues = $.map(this.selectItems, function (selectItem) {
+                    var pk = selectItem[idName],
+                        $cDom = self.element.find('[pk="' + pk + '"]').attr('checked', true);
+                    return pk;
+                });
             },
 
             /**

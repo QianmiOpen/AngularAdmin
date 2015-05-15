@@ -20,8 +20,7 @@ angular.module('admin.component')
                     init = false,
                     paginationFactory = new PaginationFactory(url, pageIndex, pageSize, pageLimit, pageDataName, pageTotalName),
                     handler = function (r) {
-                        scope.pageList = r.pageList;
-                        scope.dataList = r.dataList;
+                        $.extend(scope, r);
                     };
 
                 //
@@ -37,11 +36,15 @@ angular.module('admin.component')
                         paginationFactory.getPage(index).then(handler);
                     }
                 };
-                scope.loadFirst = function () {
-                    paginationFactory.prePage().then(handler);
+                scope.loadFirst = function (isForce) {
+                    if(!scope.isFirst || isForce){
+                        paginationFactory.prePage().then(handler);
+                    }
                 };
-                scope.loadLast = function () {
-                    paginationFactory.nextPage().then(handler);
+                scope.loadLast = function (isForce) {
+                    if(!scope.isLast || isForce){
+                        paginationFactory.nextPage().then(handler);
+                    }
                 };
 
                 //

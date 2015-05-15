@@ -12,7 +12,8 @@ angular.module('admin.component')
         '最近7天': [moment().subtract('days', 6).startOf('day'), moment().endOf('day')],
         '最近30天': [moment().subtract('days', 29).startOf('day'), moment().endOf('day')],
         '当前月': [moment().startOf('month'), moment().endOf('month')],
-        '上个月': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+        '上个月': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+        '最近六个月': [moment().subtract('days', 182).startOf('day'), moment().endOf('day')]
     })
     .value('uiDateRangeDefaultConfig', {
         opens: ('right'),

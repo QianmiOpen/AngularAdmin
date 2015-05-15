@@ -52,7 +52,7 @@
                 '<div class="form-group" {{#if isMulti}}is-multi="true"{{/if}}>',
                     '<label class="col-md-{{leftCol}} control-label">{{{label}}}</label>',
                     '<div class="col-md-{{rightCol}}">',
-                        '<select class="form-control" name="{{name}}" placeholder="{{placeholder}}" {{#if disabled}}disabled="disabled"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}} ng-transclude></select>',
+                        '<select class="form-control" {{#if buttonClass}}data-style="{{buttonClass}}"{{/if}} name="{{name}}" placeholder="{{placeholder}}" {{#if disabled}}disabled="disabled"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}} ng-transclude></select>',
                         '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',
                     '</div>',
                 '</div>'
@@ -109,6 +109,27 @@
                     '<div class="col-md-{{rightCol}}">',
                          '<input type="checkbox"  {{#if disabled}}disabled="{{disabled}}"{{/if}} {{#if value}}value="{{value}}"{{/if}} {{#if name}}name="{{name}}"{{/if}} {{#if onText}}data-on-text="{{onText}}"{{/if}}  {{#if offText}}data-off-text="{{offText}}"{{/if}}/>',
                          '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',
+                    '</div>',
+                '</div>'
+            ].join(''));
+
+            /**
+             *
+             */
+            componentHelper.setTemplate('tpl.form.spinner', [
+                '<div class="form-group">',
+                    '<label class="control-label col-md-{{leftCol}}">{{{label}}}</label>',
+                    '<div class="col-md-{{rightCol}}">',
+                        '<div class="input-group" style="width:150px;">',
+                            '<div class="spinner-buttons input-group-btn">',
+                                '<button type="button" class="btn spinner-up blue"><i class="fa fa-plus"></i></button>',
+                            '</div>',
+                            '<input type="text" class="spinner-input form-control" {{#if name}}name="{{name}}"{{/if}} {{#if value}}value="{{value}}"{{/if}} readonly>',
+                            '<div class="spinner-buttons input-group-btn">',
+                                '<button type="button" class="btn spinner-down red"><i class="fa fa-minus"></i></button>',
+                            '</div>',
+                        '</div>',
+                        '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',
                     '</div>',
                 '</div>'
             ].join(''));

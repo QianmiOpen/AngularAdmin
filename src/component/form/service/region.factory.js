@@ -35,7 +35,7 @@ angular.module('admin.component')
                             return uiRegionHelper.getProvince();
                         })
                         .then(function(data){
-                            self.$pDom.select2({data: data});
+                            self.$pDom.select2(self.toProvinceData(data));
                             if(p){
                                 self.$pDom.select2('val', p.id);
                                 self.$pDom.val(p[self.valueType]);
@@ -47,7 +47,7 @@ angular.module('admin.component')
                         })
                         .then(function(data){
                             if(data){
-                                self.$cDom.select2({data: data});
+                                self.$cDom.select2(self.toCityData(data));
                                 if(c){
                                     self.$cDom.select2('val', c.id);
                                     self.$cDom.val(c[self.valueType]);
@@ -60,7 +60,7 @@ angular.module('admin.component')
                         })
                         .then(function(data){
                             if(data){
-                                self.$sDom.select2({data: data});
+                                self.$sDom.select2(self.toStreetData(data));
                                 if(s){
                                     self.$sDom.select2('val', s.id);
                                     self.$sDom.val(s[self.valueType]);
@@ -71,8 +71,8 @@ angular.module('admin.component')
                 }
                 else { //没有则直接加载省
                     uiRegionHelper.getProvince().then(function (data) {
-                        this.$pDom.select2({data: data});
-                    }.bind(this));
+                        self.$pDom.select2(self.toProvinceData(data));
+                    });
                 }
 
                 //
@@ -89,21 +89,21 @@ angular.module('admin.component')
                 switch (this.attrs.mode) {
                     case 'p':
                         width = 120 * 1;
-                        this.$pDom.select2({data: []});
+                        this.$pDom.select2(this.toProvinceData());
                         this.$cDom.remove();
                         this.$sDom.remove();
                         break;
                     case 'c':
                         width = 120 * 2;
-                        this.$pDom.select2({data: []});
-                        this.$cDom.select2({data: []});
+                        this.$pDom.select2(this.toProvinceData());
+                        this.$cDom.select2(this.toCityData());
                         this.$sDom.remove();
                         break;
                     default:
                         width = 120 * 3;
-                        this.$pDom.select2({data: []});
-                        this.$cDom.select2({data: []});
-                        this.$sDom.select2({data: []});
+                        this.$pDom.select2(this.toProvinceData());
+                        this.$cDom.select2(this.toCityData());
+                        this.$sDom.select2(this.toStreetData());
                 }
                 if (this.autoWidth) {
                     this.element.width(width + 60);
@@ -115,39 +115,65 @@ angular.module('admin.component')
 
                 //
                 this.$pDom.change(function (evt) {
-                    uiRegionHelper.getCity(evt.val).then(function (data) {
-                        self.$cDom.select2({data: data});
-                        self.$sDom.select2({data: []});
-                    });
-
-                    //设置值
-                    this.$pDom.val(evt.added[this.valueType]);
-                    this.$inputDom.val(evt.val);
+                    if(evt.val){
+                        uiRegionHelper.getCity(evt.val).then(function (data) {
+                            self.$cDom.select2(self.toCityData(data));
+                            self.$sDom.select2(self.toStreetData());
+                        });
+                        this.$pDom.val(evt.added[this.valueType]);
+                        this.$inputDom.val(evt.val);
+                    }
+                    else{
+                        this.reset();
+                    }
                 }.bind(this));
 
                 //
                 this.$cDom.change(function (evt) {
-                    uiRegionHelper.getStreet(evt.val).then(function (data) {
-                        self.$sDom.select2({data: data});
-                    });
-
-                    //设置值
-                    this.$cDom.val(evt.added[this.valueType]);
-                    this.$inputDom.val(evt.val);
+                    if(evt.val){
+                        uiRegionHelper.getStreet(evt.val).then(function (data) {
+                            self.$sDom.select2(self.toStreetData(data));
+                        });
+                        this.$cDom.val(evt.added[this.valueType]);
+                        this.$inputDom.val(evt.val);
+                    }
+                    else{
+                        this.$sDom.select2(this.toStreetData());
+                        this.$cDom.val('');
+                        this.$inputDom.val('');
+                    }
                 }.bind(this));
 
                 //
                 this.$sDom.change(function (evt) {
-                    this.$sDom.val(evt.added[this.valueType]);
-                    this.$inputDom.val(evt.val);
+                    if(evt.val){
+                        this.$sDom.val(evt.added[this.valueType]);
+                        this.$inputDom.val(evt.val);
+                    }
+                    else{
+                        this.$sDom.val('');
+                        this.$inputDom.val('');
+                    }
                 }.bind(this));
+            },
+
+            toProvinceData: function(data){
+                return {data: data || [], allowClear: true, placeholder: '请选择省'}
+            },
+
+            toCityData: function(data){
+                return {data: data || [], allowClear: true, placeholder: '请选择市'}
+            },
+
+            toStreetData: function(data){
+                return {data: data || [], allowClear: true, placeholder: '请选择区'};
             },
 
             reset: function () {
                 this.$inputDom.val('');
                 this.$pDom.val('').select2('val', '');
-                this.$cDom.val('').select2({data: []});
-                this.$sDom.val('').select2({data: []});
+                this.$cDom.val('').select2(this.toCityData());
+                this.$sDom.val('').select2(this.toStreetData());
             }
         });
         return function(s, e, a, c, t){

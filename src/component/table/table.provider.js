@@ -68,14 +68,14 @@ angular.module('admin.component')
                                 }
                             },
                             "fnServerData": function (sSource, aoData, fnCallback) {
-                                if (!attrs.url || attrs.manual != undefined) {
+                                if ((!attrs.url && !table.url) || attrs.manual != undefined) {
                                     delete attrs.manual;
                                     fnCallback({aaData: [], iTotalRecords: 0, iTotalDisplayRecords: 0});
                                     return;
                                 }
 
                                 //请求参数
-                                var url = attrs.url;
+                                var url = table.url || attrs.url;
 
                                 //
                                 if (table.searchParams) {
@@ -94,7 +94,6 @@ angular.module('admin.component')
                                 //
                                 ajax.post(url, aoData)
                                     .then(function (result) {
-                                        table.beforeDataHandler(result);
                                         if ($.isArray(result)) {
                                             result = {
                                                 aaData: result,
@@ -102,6 +101,14 @@ angular.module('admin.component')
                                                 iTotalRecords: result.length
                                             };
                                         }
+                                        else if(attrs.nameData && attrs.nameTotal){
+                                            result = {
+                                                aaData: result[attrs.nameData],
+                                                iTotalDisplayRecords: result[attrs.nameTotal],
+                                                iTotalRecords: result[attrs.nameTotal]
+                                            }
+                                        }
+                                        table.beforeDataHandler(result);
                                         fnCallback(result);
                                         table.afterDataHandler(result);
                                     }, function (json) {

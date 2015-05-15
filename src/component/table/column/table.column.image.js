@@ -27,7 +27,7 @@ angular.module('admin.component')
 
                 //
                 if ($scope[ref] && $scope[ref].addColumn) {
-                    $scope[ref].addColumn(uiTableColumnService(ref, $scope, $attrs, render));
+                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render), $attrs.index);
                 }
                 else {
                     m.error('uiTableColumn必须放在uiTable里面');

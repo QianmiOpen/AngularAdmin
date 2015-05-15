@@ -16,7 +16,7 @@ angular.module('admin.component')
         labelName: 'name',
         valueName: 'id'
     })
-    .factory('uiMultiSelectFactory', function ($q, ajax, logger, msg, util, Event) {
+    .factory('uiMultiSelectFactory', function ($q, ajax, logger, msg, util, Event, ValueService) {
         var m = new msg('MultiSelect'),
             MultiSelect = function (scope, element, attrs) {
                 Event.call(this);
@@ -74,6 +74,8 @@ angular.module('admin.component')
                     selectOption.maximumSelectionSize = attrs.maxSize;
                 }
 
+                selectOption.closeOnSelect = false;
+
 
                 //构造对象
                 this.inputElement.select2(selectOption);
@@ -90,7 +92,7 @@ angular.module('admin.component')
              * 初始化值
              */
             initValue: function () {
-                var ngModel = this.attrs.ngModel,
+                var ngModel = this.attrs.model,
                     self = this;
                 //
                 if (this.attrs.multi != undefined && this.attrs.setCheck) {
@@ -112,7 +114,7 @@ angular.module('admin.component')
                 if (!ngModel) {
                     return;
                 }
-                var v = util.getValue(this.scope, ngModel);
+                var v = ValueService.get(this.scope, ngModel);
                 if (v) {
                     this.element.select2('val', v);
                 }
@@ -130,6 +132,10 @@ angular.module('admin.component')
             initEvents: function () {
                 var self = this;
                 this.element.on('select2-selecting', function (evt) {
+                    if (evt.object.isNew && this.attrs.editable == 'false') {
+                        return false;
+                    }
+
                     if (this.attrs.multi != undefined) {
                         this.selectValues.push(evt.val);
                         this.selectItems.push(evt.object);
@@ -139,6 +145,10 @@ angular.module('admin.component')
                         this.selectItems = [evt.object];
                     }
                     this.$emit('uiSelect.doSelect', this.selectValues, this.selectItems);
+                    if (this.attrs.model) {
+                        ValueService.set(this.scope, this.attrs.model, this.attrs.multi != undefined ? this.selectValues : this.selectValues[0]);
+                    }
+                    return true;
                 }.bind(this));
                 this.element.on('select2-removing', function (evt) {
                     this.selectValues = $.grep(this.selectValues, function (value) {
@@ -221,7 +231,7 @@ angular.module('admin.component')
                     $.each(rs, function (i, r) {
                         var isC = false;
                         if (o.init) { //初始化, 那么只会根据
-                            isC = self.formatId(r) == o.term;
+                            isC = self.attrs.multi ? o.term.indexOf(self.formatId(r)) != -1 : self.formatId(r) == o.term;
                         }
                         else { //根据属性过滤
                             if (sfs.length == 0 || sfs[0] == '') {
@@ -237,6 +247,7 @@ angular.module('admin.component')
                             os.push(r);
                         }
                     });
+
                     o.callback({results: os});
                 });
             },
@@ -261,7 +272,7 @@ angular.module('admin.component')
                     self.isInit = false;
                     handler({results: self.selectItems});
                 }
-                else if (element.val()) {
+                else if (element.val() != undefined) {
                     self.isInit = false;
                     this.filterData({
                         term: element.val(),
@@ -313,6 +324,13 @@ angular.module('admin.component')
                     else {
                         this.selectValues = [vals];
                     }
+                    var values = ',' + this.selectValues.join(',') + ',',
+                        self = this;
+                    this.loadData().then(function (datas) {
+                        self.selectItems = $.grep(datas, function (data) {
+                            return values.indexOf(',' + self.formatId(data) + ',') != -1;
+                        });
+                    });
                 }
                 else {
                     if (this.attrs.multi) {

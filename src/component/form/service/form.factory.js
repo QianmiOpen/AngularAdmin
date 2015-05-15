@@ -53,9 +53,40 @@
                 /**
                  *
                  */
+                changeValidateRule: function (ruleName, ruleConfig) {
+                    var validator = this.element.data().validator;
+                    if (validator) {
+                        var oldConfig = validator.settings.rules[ruleName];
+                        validator.settings.rules[ruleName] = $.extend(oldConfig, ruleConfig);
+                    }
+                },
+
+                /**
+                 *
+                 */
+                startValidate: function () {
+                    this.element.valid();
+                },
+
+                /**
+                 *
+                 */
                 addFormItem: function (formItem) {
                     this.formItems.push(formItem);
                     this.layout();
+                },
+
+                /**
+                 *
+                 */
+                formItemVal: function (formItemName, value) {
+                    var $el = this.element.find('[name="' + formItemName + '"]');
+                    if (value) {
+                        $el.val(value);
+                    }
+                    else {
+                        return $el.val();
+                    }
                 },
 
                 /**
@@ -122,6 +153,11 @@
                             this.setRules(rules);
                         }.bind(this));
                     }
+                    else if (this.attrs.validateUrl) {
+                        $.getJSON(this.attrs.validateUrl, function (rules) {
+                            this.setRules(rules);
+                        }.bind(this));
+                    }
                     else {
                         this.element.submit(this._submit.bind(this));
                     }
@@ -145,8 +181,28 @@
                  *
                  * @returns {*}
                  */
-                formData: function () {
-                    return this.element.serializeArray();
+                formData: function (isJson) {
+                    var r = this.element.serializeArray();
+                    if (isJson == true) {
+                        var o = {};
+                        $.each(r, function (i, item) {
+                            var n = item.name,
+                                v = item.value;
+                            if (o[n]) {
+                                if ($.isArray(o[n])) {
+                                    o[n].push(v);
+                                }
+                                else {
+                                    o[n] = [o[n], v];
+                                }
+                            }
+                            else {
+                                o[n] = v;
+                            }
+                        });
+                        r = o;
+                    }
+                    return r;
                 },
 
                 /**

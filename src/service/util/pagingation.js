@@ -64,7 +64,9 @@ angular.module('admin.service')
                 }
                 return $.extend(r, {
                     dataList: r[this.dataName],
-                    pageList: pageList
+                    pageList: pageList,
+                    isFirst: this.pageIndex == 0,
+                    isLast: this.pageIndex == this.maxPage - 1
                 })
             },
 
@@ -83,7 +85,7 @@ angular.module('admin.service')
              */
             nextPage: function () {
                 this.pageIndex++;
-                this.pageIndex = this.pageIndex > this.maxPage ? this.maxPage : this.pageIndex++;
+                this.pageIndex = this.pageIndex > this.maxPage - 1 ? (this.maxPage - 1) : this.pageIndex;
                 return this.getPage(this.pageIndex);
             },
 

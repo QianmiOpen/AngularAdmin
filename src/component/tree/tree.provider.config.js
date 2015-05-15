@@ -103,8 +103,11 @@ angular.module('admin.component')
                     bc = this.tree.attrs[attrName],
                     scope = this.tree.scope;
                 if (bc) {
+
                     args = Array.prototype.slice.call(args, 1);
-                    return scope[bc].apply(scope, args);
+                    var r = scope[bc].apply(scope, args);
+                    try{ scope.$apply(); } catch(e){ }
+                    return r;
                 }
                 else {
                     return true;

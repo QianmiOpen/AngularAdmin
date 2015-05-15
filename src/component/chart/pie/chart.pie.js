@@ -8,8 +8,19 @@ angular.module('admin.component')
             replace: true,
             transclude: true,
             scope: false,
-            link: function(scope, element, attrs){
-                new uiChartFactory(scope, element, attrs);
+            link: function (scope, element, attrs) {
+                var factory = new uiChartFactory(scope, element, attrs);
+                factory.setData = function (data) {
+                    this.config.series = [{
+                        type: 'pie',
+                        data: data.map(function (d) {
+                            for (var k in d) {
+                                return [k, d[k]];
+                            }
+                        })
+                    }];
+                    this.build();
+                };
             },
             templateUrl: 'tpl.chart.pie'
         };

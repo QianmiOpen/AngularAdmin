@@ -47,7 +47,7 @@ angular.module('admin.component')
                     });
 
                     //
-                    var $dom = $('<input type="checkbox"/>').val(rowData[name]).click(function (evt) {
+                    var $dom = $('<input type="checkbox" pk="' + rowData[name] + '"/>').val(rowData[name]).click(function (evt) {
                         $scope[ref].selectOneHandler(evt.target.checked, $attrs.name, rowData);
                         evt.stopPropagation();
                     });
@@ -59,7 +59,7 @@ angular.module('admin.component')
 
                 //
                 if ($scope[ref] && $scope[ref].addColumn) {
-                    $scope[ref].addColumn(uiTableColumnService(ref, $scope, $attrs, render));
+                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render), $attrs.index);
                     $scope[ref].idName = name;
                 }
                 else {

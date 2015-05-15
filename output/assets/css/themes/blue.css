@@ -124,10 +124,6 @@ Page sidebar
 .page-sidebar {
   background-color: #364150;
 }
-ul.page-sidebar-menu > li > a {
-  border-top: 1px solid #1c95dc !important;
-  color: #ffffff !important;
-}
 ul.page-sidebar-menu > li:last-child > a {
   border-bottom: 1px solid transparent !important;
 }
@@ -172,7 +168,7 @@ ul.page-sidebar-menu li > ul.sub-menu > li > a {
 /* menu arrows */
 ul.page-sidebar-menu > li > a .arrow:before,
 ul.page-sidebar-menu > li > a .arrow.open:before {
-  color: #51b1e9 !important;
+  color: #606C7D; !important;
 }
 ul.page-sidebar-menu > li > ul.sub-menu a .arrow:before,
 ul.page-sidebar-menu > li > ul.sub-menu a .arrow.open:before {
@@ -325,32 +321,6 @@ Gritter Notifications
   }
   .page-boxed.page-sidebar-fixed.page-footer-fixed .footer {
     background-color: #125e8b !important;
-  }
-}
-/* end: boxed page */
-/***
-Landscape phone to portrait tablet
-***/
-@media (max-width: 991px) {
-  /***
-    page sidebar
-    ***/
-  .page-sidebar {
-    background-color: #105882 !important;
-  }
-  ul.page-sidebar-menu > li > a {
-    border-top: 1px solid #187fbd !important;
-  }
-  ul.page-sidebar-menu > li:last-child > a {
-    border-bottom: 0 !important;
-  }
-  .page-sidebar .sidebar-search input {
-    background-color: #105882 !important;
-  }
-  ul.page-sidebar-menu > li.open > a,
-  ul.page-sidebar-menu > li > a:hover,
-  ul.page-sidebar-menu > li:hover > a {
-    background: #0e4b70;
   }
 }
 

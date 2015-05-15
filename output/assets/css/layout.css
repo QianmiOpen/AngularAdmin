@@ -962,11 +962,12 @@ Page sidebar
   display: block;
   position: relative;
   margin: 0;
-  border: 0px;
   padding: 10px 15px;
   text-decoration: none;
   font-size: 14px;
   font-weight: 300;
+  border-top: 1px solid #3d4957;
+  color: #b4bcc8;
 }
 .page-sidebar .page-sidebar-menu > li > a > i,
 .page-sidebar-closed.page-sidebar-fixed .page-sidebar:hover .page-sidebar-menu > li > a > i {

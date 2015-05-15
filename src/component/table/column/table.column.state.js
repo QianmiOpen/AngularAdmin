@@ -53,7 +53,7 @@ angular.module('admin.component')
                             choosableData.push({value: key, text: val});
                         }
                     });
-                    $scope[ref].addColumn(uiTableColumnService(ref, $scope, $attrs, render, uiEditableChooseFactory, choosableData));
+                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render, uiEditableChooseFactory, choosableData), $attrs.index);
                 }
                 else {
                     m.error('uiTableColumn必须放在uiTable里面');

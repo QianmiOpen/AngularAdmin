@@ -62,7 +62,12 @@ angular.module('admin.service')
                 this.element.one('shown.bs.modal', function () {
                     if (this.ctrlName) {
                         $timeout(function () {
-                            $controller(window[this.ctrlName], this.resolve);
+                            try{
+                                $controller(window[this.ctrlName] || this.ctrlName, this.resolve);
+                            }
+                            catch (e){
+                                console.error('加载controller失败')
+                            }
                         }.bind(this));
                     }
                     this.$emit('uiDialog.doShow');

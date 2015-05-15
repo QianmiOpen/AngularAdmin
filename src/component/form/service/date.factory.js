@@ -36,6 +36,7 @@ angular.module('admin.component')
                 this.inputElement.datetimepicker({
                     language: 'zh-CN',
                     pickDate: this.dateMode,
+                    useCurrent: false,
                     pickTime: this.timeMode,
                     useSeconds: this.timeMode
                 });

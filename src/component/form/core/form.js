@@ -24,7 +24,9 @@ angular.module('admin.component')
                         componentHelper.tiggerComplete(scope, ref, form);
                     },
                     post: function () {
-                        form.initValidation();
+                        setTimeout(function(){
+                            form.initValidation();
+                        }, 300);
                     }
                 };
             },

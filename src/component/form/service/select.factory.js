@@ -12,7 +12,7 @@ angular.module('admin.component')
                 this.selectElement = element.find('select');
                 this.dataKeyName = attrs.keyName || 'key';
                 this.dataValueName = attrs.valueName || 'text';
-                this.defaultResetValue = attrs.isMulti ? null : this.selectElement.find('option:eq(0)').val();
+                this.defaultResetValue = attrs.isMulti ? '' : (this.selectElement.find('option:eq(0)')[0] ? this.selectElement.find('option:eq(0)').val() : '');
                 this.model = attrs.model;
                 this.init = false;
                 uiFormControl.apply(this, arguments);
@@ -25,8 +25,10 @@ angular.module('admin.component')
 
                     //监听一下model的变化
                     this.watch = this.scope.$watch(this.model, function (newValue) {
-                        if (newValue)
+                        if (newValue != undefined)
                             this.val(newValue);
+                        else
+                            this.val(this.defaultResetValue);
                     }.bind(this));
 
                     //如果model没有值, 默认选择第一个
@@ -47,10 +49,18 @@ angular.module('admin.component')
                 this.element.removeAttr('value');
             },
 
-            load: function (url) {
+            load: function (url, value) {
                 var self = this;
-                ajax.post(url).then(function (responseData) {
+                return ajax.post(url).then(function (responseData) {
                     self.setData(responseData, false);
+                    if (value) {
+                        self.val(value);
+                    }
+                    else{
+                        var val = self.val(),
+                            m = /^\?.+:(.+)\s+\?$/.exec(val);
+                        self.val(m ? m[1] : val);
+                    }
                 });
             },
 
@@ -118,6 +128,8 @@ angular.module('admin.component')
                     itemName = isString ? item : item[dataName],
                     itemValue = isString ? item : item[dataValue];
                 var $option = $('<option/>').attr('value', itemName).html(itemValue);
+                this.$emit('uiselect.onOption', $option, item);
+                $option.data('item', item);
                 return $option;
             },
 
@@ -153,7 +165,7 @@ angular.module('admin.component')
              * @returns {*}
              */
             val: function (v) {
-                if (v) {
+                if (v != undefined) {
                     this.selectElement.val(v);
                     this.render();
                     return this;
@@ -166,5 +178,4 @@ angular.module('admin.component')
         return function (s, e, a, c, t) {
             return new Select(s, e, a, c, t);
         };
-        ;
     });
