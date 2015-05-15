@@ -6,6 +6,12 @@ angular.module('demoApp', ['admin', 'ui.router'])
         $stateProvider
             .state('start', {url: '/start', templateUrl: basePath + 'start.html'})
 
+            .state('form', {url: '/form', templateUrl: basePath + 'form/index.html'})
+
+            .state('tab', {url: '/tab', templateUrl: basePath + 'tab/index.html'})
+
+            .state('chart', {url: '/chart', templateUrl: basePath + 'chart/index.html'})
+
             .state('searchform', {url: '/searchform', templateUrl: basePath + 'searchForm/index.html'})
             .state('searchform.input', {url: '/searchform/input', templateUrl: basePath + 'searchForm/searchInput.html'})
             .state('searchform.date', {url: '/searchform/date', templateUrl: basePath + 'searchForm/searchDate.html'})
@@ -19,6 +25,12 @@ angular.module('demoApp', ['admin', 'ui.router'])
             .state('tree', {url: '/tree', templateUrl: basePath + 'tree/index.html'})
 
             .state('table', {url: '/table', templateUrl: basePath + 'table/index.html'})
+            .state('table.tablecheckcolumn', {url: '/table/checkcolumn', templateUrl: basePath + 'table/tableCheckColumn.html'})
+            .state('table.tablecolumn', {url: '/table/tablecolumn', templateUrl: basePath + 'table/tableColumn.html'})
+            .state('table.tabledatecolumn', {url: '/table/datecolumn', templateUrl: basePath + 'table/tableDateColumn.html'})
+            .state('table.tableimagecolumn', {url: '/table/imagecolumn', templateUrl: basePath + 'table/tableProgressColumn.html'})
+            .state('table.tableprogresscolumn', {url: '/table/progresscolumn', templateUrl: basePath + 'table/index.html'})
+            .state('table.tablestatecolumn', {url: '/table/statecolumn', templateUrl: basePath + 'table/tableStateColumn.html'})
 
             .state('portal', {url: '/portal', templateUrl: basePath + 'portal/index.html'})
             .state('portal.portlet', {url: '/portal/portlet', templateUrl: basePath + 'portal/portlet.html'})
