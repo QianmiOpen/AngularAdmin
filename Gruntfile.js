@@ -61,7 +61,7 @@ module.exports = function (grunt) {
                         './output/assets/css/components.css',
                         './output/assets/css/plugins.css',
                         './output/assets/css/layout.css',
-                        './output/assets/css/themes/grey.css',
+                        './output/assets/css/themes/blue.css',
                         './output/assets/js/bootstrap-toastr/toastr.min.css',
                         './output/assets/js/bootstrap-select/bootstrap-select.min.css',
                         './output/assets/js/data-tables/DT_bootstrap.css',
@@ -69,7 +69,8 @@ module.exports = function (grunt) {
                         './output/assets/js/bootstrap-daterangepicker/css/daterangepicker-bs3.css',
                         './output/assets/js/select2/select2.css',
                         './output/assets/js/select2/select2-metronic.css',
-                        './output/assets/css/custom.css'
+                        './output/assets/css/custom.css',
+                        './output/assets/js/zTree_v3/css/zTreeStyle/zTreeStyle.css'
                     ]
                 }
             }
@@ -106,7 +107,10 @@ module.exports = function (grunt) {
                     './output/js/lib.js': [
                         './output/assets/js/handlebars.js',
                         './output/assets/js/jquery-1.10.2.min.js',
+                        './output/assets/js/jquery-validation/dist/jquery.validate.min.js',
+                        './output/assets/js/jquery.validate.extends.js',
                         './output/assets/js/bootstrap/js/bootstrap.min.js',
+                        './output/assets/js/bootbox/bootbox.min.js',
                         './output/assets/js/angular.1.3.8.min.js',
                         './output/assets/js/angular-ui-router.min.js',
                         './output/assets/js/bootstrap-select/bootstrap-select.min.js',
@@ -115,6 +119,7 @@ module.exports = function (grunt) {
                         './output/assets/js/bootstrap-daterangepicker/js/daterangepicker.js',
                         './output/assets/plugins/bootstrap-switch/js/bootstrap-switch.min.js',
                         './output/assets/plugins/uniform/jquery.uniform.min.js',
+                        './output/assets/plugins/fuelux/js/spinner.min.js',
                         './output/assets/js/select2/select2.min.js',
                         './output/assets/js/jquery.blockui.min.js',
                         './output/assets/js/metronic.js',
@@ -124,7 +129,8 @@ module.exports = function (grunt) {
                         './output/assets/js/bootstrap-modal/js/bootstrap-modal.js',
                         './output/assets/js/bootstrap-modal/js/bootstrap-modalmanager.js',
                         './output/assets/js/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js',
-                        './output/assets/js/highcharts/js/highcharts.js'
+                        './output/assets/js/highcharts/js/highcharts.js',
+                        './output/assets/js/zTree_v3/js/jquery.ztree.all-3.5.min.js'
                     ]
                 }
             }
