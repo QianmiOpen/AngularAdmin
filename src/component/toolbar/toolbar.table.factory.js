@@ -49,7 +49,7 @@ angular.module('admin.component')
                 }
                 else {
                     if (this.attrs.add) {
-                        $injector.get('state').go(this.attrs.add);
+                        $injector.get('$state').go(this.attrs.add);
                     }
                     else {
                         m.error('点击添加数据按钮，但是没有设置地址, 请在add="地址"');

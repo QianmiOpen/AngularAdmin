@@ -49,10 +49,10 @@ angular.module('admin.component')
                 this.element.removeAttr('value');
             },
 
-            load: function (url, value) {
+            load: function (url, value, isClean) {
                 var self = this;
                 return ajax.post(url).then(function (responseData) {
-                    self.setData(responseData, false);
+                    self.setData(responseData, isClean);
                     if (value) {
                         self.val(value);
                     }

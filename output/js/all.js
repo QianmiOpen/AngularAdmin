@@ -3763,10 +3763,10 @@ angular.module('admin.component')
                 this.element.removeAttr('value');
             },
 
-            load: function (url, value) {
+            load: function (url, value, isClean) {
                 var self = this;
                 return ajax.post(url).then(function (responseData) {
-                    self.setData(responseData, false);
+                    self.setData(responseData, isClean);
                     if (value) {
                         self.val(value);
                     }
@@ -6433,7 +6433,7 @@ angular.module('admin.component')
                 }
                 else {
                     if (this.attrs.add) {
-                        $injector.get('state').go(this.attrs.add);
+                        $injector.get('$state').go(this.attrs.add);
                     }
                     else {
                         m.error('点击添加数据按钮，但是没有设置地址, 请在add="地址"');
