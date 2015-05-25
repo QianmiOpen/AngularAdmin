@@ -160,7 +160,7 @@ angular.module('admin.component')
                                 }
                             },
                             "oLanguage": {
-                                "sProcessing": '<img src="/static/img/loading-spinner-grey.gif"/><span>&nbsp;&nbsp;正在查询...</span>',
+                                "sProcessing": '<img src="http://7xi8np.com1.z0.glb.clouddn.com/assets/img/loading-spinner-grey.gif"/><span>&nbsp;&nbsp;正在查询.. .</span>',
                                 "sLengthMenu": "每页显示 _MENU_ 条",
                                 "sZeroRecords": "请选择条件后，点击搜索按钮开始搜索",
                                 "sInfo": "<label>当前第 _START_ - _END_ 条　共计 _TOTAL_ 条</label>",
