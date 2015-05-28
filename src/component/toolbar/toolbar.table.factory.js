@@ -61,7 +61,7 @@ angular.module('admin.component')
                     this.scope.delItem(values);
                 }
                 else {
-                    if (this.attrs.add) {
+                    if (this.attrs.del) {
                         if (values.length > 1) {
                             ajax.remove(this.attrs.del, {ids: values.join(',')}).then(function () {
                                 this.scope[this.tableId].refresh();

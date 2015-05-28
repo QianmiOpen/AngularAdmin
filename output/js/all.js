@@ -1,4 +1,4 @@
-/*! zk - v0.0.1 - 2015-05-25 */
+/*! zk - v0.0.1 - 2015-05-28 */
 (function(){
 //-----------------------------------------------------------------------------------------------
 //
@@ -6445,7 +6445,7 @@ angular.module('admin.component')
                     this.scope.delItem(values);
                 }
                 else {
-                    if (this.attrs.add) {
+                    if (this.attrs.del) {
                         if (values.length > 1) {
                             ajax.remove(this.attrs.del, {ids: values.join(',')}).then(function () {
                                 this.scope[this.tableId].refresh();
