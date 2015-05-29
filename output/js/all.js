@@ -5415,11 +5415,15 @@ angular.module('admin.component')
                 var ref = componentHelper.getComponentRef($element.parents('table').parent(), '$table'),
                     placeholder = $attrs.placeholder || 'http://usr.im/110x30?text=What',
                     name = $attrs.name,
+                    qiniu = $attrs.qiniu,
                     styleWidth = $attrs.imageWidth,
                     styleHeight = $attrs.imageHeight,
                     render = function (rowData) {
                         var val = rowData[name];
                         val = val != undefined ? val : placeholder;
+                        if(qiniu){
+                            val = val + qiniu;
+                        }
                         return $('<img/>').attr('src', val).css({width: styleWidth, height: styleHeight});
                     };
 
