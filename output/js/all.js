@@ -1,4 +1,4 @@
-/*! zk - v0.0.1 - 2015-05-28 */
+/*! zk - v0.0.1 - 2015-05-29 */
 (function(){
 //-----------------------------------------------------------------------------------------------
 //
@@ -5701,7 +5701,9 @@ angular.module('admin.component')
                         if (tpl) {
                         }
                         else {
-                            $transclude(function (clone) {
+                            var $s = $scope.$new();
+                            $s.data = rowData;
+                            $transclude($s, function (clone) {
                                 $dom = clone.filter('[state="' + val + '"]');
                                 if ($dom.length == 0) { //用默认值
                                     $dom = clone.filter('[state="' + defaultValue + '"]');
