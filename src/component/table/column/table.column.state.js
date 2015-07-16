@@ -24,7 +24,9 @@ angular.module('admin.component')
                         if (tpl) {
                         }
                         else {
-                            $transclude(function (clone) {
+                            var $s = $scope.$new();
+                            $s.data = rowData;
+                            $transclude($s, function (clone) {
                                 $dom = clone.filter('[state="' + val + '"]');
                                 if ($dom.length == 0) { //用默认值
                                     $dom = clone.filter('[state="' + defaultValue + '"]');
