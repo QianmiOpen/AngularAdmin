@@ -5512,7 +5512,7 @@ angular.module('admin.component')
                             if (name && name.indexOf(".") != -1){
                                 var ns = name.split('.'), n;
                                 v = rowData;
-                                while(n = ns.shift() && v){
+                                while((n = ns.shift()) && v){
                                     v = v[n];
                                 }
                             }
