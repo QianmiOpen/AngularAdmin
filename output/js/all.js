@@ -1,4 +1,4 @@
-/*! zk - v0.0.1 - 2015-05-25 */
+/*! zk - v0.0.1 - 2015-07-16 */
 (function(){
 //-----------------------------------------------------------------------------------------------
 //
@@ -2080,15 +2080,15 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormRemoteSelect', function (uiMultiSelectFactory, componentHelper, tagConfig, defaultCol) {
+    .directive('uiFormRemoteSelect', function (uiMultiSelectFactory, componentHelper, defaultCol) {
         return {
             restrict: 'E',
             replace: false,
             transclude: true,
             link: function (scope, element, attrs) {
                 //
-                var select = uiMultiSelectFactory(scope, element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formUserSelect', select);
+                var select = uiMultiSelectFactory(scope, element, $.extend({multi: true}, attrs));
+                componentHelper.tiggerComplete(scope, attrs.ref || '$formRemoteSelect', select);
 
                 //
                 scope.$on('uiform.reset', function () {
@@ -2511,6 +2511,42 @@ angular.module('admin.component')
             }
         };
     });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchRemoteSelect', function (uiMultiSelectFactory, componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: function (scope, element, attrs) {
+                //
+                var select = uiMultiSelectFactory(scope, element, $.extend({multi: true}, attrs));
+                componentHelper.tiggerComplete(scope, attrs.ref || '$searchRemoteSelect', select);
+
+                //
+                scope.$on('uisearchform.reset', function () {
+                    select.reset();
+                });
+
+                //
+                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
+            },
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.searchform.userselect.input', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5468,6 +5504,13 @@ angular.module('admin.component')
                                 v = rowData[name];
                             if ($scope[customRenderName]) {
                                 return $scope[customRenderName](rowData);
+                            }
+                            if (name && name.indexOf(".") != -1){
+                                var ns = name.split('.'), n;
+                                v = rowData;
+                                while(n = ns.shift()){
+                                    v = v[n];
+                                }
                             }
                             return v != undefined ? $('<div/>').html(v) : v;
                         }

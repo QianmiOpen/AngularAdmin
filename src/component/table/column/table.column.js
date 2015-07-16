@@ -31,6 +31,13 @@ angular.module('admin.component')
                             if ($scope[customRenderName]) {
                                 return $scope[customRenderName](rowData);
                             }
+                            if (name && name.indexOf(".") != -1){
+                                var ns = name.split('.'), n;
+                                v = rowData;
+                                while(n = ns.shift()){
+                                    v = v[n];
+                                }
+                            }
                             return v != undefined ? $('<div/>').html(v) : v;
                         }
                     };
