@@ -5451,11 +5451,15 @@ angular.module('admin.component')
                 var ref = componentHelper.getComponentRef($element.parents('table').parent(), '$table'),
                     placeholder = $attrs.placeholder || 'http://usr.im/110x30?text=What',
                     name = $attrs.name,
+                    qiniu = $attrs.qiniu,
                     styleWidth = $attrs.imageWidth,
                     styleHeight = $attrs.imageHeight,
                     render = function (rowData) {
                         var val = rowData[name];
                         val = val != undefined ? val : placeholder;
+                        if(qiniu){
+                            val = val + qiniu;
+                        }
                         return $('<img/>').attr('src', val).css({width: styleWidth, height: styleHeight});
                     };
 
@@ -5508,7 +5512,7 @@ angular.module('admin.component')
                             if (name && name.indexOf(".") != -1){
                                 var ns = name.split('.'), n;
                                 v = rowData;
-                                while(n = ns.shift()){
+                                while(n = ns.shift() && v){
                                     v = v[n];
                                 }
                             }
@@ -5744,7 +5748,9 @@ angular.module('admin.component')
                         if (tpl) {
                         }
                         else {
-                            $transclude(function (clone) {
+                            var $s = $scope.$new();
+                            $s.data = rowData;
+                            $transclude($s, function (clone) {
                                 $dom = clone.filter('[state="' + val + '"]');
                                 if ($dom.length == 0) { //用默认值
                                     $dom = clone.filter('[state="' + defaultValue + '"]');
@@ -6488,7 +6494,7 @@ angular.module('admin.component')
                     this.scope.delItem(values);
                 }
                 else {
-                    if (this.attrs.add) {
+                    if (this.attrs.del) {
                         if (values.length > 1) {
                             ajax.remove(this.attrs.del, {ids: values.join(',')}).then(function () {
                                 this.scope[this.tableId].refresh();
