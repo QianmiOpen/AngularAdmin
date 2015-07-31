@@ -33,5 +33,6 @@
     }
 
     angular.module('admin.service')
-        .service('logger', () => Logger);
+        .service('logger', () => Logger)
+        .service('Logger', () => Logger)
 })();

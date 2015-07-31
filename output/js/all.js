@@ -39,12 +39,12 @@ angular.module('admin.service', []);
 (function ($) {var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};
 
     var Ajax = (function(){"use strict";var proto$0={};
-        function Ajax(q, msg, util, logger, provider) {
+        function Ajax(q, Message, util, logger, provider) {
             this.q = q;
-            this.msg = msg;
+            this.msg = new Message("Ajax");
             this.util = util;
             this.provder = provider;
-            this.logger = new logger('ajax');
+            this.logger = new logger('Ajax');
         }DP$0(Ajax,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
         proto$0._execute = function(method, url, data) {var this$0 = this;
@@ -63,7 +63,7 @@ angular.module('admin.service', []);
                 },
                 error: function(xhr, status)  {
                     var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
-                    this$0.msg.error(errMsg);
+                    this$0.msg.error(errMsg || '服务器出现了问题,请稍后重试');
                 }
             });
             return defer.promise;
@@ -107,13 +107,14 @@ angular.module('admin.service', []);
             this.failHandler = handler;
         };
 
-        proto$0.$get = function($q, msg, util, logger) {
-            return new Ajax($q, msg, util, logger, this);
+        proto$0.$get = function($q, Message, util, Logger) {
+            return new Ajax($q, Message, util, Logger, this);
         };
     MIXIN$0(AjaxProvider.prototype,proto$0);proto$0=void 0;return AjaxProvider;})();
 
     angular.module('admin.service')
-        .provider('ajax', AjaxProvider);
+        .provider('ajax', AjaxProvider)
+        .provider('Ajax', AjaxProvider);
 })(jQuery);
 //-----------------------------------------------------------------------------------------------
 //
@@ -644,7 +645,8 @@ angular.module('admin.service')
     MIXIN$0(Logger.prototype,proto$0);proto$0=void 0;return Logger;})();
 
     angular.module('admin.service')
-        .service('logger', function()  {return Logger});
+        .service('logger', function()  {return Logger})
+        .service('Logger', function()  {return Logger})
 })();
 //-----------------------------------------------------------------------------------------------
 //
@@ -653,7 +655,7 @@ angular.module('admin.service')
 //
 //
 //-----------------------------------------------------------------------------------------------
-(function () {
+(function () {var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};
     if (window.toastr) {
         toastr.options = {
             "closeButton": true,
@@ -673,47 +675,65 @@ angular.module('admin.service')
         console.error('需要 toastr库 支持, 请导入...');
     }
 
-    /**
-     *
-     * @param className
-     * @constructor
-     */
-    var P = function (className) {
-        this.className = className ? '[' + className + ']' : '';
-    };
-    $.each(['success', 'info', 'warning', 'error'], function (i, item) {
-        P[item] = function (t, m) {
-            var msg = m ? m : t,
-                title = m ? t : ['成功', '提示', '警告', '错误'][i];
-            toastr[item]((this.className || '') + ': ' + msg, title);
-        };
-    });
-    P.prototype = P; //保险实例有单例的方法
+    var Message = (function(){"use strict";var static$0={},proto$0={};
+        function Message(className) {
+            this.className = className ? className + ': ' : '';
+        }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
+        proto$0.success = function(msg, title) {
+            Message.success(this.className + msg, title);
+        };
+
+        static$0.success = function(msg, title) {
+            title = title || '成功';
+            toastr.success((this.className || '') + msg, title);
+        };
+
+        proto$0.info = function(msg, title) {
+            Message.info(this.className + msg, title);
+        };
+
+        static$0.info = function(msg, title) {
+            title = title || '消息';
+            toastr.info((this.className || '') + msg, title);
+        };
+
+        proto$0.warning = function(msg, title) {
+            Message.warning(this.className + msg, title);
+        };
+
+        static$0.warning = function(msg, title) {
+            title = title || '警告';
+            toastr.warning(msg, title);
+        };
+
+        proto$0.error = function(msg, title) {
+            Message.error(this.className + msg, title);
+        };
+
+        static$0.error = function(msg, title) {
+            title = title || '错误';
+            toastr.error(msg, title);
+        };
+    MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
+
+    var MessageProvider = (function(){"use strict";function MessageProvider() {}DP$0(MessageProvider,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
+
+        proto$0.setPostion = function(v, h) {
+            toastr.options.positionClass = 'toast-' + v + '-' + h;
+        };
+
+        proto$0.$get = function() {
+            return Message;
+        };
+    MIXIN$0(MessageProvider.prototype,proto$0);proto$0=void 0;return MessageProvider;})();
 
     /**
      * 导出
      */
     angular.module('admin.service')
-        .provider('msg', function () {
-            return {
-
-                /**
-                 * 设置位置
-                 */
-                setPostion: function (v, h) {
-                    toastr.options.positionClass = 'toast-' + v + '-' + h;
-                },
-
-                /**
-                 *
-                 * @returns {Function}
-                 */
-                $get: function () {
-                    return P;
-                }
-            };
-        });
+        .provider('msg', MessageProvider)
+        .provider('Message', MessageProvider);
 })();
 
 //-----------------------------------------------------------------------------------------------
@@ -1222,23 +1242,31 @@ angular.module('admin.service')
 /**
  *
  */
-angular.module('admin.service')
-    .factory('ValueService', function ($parse) {
-        return {
-            set: function (scope, express, value) {
-                var getter = $parse(express);
-                getter.assign(scope, value);
-                if (!scope.$$phase) {
-                    scope.$apply();
-                }
-            },
+(function () {
 
-            get: function (scope, express) {
-                var getter = $parse(express);
-                return getter(scope);
+    var ValueService = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};function ValueService() {}DP$0(ValueService,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
+
+        proto$0.constrcutor = function($parse) {
+            this.$parse = $parse;
+        };
+
+        proto$0.set = function(scope, express, value) {
+            var getter = this.$parse(express);
+            getter.assign(scope, value);
+            if (!scope.$$phase) {
+                scope.$apply();
             }
         };
-    });
+
+        proto$0.get = function(scope, express) {
+            var getter = this.$parse(express);
+            return getter(scope);
+        };
+    MIXIN$0(ValueService.prototype,proto$0);proto$0=void 0;return ValueService;})();
+
+    angular.module('admin.service')
+        .service('ValueService', ValueService);
+})();
 
 //-----------------------------------------------------------------------------------------------
 //
@@ -1329,15 +1357,16 @@ angular.module('admin.component')
  *
  */
 angular.module('admin.component')
-    .directive('uiMixedChart', function (uiChartFactory) {
+    .directive('uiColumnChart', function (uiChartFactory) {
         return {
             restrict: 'E',
             replace: true,
+            transclude: true,
             scope: false,
-            link: function (scope, element, attrs) {
+            link: function(scope, element, attrs){
                 new uiChartFactory(scope, element, attrs);
             },
-            templateUrl: 'tpl.chart.line'
+            templateUrl: 'tpl.chart.column'
         };
     });
 
@@ -1361,17 +1390,15 @@ angular.module('admin.component')
  *
  */
 angular.module('admin.component')
-    .directive('uiScatterChart', function (uiChartFactory) {
+    .directive('uiMixedChart', function (uiChartFactory) {
         return {
             restrict: 'E',
             replace: true,
-            transclude: true,
             scope: false,
-            link: function(scope, element, attrs){
-                var chart = new uiChartFactory(scope, element, attrs);
-                chart.setType('line');
+            link: function (scope, element, attrs) {
+                new uiChartFactory(scope, element, attrs);
             },
-            templateUrl: 'tpl.chart'
+            templateUrl: 'tpl.chart.line'
         };
     });
 
@@ -1400,6 +1427,24 @@ angular.module('admin.component')
                 };
             },
             templateUrl: 'tpl.chart.pie'
+        };
+    });
+
+/**
+ *
+ */
+angular.module('admin.component')
+    .directive('uiScatterChart', function (uiChartFactory) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: false,
+            link: function(scope, element, attrs){
+                var chart = new uiChartFactory(scope, element, attrs);
+                chart.setType('line');
+            },
+            templateUrl: 'tpl.chart'
         };
     });
 
@@ -4834,23 +4879,6 @@ angular.module('admin.component')
             }
         };
     });
-/**
- *
- */
-angular.module('admin.component')
-    .directive('uiColumnChart', function (uiChartFactory) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: false,
-            link: function(scope, element, attrs){
-                new uiChartFactory(scope, element, attrs);
-            },
-            templateUrl: 'tpl.chart.column'
-        };
-    });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -7526,13 +7554,18 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 (function () {
     angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'admin.template'])
-        .config(function(ajaxProvider)  {
+        .config(function(AjaxProvider, MessageProvider)  {
 
             //
             // ajax 默认返回处理
             //
-            ajaxProvider.setSuccessHandler(function(result)  {return result.type == 1 ? result.data : null});
-            ajaxProvider.setFailHandler(function(result)  {return result.type != 1 ? result.data : null});
+            AjaxProvider.setSuccessHandler(function(result)  {return result.type == 1 ? result.data : null});
+            AjaxProvider.setFailHandler(function(result)  {return result.type != 1 ? result.data : null});
+
+            //
+            // 通知位置
+            //
+            MessageProvider.setPostion('bottom', 'right');
         });
 })();
 

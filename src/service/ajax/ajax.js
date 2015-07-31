@@ -8,12 +8,12 @@
 (function ($) {
 
     class Ajax {
-        constructor(q, msg, util, logger, provider) {
+        constructor(q, Message, util, logger, provider) {
             this.q = q;
-            this.msg = msg;
+            this.msg = new Message("Ajax");
             this.util = util;
             this.provder = provider;
-            this.logger = new logger('ajax');
+            this.logger = new logger('Ajax');
         }
 
         _execute(method, url, data) {
@@ -32,7 +32,7 @@
                 },
                 error: (xhr, status) => {
                     var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
-                    this.msg.error(errMsg);
+                    this.msg.error(errMsg || '服务器出现了问题,请稍后重试');
                 }
             });
             return defer.promise;
@@ -76,11 +76,12 @@
             this.failHandler = handler;
         }
 
-        $get($q, msg, util, logger) {
-            return new Ajax($q, msg, util, logger, this);
+        $get($q, Message, util, Logger) {
+            return new Ajax($q, Message, util, Logger, this);
         }
     }
 
     angular.module('admin.service')
-        .provider('ajax', AjaxProvider);
+        .provider('ajax', AjaxProvider)
+        .provider('Ajax', AjaxProvider);
 })(jQuery);

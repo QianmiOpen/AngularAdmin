@@ -25,45 +25,63 @@
         console.error('需要 toastr库 支持, 请导入...');
     }
 
-    /**
-     *
-     * @param className
-     * @constructor
-     */
-    var P = function (className) {
-        this.className = className ? '[' + className + ']' : '';
-    };
-    $.each(['success', 'info', 'warning', 'error'], function (i, item) {
-        P[item] = function (t, m) {
-            var msg = m ? m : t,
-                title = m ? t : ['成功', '提示', '警告', '错误'][i];
-            toastr[item]((this.className || '') + ': ' + msg, title);
-        };
-    });
-    P.prototype = P; //保险实例有单例的方法
+    class Message {
+        constructor(className) {
+            this.className = className ? className + ': ' : '';
+        }
 
+        success(msg, title) {
+            Message.success(this.className + msg, title);
+        }
+
+        static success(msg, title) {
+            title = title || '成功';
+            toastr.success((this.className || '') + msg, title);
+        }
+
+        info(msg, title) {
+            Message.info(this.className + msg, title);
+        }
+
+        static info(msg, title) {
+            title = title || '消息';
+            toastr.info((this.className || '') + msg, title);
+        }
+
+        warning(msg, title) {
+            Message.warning(this.className + msg, title);
+        }
+
+        static warning(msg, title) {
+            title = title || '警告';
+            toastr.warning(msg, title);
+        }
+
+        error(msg, title) {
+            Message.error(this.className + msg, title);
+        }
+
+        static error(msg, title) {
+            title = title || '错误';
+            toastr.error(msg, title);
+        }
+    }
+
+    class MessageProvider {
+
+        setPostion(v, h) {
+            toastr.options.positionClass = 'toast-' + v + '-' + h;
+        }
+
+        $get() {
+            return Message;
+        }
+    }
 
     /**
      * 导出
      */
     angular.module('admin.service')
-        .provider('msg', function () {
-            return {
-
-                /**
-                 * 设置位置
-                 */
-                setPostion: function (v, h) {
-                    toastr.options.positionClass = 'toast-' + v + '-' + h;
-                },
-
-                /**
-                 *
-                 * @returns {Function}
-                 */
-                $get: function () {
-                    return P;
-                }
-            };
-        });
+        .provider('msg', MessageProvider)
+        .provider('Message', MessageProvider);
 })();
