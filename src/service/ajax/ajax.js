@@ -7,133 +7,80 @@
 //-----------------------------------------------------------------------------------------------
 (function ($) {
 
+    class Ajax {
+        constructor(q, msg, util, logger, provider) {
+            this.q = q;
+            this.msg = msg;
+            this.util = util;
+            this.provder = provider;
+            this.logger = new logger('ajax');
+        }
 
-    var P = function ($q, msg) {
-        this.$q = $q;
-        this.m = msg;
-    };
-    P.prototype = {
-        execute: function (method, url, data, extra) {
-            extra = extra || {};
-            var self = this,
-                defer = extra.defer || this.$q.defer();
+        _execute(method, url, data) {
+            var defer = this.q.defer();
             $.ajax({
-                url: url,
-                cache: false,
-                data: data,
-                type: method,
-                async: extra.async !== undefined ? extra.async : true,
-                dataType: 'json',
-                success: function (resData) {
-                    if (resData.result == 'ok' || resData.result == 1 || resData.status == 1) {
-                        defer.resolve(resData.data);
+                url: url, cache: false, data: data, type: method, dataType: 'json',
+                success: (resData) => {
+                    var success = this.provider.successHandler(resData),
+                        error = this.provder.failHandler(resData);
+                    if (success) {
+                        defer.resolve(success);
                     }
                     else {
-                        defer.reject(resData);
-                        self.m.error(resData.msg || resData.data);
+                        defer.resolve(error);
                     }
                 },
-                error: function (xhr, status, err) {
-                    switch (status) {
-                        case 403:
-                            self.m.error('没有权限');
-                            break;
-                        case 404:
-                            self.m.error('请求的地址不存在');
-                            break;
-                        case 500:
-                            self.m.error('服务器出现了问题,请稍后重试');
-                            break;
-                    }
+                error: (xhr, status) => {
+                    var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
+                    this.msg.error(errMsg);
                 }
             });
             return defer.promise;
         }
-    };
 
-    /**
-     *  导出
-     */
+        get(url, data) {
+            return this._execute('GET', url, data);
+        }
+
+        post(url, data) {
+            return this._execute('POST', url, data);
+        }
+
+        message(url, data, successMsg, failMsg) {
+            return this.post(url, data)
+                .then(() => this.msg.success(successMsg))
+                .catch(() => this.msg.error(failMsg));
+        }
+
+        add(url, data) {
+            return this.message(url, data, '添加数据成功', '添加数据失败');
+        }
+
+        update(url, data) {
+            return this.message(url, data, '更新数据成功', '更新数据失败');
+        }
+
+        remove(url, data, options) {
+            return this.util.confirm(`您确认删除该${options.label || '数据'}吗?`)
+                .then(() => this.message(url, data, '删除数据成功', '删除数据失败'));
+        }
+    }
+
+    class AjaxProvider {
+
+        setSuccessHandler(handler) {
+            this.successHandler = handler;
+        }
+
+        setFailHandler(handler) {
+            this.failHandler = handler;
+        }
+
+        $get($q, msg, util, logger) {
+            return new Ajax($q, msg, util, logger, this);
+        }
+    }
+
     angular.module('admin.service')
-        .factory('ajax', function ($q, msg, util) {
-            var m = new msg('Ajax'),
-                p = new P($q, m);
-
-
-            //
-            var result = {
-
-                /**
-                 * get请求
-                 *      url        地址
-                 *      data        数据
-                 *      timeout    超时, 毫秒
-                 *      extra        扩展参数
-                 */
-                get: function (url, data, extra) {
-                    return p.execute('GET', url, data, extra);
-                },
-
-                /**
-                 * post请求
-                 *      同get
-                 */
-                post: function (url, data, extra) {
-                    return p.execute('POST', url, data, extra);
-                },
-
-                /**
-                 * 简单的提交根据返回结果提示信息
-                 * @param url
-                 * @param data
-                 * @param extra
-                 * @param successMsg
-                 * @param failMsg
-                 * @returns {promise}
-                 */
-                message: function (url, data, extra, successMsg, failMsg) {
-                    var defer = $q.defer();
-                    this.post.apply(this, arguments).then(
-                        function (json) {
-                            m.success(successMsg);
-                            defer.resolve(json);
-                        }, function (json) {
-                            m.error(failMsg);
-                            defer.reject(json);
-                        });
-                    return defer.promise;
-                },
-
-                /**
-                 * 新增
-                 */
-                add: function (url, data, extra) {
-                    return this.message(url, data, extra, '添加数据成功', '添加数据失败');
-                },
-
-                /**
-                 * 更新
-                 */
-                update: function (url, data, extra) {
-                    return this.message(url, data, extra, '更新数据成功', '更新数据失败');
-                },
-
-                /**
-                 * 删除
-                 */
-                remove: function (url, data, options, extra) {
-                    var defer = $q.defer(),
-                        self = this;
-                    options = options || {};
-                    options.defer = defer;
-                    util.confirm("您确认删除该" + (options.label || '数据') + "吗？").then(function () {
-                        self.message(url, data, extra, '删除数据成功', '删除数据失败').then(
-                            function(){defer.resolve();}
-                        );
-                    });
-                    return defer.promise;
-                }
-            };
-            return result;
-        });
+        .provider('ajax', AjaxProvider);
 })(jQuery);

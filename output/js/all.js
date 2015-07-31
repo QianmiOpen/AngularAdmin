@@ -36,137 +36,84 @@ angular.module('admin.service', []);
 //
 //
 //-----------------------------------------------------------------------------------------------
-(function ($) {
+(function ($) {var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};
 
+    var Ajax = (function(){"use strict";var proto$0={};
+        function Ajax(q, msg, util, logger, provider) {
+            this.q = q;
+            this.msg = msg;
+            this.util = util;
+            this.provder = provider;
+            this.logger = new logger('ajax');
+        }DP$0(Ajax,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
-    var P = function ($q, msg) {
-        this.$q = $q;
-        this.m = msg;
-    };
-    P.prototype = {
-        execute: function (method, url, data, extra) {
-            extra = extra || {};
-            var self = this,
-                defer = extra.defer || this.$q.defer();
+        proto$0._execute = function(method, url, data) {var this$0 = this;
+            var defer = this.q.defer();
             $.ajax({
-                url: url,
-                cache: false,
-                data: data,
-                type: method,
-                async: extra.async !== undefined ? extra.async : true,
-                dataType: 'json',
-                success: function (resData) {
-                    if (resData.result == 'ok' || resData.result == 1 || resData.status == 1) {
-                        defer.resolve(resData.data);
+                url: url, cache: false, data: data, type: method, dataType: 'json',
+                success: function(resData)  {
+                    var success = this$0.provider.successHandler(resData),
+                        error = this$0.provder.failHandler(resData);
+                    if (success) {
+                        defer.resolve(success);
                     }
                     else {
-                        defer.reject(resData);
-                        self.m.error(resData.msg || resData.data);
+                        defer.resolve(error);
                     }
                 },
-                error: function (xhr, status, err) {
-                    switch (status) {
-                        case 403:
-                            self.m.error('没有权限');
-                            break;
-                        case 404:
-                            self.m.error('请求的地址不存在');
-                            break;
-                        case 500:
-                            self.m.error('服务器出现了问题,请稍后重试');
-                            break;
-                    }
+                error: function(xhr, status)  {
+                    var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
+                    this$0.msg.error(errMsg);
                 }
             });
             return defer.promise;
-        }
-    };
+        };
 
-    /**
-     *  导出
-     */
+        proto$0.get = function(url, data) {
+            return this._execute('GET', url, data);
+        };
+
+        proto$0.post = function(url, data) {
+            return this._execute('POST', url, data);
+        };
+
+        proto$0.message = function(url, data, successMsg, failMsg) {var this$0 = this;
+            return this.post(url, data)
+                .then(function()  {return this$0.msg.success(successMsg)})
+                .catch(function()  {return this$0.msg.error(failMsg)});
+        };
+
+        proto$0.add = function(url, data) {
+            return this.message(url, data, '添加数据成功', '添加数据失败');
+        };
+
+        proto$0.update = function(url, data) {
+            return this.message(url, data, '更新数据成功', '更新数据失败');
+        };
+
+        proto$0.remove = function(url, data, options) {var this$0 = this;
+            return this.util.confirm((("您确认删除该" + (options.label || '数据')) + "吗?"))
+                .then(function()  {return this$0.message(url, data, '删除数据成功', '删除数据失败')});
+        };
+    MIXIN$0(Ajax.prototype,proto$0);proto$0=void 0;return Ajax;})();
+
+    var AjaxProvider = (function(){"use strict";function AjaxProvider() {}DP$0(AjaxProvider,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
+
+        proto$0.setSuccessHandler = function(handler) {
+            this.successHandler = handler;
+        };
+
+        proto$0.setFailHandler = function(handler) {
+            this.failHandler = handler;
+        };
+
+        proto$0.$get = function($q, msg, util, logger) {
+            return new Ajax($q, msg, util, logger, this);
+        };
+    MIXIN$0(AjaxProvider.prototype,proto$0);proto$0=void 0;return AjaxProvider;})();
+
     angular.module('admin.service')
-        .factory('ajax', function ($q, msg, util) {
-            var m = new msg('Ajax'),
-                p = new P($q, m);
-
-
-            //
-            var result = {
-
-                /**
-                 * get请求
-                 *      url        地址
-                 *      data        数据
-                 *      timeout    超时, 毫秒
-                 *      extra        扩展参数
-                 */
-                get: function (url, data, extra) {
-                    return p.execute('GET', url, data, extra);
-                },
-
-                /**
-                 * post请求
-                 *      同get
-                 */
-                post: function (url, data, extra) {
-                    return p.execute('POST', url, data, extra);
-                },
-
-                /**
-                 * 简单的提交根据返回结果提示信息
-                 * @param url
-                 * @param data
-                 * @param extra
-                 * @param successMsg
-                 * @param failMsg
-                 * @returns {promise}
-                 */
-                message: function (url, data, extra, successMsg, failMsg) {
-                    var defer = $q.defer();
-                    this.post.apply(this, arguments).then(
-                        function (json) {
-                            m.success(successMsg);
-                            defer.resolve(json);
-                        }, function (json) {
-                            m.error(failMsg);
-                            defer.reject(json);
-                        });
-                    return defer.promise;
-                },
-
-                /**
-                 * 新增
-                 */
-                add: function (url, data, extra) {
-                    return this.message(url, data, extra, '添加数据成功', '添加数据失败');
-                },
-
-                /**
-                 * 更新
-                 */
-                update: function (url, data, extra) {
-                    return this.message(url, data, extra, '更新数据成功', '更新数据失败');
-                },
-
-                /**
-                 * 删除
-                 */
-                remove: function (url, data, options, extra) {
-                    var defer = $q.defer(),
-                        self = this;
-                    options = options || {};
-                    options.defer = defer;
-                    util.confirm("您确认删除该" + (options.label || '数据') + "吗？").then(function () {
-                        self.message(url, data, extra, '删除数据成功', '删除数据失败').then(
-                            function(){defer.resolve();}
-                        );
-                    });
-                    return defer.promise;
-                }
-            };
-            return result;
-        });
+        .provider('ajax', AjaxProvider);
 })(jQuery);
 //-----------------------------------------------------------------------------------------------
 //
@@ -669,27 +616,36 @@ angular.module('admin.service')
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.service')
-    .factory('logger', function () {
-        var c = window.console;
-        return {
-            debug: function (m) {
-                if (c) {
-                    c.debug ? c.debug(m) : c.log(m);
-                }
-            },
-            info: function (m) {
-                if (c) {
-                    c.info ? c.info(m) : c.log(m);
-                }
-            },
-            error: function (m) {
-                if (c) {
-                    c.error ? c.error(m) : c.log(m);
-                }
+(function () {
+
+    var Logger = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var proto$0={};
+        function Logger(className) {
+            this.className = className;
+            this.console = window.console;
+            this.isEnableDebug = location.hash.indexOf("debug") != -1;
+        }DP$0(Logger,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+        proto$0.debug = function(m) {
+            m = (("" + (this.className)) + (": " + m) + "");
+            if (this.isEnableDebug && this.console) {
+                this.console.debug ? this.console.debug(m) : this.console.log(m);
             }
         };
-    });
+
+        proto$0.info = function(m) {
+            m = (("" + (this.className)) + (": " + m) + "");
+            this.console.info ? this.console.info(m) : this.console.log(m);
+        };
+
+        proto$0.error = function(m) {
+            m = (("" + (this.className)) + (": " + m) + "");
+            this.console.error ? this.console.error(m) : this.console.log(m);
+        };
+    MIXIN$0(Logger.prototype,proto$0);proto$0=void 0;return Logger;})();
+
+    angular.module('admin.service')
+        .service('logger', function()  {return Logger});
+})();
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -1373,16 +1329,15 @@ angular.module('admin.component')
  *
  */
 angular.module('admin.component')
-    .directive('uiColumnChart', function (uiChartFactory) {
+    .directive('uiMixedChart', function (uiChartFactory) {
         return {
             restrict: 'E',
             replace: true,
-            transclude: true,
             scope: false,
-            link: function(scope, element, attrs){
+            link: function (scope, element, attrs) {
                 new uiChartFactory(scope, element, attrs);
             },
-            templateUrl: 'tpl.chart.column'
+            templateUrl: 'tpl.chart.line'
         };
     });
 
@@ -1406,15 +1361,17 @@ angular.module('admin.component')
  *
  */
 angular.module('admin.component')
-    .directive('uiMixedChart', function (uiChartFactory) {
+    .directive('uiScatterChart', function (uiChartFactory) {
         return {
             restrict: 'E',
             replace: true,
+            transclude: true,
             scope: false,
-            link: function (scope, element, attrs) {
-                new uiChartFactory(scope, element, attrs);
+            link: function(scope, element, attrs){
+                var chart = new uiChartFactory(scope, element, attrs);
+                chart.setType('line');
             },
-            templateUrl: 'tpl.chart.line'
+            templateUrl: 'tpl.chart'
         };
     });
 
@@ -1443,24 +1400,6 @@ angular.module('admin.component')
                 };
             },
             templateUrl: 'tpl.chart.pie'
-        };
-    });
-
-/**
- *
- */
-angular.module('admin.component')
-    .directive('uiScatterChart', function (uiChartFactory) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: false,
-            link: function(scope, element, attrs){
-                var chart = new uiChartFactory(scope, element, attrs);
-                chart.setType('line');
-            },
-            templateUrl: 'tpl.chart'
         };
     });
 
@@ -4895,6 +4834,23 @@ angular.module('admin.component')
             }
         };
     });
+/**
+ *
+ */
+angular.module('admin.component')
+    .directive('uiColumnChart', function (uiChartFactory) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: false,
+            link: function(scope, element, attrs){
+                new uiChartFactory(scope, element, attrs);
+            },
+            templateUrl: 'tpl.chart.column'
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -7568,7 +7524,17 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'admin.template']);
+(function () {
+    angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'admin.template'])
+        .config(function(ajaxProvider)  {
+
+            //
+            // ajax 默认返回处理
+            //
+            ajaxProvider.setSuccessHandler(function(result)  {return result.type == 1 ? result.data : null});
+            ajaxProvider.setFailHandler(function(result)  {return result.type != 1 ? result.data : null});
+        });
+})();
 
 //
 if($.fn.modal){

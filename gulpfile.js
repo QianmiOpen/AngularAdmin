@@ -29,7 +29,8 @@ gulp.task('lint', function () {
     gulp.src(scripts)
         .pipe(jshint({
             expr: true,
-            sub: true
+            sub: true,
+            esnext: true
         }))
         .pipe(jshint.reporter('default'));
 });
