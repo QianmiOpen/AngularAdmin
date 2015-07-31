@@ -549,24 +549,32 @@ angular.module('admin.service')
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.service')
-    .factory('Event', function () {
-        return function () {
+(function () {
+
+    var Event = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var proto$0={};
+        function Event() {
             this.listenerMap = {};
-            this.$on = function (evtName, fn) {
-                var list = this.listenerMap[evtName] || [];
-                list.push(fn);
-                this.listenerMap[evtName] = list;
-            };
-            this.$emit = function (evtName) {
-                var list = this.listenerMap[evtName] || [],
-                    args = Array.prototype.slice.call(arguments, 1);
-                $.each(list, function (index, fn) {
-                    fn.apply(this, args);
-                }.bind(this));
-            };
+        }DP$0(Event,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+        proto$0.$on = function(evtName, fn) {
+            var list = this.listenerMap[evtName] || [];
+            list.push(fn);
+            this.listenerMap[evtName] = list;
         };
-    });
+
+        proto$0.$emit = function(evtName) {
+            var list = this.listenerMap[evtName] || [],
+                args = Array.prototype.slice.call(arguments, 1);
+            $.each(list, function (index, fn) {
+                fn.apply(this, args);
+            }.bind(this));
+        };
+    MIXIN$0(Event.prototype,proto$0);proto$0=void 0;return Event;})();
+
+
+    angular.module('admin.service')
+        .service('Event', Event);
+})();
 (function () {
     if (!window.Handlebars) {
         return;
