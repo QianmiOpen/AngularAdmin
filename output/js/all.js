@@ -751,115 +751,94 @@ angular.module('admin.service')
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.service')
-    .factory('PaginationFactory', function (Event, ajax) {
-        var P = function (url, index, size, pageLimit, dataName, totalName) {
-            this.url = url;
-            this.pageIndex = parseInt(index || 0);
-            this.pageSize = parseInt(size || 10);
-            this.maxPage = 0;
-            this.pageLimit = parseInt(pageLimit || 10);
-            this.dataName = dataName || 'data';
-            this.totalName = totalName || 'total';
-            Event.call(this);
-        };
-        P.prototype = {
+(function () {
+    angular.module('admin.service')
+        .factory('PaginationFactory', function (Event, Ajax) {
 
-            /**
-             *
-             * @returns {*}
-             */
-            load: function () {
-                var self = this;
-                return ajax
-                    .post(this.url, {pageIndex: this.pageIndex, pageSize: this.pageSize})
-                    .then(function (r) {
-                        return self.analyze(r);
+            var Pagination = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(Pagination, super$0);var proto$0={};
+                function Pagination(url, index, size, pageLimit, dataName, totalName) {
+                    this.url = url;
+                    this.pageIndex = parseInt(index || 0);
+                    this.pageSize = parseInt(size || 10);
+                    this.maxPage = 0;
+                    this.pageLimit = parseInt(pageLimit || 10);
+                    this.dataName = dataName || 'data';
+                    this.totalName = totalName || 'total';
+                }if(super$0!==null)SP$0(Pagination,super$0);Pagination.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":Pagination,"configurable":true,"writable":true}});DP$0(Pagination,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.load = function() {
+                    var self = this;
+                    return Ajax
+                        .post(this.url, {pageIndex: this.pageIndex, pageSize: this.pageSize})
+                        .then(function (r) {
+                            return self.analyze(r);
+                        });
+                };
+
+                proto$0.analyze = function(r) {
+                    var total = r[this.totalName],
+                        to, s, e, pageList = [];
+                    this.maxPage = Math.ceil(total / this.pageSize);
+                    to = this.maxPage - (this.pageIndex + this.pageLimit);
+                    if (to >= 0) { //够放
+                        s = this.pageIndex;
+                        e = s + this.pageLimit;
+                    }
+                    else { //不够放,往前移动
+                        s = this.pageIndex - Math.abs(to);
+                        s = s < 0 ? 0 : s;
+                        e = this.pageIndex + (this.pageLimit - Math.abs(to));
+                    }
+                    //
+                    //if(s - 1 >= 0 && e != this.maxPage){
+                    //    s--;
+                    //    e--;
+                    //}
+
+                    //
+                    for (var i = s; i < e; i++) {
+                        pageList.push({
+                            index: i + 1,
+                            current: i == this.pageIndex
+                        });
+                    }
+                    return $.extend(r, {
+                        dataList: r[this.dataName],
+                        pageList: pageList,
+                        isFirst: this.pageIndex === 0,
+                        isLast: this.pageIndex == this.maxPage - 1
                     });
-            },
+                };
 
-            /**
-             *
-             */
-            analyze: function (r) {
-                var total = r[this.totalName],
-                    to, s, e, pageList = [];
-                this.maxPage = Math.ceil(total / this.pageSize);
-                to = this.maxPage - (this.pageIndex + this.pageLimit);
-                if (to >= 0) { //够放
-                    s = this.pageIndex;
-                    e = s + this.pageLimit;
-                }
-                else { //不够放,往前移动
-                    s = this.pageIndex - Math.abs(to);
-                    s = s < 0 ? 0 : s;
-                    e = this.pageIndex + (this.pageLimit - Math.abs(to));
-                }
-                //
-                //if(s - 1 >= 0 && e != this.maxPage){
-                //    s--;
-                //    e--;
-                //}
+                proto$0.prePage = function() {
+                    this.pageIndex--;
+                    this.pageIndex = this.pageIndex < 0 ? 0 : this.pageIndex;
+                    return this.getPage(this.pageIndex);
+                };
 
-                //
-                for(var i = s; i < e; i++){
-                    pageList.push({
-                        index: i + 1,
-                        current: i == this.pageIndex
-                    });
-                }
-                return $.extend(r, {
-                    dataList: r[this.dataName],
-                    pageList: pageList,
-                    isFirst: this.pageIndex === 0,
-                    isLast: this.pageIndex == this.maxPage - 1
-                });
-            },
+                proto$0.nextPage = function() {
+                    this.pageIndex++;
+                    this.pageIndex = this.pageIndex > this.maxPage - 1 ? (this.maxPage - 1) : this.pageIndex;
+                    return this.getPage(this.pageIndex);
+                };
 
-            /**
-             *
-             * @returns {*}
-             */
-            prePage: function () {
-                this.pageIndex--;
-                this.pageIndex = this.pageIndex < 0 ? 0 : this.pageIndex;
-                return this.getPage(this.pageIndex);
-            },
+                proto$0.firstPage = function() {
+                    return this.getPage(0);
+                };
 
-            /**
-             *
-             */
-            nextPage: function () {
-                this.pageIndex++;
-                this.pageIndex = this.pageIndex > this.maxPage - 1 ? (this.maxPage - 1) : this.pageIndex;
-                return this.getPage(this.pageIndex);
-            },
+                proto$0.lastPage = function() {
+                    return this.getPage(this.maxPage);
+                };
 
-            /**
-             *
-             */
-            firstPage: function () {
-                return this.getPage(0);
-            },
+                proto$0.getPage = function(pageIndex) {
+                    this.pageIndex = pageIndex;
+                    return this.load();
+                };
+            MIXIN$0(Pagination.prototype,proto$0);proto$0=void 0;return Pagination;})(Event);;
 
-            /**
-             *
-             */
-            lastPage: function () {
-                return this.getPage(this.maxPage);
-            },
-
-            /**
-             *
-             * @param pageIndex
-             */
-            getPage: function (pageIndex) {
-                this.pageIndex = pageIndex;
-                return this.load();
-            }
-        };
-        return P;
-    });
+            return Pagination;
+        });
+})();
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -867,216 +846,218 @@ angular.module('admin.service')
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.service')
-    .factory('ShortcutFactory', function ($window, $timeout) {
-        var keyboardManagerService = {};
+(function () {
+    angular.module('admin.service')
+        .factory('ShortcutFactory', function ($window, $timeout) {
+            var keyboardManagerService = {};
 
-        var defaultOpt = {
-            'type': 'keydown',
-            'propagate': false,
-            'inputDisabled': false,
-            'target': $window.document,
-            'keyCode': false
-        };
+            var defaultOpt = {
+                'type': 'keydown',
+                'propagate': false,
+                'inputDisabled': false,
+                'target': $window.document,
+                'keyCode': false
+            };
 
-        //
-        keyboardManagerService.keyboardEvent = {};
-        keyboardManagerService.bind = function (label, callback, opt) {
-            var fct, elt, code, k;
-            opt = angular.extend({}, defaultOpt, opt);
-            label = label.toLowerCase();
-            elt = opt.target;
-            if (typeof opt.target == 'string') elt = document.getElementById(opt.target);
+            //
+            keyboardManagerService.keyboardEvent = {};
+            keyboardManagerService.bind = function (label, callback, opt) {
+                var fct, elt, code, k;
+                opt = angular.extend({}, defaultOpt, opt);
+                label = label.toLowerCase();
+                elt = opt.target;
+                if (typeof opt.target == 'string') elt = document.getElementById(opt.target);
 
-            fct = function (e) {
-                e = e || $window.event;
+                fct = function (e) {
+                    e = e || $window.event;
 
-                //表单输入框放弃
-                if (opt['inputDisabled']) {
-                    var elt;
-                    if (e.target) elt = e.target;
-                    else if (e.srcElement) elt = e.srcElement;
-                    if (elt.nodeType == 3) elt = elt.parentNode;
-                    if (elt.tagName == 'INPUT' || elt.tagName == 'TEXTAREA') return;
-                }
-
-                // 找按键
-                if (e.keyCode) code = e.keyCode;
-                else if (e.which) code = e.which;
-                var character = String.fromCharCode(code).toLowerCase();
-
-                if (code == 188) character = ",";
-                if (code == 190) character = ".";
-
-                var keys = label.split("+");
-                var kp = 0;
-                var shift_nums = {
-                    "`": "~",
-                    "1": "!",
-                    "2": "@",
-                    "3": "#",
-                    "4": "$",
-                    "5": "%",
-                    "6": "^",
-                    "7": "&",
-                    "8": "*",
-                    "9": "(",
-                    "0": ")",
-                    "-": "_",
-                    "=": "+",
-                    ";": ":",
-                    "'": "\"",
-                    ",": "<",
-                    ".": ">",
-                    "/": "?",
-                    "\\": "|"
-                };
-                var special_keys = {
-                    'esc': 27,
-                    'escape': 27,
-                    'tab': 9,
-                    'space': 32,
-                    'return': 13,
-                    'enter': 13,
-                    'backspace': 8,
-
-                    'scrolllock': 145,
-                    'scroll_lock': 145,
-                    'scroll': 145,
-                    'capslock': 20,
-                    'caps_lock': 20,
-                    'caps': 20,
-                    'numlock': 144,
-                    'num_lock': 144,
-                    'num': 144,
-
-                    'pause': 19,
-                    'break': 19,
-
-                    'insert': 45,
-                    'home': 36,
-                    'delete': 46,
-                    'end': 35,
-
-                    'pageup': 33,
-                    'page_up': 33,
-                    'pu': 33,
-
-                    'pagedown': 34,
-                    'page_down': 34,
-                    'pd': 34,
-
-                    'left': 37,
-                    'up': 38,
-                    'right': 39,
-                    'down': 40,
-
-                    'f1': 112,
-                    'f2': 113,
-                    'f3': 114,
-                    'f4': 115,
-                    'f5': 116,
-                    'f6': 117,
-                    'f7': 118,
-                    'f8': 119,
-                    'f9': 120,
-                    'f10': 121,
-                    'f11': 122,
-                    'f12': 123
-                };
-                var modifiers = {
-                    shift: {
-                        wanted: false,
-                        pressed: e.shiftKey ? true : false
-                    },
-                    ctrl: {
-                        wanted: false,
-                        pressed: e.ctrlKey ? true : false
-                    },
-                    alt: {
-                        wanted: false,
-                        pressed: e.altKey ? true : false
-                    },
-                    meta: { //Meta is Mac specific
-                        wanted: false,
-                        pressed: e.metaKey ? true : false
-                    }
-                };
-                for (var i = 0, l = keys.length; k = keys[i], i < l; i++) {
-                    switch (k) {
-                        case 'ctrl':
-                        case 'control':
-                            kp++;
-                            modifiers.ctrl.wanted = true;
-                            break;
-                        case 'shift':
-                        case 'alt':
-                        case 'meta':
-                            kp++;
-                            modifiers[k].wanted = true;
-                            break;
+                    //表单输入框放弃
+                    if (opt['inputDisabled']) {
+                        var elt;
+                        if (e.target) elt = e.target;
+                        else if (e.srcElement) elt = e.srcElement;
+                        if (elt.nodeType == 3) elt = elt.parentNode;
+                        if (elt.tagName == 'INPUT' || elt.tagName == 'TEXTAREA') return;
                     }
 
-                    if (k.length > 1) {
-                        if (special_keys[k] == code) kp++;
-                    } else if (opt['keyCode']) {
-                        if (opt['keyCode'] == code) kp++;
-                    } else {
-                        if (character == k) kp++;
-                        else {
-                            if (shift_nums[character] && e.shiftKey) {
-                                character = shift_nums[character];
-                                if (character == k) kp++;
+                    // 找按键
+                    if (e.keyCode) code = e.keyCode;
+                    else if (e.which) code = e.which;
+                    var character = String.fromCharCode(code).toLowerCase();
+
+                    if (code == 188) character = ",";
+                    if (code == 190) character = ".";
+
+                    var keys = label.split("+");
+                    var kp = 0;
+                    var shift_nums = {
+                        "`": "~",
+                        "1": "!",
+                        "2": "@",
+                        "3": "#",
+                        "4": "$",
+                        "5": "%",
+                        "6": "^",
+                        "7": "&",
+                        "8": "*",
+                        "9": "(",
+                        "0": ")",
+                        "-": "_",
+                        "=": "+",
+                        ";": ":",
+                        "'": "\"",
+                        ",": "<",
+                        ".": ">",
+                        "/": "?",
+                        "\\": "|"
+                    };
+                    var special_keys = {
+                        'esc': 27,
+                        'escape': 27,
+                        'tab': 9,
+                        'space': 32,
+                        'return': 13,
+                        'enter': 13,
+                        'backspace': 8,
+
+                        'scrolllock': 145,
+                        'scroll_lock': 145,
+                        'scroll': 145,
+                        'capslock': 20,
+                        'caps_lock': 20,
+                        'caps': 20,
+                        'numlock': 144,
+                        'num_lock': 144,
+                        'num': 144,
+
+                        'pause': 19,
+                        'break': 19,
+
+                        'insert': 45,
+                        'home': 36,
+                        'delete': 46,
+                        'end': 35,
+
+                        'pageup': 33,
+                        'page_up': 33,
+                        'pu': 33,
+
+                        'pagedown': 34,
+                        'page_down': 34,
+                        'pd': 34,
+
+                        'left': 37,
+                        'up': 38,
+                        'right': 39,
+                        'down': 40,
+
+                        'f1': 112,
+                        'f2': 113,
+                        'f3': 114,
+                        'f4': 115,
+                        'f5': 116,
+                        'f6': 117,
+                        'f7': 118,
+                        'f8': 119,
+                        'f9': 120,
+                        'f10': 121,
+                        'f11': 122,
+                        'f12': 123
+                    };
+                    var modifiers = {
+                        shift: {
+                            wanted: false,
+                            pressed: e.shiftKey ? true : false
+                        },
+                        ctrl: {
+                            wanted: false,
+                            pressed: e.ctrlKey ? true : false
+                        },
+                        alt: {
+                            wanted: false,
+                            pressed: e.altKey ? true : false
+                        },
+                        meta: { //Meta is Mac specific
+                            wanted: false,
+                            pressed: e.metaKey ? true : false
+                        }
+                    };
+                    for (var i = 0, l = keys.length; k = keys[i], i < l; i++) {
+                        switch (k) {
+                            case 'ctrl':
+                            case 'control':
+                                kp++;
+                                modifiers.ctrl.wanted = true;
+                                break;
+                            case 'shift':
+                            case 'alt':
+                            case 'meta':
+                                kp++;
+                                modifiers[k].wanted = true;
+                                break;
+                        }
+
+                        if (k.length > 1) {
+                            if (special_keys[k] == code) kp++;
+                        } else if (opt['keyCode']) {
+                            if (opt['keyCode'] == code) kp++;
+                        } else {
+                            if (character == k) kp++;
+                            else {
+                                if (shift_nums[character] && e.shiftKey) {
+                                    character = shift_nums[character];
+                                    if (character == k) kp++;
+                                }
                             }
                         }
                     }
-                }
 
-                if (kp == keys.length &&
-                    modifiers.ctrl.pressed == modifiers.ctrl.wanted &&
-                    modifiers.shift.pressed == modifiers.shift.wanted &&
-                    modifiers.alt.pressed == modifiers.alt.wanted &&
-                    modifiers.meta.pressed == modifiers.meta.wanted) {
-                    $timeout(function () {
-                        callback(e);
-                    }, 1);
+                    if (kp == keys.length &&
+                        modifiers.ctrl.pressed == modifiers.ctrl.wanted &&
+                        modifiers.shift.pressed == modifiers.shift.wanted &&
+                        modifiers.alt.pressed == modifiers.alt.wanted &&
+                        modifiers.meta.pressed == modifiers.meta.wanted) {
+                        $timeout(function () {
+                            callback(e);
+                        }, 1);
 
-                    if (!opt['propagate']) {
-                        e.cancelBubble = true;
-                        e.returnValue = false;
+                        if (!opt['propagate']) {
+                            e.cancelBubble = true;
+                            e.returnValue = false;
 
-                        if (e.stopPropagation) {
-                            e.stopPropagation();
-                            e.preventDefault();
+                            if (e.stopPropagation) {
+                                e.stopPropagation();
+                                e.preventDefault();
+                            }
+                            return false;
                         }
-                        return false;
                     }
-                }
 
+                };
+                keyboardManagerService.keyboardEvent[label] = {
+                    'callback': fct,
+                    'target': elt,
+                    'event': opt['type']
+                };
+                if (elt.addEventListener) elt.addEventListener(opt['type'], fct, false);
+                else if (elt.attachEvent) elt.attachEvent('on' + opt['type'], fct);
+                else elt['on' + opt['type']] = fct;
             };
-            keyboardManagerService.keyboardEvent[label] = {
-                'callback': fct,
-                'target': elt,
-                'event': opt['type']
+            keyboardManagerService.unbind = function (label) {
+                label = label.toLowerCase();
+                var binding = keyboardManagerService.keyboardEvent[label];
+                delete(keyboardManagerService.keyboardEvent[label]);
+                if (!binding) return;
+                var type = binding['event'],
+                    elt = binding['target'],
+                    callback = binding['callback'];
+                if (elt.detachEvent) elt.detachEvent('on' + type, callback);
+                else if (elt.removeEventListener) elt.removeEventListener(type, callback, false);
+                else elt['on' + type] = false;
             };
-            if (elt.addEventListener) elt.addEventListener(opt['type'], fct, false);
-            else if (elt.attachEvent) elt.attachEvent('on' + opt['type'], fct);
-            else elt['on' + opt['type']] = fct;
-        };
-        keyboardManagerService.unbind = function (label) {
-            label = label.toLowerCase();
-            var binding = keyboardManagerService.keyboardEvent[label];
-            delete(keyboardManagerService.keyboardEvent[label]);
-            if (!binding) return;
-            var type = binding['event'],
-                elt = binding['target'],
-                callback = binding['callback'];
-            if (elt.detachEvent) elt.detachEvent('on' + type, callback);
-            else if (elt.removeEventListener) elt.removeEventListener(type, callback, false);
-            else elt['on' + type] = false;
-        };
-        return keyboardManagerService;
-    });
+            return keyboardManagerService;
+        });
+})();
 //-----------------------------------------------------------------------------------------------
 //
 //
