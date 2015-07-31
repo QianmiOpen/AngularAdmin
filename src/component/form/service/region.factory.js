@@ -158,11 +158,11 @@ angular.module('admin.component')
             },
 
             toProvinceData: function(data){
-                return {data: data || [], allowClear: true, placeholder: '请选择省'}
+                return {data: data || [], allowClear: true, placeholder: '请选择省'};
             },
 
             toCityData: function(data){
-                return {data: data || [], allowClear: true, placeholder: '请选择市'}
+                return {data: data || [], allowClear: true, placeholder: '请选择市'};
             },
 
             toStreetData: function(data){

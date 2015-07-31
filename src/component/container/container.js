@@ -17,7 +17,7 @@ angular.module('admin.component')
                         $scope[o.ref] = o.component;
                     }
                 });
-                if($attrs.sameScope != undefined){
+                if($attrs.sameScope !== undefined){
                     $element.append($transclude($scope));
                 }
             },
@@ -28,7 +28,8 @@ angular.module('admin.component')
                         var ctrlArgs = /\(([^\)]+)\)/.exec(window[attrs.controller].toString())[1],
                             args = {$scope: scope};
                         ctrlArgs = ctrlArgs.split(',');
-                        for (var i = 1, arg; arg = $.trim(ctrlArgs[i]); i++) {
+                        for (var i = 1, arg; i < ctrlArgs.length; i++) {
+                            arg = $.trim(ctrlArgs[i]);
                             args[arg] = $injector.get(arg);
                         }
                         $controller(window[attrs.controller], args);
@@ -42,7 +43,7 @@ angular.module('admin.component')
                 });
             },
             template: function (elemet, attrs) {
-                if(attrs.sameScope != undefined){
+                if(attrs.sameScope !== undefined){
                     return '<div></div>';
                 }
                 else{

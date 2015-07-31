@@ -66,7 +66,7 @@ angular.module('admin.component')
              * @returns {*}
              */
             val: function (v) {
-                if (v != undefined) {
+                if (v !== undefined) {
                     this.inputElement.val(v ? util.dateFormatStr(v, this.format) : '');
                     return this;
                 }

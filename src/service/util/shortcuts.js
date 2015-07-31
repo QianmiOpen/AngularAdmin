@@ -18,7 +18,7 @@ angular.module('admin.service')
         };
 
         //
-        keyboardManagerService.keyboardEvent = {}
+        keyboardManagerService.keyboardEvent = {};
         keyboardManagerService.bind = function (label, callback, opt) {
             var fct, elt, code, k;
             opt = angular.extend({}, defaultOpt, opt);

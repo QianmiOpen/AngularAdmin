@@ -42,15 +42,15 @@ angular.module('admin.component')
                         var r = render ? render.apply(this, arguments) : aData[$attrs.name];
 
                         //针对字符串, 如果为空, 返回'-'
-                        r = r != undefined ? r : '-'; //针对0或者false值
-                        if (r != undefined && angular.isString(r)) {
+                        r = r !== undefined ? r : '-'; //针对0或者false值
+                        if (r !== undefined && angular.isString(r)) {
                             r = $.trim(r);
                             r = r.length ? r : '-';
                             r = '<div>' + r + '</div>';
                         }
 
                         //
-                        if ($attrs.editable != undefined) {
+                        if ($attrs.editable !== undefined) {
                             if (editorFactory) {
                                 var edit = null,
                                     option = {

@@ -64,6 +64,6 @@
                 $get: function () {
                     return P;
                 }
-            }
+            };
         });
 })();

@@ -26,7 +26,8 @@ angular.module('admin.service')
                         container = $this.data('editableContainer');
                     if (container) {
                         var item = $(container.$form.find('input')[1]).data('uiSelect.data');
-                        item && $this.html(item.name);
+                        if (item)
+                            $this.html(item.name);
                     }
                 };
 

@@ -65,9 +65,9 @@ angular.module('admin.service')
                 return $.extend(r, {
                     dataList: r[this.dataName],
                     pageList: pageList,
-                    isFirst: this.pageIndex == 0,
+                    isFirst: this.pageIndex === 0,
                     isLast: this.pageIndex == this.maxPage - 1
-                })
+                });
             },
 
             /**

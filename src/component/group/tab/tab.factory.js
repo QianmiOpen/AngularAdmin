@@ -65,7 +65,7 @@ angular.module('admin.component')
                 //
                 var container = this.getContainer();
                 tabItem.active(true).show().then(function (content) {
-                    if (content.parent().length == 0) {
+                    if (content.parent().length === 0) {
                         container.append(content);
                     }
                     content.show();

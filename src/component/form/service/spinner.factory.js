@@ -23,12 +23,12 @@ angular.module('admin.component')
                     }
                     this.element.on('changed', function () {
                         ValueService.set(this.scope, this.attrs.model, this.val());
-                        this.$emit('change', this.val())
+                        this.$emit('change', this.val());
                     }.bind(this));
 
                     this.scope.$watch(this.attrs.model, function(newValue){
-                        if(newValue != this.val()){
-                            this.val(newValue == undefined ? '0' : newValue);
+                        if(newValue !== this.val()){
+                            this.val(newValue === undefined ? '0' : newValue);
                         }
                     }.bind(this));
                 }
@@ -56,7 +56,7 @@ angular.module('admin.component')
             },
 
             val: function (v) {
-                if (v != undefined) {
+                if (v !== undefined) {
                     this.inputElement.val(v);
                     return this;
                 }

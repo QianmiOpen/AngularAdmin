@@ -1,5 +1,3 @@
-/*! zk - v0.0.1 - 2015-07-16 */
-(function(){
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -238,7 +236,7 @@ angular.module('admin.service')
                                 $controller(window[this.ctrlName] || this.ctrlName, this.resolve);
                             }
                             catch (e){
-                                console.error('加载controller失败')
+                                console.error('加载controller失败');
                             }
                         }.bind(this));
                     }
@@ -360,7 +358,7 @@ angular.module('admin.service')
 
             validation: function(val){
                 var inputVal = this.element.data('editableContainer').$form.find('[name="' + this.name + '"]').val();
-                val = inputVal != undefined ? inputVal : val;
+                val = inputVal !== undefined ? inputVal : val;
                 if (this.rule) {
                     return util.checkValueUseRules(this.name, val, this.rule);
                 }
@@ -475,11 +473,11 @@ angular.module('admin.service')
                         var province = "";
                         var city = "";
                         $.each(nvs, function (i, item) {
-                            if (item['name'] == 'province') {
-                                province = item['value'];
+                            if (item.name == 'province') {
+                                province = item.value;
                             }
-                            if (item['name'] == 'city') {
-                                city = item['value'];
+                            if (item.name == 'city') {
+                                city = item.value;
                             }
                         });
                     }
@@ -490,7 +488,7 @@ angular.module('admin.service')
                     var $form = this.element.data('editableContainer').$form.find('form'),
                         nvs = $form.serializeArray();
                     $.each(nvs, function (i, item) {
-                        params[item['name']] = item['value'];
+                        params[item.name] = item.value;
                     });
                     params.value = params[params.name];
                     return params;
@@ -501,8 +499,8 @@ angular.module('admin.service')
                         nvs = $form.serializeArray();
                     var noChange = true;
                     $.each(nvs, function (i, item) {
-                        if (item['name'] == this.option.name) {
-                            noChange = this.option.value == item['value'];
+                        if (item.name == this.option.name) {
+                            noChange = this.option.value == item.value;
                         }
                     });
                     return noChange;
@@ -547,7 +545,8 @@ angular.module('admin.service')
                         container = $this.data('editableContainer');
                     if (container) {
                         var item = $(container.$form.find('input')[1]).data('uiSelect.data');
-                        item && $this.html(item.name);
+                        if (item)
+                            $this.html(item.name);
                     }
                 };
 
@@ -757,7 +756,7 @@ angular.module('admin.service')
                 $get: function () {
                     return P;
                 }
-            }
+            };
         });
 })();
 
@@ -828,9 +827,9 @@ angular.module('admin.service')
                 return $.extend(r, {
                     dataList: r[this.dataName],
                     pageList: pageList,
-                    isFirst: this.pageIndex == 0,
+                    isFirst: this.pageIndex === 0,
                     isLast: this.pageIndex == this.maxPage - 1
-                })
+                });
             },
 
             /**
@@ -897,7 +896,7 @@ angular.module('admin.service')
         };
 
         //
-        keyboardManagerService.keyboardEvent = {}
+        keyboardManagerService.keyboardEvent = {};
         keyboardManagerService.bind = function (label, callback, opt) {
             var fct, elt, code, k;
             opt = angular.extend({}, defaultOpt, opt);
@@ -1112,7 +1111,7 @@ angular.module('admin.service')
              * @returns {*}
              */
             dateFormatStr: function (date, format) {
-                return $filter('date')(date || new Date, format);
+                return $filter('date')(date || new Date(), format);
             },
             dateTimeStr: function (date) {
                 return this.dateFormatStr(date, 'yyyy-MM-dd HH:mm:ss');
@@ -1131,7 +1130,7 @@ angular.module('admin.service')
              * @param isCompleteRemove
              */
             animate: function ($el, animateCssName, isCompleteRemove) {
-                isCompleteRemove = isCompleteRemove != undefined ? isCompleteRemove : true;
+                isCompleteRemove = isCompleteRemove !== undefined ? isCompleteRemove : true;
                 $el.addClass(animateCssName + ' animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
                     isCompleteRemove && $(this).removeClass(animateCssName + ' animated');
                 });
@@ -1180,7 +1179,7 @@ angular.module('admin.service')
              * @param str
              */
             toJSON: function (str) {
-                return (new Function("return " + str))();
+                return JSON.parse(str);
             },
 
             /**
@@ -1334,41 +1333,6 @@ angular.module('admin.component', [])
         };
     });
 
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiStateButton', function () {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: function (scope, element, attrs, ctr, transclude) {
-                var c = transclude().text(),
-                    clickHandlerName = attrs;
-                element.html(c);
-                if(clickHandlerName){
-                    element.click(function(){
-                        element.prop('disabled', true);
-                        var r = scope[clickHandlerName]();
-                        if(r.finally){
-                            r.finally(function(){
-                                element.prop('disabled', false);
-                            });
-                        }
-                        else{
-                            element.prop('disabled', false);
-                        }
-                    });
-                }
-            },
-            template: 'tpl.button.state'
-        };
-    });
 /**
  *
  */
@@ -1654,93 +1618,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiBreadcrumb', function () {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            template: function (el, attrs) {
-                var dataList = attrs.data.split(','),
-                    h = [];
-                for (var i = 0; i < dataList.length; i++) {
-                    var data = dataList[i].split(':');
-                    h.push([
-                        '<li>',
-                            '<a href="' + (data[1] || '#') + '">' + data[0] + '</a>',
-                            i != dataList.length - 1 ? '<i class="fa fa-angle-right"></i>' : '',
-                        '</li>'
-                    ].join(''));
-                }
-                return [
-                    '<div class="page-bar">',
-                        '<ul class="page-breadcrumb">',
-                            h.join(''),
-                        '</ul>',
-                    '</div>'
-                ].join('')
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiContainer', function ($timeout, $controller, $injector) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: false,
-            controller: function ($scope, $attrs, $element, $transclude) {
-                $scope.$on('componentComplete', function (evt, o) {
-                    if (o) {
-                        $scope[o.ref] = o.component;
-                    }
-                });
-                if($attrs.sameScope != undefined){
-                    $element.append($transclude($scope));
-                }
-            },
-            link: function (scope, element, attrs) {
-                element.show();
-                $timeout(function(){
-                    if (attrs.controller && window[attrs.controller]) {
-                        var ctrlArgs = /\(([^\)]+)\)/.exec(window[attrs.controller].toString())[1],
-                            args = {$scope: scope};
-                        ctrlArgs = ctrlArgs.split(',');
-                        for (var i = 1, arg; arg = $.trim(ctrlArgs[i]); i++) {
-                            args[arg] = $injector.get(arg);
-                        }
-                        $controller(window[attrs.controller], args);
-                    }
-                    else if(attrs.controller){
-                        $controller(attrs.controller, {$scope: scope});
-                    }
-                    else {
-                        scope.$emit('uicontainer.ready'); // 触发
-                    }
-                });
-            },
-            template: function (elemet, attrs) {
-                if(attrs.sameScope != undefined){
-                    return '<div></div>';
-                }
-                else{
-                    return '<div ng-transclude></div>';
-                }
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
 //  针对input的封装
 //
 //
@@ -1752,7 +1629,7 @@ angular.module('admin.component')
             replace: true,
             transclude: true,
             link: function (scope, element, attrs, controller, tranclude) {
-                element.find('>div').append(tranclude(scope))
+                element.find('>div').append(tranclude(scope));
                 element.removeAttr('name').removeAttr('model');
             },
             template: function (element, attrs) {
@@ -1867,573 +1744,6 @@ angular.module('admin.component')
         return this.optional(element) || reg.test(value);
     }, "密码由8-16位字母、数字和特殊字符组成，且至少有一个大写字母或者特殊字符！");
 })(jQuery);
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormDate', function (uiDateFactory, componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: uiDateFactory,
-            template: function (element, attrs) {
-                //
-                var format = [],
-                    cc = (attrs.col || defaultCol).split(':');
-                if(attrs.mode){
-                    if (!attrs.mode || attrs.mode.indexOf('date') != -1)
-                        format.push('YYYY-MM-DD');
-                    if (!attrs.mode || attrs.mode.indexOf('time') != -1)
-                        format.push('HH:mm:ss');
-                }
-                else{ //兼容老属性
-                    if (!attrs.date)
-                        format.push('YYYY-MM-DD');
-                    if (!attrs.time)
-                        format.push('HH:mm:ss');
-                }
-                return componentHelper.getTemplate('tpl.form.input', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1],
-                    other: [
-                        {key: 'data-date-format', val: format.join(' ')},
-                        {key: 'readonly', val: ''}
-                    ]
-                }, attrs));
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormDateRange', function (uiDateRangeService, componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: uiDateRangeService,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.input.daterange', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormInput', function (uiInputFactory, componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: uiInputFactory,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.input', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormTextarea', function (componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: function (scope, element, attrs, ctrl, transclude) {
-                //
-                var $textarea = element.find('textarea');
-                scope.$on('uiform.reset', function () {
-                    $textarea.val('');
-                });
-
-                //
-                $textarea.html(transclude().text());
-
-                //
-                element.removeAttr('name').removeAttr('model').removeAttr('rows').removeAttr('cols');
-            },
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.textarea', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  参数
-//      p -- 省, 开关, 默认开, 可不填
-//      c -- 市, 开关, 默认开, 可不填
-//      s -- 区, 开关, 默认开, 可不填
-//      a -- 地址, 开关, 默认关
-//
-//      s-name -- 区域的name
-//      a-name -- 详细地址的name
-//
-//
-//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
-//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
-//      s-value -- 区域默认值
-//      a-value -- 地址值
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormRegion', function (uiRegionService, componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: uiRegionService,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.region', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSelect', function (uiSelectFactory, componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: uiSelectFactory,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.select', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormMultiSelect', function (util, uiSelectFactory, componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: uiSelectFactory,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.select', $.extend({
-                    isMulti: true,
-                    leftCol: cc[0],
-                    rightCol: cc[1],
-                    other: [
-                        {key: 'multiple', val: ''},
-                        {key: 'title', val: attrs.tip || '请选择'}
-                    ]
-                }, attrs));
-            }
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormRemoteSelect', function (uiMultiSelectFactory, componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: false,
-            transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                var select = uiMultiSelectFactory(scope, element, $.extend({multi: true}, attrs));
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formRemoteSelect', select);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    select.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
-            },
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.input', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormTagSelect', function (uiMultiSelectFactory, componentHelper, tagConfig, defaultCol, msg, ajax) {
-        return {
-            restrict: 'E',
-            replace: false,
-            transclude: true,
-            link: function (scope, element, attrs) {
-
-                //
-                var select = uiMultiSelectFactory(scope, element, $.extend({}, tagConfig, attrs, {
-                    url: tagConfig.url + attrs.classify,
-                    multi: true
-                }));
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formTagSelect', select);
-
-                //
-                var classifyId = attrs.classify,
-                    manual = attrs.manual != undefined,
-                    usercode = attrs.usercode; //分类ID
-
-                //
-                select.setUserCode = function(uc){
-                    usercode = uc;
-                };
-                select.setClassify = function(c){
-                    classifyId = c;
-                };
-
-                //
-                scope.$on('uiform.reset', function () {
-                    select.reset();
-                });
-
-
-                if(!manual){
-                    select.$on('uiSelect.doAdd', function(addObj, tag){
-                        ajax.post('/sysconfig/tag/rel/add', {name: addObj.name, classify: classifyId, id: addObj.isNew ? '': addObj.id, usercode: usercode}).then(function(data){
-                            addObj.id = data;
-                            delete addObj.isNew;
-                            msg.success('添加成功');
-                        });
-                    });
-                    select.$on('uiSelect.doDel', function(delObj, tag){
-                        if(!delObj.isNew){ //新的
-                            ajax.post('/sysconfig/tag/rel/del', {name: delObj.name, classify: classifyId, id: delObj.id, usercode: usercode}).then(function(){
-                                msg.success('删除成功');
-                            });
-                        }
-                    });
-                }
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
-            },
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.input', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormUserSelect', function (uiMultiSelectFactory, componentHelper, userConfig, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: false,
-            transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                var select = uiMultiSelectFactory(scope, element, $.extend({}, userConfig, attrs));
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formUserSelect', select);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    select.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
-            },
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.input', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSpinner', function (uiSpinnerFactory, componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: uiSpinnerFactory,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.spinner', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSwitch', function (uiSwitchFactory, componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: uiSwitchFactory,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.switch', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchDate', function (uiDateFactory, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: uiDateFactory,
-            template: function (element, attrs) {
-                var format = [];
-                if(attrs.mode){
-                    if (!attrs.mode || attrs.mode.indexOf('date') != -1)
-                        format.push('YYYY-MM-DD');
-                    if (!attrs.mode || attrs.mode.indexOf('time') != -1)
-                        format.push('HH:mm:ss');
-                }
-                else{ //兼容老属性
-                    if (!attrs.date)
-                        format.push('YYYY-MM-DD');
-                    if (!attrs.time)
-                        format.push('HH:mm:ss');
-                }
-                return componentHelper.getTemplate('tpl.searchform.input', $.extend({
-                    other: [
-                        {key: 'data-date-format', val: format.join(' ')},
-                        {key: 'readonly', val: ''}
-                    ]
-                }, attrs));
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchDateRange', function (uiDateRangeService, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: uiDateRangeService,
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.daterange', attrs);
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchInput', function (uiInputFactory, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: uiInputFactory,
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.input', attrs);
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchNumberInput', function (componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: function (scope, element) {
-                //
-                var $input = element.find('input');
-                scope.$on('uisearchform.reset', function () {
-                    $input.val('');
-                });
-                $input.onkeyup(function(evt){
-                    var v = this.value;
-                    v = v.replace(/[^\d]/g, '');
-                    this.value = v;
-                });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.input', attrs);
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchInputSelect', function (uiSelectFactory, uiInputFactory, componentHelper, msg) {
-        var m = new msg('SearchInputSelect');
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: function (scope, element, attrs) {
-
-                //
-                var hasName = attrs.selectName && attrs.inputName,
-                    input = new uiInputFactory(scope, element, attrs),
-                    select = new uiSelectFactory(scope, element, attrs);
-
-                //
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchInputSelect', {
-                    select: select,
-                    input: input
-                });
-
-                //
-                if (hasName) { //没有设置name, 那么当select的值变动的时候, 自动设置input的name为select的value
-                }
-                else if (!!!attrs.selectName && !!!attrs.inputName) {
-                    select.change(function () {
-                        input.attr('name', select.val());
-                    });
-                    input.attr('name', select.val());
-                }
-                else {
-                    m.error('必须同时设置select-name和input-name, 要么不设置, 要么全设置');
-                }
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    select.reset();
-                    input.reset();
-                });
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.input.select', attrs);
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchRegion', function (uiRegionService, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: uiRegionService,
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.region', attrs);
-            }
-        };
-    });
 //------------------------------------------------------
 //
 //
@@ -2469,112 +1779,6 @@ angular.module('admin.component')
         };
     });
 
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchSelect', function (uiSelectFactory, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: uiSelectFactory,
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.select', attrs);
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchMultiSelect', function (uiSelectFactory, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: uiSelectFactory,
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.select', $.extend({
-                    isMulti: true,
-                    other: [
-                        {key: 'multiple', val: ''},
-                        {key: 'title', val: attrs.tip || '请选择'}
-                    ]
-                }, attrs));
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchRemoteSelect', function (uiMultiSelectFactory, componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                var select = uiMultiSelectFactory(scope, element, $.extend({multi: true}, attrs));
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchRemoteSelect', select);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    select.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
-            },
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.searchform.userselect.input', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchUserSelect', function (uiMultiSelectFactory, componentHelper, userConfig) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: function (scope, element, attrs) {
-                var select = uiMultiSelectFactory(scope, element, $.extend({}, userConfig, attrs));
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchUserSelect', select);
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    select.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('model');
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.userselect.input', attrs);
-            }
-        };
-    });
 /**
  * 表单控件
  */
@@ -2736,7 +1940,7 @@ angular.module('admin.component')
              * @returns {*}
              */
             val: function (v) {
-                if (v != undefined) {
+                if (v !== undefined) {
                     this.inputElement.val(v ? util.dateFormatStr(v, this.format) : '');
                     return this;
                 }
@@ -2800,7 +2004,7 @@ angular.module('admin.component')
                 this.attrs = attrs;
 
                 this.hasDefaultDateRange = !!this.attrs.range;
-                this.isDateTimeMode = attrs.mode != 'date' || attr.time != undefined;
+                this.isDateTimeMode = attrs.mode !== 'date' || attr.time !== undefined;
                 this.format = attrs.format || (this.isDateTimeMode ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD');
                 var dateRange = uiDateRangeDefaultRange[this.attrs.range] || [];
                 this.defaultStartDate = attrs.fromValue || dateRange[0];
@@ -2957,14 +2161,16 @@ angular.module('admin.component')
                  * 根据column进行布局
                  */
                 layout: function (column) {
-                    column = parseInt(column != undefined ? column : this.column);
+                    column = parseInt(column !== undefined ? column : this.column);
                     if (column > 1) {
                         var eachColumn = 12 / column,
                             $body = this.element.find(' > div'),
                             doms = []; //没列占多少
                         $body.html();
-                        for (var i = 0, dom; dom = this.formItems[i]; i++) { //过滤一下
-                            if (dom.innerHTML != undefined) {
+                        var i, dom;
+                        for (i = 0; i < this.formItems.length; i++) { //过滤一下
+                            dom = this.formItems[i];
+                            if (dom.innerHTML !== undefined) {
                                 if (dom.type == 'hidden') {
                                     $body.append(dom);
                                 }
@@ -2973,13 +2179,16 @@ angular.module('admin.component')
                                 }
                             }
                         }
-                        for (var i = 0; i < doms.length; i = i + column) {
+                        var otherHandler = function (i, dom) {
+                            $body.append(dom);
+                        };
+                        for (i = 0; i < doms.length; i = i + column) {
                             var $rowDom = $('<div/>').addClass('row'),
                                 tempI = i,
                                 tempColumn = i,
                                 other = [];
                             while (tempColumn < tempI + column && doms[tempColumn]) {
-                                var dom = doms[tempColumn];
+                                dom = doms[tempColumn];
                                 if (dom.className.indexOf('row') != -1) {
                                     other.push(dom);
                                     i++; //多用了一个
@@ -2993,9 +2202,7 @@ angular.module('admin.component')
                                 tempColumn++;
                             }
                             $body.append($rowDom);
-                            $.each(other, function (i, dom) {
-                                $body.append(dom);
-                            });
+                            $.each(other, otherHandler);
                         }
                     }
                     else {
@@ -3047,7 +2254,7 @@ angular.module('admin.component')
                  */
                 formData: function (isJson) {
                     var r = this.element.serializeArray();
-                    if (isJson == true) {
+                    if (isJson === true) {
                         var o = {};
                         $.each(r, function (i, item) {
                             var n = item.name,
@@ -3167,7 +2374,7 @@ angular.module('admin.component')
             },
 
             val: function (v) {
-                if (v != undefined) {
+                if (v !== undefined) {
                     this.inputElement.val(v);
                     return this;
                 }
@@ -3195,18 +2402,18 @@ angular.module('admin.component')
             isInitDataMaping = false,
             isInitDataMap = false,
             dataMapUrl = 'http://pic.ofcard.com/themes/common/region/China_Region_Last.js',
-            dataMap = undefined,
+            dataMap,
 
             isInitDataList = false,
-            dataList = undefined,
+            dataList,
 
 
             isInitTreeData = false,
-            strandardTreeData = undefined,
-            allTreeData = undefined,
+            strandardTreeData,
+            allTreeData,
             rootId = '086',
             getSubDataList = function (pid, placeholder, $el, isRequire) {
-                if (isRequire && pid == undefined) {
+                if (isRequire && pid === undefined) {
                     logger.error(placeholder + '的pid为空');
                     return;
                 }
@@ -3429,7 +2636,7 @@ angular.module('admin.component')
                     d = $q.defer();
                 this.getById(sid).then(function (target) {
                     if (target) {
-                        var provinceId, cityId, streetId;
+                        var provinceId, cityId, streetId, p, c;
                         switch (target.mode) {
                             //省的话, 直接取值
                             case 'p':
@@ -3440,7 +2647,7 @@ angular.module('admin.component')
                                 break;
                             //市的话, 取他的省
                             case 'c':
-                                var p = allTreeData[target.pid];
+                                p = allTreeData[target.pid];
                                 provinceId = p.id;
                                 cityId = sid;
                                 self.getProvince($pel);
@@ -3450,8 +2657,8 @@ angular.module('admin.component')
                                 break;
                             //区的话, 取他的市和省
                             case 's':
-                                var c = allTreeData[target.pid];
-                                var p = allTreeData[c.pid];
+                                c = allTreeData[target.pid];
+                                p = allTreeData[c.pid];
                                 provinceId = p.id;
                                 cityId = c.id;
                                 streetId = sid;
@@ -3665,11 +2872,11 @@ angular.module('admin.component')
             },
 
             toProvinceData: function(data){
-                return {data: data || [], allowClear: true, placeholder: '请选择省'}
+                return {data: data || [], allowClear: true, placeholder: '请选择省'};
             },
 
             toCityData: function(data){
-                return {data: data || [], allowClear: true, placeholder: '请选择市'}
+                return {data: data || [], allowClear: true, placeholder: '请选择市'};
             },
 
             toStreetData: function(data){
@@ -3775,7 +2982,7 @@ angular.module('admin.component')
 
                     //监听一下model的变化
                     this.watch = this.scope.$watch(this.model, function (newValue) {
-                        if (newValue != undefined)
+                        if (newValue !== undefined)
                             this.val(newValue);
                         else
                             this.val(this.defaultResetValue);
@@ -3858,7 +3065,7 @@ angular.module('admin.component')
                     $.each(data, function (group, items) {
                         var $optiongroup = this.toOptionGroup(group);
                         $.each(items, function (i, item) {
-                            $optiongroup.append(this.toOption(item, dataName, dataValue))
+                            $optiongroup.append(this.toOption(item, dataName, dataValue));
                         }.bind(this));
                         this.selectElement.append($optiongroup);
                     }.bind(this));
@@ -3915,7 +3122,7 @@ angular.module('admin.component')
              * @returns {*}
              */
             val: function (v) {
-                if (v != undefined) {
+                if (v !== undefined) {
                     this.selectElement.val(v);
                     this.render();
                     return this;
@@ -3985,11 +3192,11 @@ angular.module('admin.component')
                         }
                     };
 
-                if (attrs.multi != undefined) {  //开启多选, select元素不能开启
+                if (attrs.multi !== undefined) {  //开启多选, select元素不能开启
                     selectOption.multiple = true;
                 }
-                if (attrs.url != undefined) { //开启远程查询
-                    if (attrs.multi != undefined) {
+                if (attrs.url !== undefined) { //开启远程查询
+                    if (attrs.multi !== undefined) {
                         selectOption.createSearchChoice = $.proxy(self.createSearchChoice, self);
                     }
                     selectOption.query = $.proxy(self.filterData, self);
@@ -4026,7 +3233,7 @@ angular.module('admin.component')
                 var ngModel = this.attrs.model,
                     self = this;
                 //
-                if (this.attrs.multi != undefined && this.attrs.setCheck) {
+                if (this.attrs.multi !== undefined && this.attrs.setCheck) {
                     this.loadData().then(function () {
                         self.selectItems = [];
                         self.selectValues = [];
@@ -4067,7 +3274,7 @@ angular.module('admin.component')
                         return false;
                     }
 
-                    if (this.attrs.multi != undefined) {
+                    if (this.attrs.multi !== undefined) {
                         this.selectValues.push(evt.val);
                         this.selectItems.push(evt.object);
                     }
@@ -4077,7 +3284,7 @@ angular.module('admin.component')
                     }
                     this.$emit('uiSelect.doSelect', this.selectValues, this.selectItems);
                     if (this.attrs.model) {
-                        ValueService.set(this.scope, this.attrs.model, this.attrs.multi != undefined ? this.selectValues : this.selectValues[0]);
+                        ValueService.set(this.scope, this.attrs.model, this.attrs.multi !== undefined ? this.selectValues : this.selectValues[0]);
                     }
                     return true;
                 }.bind(this));
@@ -4165,7 +3372,7 @@ angular.module('admin.component')
                             isC = self.attrs.multi ? o.term.indexOf(self.formatId(r)) != -1 : self.formatId(r) == o.term;
                         }
                         else { //根据属性过滤
-                            if (sfs.length == 0 || sfs[0] == '') {
+                            if (sfs.length === 0 || sfs[0] === '') {
                                 isC = r.__string.indexOf(keyword) != -1;
                             }
                             else {   //针对特定属性
@@ -4191,7 +3398,7 @@ angular.module('admin.component')
             initSelection: function (element, callback) {
                 var self = this,
                     handler = function (data) {
-                        if (self.attrs.multi != undefined) {
+                        if (self.attrs.multi !== undefined) {
                             callback(data.results);
                         }
                         else {
@@ -4203,7 +3410,7 @@ angular.module('admin.component')
                     self.isInit = false;
                     handler({results: self.selectItems});
                 }
-                else if (element.val() != undefined) {
+                else if (element.val() !== undefined) {
                     self.isInit = false;
                     this.filterData({
                         term: element.val(),
@@ -4319,12 +3526,12 @@ angular.module('admin.component')
                     }
                     this.element.on('changed', function () {
                         ValueService.set(this.scope, this.attrs.model, this.val());
-                        this.$emit('change', this.val())
+                        this.$emit('change', this.val());
                     }.bind(this));
 
                     this.scope.$watch(this.attrs.model, function(newValue){
-                        if(newValue != this.val()){
-                            this.val(newValue == undefined ? '0' : newValue);
+                        if(newValue !== this.val()){
+                            this.val(newValue === undefined ? '0' : newValue);
                         }
                     }.bind(this));
                 }
@@ -4352,7 +3559,7 @@ angular.module('admin.component')
             },
 
             val: function (v) {
-                if (v != undefined) {
+                if (v !== undefined) {
                     this.inputElement.val(v);
                     return this;
                 }
@@ -4432,7 +3639,7 @@ angular.module('admin.component')
 
 
             val: function (val) {
-                if (val != undefined) {
+                if (val !== undefined) {
                     this.inputElement.bootstrapSwitch('state', val == this.onValue);
                     return this;
                 }
@@ -4512,7 +3719,7 @@ angular.module('admin.component')
                 //
                 var container = this.getContainer();
                 tabItem.active(true).show().then(function (content) {
-                    if (content.parent().length == 0) {
+                    if (content.parent().length === 0) {
                         container.append(content);
                     }
                     content.show();
@@ -4813,106 +4020,6 @@ angular.module('admin.component')
         };
     });
 
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('uiMenuFactory', function (msg, ajax, Event) {
-        var m = new msg('Menu'),
-            Menu = function (scope, element, attrs) {
-                Event.call(this);
-                this.element = element;
-                this.attrs = attrs;
-                this.scope = scope;
-                this.activeItem = null;
-                this.init();
-            };
-        Menu.prototype = {
-
-            /**
-             *
-             */
-            init: function () {
-                this.scope.activeItem = null;
-                this.scope.menuItems = [];
-                this.scope.onClickHandler = this.onClickHandler.bind(this);
-                if (this.attrs.url) {
-                    this.setUrl(this.attrs.url);
-                }
-            },
-
-            /**
-             *
-             * @param url
-             */
-            setUrl: function (url) {
-                ajax.get(url).then(function(data){
-                    this.setData(data);
-                }.bind(this));
-            },
-
-            /**
-             *
-             */
-            setData: function (menuItems) {
-                this.scope.menuItems = menuItems;
-            },
-
-            /**
-             *
-             * @param menuItem
-             */
-            onClickHandler: function(menuItem){
-                if(this.scope.activeItem){
-                    this.scope.activeItem.active = false;
-                }
-                this.scope.activeItem = menuItem;
-                this.scope.activeItem.active = true;
-            }
-        };
-        return function (s, e, a, c, t) {
-            return new Menu(s, e, a, c, t);
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiMenu', function () {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: function (scope, element) {
-                element.find(' li a').click(function (evt) {
-                    var $a = $(evt.target);
-                    $a.parent().parent().find('li').removeClass('active');
-                    $a.parent().parent().find('.arrow').removeClass('open');
-
-                    $a.parent().addClass('active');
-                    $a.find('.arrow').addClass('open');
-                });
-
-                //
-                var $a = element.find('a[href="' + window.location.hash + '"]');
-                $a = $a.length > 0 ? $a : element.find('a[href="' + window.location.hash.replace(/\/[^\/]+$/, '') + '"]');
-                $a.parents('li').each(function(i, li){
-                    var $li = $(li);
-                    $li.addClass('active');
-                    $li.find(' > a .arrow').addClass('open');
-                });
-            },
-            templateUrl: 'tpl.menu'
-        };
-    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4940,9 +4047,6 @@ angular.module('admin.component')
                     placeholder: 'portlet-sortable-placeholder',
                     forcePlaceholderSize: true,
                     tolerance: "pointer",
-                    helper: "clone",
-                    tolerance: "pointer",
-                    forcePlaceholderSize: !0,
                     helper: "clone",
                     cancel: ".portlet-sortable-empty, .portlet-fullscreen", // cancel dragging if portlet is in fullscreen mode
                     revert: 250, // animation in milliseconds
@@ -4990,7 +4094,7 @@ angular.module('admin.component')
                 cookieValue[portlet.url] = {row: portlet.row, col: portlet.col};
             });
             $.cookie(cookieKey, JSON.stringify(cookieValue));
-        }
+        };
 
         //
         var portletSize, portlets;
@@ -5265,7 +4369,7 @@ angular.module('admin.component')
             controller: function ($scope, $element, $attrs, $transclude) {
                 var $content = $transclude($scope),
                     $toolbar = $content.filter('.portlet-tool-bar');
-                if ($toolbar.length == 0) {
+                if ($toolbar.length === 0) {
                     $.each($content, function (i, c) {
                         if (c.nodeName.indexOf('UI-PORTLET-ACTION') != -1) {
                             $toolbar = $(c);
@@ -5274,7 +4378,7 @@ angular.module('admin.component')
                     });
                 }
                 $element.find('.portlet-body').append($content);
-                if ($toolbar.length != 0) {
+                if ($toolbar.length !== 0) {
                     $toolbar.insertAfter($element.find('.caption'));
                 }
 
@@ -5456,7 +4560,7 @@ angular.module('admin.component')
                     styleHeight = $attrs.imageHeight,
                     render = function (rowData) {
                         var val = rowData[name];
-                        val = val != undefined ? val : placeholder;
+                        val = val !== undefined ? val : placeholder;
                         if(qiniu){
                             val = val + qiniu;
                         }
@@ -5516,14 +4620,14 @@ angular.module('admin.component')
                                     v = v[n];
                                 }
                             }
-                            return v != undefined ? $('<div/>').html(v) : v;
+                            return v !== undefined ? $('<div/>').html(v) : v;
                         }
                     };
 
                 //
                 if ($scope[ref] && $scope[ref].addColumn) {
                     var editor = null;
-                    if ($attrs.editable != undefined) {
+                    if ($attrs.editable !== undefined) {
                         var editorName = 'uiEditable' + $attrs.editable.charAt(0).toUpperCase() + $attrs.editable.substring(1) + 'Factory';
                         try {
                             editor = $injector.get(editorName);
@@ -5609,7 +4713,7 @@ angular.module('admin.component')
                     render = function (rowData) {
                         var val = rowData[name],
                             level = 'progress-bar-success';
-                        val = val != undefined ? val : 0;
+                        val = val !== undefined ? val : 0;
                         if (val <= 25)
                             level = 'progress-bar-danger';
                         else if (val <= 50)
@@ -5678,15 +4782,15 @@ angular.module('admin.component')
                         var r = render ? render.apply(this, arguments) : aData[$attrs.name];
 
                         //针对字符串, 如果为空, 返回'-'
-                        r = r != undefined ? r : '-'; //针对0或者false值
-                        if (r != undefined && angular.isString(r)) {
+                        r = r !== undefined ? r : '-'; //针对0或者false值
+                        if (r !== undefined && angular.isString(r)) {
                             r = $.trim(r);
                             r = r.length ? r : '-';
                             r = '<div>' + r + '</div>';
                         }
 
                         //
-                        if ($attrs.editable != undefined) {
+                        if ($attrs.editable !== undefined) {
                             if (editorFactory) {
                                 var edit = null,
                                     option = {
@@ -5752,11 +4856,12 @@ angular.module('admin.component')
                             $s.data = rowData;
                             $transclude($s, function (clone) {
                                 $dom = clone.filter('[state="' + val + '"]');
-                                if ($dom.length == 0) { //用默认值
+                                if ($dom.length === 0) { //用默认值
                                     $dom = clone.filter('[state="' + defaultValue + '"]');
                                 }
-                                if ($dom.length == 0) { //还没有...
-                                    for (var i = 0, c; c = clone[i]; i++) {
+                                if ($dom.length === 0) { //还没有...
+                                    for (var i = 0, c; i < clone.length; i++) {
+                                        c = clone[i];
                                         if (c.innerHTML && c.innerHTML.indexOf(defaultValue) != -1) {
                                             $dom = $(c);
                                             break;
@@ -5788,6 +4893,795 @@ angular.module('admin.component')
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.table.column', attrs);
             }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormDate', function (uiDateFactory, componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: uiDateFactory,
+            template: function (element, attrs) {
+                //
+                var format = [],
+                    cc = (attrs.col || defaultCol).split(':');
+                if(attrs.mode){
+                    if (!attrs.mode || attrs.mode.indexOf('date') != -1)
+                        format.push('YYYY-MM-DD');
+                    if (!attrs.mode || attrs.mode.indexOf('time') != -1)
+                        format.push('HH:mm:ss');
+                }
+                else{ //兼容老属性
+                    if (!attrs.date)
+                        format.push('YYYY-MM-DD');
+                    if (!attrs.time)
+                        format.push('HH:mm:ss');
+                }
+                return componentHelper.getTemplate('tpl.form.input', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1],
+                    other: [
+                        {key: 'data-date-format', val: format.join(' ')},
+                        {key: 'readonly', val: ''}
+                    ]
+                }, attrs));
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormDateRange', function (uiDateRangeService, componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: uiDateRangeService,
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.form.input.daterange', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormInput', function (uiInputFactory, componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: uiInputFactory,
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.form.input', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormTextarea', function (componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: function (scope, element, attrs, ctrl, transclude) {
+                //
+                var $textarea = element.find('textarea');
+                scope.$on('uiform.reset', function () {
+                    $textarea.val('');
+                });
+
+                //
+                $textarea.html(transclude().text());
+
+                //
+                element.removeAttr('name').removeAttr('model').removeAttr('rows').removeAttr('cols');
+            },
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.form.textarea', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  参数
+//      p -- 省, 开关, 默认开, 可不填
+//      c -- 市, 开关, 默认开, 可不填
+//      s -- 区, 开关, 默认开, 可不填
+//      a -- 地址, 开关, 默认关
+//
+//      s-name -- 区域的name
+//      a-name -- 详细地址的name
+//
+//
+//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
+//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
+//      s-value -- 区域默认值
+//      a-value -- 地址值
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormRegion', function (uiRegionService, componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: uiRegionService,
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.form.region', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSelect', function (uiSelectFactory, componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: uiSelectFactory,
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.form.select', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormMultiSelect', function (util, uiSelectFactory, componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: uiSelectFactory,
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.form.select', $.extend({
+                    isMulti: true,
+                    leftCol: cc[0],
+                    rightCol: cc[1],
+                    other: [
+                        {key: 'multiple', val: ''},
+                        {key: 'title', val: attrs.tip || '请选择'}
+                    ]
+                }, attrs));
+            }
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormRemoteSelect', function (uiMultiSelectFactory, componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: false,
+            transclude: true,
+            link: function (scope, element, attrs) {
+                //
+                var select = uiMultiSelectFactory(scope, element, $.extend({multi: true}, attrs));
+                componentHelper.tiggerComplete(scope, attrs.ref || '$formRemoteSelect', select);
+
+                //
+                scope.$on('uiform.reset', function () {
+                    select.reset();
+                });
+
+                //
+                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
+            },
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.form.input', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSpinner', function (uiSpinnerFactory, componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: uiSpinnerFactory,
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.form.spinner', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSwitch', function (uiSwitchFactory, componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: uiSwitchFactory,
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.form.switch', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchDate', function (uiDateFactory, componentHelper) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: uiDateFactory,
+            template: function (element, attrs) {
+                var format = [];
+                if(attrs.mode){
+                    if (!attrs.mode || attrs.mode.indexOf('date') != -1)
+                        format.push('YYYY-MM-DD');
+                    if (!attrs.mode || attrs.mode.indexOf('time') != -1)
+                        format.push('HH:mm:ss');
+                }
+                else{ //兼容老属性
+                    if (!attrs.date)
+                        format.push('YYYY-MM-DD');
+                    if (!attrs.time)
+                        format.push('HH:mm:ss');
+                }
+                return componentHelper.getTemplate('tpl.searchform.input', $.extend({
+                    other: [
+                        {key: 'data-date-format', val: format.join(' ')},
+                        {key: 'readonly', val: ''}
+                    ]
+                }, attrs));
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchDateRange', function (uiDateRangeService, componentHelper) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: uiDateRangeService,
+            template: function (element, attrs) {
+                return componentHelper.getTemplate('tpl.searchform.daterange', attrs);
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchInput', function (uiInputFactory, componentHelper) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: uiInputFactory,
+            template: function (element, attrs) {
+                return componentHelper.getTemplate('tpl.searchform.input', attrs);
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchNumberInput', function (componentHelper) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: function (scope, element) {
+                //
+                var $input = element.find('input');
+                scope.$on('uisearchform.reset', function () {
+                    $input.val('');
+                });
+                $input.onkeyup(function(evt){
+                    var v = this.value;
+                    v = v.replace(/[^\d]/g, '');
+                    this.value = v;
+                });
+
+                //
+                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
+            },
+            template: function (element, attrs) {
+                return componentHelper.getTemplate('tpl.searchform.input', attrs);
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchInputSelect', function (uiSelectFactory, uiInputFactory, componentHelper, msg) {
+        var m = new msg('SearchInputSelect');
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: function (scope, element, attrs) {
+
+                //
+                var hasName = attrs.selectName && attrs.inputName,
+                    input = new uiInputFactory(scope, element, attrs),
+                    select = new uiSelectFactory(scope, element, attrs);
+
+                //
+                componentHelper.tiggerComplete(scope, attrs.ref || '$searchInputSelect', {
+                    select: select,
+                    input: input
+                });
+
+                //
+                if (hasName) { //没有设置name, 那么当select的值变动的时候, 自动设置input的name为select的value
+                }
+                else if (!!!attrs.selectName && !!!attrs.inputName) {
+                    select.change(function () {
+                        input.attr('name', select.val());
+                    });
+                    input.attr('name', select.val());
+                }
+                else {
+                    m.error('必须同时设置select-name和input-name, 要么不设置, 要么全设置');
+                }
+
+                //
+                scope.$on('uisearchform.reset', function () {
+                    select.reset();
+                    input.reset();
+                });
+            },
+            template: function (element, attrs) {
+                return componentHelper.getTemplate('tpl.searchform.input.select', attrs);
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchRegion', function (uiRegionService, componentHelper) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: uiRegionService,
+            template: function (element, attrs) {
+                return componentHelper.getTemplate('tpl.searchform.region', attrs);
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchSelect', function (uiSelectFactory, componentHelper) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: uiSelectFactory,
+            template: function (element, attrs) {
+                return componentHelper.getTemplate('tpl.searchform.select', attrs);
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchMultiSelect', function (uiSelectFactory, componentHelper) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: uiSelectFactory,
+            template: function (element, attrs) {
+                return componentHelper.getTemplate('tpl.searchform.select', $.extend({
+                    isMulti: true,
+                    other: [
+                        {key: 'multiple', val: ''},
+                        {key: 'title', val: attrs.tip || '请选择'}
+                    ]
+                }, attrs));
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchRemoteSelect', function (uiMultiSelectFactory, componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: function (scope, element, attrs) {
+                //
+                var select = uiMultiSelectFactory(scope, element, $.extend({multi: true}, attrs));
+                componentHelper.tiggerComplete(scope, attrs.ref || '$searchRemoteSelect', select);
+
+                //
+                scope.$on('uisearchform.reset', function () {
+                    select.reset();
+                });
+
+                //
+                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
+            },
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.searchform.userselect.input', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchUserSelect', function (uiMultiSelectFactory, componentHelper, userConfig) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: function (scope, element, attrs) {
+                var select = uiMultiSelectFactory(scope, element, $.extend({}, userConfig, attrs));
+                componentHelper.tiggerComplete(scope, attrs.ref || '$searchUserSelect', select);
+
+                //
+                scope.$on('uisearchform.reset', function () {
+                    select.reset();
+                });
+
+                //
+                element.removeAttr('name').removeAttr('model');
+            },
+            template: function (element, attrs) {
+                return componentHelper.getTemplate('tpl.searchform.userselect.input', attrs);
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiStateButton', function () {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: function (scope, element, attrs, ctr, transclude) {
+                var c = transclude().text(),
+                    clickHandlerName = attrs;
+                element.html(c);
+                if(clickHandlerName){
+                    element.click(function(){
+                        element.prop('disabled', true);
+                        var r = scope[clickHandlerName]();
+                        if(r.finally){
+                            r.finally(function(){
+                                element.prop('disabled', false);
+                            });
+                        }
+                        else{
+                            element.prop('disabled', false);
+                        }
+                    });
+                }
+            },
+            template: 'tpl.button.state'
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiBreadcrumb', function () {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            template: function (el, attrs) {
+                var dataList = attrs.data.split(','),
+                    h = [];
+                for (var i = 0; i < dataList.length; i++) {
+                    var data = dataList[i].split(':');
+                    h.push([
+                        '<li>',
+                            '<a href="' + (data[1] || '#') + '">' + data[0] + '</a>',
+                            i != dataList.length - 1 ? '<i class="fa fa-angle-right"></i>' : '',
+                        '</li>'
+                    ].join(''));
+                }
+                return [
+                    '<div class="page-bar">',
+                        '<ul class="page-breadcrumb">',
+                            h.join(''),
+                        '</ul>',
+                    '</div>'
+                ].join('');
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiContainer', function ($timeout, $controller, $injector) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: false,
+            controller: function ($scope, $attrs, $element, $transclude) {
+                $scope.$on('componentComplete', function (evt, o) {
+                    if (o) {
+                        $scope[o.ref] = o.component;
+                    }
+                });
+                if($attrs.sameScope !== undefined){
+                    $element.append($transclude($scope));
+                }
+            },
+            link: function (scope, element, attrs) {
+                element.show();
+                $timeout(function(){
+                    if (attrs.controller && window[attrs.controller]) {
+                        var ctrlArgs = /\(([^\)]+)\)/.exec(window[attrs.controller].toString())[1],
+                            args = {$scope: scope};
+                        ctrlArgs = ctrlArgs.split(',');
+                        for (var i = 1, arg; i < ctrlArgs.length; i++) {
+                            arg = $.trim(ctrlArgs[i]);
+                            args[arg] = $injector.get(arg);
+                        }
+                        $controller(window[attrs.controller], args);
+                    }
+                    else if(attrs.controller){
+                        $controller(attrs.controller, {$scope: scope});
+                    }
+                    else {
+                        scope.$emit('uicontainer.ready'); // 触发
+                    }
+                });
+            },
+            template: function (elemet, attrs) {
+                if(attrs.sameScope !== undefined){
+                    return '<div></div>';
+                }
+                else{
+                    return '<div ng-transclude></div>';
+                }
+            }
+        };
+    });
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .factory('uiMenuFactory', function (msg, ajax, Event) {
+        var m = new msg('Menu'),
+            Menu = function (scope, element, attrs) {
+                Event.call(this);
+                this.element = element;
+                this.attrs = attrs;
+                this.scope = scope;
+                this.activeItem = null;
+                this.init();
+            };
+        Menu.prototype = {
+
+            /**
+             *
+             */
+            init: function () {
+                this.scope.activeItem = null;
+                this.scope.menuItems = [];
+                this.scope.onClickHandler = this.onClickHandler.bind(this);
+                if (this.attrs.url) {
+                    this.setUrl(this.attrs.url);
+                }
+            },
+
+            /**
+             *
+             * @param url
+             */
+            setUrl: function (url) {
+                ajax.get(url).then(function(data){
+                    this.setData(data);
+                }.bind(this));
+            },
+
+            /**
+             *
+             */
+            setData: function (menuItems) {
+                this.scope.menuItems = menuItems;
+            },
+
+            /**
+             *
+             * @param menuItem
+             */
+            onClickHandler: function(menuItem){
+                if(this.scope.activeItem){
+                    this.scope.activeItem.active = false;
+                }
+                this.scope.activeItem = menuItem;
+                this.scope.activeItem.active = true;
+            }
+        };
+        return function (s, e, a, c, t) {
+            return new Menu(s, e, a, c, t);
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiMenu', function () {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: function (scope, element) {
+                element.find(' li a').click(function (evt) {
+                    var $a = $(evt.target);
+                    $a.parent().parent().find('li').removeClass('active');
+                    $a.parent().parent().find('.arrow').removeClass('open');
+
+                    $a.parent().addClass('active');
+                    $a.find('.arrow').addClass('open');
+                });
+
+                //
+                var $a = element.find('a[href="' + window.location.hash + '"]');
+                $a = $a.length > 0 ? $a : element.find('a[href="' + window.location.hash.replace(/\/[^\/]+$/, '') + '"]');
+                $a.parents('li').each(function(i, li){
+                    var $li = $(li);
+                    $li.addClass('active');
+                    $li.find(' > a .arrow').addClass('open');
+                });
+            },
+            templateUrl: 'tpl.menu'
         };
     });
 //-----------------------------------------------------------------------------------------------
@@ -6350,7 +6244,7 @@ angular.module('admin.component')
                                                 aaData: result[attrs.nameData],
                                                 iTotalDisplayRecords: result[attrs.nameTotal],
                                                 iTotalRecords: result[attrs.nameTotal]
-                                            }
+                                            };
                                         }
                                         table.beforeDataHandler(result);
                                         fnCallback(result);
@@ -6988,7 +6882,7 @@ angular.module('admin.component')
                 componentHelper.tiggerComplete(scope, attrs.ref || '$tree', uiTree);
             },
             template: function (element, attrs) {
-                attrs.treeId = (new Date).getTime();
+                attrs.treeId = new Date().getTime();
                 return '<ul id="tree' + attrs.treeId + '" class="ztree" style="width:100%; overflow:auto;"></ul>';
             }
         };
@@ -7146,7 +7040,7 @@ angular.module('admin.component')
                 componentHelper.tiggerComplete(scope, attrs.ref || '$treeRegion', uiTree);
             },
             template: function (element, attrs) {
-                attrs.treeId = (new Date).getTime();
+                attrs.treeId = new Date().getTime();
                 return '<ul id="tree' + attrs.treeId + '" class="ztree" style="width:100%; overflow:auto;"></ul>';
             }
         };
@@ -7680,5 +7574,3 @@ angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'ad
 if($.fn.modal){
     $.fn.modal.Constructor.prototype.enforceFocus = function() {};
 }
-
-})();

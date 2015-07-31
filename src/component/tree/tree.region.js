@@ -16,7 +16,7 @@ angular.module('admin.component')
                 componentHelper.tiggerComplete(scope, attrs.ref || '$treeRegion', uiTree);
             },
             template: function (element, attrs) {
-                attrs.treeId = (new Date).getTime();
+                attrs.treeId = new Date().getTime();
                 return '<ul id="tree' + attrs.treeId + '" class="ztree" style="width:100%; overflow:auto;"></ul>';
             }
         };

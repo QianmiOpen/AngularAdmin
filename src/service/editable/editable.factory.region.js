@@ -25,11 +25,11 @@ angular.module('admin.service')
                         var province = "";
                         var city = "";
                         $.each(nvs, function (i, item) {
-                            if (item['name'] == 'province') {
-                                province = item['value'];
+                            if (item.name == 'province') {
+                                province = item.value;
                             }
-                            if (item['name'] == 'city') {
-                                city = item['value'];
+                            if (item.name == 'city') {
+                                city = item.value;
                             }
                         });
                     }
@@ -40,7 +40,7 @@ angular.module('admin.service')
                     var $form = this.element.data('editableContainer').$form.find('form'),
                         nvs = $form.serializeArray();
                     $.each(nvs, function (i, item) {
-                        params[item['name']] = item['value'];
+                        params[item.name] = item.value;
                     });
                     params.value = params[params.name];
                     return params;
@@ -51,8 +51,8 @@ angular.module('admin.service')
                         nvs = $form.serializeArray();
                     var noChange = true;
                     $.each(nvs, function (i, item) {
-                        if (item['name'] == this.option.name) {
-                            noChange = this.option.value == item['value'];
+                        if (item.name == this.option.name) {
+                            noChange = this.option.value == item.value;
                         }
                     });
                     return noChange;

@@ -66,7 +66,7 @@ angular.module('admin.service')
                                 $controller(window[this.ctrlName] || this.ctrlName, this.resolve);
                             }
                             catch (e){
-                                console.error('加载controller失败')
+                                console.error('加载controller失败');
                             }
                         }.bind(this));
                     }

@@ -16,7 +16,7 @@ angular.module('admin.service')
              * @returns {*}
              */
             dateFormatStr: function (date, format) {
-                return $filter('date')(date || new Date, format);
+                return $filter('date')(date || new Date(), format);
             },
             dateTimeStr: function (date) {
                 return this.dateFormatStr(date, 'yyyy-MM-dd HH:mm:ss');
@@ -35,7 +35,7 @@ angular.module('admin.service')
              * @param isCompleteRemove
              */
             animate: function ($el, animateCssName, isCompleteRemove) {
-                isCompleteRemove = isCompleteRemove != undefined ? isCompleteRemove : true;
+                isCompleteRemove = isCompleteRemove !== undefined ? isCompleteRemove : true;
                 $el.addClass(animateCssName + ' animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
                     isCompleteRemove && $(this).removeClass(animateCssName + ' animated');
                 });
@@ -84,7 +84,7 @@ angular.module('admin.service')
              * @param str
              */
             toJSON: function (str) {
-                return (new Function("return " + str))();
+                return JSON.parse(str);
             },
 
             /**

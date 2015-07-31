@@ -93,14 +93,16 @@
                  * 根据column进行布局
                  */
                 layout: function (column) {
-                    column = parseInt(column != undefined ? column : this.column);
+                    column = parseInt(column !== undefined ? column : this.column);
                     if (column > 1) {
                         var eachColumn = 12 / column,
                             $body = this.element.find(' > div'),
                             doms = []; //没列占多少
                         $body.html();
-                        for (var i = 0, dom; dom = this.formItems[i]; i++) { //过滤一下
-                            if (dom.innerHTML != undefined) {
+                        var i, dom;
+                        for (i = 0; i < this.formItems.length; i++) { //过滤一下
+                            dom = this.formItems[i];
+                            if (dom.innerHTML !== undefined) {
                                 if (dom.type == 'hidden') {
                                     $body.append(dom);
                                 }
@@ -109,13 +111,16 @@
                                 }
                             }
                         }
-                        for (var i = 0; i < doms.length; i = i + column) {
+                        var otherHandler = function (i, dom) {
+                            $body.append(dom);
+                        };
+                        for (i = 0; i < doms.length; i = i + column) {
                             var $rowDom = $('<div/>').addClass('row'),
                                 tempI = i,
                                 tempColumn = i,
                                 other = [];
                             while (tempColumn < tempI + column && doms[tempColumn]) {
-                                var dom = doms[tempColumn];
+                                dom = doms[tempColumn];
                                 if (dom.className.indexOf('row') != -1) {
                                     other.push(dom);
                                     i++; //多用了一个
@@ -129,9 +134,7 @@
                                 tempColumn++;
                             }
                             $body.append($rowDom);
-                            $.each(other, function (i, dom) {
-                                $body.append(dom);
-                            });
+                            $.each(other, otherHandler);
                         }
                     }
                     else {
@@ -183,7 +186,7 @@
                  */
                 formData: function (isJson) {
                     var r = this.element.serializeArray();
-                    if (isJson == true) {
+                    if (isJson === true) {
                         var o = {};
                         $.each(r, function (i, item) {
                             var n = item.name,

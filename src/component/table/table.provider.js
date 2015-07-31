@@ -106,7 +106,7 @@ angular.module('admin.component')
                                                 aaData: result[attrs.nameData],
                                                 iTotalDisplayRecords: result[attrs.nameTotal],
                                                 iTotalRecords: result[attrs.nameTotal]
-                                            }
+                                            };
                                         }
                                         table.beforeDataHandler(result);
                                         fnCallback(result);

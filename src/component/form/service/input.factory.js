@@ -44,7 +44,7 @@ angular.module('admin.component')
             },
 
             val: function (v) {
-                if (v != undefined) {
+                if (v !== undefined) {
                     this.inputElement.val(v);
                     return this;
                 }

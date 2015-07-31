@@ -12,7 +12,7 @@ angular.module('admin.component')
             replace: true,
             transclude: true,
             link: function (scope, element, attrs, controller, tranclude) {
-                element.find('>div').append(tranclude(scope))
+                element.find('>div').append(tranclude(scope));
                 element.removeAttr('name').removeAttr('model');
             },
             template: function (element, attrs) {

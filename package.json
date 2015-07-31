@@ -9,12 +9,11 @@
   "dependencies": {
   },
   "devDependencies": {
-    "request": "*",
-    "grunt": "^0.4.5",
-    "grunt-contrib-concat": "*",
-    "grunt-contrib-cssmin": "*",
-    "grunt-contrib-jshint": "^0.10.0",
-    "grunt-contrib-uglify": "*",
-    "grunt-contrib-watch": "*"
+      "gulp": "*",
+      "gulp-jshint": "*",
+      "gulp-concat": "*",
+      "gulp-uglify": "*",
+      "gulp-rename": "*",
+      "gulp-es6-transpiler": "*"
   }
 }

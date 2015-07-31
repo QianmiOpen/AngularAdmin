@@ -28,7 +28,7 @@ angular.module('admin.component')
                             h.join(''),
                         '</ul>',
                     '</div>'
-                ].join('')
+                ].join('');
             }
         };
     });

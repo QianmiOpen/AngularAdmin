@@ -28,11 +28,12 @@ angular.module('admin.component')
                             $s.data = rowData;
                             $transclude($s, function (clone) {
                                 $dom = clone.filter('[state="' + val + '"]');
-                                if ($dom.length == 0) { //用默认值
+                                if ($dom.length === 0) { //用默认值
                                     $dom = clone.filter('[state="' + defaultValue + '"]');
                                 }
-                                if ($dom.length == 0) { //还没有...
-                                    for (var i = 0, c; c = clone[i]; i++) {
+                                if ($dom.length === 0) { //还没有...
+                                    for (var i = 0, c; i < clone.length; i++) {
+                                        c = clone[i];
                                         if (c.innerHTML && c.innerHTML.indexOf(defaultValue) != -1) {
                                             $dom = $(c);
                                             break;

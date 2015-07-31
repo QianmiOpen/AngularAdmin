@@ -13,18 +13,18 @@ angular.module('admin.component')
             isInitDataMaping = false,
             isInitDataMap = false,
             dataMapUrl = 'http://pic.ofcard.com/themes/common/region/China_Region_Last.js',
-            dataMap = undefined,
+            dataMap,
 
             isInitDataList = false,
-            dataList = undefined,
+            dataList,
 
 
             isInitTreeData = false,
-            strandardTreeData = undefined,
-            allTreeData = undefined,
+            strandardTreeData,
+            allTreeData,
             rootId = '086',
             getSubDataList = function (pid, placeholder, $el, isRequire) {
-                if (isRequire && pid == undefined) {
+                if (isRequire && pid === undefined) {
                     logger.error(placeholder + '的pid为空');
                     return;
                 }
@@ -247,7 +247,7 @@ angular.module('admin.component')
                     d = $q.defer();
                 this.getById(sid).then(function (target) {
                     if (target) {
-                        var provinceId, cityId, streetId;
+                        var provinceId, cityId, streetId, p, c;
                         switch (target.mode) {
                             //省的话, 直接取值
                             case 'p':
@@ -258,7 +258,7 @@ angular.module('admin.component')
                                 break;
                             //市的话, 取他的省
                             case 'c':
-                                var p = allTreeData[target.pid];
+                                p = allTreeData[target.pid];
                                 provinceId = p.id;
                                 cityId = sid;
                                 self.getProvince($pel);
@@ -268,8 +268,8 @@ angular.module('admin.component')
                                 break;
                             //区的话, 取他的市和省
                             case 's':
-                                var c = allTreeData[target.pid];
-                                var p = allTreeData[c.pid];
+                                c = allTreeData[target.pid];
+                                p = allTreeData[c.pid];
                                 provinceId = p.id;
                                 cityId = c.id;
                                 streetId = sid;

@@ -15,7 +15,7 @@ angular.module('admin.component')
             controller: function ($scope, $element, $attrs, $transclude) {
                 var $content = $transclude($scope),
                     $toolbar = $content.filter('.portlet-tool-bar');
-                if ($toolbar.length == 0) {
+                if ($toolbar.length === 0) {
                     $.each($content, function (i, c) {
                         if (c.nodeName.indexOf('UI-PORTLET-ACTION') != -1) {
                             $toolbar = $(c);
@@ -24,7 +24,7 @@ angular.module('admin.component')
                     });
                 }
                 $element.find('.portlet-body').append($content);
-                if ($toolbar.length != 0) {
+                if ($toolbar.length !== 0) {
                     $toolbar.insertAfter($element.find('.caption'));
                 }
 

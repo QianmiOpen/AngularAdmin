@@ -65,7 +65,7 @@ angular.module('admin.component')
 
 
             val: function (val) {
-                if (val != undefined) {
+                if (val !== undefined) {
                     this.inputElement.bootstrapSwitch('state', val == this.onValue);
                     return this;
                 }

@@ -26,9 +26,6 @@ angular.module('admin.component')
                     forcePlaceholderSize: true,
                     tolerance: "pointer",
                     helper: "clone",
-                    tolerance: "pointer",
-                    forcePlaceholderSize: !0,
-                    helper: "clone",
                     cancel: ".portlet-sortable-empty, .portlet-fullscreen", // cancel dragging if portlet is in fullscreen mode
                     revert: 250, // animation in milliseconds
                     start: function(b, c){
@@ -75,7 +72,7 @@ angular.module('admin.component')
                 cookieValue[portlet.url] = {row: portlet.row, col: portlet.col};
             });
             $.cookie(cookieKey, JSON.stringify(cookieValue));
-        }
+        };
 
         //
         var portletSize, portlets;

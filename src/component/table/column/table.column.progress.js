@@ -24,7 +24,7 @@ angular.module('admin.component')
                     render = function (rowData) {
                         var val = rowData[name],
                             level = 'progress-bar-success';
-                        val = val != undefined ? val : 0;
+                        val = val !== undefined ? val : 0;
                         if (val <= 25)
                             level = 'progress-bar-danger';
                         else if (val <= 50)

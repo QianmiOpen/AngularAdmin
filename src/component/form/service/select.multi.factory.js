@@ -54,11 +54,11 @@ angular.module('admin.component')
                         }
                     };
 
-                if (attrs.multi != undefined) {  //开启多选, select元素不能开启
+                if (attrs.multi !== undefined) {  //开启多选, select元素不能开启
                     selectOption.multiple = true;
                 }
-                if (attrs.url != undefined) { //开启远程查询
-                    if (attrs.multi != undefined) {
+                if (attrs.url !== undefined) { //开启远程查询
+                    if (attrs.multi !== undefined) {
                         selectOption.createSearchChoice = $.proxy(self.createSearchChoice, self);
                     }
                     selectOption.query = $.proxy(self.filterData, self);
@@ -95,7 +95,7 @@ angular.module('admin.component')
                 var ngModel = this.attrs.model,
                     self = this;
                 //
-                if (this.attrs.multi != undefined && this.attrs.setCheck) {
+                if (this.attrs.multi !== undefined && this.attrs.setCheck) {
                     this.loadData().then(function () {
                         self.selectItems = [];
                         self.selectValues = [];
@@ -136,7 +136,7 @@ angular.module('admin.component')
                         return false;
                     }
 
-                    if (this.attrs.multi != undefined) {
+                    if (this.attrs.multi !== undefined) {
                         this.selectValues.push(evt.val);
                         this.selectItems.push(evt.object);
                     }
@@ -146,7 +146,7 @@ angular.module('admin.component')
                     }
                     this.$emit('uiSelect.doSelect', this.selectValues, this.selectItems);
                     if (this.attrs.model) {
-                        ValueService.set(this.scope, this.attrs.model, this.attrs.multi != undefined ? this.selectValues : this.selectValues[0]);
+                        ValueService.set(this.scope, this.attrs.model, this.attrs.multi !== undefined ? this.selectValues : this.selectValues[0]);
                     }
                     return true;
                 }.bind(this));
@@ -234,7 +234,7 @@ angular.module('admin.component')
                             isC = self.attrs.multi ? o.term.indexOf(self.formatId(r)) != -1 : self.formatId(r) == o.term;
                         }
                         else { //根据属性过滤
-                            if (sfs.length == 0 || sfs[0] == '') {
+                            if (sfs.length === 0 || sfs[0] === '') {
                                 isC = r.__string.indexOf(keyword) != -1;
                             }
                             else {   //针对特定属性
@@ -260,7 +260,7 @@ angular.module('admin.component')
             initSelection: function (element, callback) {
                 var self = this,
                     handler = function (data) {
-                        if (self.attrs.multi != undefined) {
+                        if (self.attrs.multi !== undefined) {
                             callback(data.results);
                         }
                         else {
@@ -272,7 +272,7 @@ angular.module('admin.component')
                     self.isInit = false;
                     handler({results: self.selectItems});
                 }
-                else if (element.val() != undefined) {
+                else if (element.val() !== undefined) {
                     self.isInit = false;
                     this.filterData({
                         term: element.val(),

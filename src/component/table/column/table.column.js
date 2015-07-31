@@ -38,14 +38,14 @@ angular.module('admin.component')
                                     v = v[n];
                                 }
                             }
-                            return v != undefined ? $('<div/>').html(v) : v;
+                            return v !== undefined ? $('<div/>').html(v) : v;
                         }
                     };
 
                 //
                 if ($scope[ref] && $scope[ref].addColumn) {
                     var editor = null;
-                    if ($attrs.editable != undefined) {
+                    if ($attrs.editable !== undefined) {
                         var editorName = 'uiEditable' + $attrs.editable.charAt(0).toUpperCase() + $attrs.editable.substring(1) + 'Factory';
                         try {
                             editor = $injector.get(editorName);

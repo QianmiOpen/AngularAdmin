@@ -22,7 +22,7 @@ angular.module('admin.component')
                     styleHeight = $attrs.imageHeight,
                     render = function (rowData) {
                         var val = rowData[name];
-                        val = val != undefined ? val : placeholder;
+                        val = val !== undefined ? val : placeholder;
                         if(qiniu){
                             val = val + qiniu;
                         }

@@ -60,7 +60,7 @@ angular.module('admin.service')
 
             validation: function(val){
                 var inputVal = this.element.data('editableContainer').$form.find('[name="' + this.name + '"]').val();
-                val = inputVal != undefined ? inputVal : val;
+                val = inputVal !== undefined ? inputVal : val;
                 if (this.rule) {
                     return util.checkValueUseRules(this.name, val, this.rule);
                 }

@@ -25,7 +25,7 @@ angular.module('admin.component')
 
                     //监听一下model的变化
                     this.watch = this.scope.$watch(this.model, function (newValue) {
-                        if (newValue != undefined)
+                        if (newValue !== undefined)
                             this.val(newValue);
                         else
                             this.val(this.defaultResetValue);
@@ -108,7 +108,7 @@ angular.module('admin.component')
                     $.each(data, function (group, items) {
                         var $optiongroup = this.toOptionGroup(group);
                         $.each(items, function (i, item) {
-                            $optiongroup.append(this.toOption(item, dataName, dataValue))
+                            $optiongroup.append(this.toOption(item, dataName, dataValue));
                         }.bind(this));
                         this.selectElement.append($optiongroup);
                     }.bind(this));
@@ -165,7 +165,7 @@ angular.module('admin.component')
              * @returns {*}
              */
             val: function (v) {
-                if (v != undefined) {
+                if (v !== undefined) {
                     this.selectElement.val(v);
                     this.render();
                     return this;
