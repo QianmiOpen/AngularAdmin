@@ -5,7 +5,7 @@
             /**
              *
              */
-            componentHelper.setTemplate('tpl.button.state', '<button type="button" class="btn"></button>');
+            componentHelper.setTemplate('tpl.button.state', '<button type="button" class="btn" ng-transclude></button>');
 
         });
 })(jQuery);

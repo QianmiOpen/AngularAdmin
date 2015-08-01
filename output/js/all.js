@@ -618,125 +618,119 @@ angular.module('admin.service')
 //
 //
 //-----------------------------------------------------------------------------------------------
-(function () {
+var Logger = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var proto$0={};
+    function Logger(className) {
+        this.className = className;
+        this.console = window.console;
+        this.isEnableDebug = location.hash.indexOf("debug") != -1;
+    }DP$0(Logger,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
-    var Logger = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var proto$0={};
-        function Logger(className) {
-            this.className = className;
-            this.console = window.console;
-            this.isEnableDebug = location.hash.indexOf("debug") != -1;
-        }DP$0(Logger,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+    proto$0.debug = function(m) {
+        m = (("" + (this.className)) + (": " + m) + "");
+        if (this.isEnableDebug && this.console) {
+            this.console.debug ? this.console.debug(m) : this.console.log(m);
+        }
+    };
 
-        proto$0.debug = function(m) {
-            m = (("" + (this.className)) + (": " + m) + "");
-            if (this.isEnableDebug && this.console) {
-                this.console.debug ? this.console.debug(m) : this.console.log(m);
-            }
-        };
+    proto$0.info = function(m) {
+        m = (("" + (this.className)) + (": " + m) + "");
+        this.console.info ? this.console.info(m) : this.console.log(m);
+    };
 
-        proto$0.info = function(m) {
-            m = (("" + (this.className)) + (": " + m) + "");
-            this.console.info ? this.console.info(m) : this.console.log(m);
-        };
+    proto$0.error = function(m) {
+        m = (("" + (this.className)) + (": " + m) + "");
+        this.console.error ? this.console.error(m) : this.console.log(m);
+    };
+MIXIN$0(Logger.prototype,proto$0);proto$0=void 0;return Logger;})();
 
-        proto$0.error = function(m) {
-            m = (("" + (this.className)) + (": " + m) + "");
-            this.console.error ? this.console.error(m) : this.console.log(m);
-        };
-    MIXIN$0(Logger.prototype,proto$0);proto$0=void 0;return Logger;})();
-
-    angular.module('admin.service')
-        .service('logger', function()  {return Logger})
-        .service('Logger', function()  {return Logger});
-})();
-//-----------------------------------------------------------------------------------------------
+angular.module('admin.service')
+    .service('logger', function()  {return Logger})
+    .service('Logger', function()  {return Logger});
+var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};//-----------------------------------------------------------------------------------------------
 //
 //
 //
 //
 //
 //-----------------------------------------------------------------------------------------------
-(function () {var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};
-    if (window.toastr) {
-        toastr.options = {
-            "closeButton": true,
-            "debug": false,
-            "positionClass": "toast-top-center",
-            "showDuration": "1000",
-            "hideDuration": "1000",
-            "timeOut": "5000",
-            "extendedTimeOut": "1000",
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        };
-    }
-    else {
-        console.error('需要 toastr库 支持, 请导入...');
-    }
+if (window.toastr) {
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "positionClass": "toast-top-center",
+        "showDuration": "1000",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+}
+else {
+    console.error('需要 toastr库 支持, 请导入...');
+}
 
-    var Message = (function(){"use strict";var static$0={},proto$0={};
-        function Message(className) {
-            this.className = className ? className + ': ' : '';
-        }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+var Message = (function(){"use strict";var static$0={},proto$0={};
+    function Message(className) {
+        this.className = className ? className + ': ' : '';
+    }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
-        proto$0.success = function(msg, title) {
-            Message.success(this.className + msg, title);
-        };
+    proto$0.success = function(msg, title) {
+        Message.success(this.className + msg, title);
+    };
 
-        static$0.success = function(msg, title) {
-            title = title || '成功';
-            toastr.success((this.className || '') + msg, title);
-        };
+    static$0.success = function(msg, title) {
+        title = title || '成功';
+        toastr.success((this.className || '') + msg, title);
+    };
 
-        proto$0.info = function(msg, title) {
-            Message.info(this.className + msg, title);
-        };
+    proto$0.info = function(msg, title) {
+        Message.info(this.className + msg, title);
+    };
 
-        static$0.info = function(msg, title) {
-            title = title || '消息';
-            toastr.info((this.className || '') + msg, title);
-        };
+    static$0.info = function(msg, title) {
+        title = title || '消息';
+        toastr.info((this.className || '') + msg, title);
+    };
 
-        proto$0.warning = function(msg, title) {
-            Message.warning(this.className + msg, title);
-        };
+    proto$0.warning = function(msg, title) {
+        Message.warning(this.className + msg, title);
+    };
 
-        static$0.warning = function(msg, title) {
-            title = title || '警告';
-            toastr.warning(msg, title);
-        };
+    static$0.warning = function(msg, title) {
+        title = title || '警告';
+        toastr.warning(msg, title);
+    };
 
-        proto$0.error = function(msg, title) {
-            Message.error(this.className + msg, title);
-        };
+    proto$0.error = function(msg, title) {
+        Message.error(this.className + msg, title);
+    };
 
-        static$0.error = function(msg, title) {
-            title = title || '错误';
-            toastr.error(msg, title);
-        };
-    MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
+    static$0.error = function(msg, title) {
+        title = title || '错误';
+        toastr.error(msg, title);
+    };
+MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
 
-    var MessageProvider = (function(){"use strict";function MessageProvider() {}DP$0(MessageProvider,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
+var MessageProvider = (function(){"use strict";function MessageProvider() {}DP$0(MessageProvider,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
 
-        proto$0.setPostion = function(v, h) {
-            toastr.options.positionClass = 'toast-' + v + '-' + h;
-        };
+    proto$0.setPostion = function(v, h) {
+        toastr.options.positionClass = 'toast-' + v + '-' + h;
+    };
 
-        proto$0.$get = function() {
-            return Message;
-        };
-    MIXIN$0(MessageProvider.prototype,proto$0);proto$0=void 0;return MessageProvider;})();
+    proto$0.$get = function() {
+        return Message;
+    };
+MIXIN$0(MessageProvider.prototype,proto$0);proto$0=void 0;return MessageProvider;})();
 
-    /**
-     * 导出
-     */
-    angular.module('admin.service')
-        .provider('msg', MessageProvider)
-        .provider('Message', MessageProvider);
-})();
-
+/**
+ * 导出
+ */
+angular.module('admin.service')
+    .provider('msg', MessageProvider)
+    .provider('Message', MessageProvider);
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5422,34 +5416,84 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiStateButton', function () {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: function (scope, element, attrs, ctr, transclude) {
-                var c = transclude().text(),
-                    clickHandlerName = attrs;
-                element.html(c);
-                if(clickHandlerName){
-                    element.click(function(){
-                        element.prop('disabled', true);
-                        var r = scope[clickHandlerName]();
-                        if(r.finally){
-                            r.finally(function(){
-                                element.prop('disabled', false);
-                            });
-                        }
-                        else{
-                            element.prop('disabled', false);
-                        }
-                    });
-                }
-            },
-            template: 'tpl.button.state'
+(function () {
+
+    var UIStateButton = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIStateButton, super$0);var proto$0={};
+        function UIStateButton(scope, element, attrs) {
+            this.scope = scope;
+            this.element = element;
+            this.attrs = attrs;
+            this.logger = new Logger('uiStateButton');
+            this.message = new Message('uiStateButton');
+        }if(super$0!==null)SP$0(UIStateButton,super$0);UIStateButton.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIStateButton,"configurable":true,"writable":true}});DP$0(UIStateButton,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+        proto$0.init = function() {var this$0 = this;
+            if (!this.scope.clickHandler) {
+                this.message.error('必须设置ng-click属性');
+            }
+            this.element.click(function()  {
+                this$0.disable(true);
+                var result = this$0.scope.clickHandler();
+                this$0.wait(result);
+            });
         };
-    });
+
+        proto$0.wait = function(result) {var this$0 = this;
+            if (result && result.finally) {
+                result.finally(function()  {return this$0.disable(false)});
+            }
+            else {
+                this.disable(false);
+            }
+        };
+
+        proto$0.disable = function(isD) {
+            //
+            if(this.scope.target){
+                Me
+            }
+
+            //
+            this.element.prop('disabled', isD);
+        };
+    MIXIN$0(UIStateButton.prototype,proto$0);proto$0=void 0;return UIStateButton;})(Event);
+
+    angular.module('admin.component')
+        .directive('uiStateButton', function () {
+            return {
+                restrict: 'E',
+                replace: true,
+                transclude: true,
+                scope: {
+                    target: '@target',
+                    clickHandler: '&ngClick'
+                },
+                link: function (scope, element, attrs, ctr, transclude) {
+                    var button = new UIStateButton(scope, element, attrs);
+                    button.init();
+
+                    var c = transclude().text(),
+                        clickHandlerName = attrs;
+                    element.html(c);
+                    if (clickHandlerName) {
+                        element.click(function () {
+                            element.prop('disabled', true);
+                            var r = scope[clickHandlerName]();
+                            if (r.finally) {
+                                r.finally(function () {
+                                    element.prop('disabled', false);
+                                });
+                            }
+                            else {
+                                element.prop('disabled', false);
+                            }
+                        });
+                    }
+                },
+                template: 'tpl.button.state'
+            };
+        });
+})();
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -7017,7 +7061,7 @@ angular.module('admin.component')
             /**
              *
              */
-            componentHelper.setTemplate('tpl.button.state', '<button type="button" class="btn"></button>');
+            componentHelper.setTemplate('tpl.button.state', '<button type="button" class="btn" ng-transclude></button>');
 
         });
 })(jQuery);

@@ -8,10 +8,45 @@
     * template   custom control template
     * admin.js   entry file
 
+## configuration
+```javascript
+.config((AjaxProvider, MessageProvider) => {
+    //
+    // ajax 默认返回处理
+    //
+    AjaxProvider.setSuccessHandler((result) => result.type == 1 ? result.data : null);
+    AjaxProvider.setFailHandler((result) => result.type != 1 ? result.data : null);
+
+    //
+    // 通知位置
+    //
+    MessageProvider.setPostion('bottom', 'right');
+});
+```
+
+## 控制
+
+* ```<ui-state-button class="btn-danger" ng-click="" target="">点击</ui-state-button>```
+    * ngClick 是controller里面的方法, 可以返回pormise方法
+    * target 如果设置, 点击会锁屏幕, css3表达式
+
+## 图表
+
+## 容器
+
+## 表单
+
+## 查询
+
+## 表格
+
+## 树
+
+## 弹出框
 
 ## component list
 ![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/docs/components.jpg)
-
+    
 ## template list
 ![Image text](https://raw.githubusercontent.com/binlaniua/AngularAdmin/master/demo/docs/template.jpg)
 
