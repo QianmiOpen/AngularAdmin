@@ -29,93 +29,90 @@ angular.module('admin.filter')
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.service', []);
 
-//-----------------------------------------------------------------------------------------------
+var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};//-----------------------------------------------------------------------------------------------
 //
 //
 //
 //
 //
 //-----------------------------------------------------------------------------------------------
-(function ($) {var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};
+var Ajax = (function(){"use strict";var proto$0={};
+    function Ajax(q, Message, util, logger, provider) {
+        this.q = q;
+        this.msg = new Message("Ajax");
+        this.util = util;
+        this.provder = provider;
+        this.logger = new logger('Ajax');
+    }DP$0(Ajax,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
-    var Ajax = (function(){"use strict";var proto$0={};
-        function Ajax(q, Message, util, logger, provider) {
-            this.q = q;
-            this.msg = new Message("Ajax");
-            this.util = util;
-            this.provder = provider;
-            this.logger = new logger('Ajax');
-        }DP$0(Ajax,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-        proto$0._execute = function(method, url, data) {var this$0 = this;
-            var defer = this.q.defer();
-            $.ajax({
-                url: url, cache: false, data: data, type: method, dataType: 'json',
-                success: function(resData)  {
-                    var success = this$0.provider.successHandler(resData),
-                        error = this$0.provder.failHandler(resData);
-                    if (success) {
-                        defer.resolve(success);
-                    }
-                    else {
-                        defer.resolve(error);
-                    }
-                },
-                error: function(xhr, status)  {
-                    var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
-                    this$0.msg.error(errMsg || '服务器出现了问题,请稍后重试');
+    proto$0._execute = function(method, url, data) {var this$0 = this;
+        var defer = this.q.defer();
+        $.ajax({
+            url: url, cache: false, data: data, type: method, dataType: 'json',
+            success: function(resData)  {
+                var success = this$0.provider.successHandler(resData),
+                    error = this$0.provder.failHandler(resData);
+                if (success) {
+                    defer.resolve(success);
                 }
-            });
-            return defer.promise;
-        };
+                else {
+                    defer.resolve(error);
+                }
+            },
+            error: function(xhr, status)  {
+                var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
+                this$0.msg.error(errMsg || '服务器出现了问题,请稍后重试');
+            }
+        });
+        return defer.promise;
+    };
 
-        proto$0.get = function(url, data) {
-            return this._execute('GET', url, data);
-        };
+    proto$0.get = function(url, data) {
+        return this._execute('GET', url, data);
+    };
 
-        proto$0.post = function(url, data) {
-            return this._execute('POST', url, data);
-        };
+    proto$0.post = function(url, data) {
+        return this._execute('POST', url, data);
+    };
 
-        proto$0.message = function(url, data, successMsg, failMsg) {var this$0 = this;
-            return this.post(url, data)
-                .then(function()  {return this$0.msg.success(successMsg)})
-                .catch(function()  {return this$0.msg.error(failMsg)});
-        };
+    proto$0.message = function(url, data, successMsg, failMsg) {var this$0 = this;
+        return this.post(url, data)
+            .then(function()  {return this$0.msg.success(successMsg)})
+            .catch(function()  {return this$0.msg.error(failMsg)});
+    };
 
-        proto$0.add = function(url, data) {
-            return this.message(url, data, '添加数据成功', '添加数据失败');
-        };
+    proto$0.add = function(url, data) {
+        return this.message(url, data, '添加数据成功', '添加数据失败');
+    };
 
-        proto$0.update = function(url, data) {
-            return this.message(url, data, '更新数据成功', '更新数据失败');
-        };
+    proto$0.update = function(url, data) {
+        return this.message(url, data, '更新数据成功', '更新数据失败');
+    };
 
-        proto$0.remove = function(url, data, options) {var this$0 = this;
-            return this.util.confirm((("您确认删除该" + (options.label || '数据')) + "吗?"))
-                .then(function()  {return this$0.message(url, data, '删除数据成功', '删除数据失败')});
-        };
-    MIXIN$0(Ajax.prototype,proto$0);proto$0=void 0;return Ajax;})();
+    proto$0.remove = function(url, data, options) {var this$0 = this;
+        return this.util.confirm((("您确认删除该" + (options.label || '数据')) + "吗?"))
+            .then(function()  {return this$0.message(url, data, '删除数据成功', '删除数据失败')});
+    };
+MIXIN$0(Ajax.prototype,proto$0);proto$0=void 0;return Ajax;})();
 
-    var AjaxProvider = (function(){"use strict";function AjaxProvider() {}DP$0(AjaxProvider,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
+var AjaxProvider = (function(){"use strict";function AjaxProvider() {}DP$0(AjaxProvider,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
 
-        proto$0.setSuccessHandler = function(handler) {
-            this.successHandler = handler;
-        };
+    proto$0.setSuccessHandler = function(handler) {
+        this.successHandler = handler;
+    };
 
-        proto$0.setFailHandler = function(handler) {
-            this.failHandler = handler;
-        };
+    proto$0.setFailHandler = function(handler) {
+        this.failHandler = handler;
+    };
 
-        proto$0.$get = function($q, Message, util, Logger) {
-            return new Ajax($q, Message, util, Logger, this);
-        };
-    MIXIN$0(AjaxProvider.prototype,proto$0);proto$0=void 0;return AjaxProvider;})();
+    proto$0.$get = function($q, Message, util, Logger) {
+        return new Ajax($q, Message, util, Logger, this);
+    };
+MIXIN$0(AjaxProvider.prototype,proto$0);proto$0=void 0;return AjaxProvider;})();
 
-    angular.module('admin.service')
-        .provider('ajax', AjaxProvider)
-        .provider('Ajax', AjaxProvider);
-})(jQuery);
+angular.module('admin.service')
+    .provider('ajax', AjaxProvider)
+    .provider('Ajax', AjaxProvider);
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -549,32 +546,28 @@ angular.module('admin.service')
 //
 //
 //-----------------------------------------------------------------------------------------------
-(function () {
+var Event = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var proto$0={};
+    function Event() {
+        this.listenerMap = {};
+    }DP$0(Event,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
-    var Event = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var proto$0={};
-        function Event() {
-            this.listenerMap = {};
-        }DP$0(Event,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+    proto$0.$on = function(evtName, fn) {
+        var list = this.listenerMap[evtName] || [];
+        list.push(fn);
+        this.listenerMap[evtName] = list;
+    };
 
-        proto$0.$on = function(evtName, fn) {
-            var list = this.listenerMap[evtName] || [];
-            list.push(fn);
-            this.listenerMap[evtName] = list;
-        };
+    proto$0.$emit = function(evtName) {
+        var list = this.listenerMap[evtName] || [],
+            args = Array.prototype.slice.call(arguments, 1);
+        $.each(list, function (index, fn) {
+            fn.apply(this, args);
+        }.bind(this));
+    };
+MIXIN$0(Event.prototype,proto$0);proto$0=void 0;return Event;})();
 
-        proto$0.$emit = function(evtName) {
-            var list = this.listenerMap[evtName] || [],
-                args = Array.prototype.slice.call(arguments, 1);
-            $.each(list, function (index, fn) {
-                fn.apply(this, args);
-            }.bind(this));
-        };
-    MIXIN$0(Event.prototype,proto$0);proto$0=void 0;return Event;})();
-
-
-    angular.module('admin.service')
-        .service('Event', Event);
-})();
+angular.module('admin.service')
+    .service('Event', Event);
 (function () {
     if (!window.Handlebars) {
         return;
@@ -654,7 +647,7 @@ angular.module('admin.service')
 
     angular.module('admin.service')
         .service('logger', function()  {return Logger})
-        .service('Logger', function()  {return Logger})
+        .service('Logger', function()  {return Logger});
 })();
 //-----------------------------------------------------------------------------------------------
 //
@@ -752,92 +745,90 @@ angular.module('admin.service')
 //
 //-----------------------------------------------------------------------------------------------
 (function () {
+    var Pagination = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(Pagination, super$0);var proto$0={};
+        function Pagination(url, index, size, pageLimit, dataName, totalName) {
+            this.url = url;
+            this.pageIndex = parseInt(index || 0);
+            this.pageSize = parseInt(size || 10);
+            this.maxPage = 0;
+            this.pageLimit = parseInt(pageLimit || 10);
+            this.dataName = dataName || 'data';
+            this.totalName = totalName || 'total';
+            this.ajax = new Ajax();
+        }if(super$0!==null)SP$0(Pagination,super$0);Pagination.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":Pagination,"configurable":true,"writable":true}});DP$0(Pagination,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+        proto$0.load = function() {
+            var self = this;
+            return this.ajax
+                .post(this.url, {pageIndex: this.pageIndex, pageSize: this.pageSize})
+                .then(function (r) {
+                    return self.analyze(r);
+                });
+        };
+
+        proto$0.analyze = function(r) {
+            var total = r[this.totalName],
+                to, s, e, pageList = [];
+            this.maxPage = Math.ceil(total / this.pageSize);
+            to = this.maxPage - (this.pageIndex + this.pageLimit);
+            if (to >= 0) { //够放
+                s = this.pageIndex;
+                e = s + this.pageLimit;
+            }
+            else { //不够放,往前移动
+                s = this.pageIndex - Math.abs(to);
+                s = s < 0 ? 0 : s;
+                e = this.pageIndex + (this.pageLimit - Math.abs(to));
+            }
+            //
+            //if(s - 1 >= 0 && e != this.maxPage){
+            //    s--;
+            //    e--;
+            //}
+
+            //
+            for (var i = s; i < e; i++) {
+                pageList.push({
+                    index: i + 1,
+                    current: i == this.pageIndex
+                });
+            }
+            return $.extend(r, {
+                dataList: r[this.dataName],
+                pageList: pageList,
+                isFirst: this.pageIndex === 0,
+                isLast: this.pageIndex == this.maxPage - 1
+            });
+        };
+
+        proto$0.prePage = function() {
+            this.pageIndex--;
+            this.pageIndex = this.pageIndex < 0 ? 0 : this.pageIndex;
+            return this.getPage(this.pageIndex);
+        };
+
+        proto$0.nextPage = function() {
+            this.pageIndex++;
+            this.pageIndex = this.pageIndex > this.maxPage - 1 ? (this.maxPage - 1) : this.pageIndex;
+            return this.getPage(this.pageIndex);
+        };
+
+        proto$0.firstPage = function() {
+            return this.getPage(0);
+        };
+
+        proto$0.lastPage = function() {
+            return this.getPage(this.maxPage);
+        };
+
+        proto$0.getPage = function(pageIndex) {
+            this.pageIndex = pageIndex;
+            return this.load();
+        };
+    MIXIN$0(Pagination.prototype,proto$0);proto$0=void 0;return Pagination;})(Event);
+
     angular.module('admin.service')
-        .factory('PaginationFactory', function (Event, Ajax) {
-
-            var Pagination = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(Pagination, super$0);var proto$0={};
-                function Pagination(url, index, size, pageLimit, dataName, totalName) {
-                    this.url = url;
-                    this.pageIndex = parseInt(index || 0);
-                    this.pageSize = parseInt(size || 10);
-                    this.maxPage = 0;
-                    this.pageLimit = parseInt(pageLimit || 10);
-                    this.dataName = dataName || 'data';
-                    this.totalName = totalName || 'total';
-                }if(super$0!==null)SP$0(Pagination,super$0);Pagination.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":Pagination,"configurable":true,"writable":true}});DP$0(Pagination,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-                proto$0.load = function() {
-                    var self = this;
-                    return Ajax
-                        .post(this.url, {pageIndex: this.pageIndex, pageSize: this.pageSize})
-                        .then(function (r) {
-                            return self.analyze(r);
-                        });
-                };
-
-                proto$0.analyze = function(r) {
-                    var total = r[this.totalName],
-                        to, s, e, pageList = [];
-                    this.maxPage = Math.ceil(total / this.pageSize);
-                    to = this.maxPage - (this.pageIndex + this.pageLimit);
-                    if (to >= 0) { //够放
-                        s = this.pageIndex;
-                        e = s + this.pageLimit;
-                    }
-                    else { //不够放,往前移动
-                        s = this.pageIndex - Math.abs(to);
-                        s = s < 0 ? 0 : s;
-                        e = this.pageIndex + (this.pageLimit - Math.abs(to));
-                    }
-                    //
-                    //if(s - 1 >= 0 && e != this.maxPage){
-                    //    s--;
-                    //    e--;
-                    //}
-
-                    //
-                    for (var i = s; i < e; i++) {
-                        pageList.push({
-                            index: i + 1,
-                            current: i == this.pageIndex
-                        });
-                    }
-                    return $.extend(r, {
-                        dataList: r[this.dataName],
-                        pageList: pageList,
-                        isFirst: this.pageIndex === 0,
-                        isLast: this.pageIndex == this.maxPage - 1
-                    });
-                };
-
-                proto$0.prePage = function() {
-                    this.pageIndex--;
-                    this.pageIndex = this.pageIndex < 0 ? 0 : this.pageIndex;
-                    return this.getPage(this.pageIndex);
-                };
-
-                proto$0.nextPage = function() {
-                    this.pageIndex++;
-                    this.pageIndex = this.pageIndex > this.maxPage - 1 ? (this.maxPage - 1) : this.pageIndex;
-                    return this.getPage(this.pageIndex);
-                };
-
-                proto$0.firstPage = function() {
-                    return this.getPage(0);
-                };
-
-                proto$0.lastPage = function() {
-                    return this.getPage(this.maxPage);
-                };
-
-                proto$0.getPage = function(pageIndex) {
-                    this.pageIndex = pageIndex;
-                    return this.load();
-                };
-            MIXIN$0(Pagination.prototype,proto$0);proto$0=void 0;return Pagination;})(Event);;
-
-            return Pagination;
-        });
+        .service('PaginationFactory', Pagination);
 })();
 //-----------------------------------------------------------------------------------------------
 //
@@ -847,216 +838,206 @@ angular.module('admin.service')
 //
 //-----------------------------------------------------------------------------------------------
 (function () {
-    angular.module('admin.service')
-        .factory('ShortcutFactory', function ($window, $timeout) {
-            var keyboardManagerService = {};
 
-            var defaultOpt = {
-                'type': 'keydown',
-                'propagate': false,
-                'inputDisabled': false,
-                'target': $window.document,
-                'keyCode': false
+    var defaultOpt = {
+        'type': 'keydown',
+        'propagate': false,
+        'inputDisabled': false,
+        'keyCode': false
+    };
+
+    var shift_nums = {
+        "`": "~",
+        "1": "!",
+        "2": "@",
+        "3": "#",
+        "4": "$",
+        "5": "%",
+        "6": "^",
+        "7": "&",
+        "8": "*",
+        "9": "(",
+        "0": ")",
+        "-": "_",
+        "=": "+",
+        ";": ":",
+        "'": "\"",
+        ",": "<",
+        ".": ">",
+        "/": "?",
+        "\\": "|"
+    };
+    var special_keys = {
+        'esc': 27,
+        'escape': 27,
+        'tab': 9,
+        'space': 32,
+        'return': 13,
+        'enter': 13,
+        'backspace': 8,
+
+        'scrolllock': 145,
+        'scroll_lock': 145,
+        'scroll': 145,
+        'capslock': 20,
+        'caps_lock': 20,
+        'caps': 20,
+        'numlock': 144,
+        'num_lock': 144,
+        'num': 144,
+
+        'pause': 19,
+        'break': 19,
+
+        'insert': 45,
+        'home': 36,
+        'delete': 46,
+        'end': 35,
+
+        'pageup': 33,
+        'page_up': 33,
+        'pu': 33,
+
+        'pagedown': 34,
+        'page_down': 34,
+        'pd': 34,
+
+        'left': 37,
+        'up': 38,
+        'right': 39,
+        'down': 40,
+
+        'f1': 112,
+        'f2': 113,
+        'f3': 114,
+        'f4': 115,
+        'f5': 116,
+        'f6': 117,
+        'f7': 118,
+        'f8': 119,
+        'f9': 120,
+        'f10': 121,
+        'f11': 122,
+        'f12': 123
+    };
+
+    var Shortcut = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var proto$0={};
+        function Shortcut($window, $timeout) {
+            this.window = $window;
+            this.timeout = $timeout;
+            this.keyboardEvent = {};
+        }DP$0(Shortcut,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+        proto$0.bind = function(label, callback, opt) {
+            opt = $.extend({}, defaultOpt, opt);
+            label = label.toLowerCase();
+            var el = opt && opt.target ? opt.target : this.window.document;
+            this.keyboardEvent[label] = {
+                callback: this.handler,
+                target: el,
+                event: opt['type'],
+                opt: opt
             };
+            $(el).bind(opt.type, this.handler.bind(this, callback, label));
+        };
+
+        proto$0.unbind = function(label) {
+            label = label.toLowerCase();
+            var binding = this.keyboardEvent[label];
+            delete(this.keyboardEvent[label]);
+            if (!binding)
+                return;
+            var type = binding['event'],
+                elt = binding['target'],
+                callback = binding['callback'];
+            $(elt).unbind(type, callback);
+        };
+
+        proto$0.handler = function(callback, label, evt) {
+            var opt = this.keyboardEvent[label];
+
+            //输入框不监听
+            if (opt.inputDisabled) {
+                var elt = evt.target;
+                if (elt.tagName == 'INPUT' || elt.tagName == 'TEXTAREA') return;
+            }
 
             //
-            keyboardManagerService.keyboardEvent = {};
-            keyboardManagerService.bind = function (label, callback, opt) {
-                var fct, elt, code, k;
-                opt = angular.extend({}, defaultOpt, opt);
-                label = label.toLowerCase();
-                elt = opt.target;
-                if (typeof opt.target == 'string') elt = document.getElementById(opt.target);
+            var character = String.fromCharCode(evt.keyCode).toLowerCase();
+            if (code == 188)
+                character = ",";
+            if (code == 190)
+                character = ".";
 
-                fct = function (e) {
-                    e = e || $window.event;
+            //
+            var keys = label.split("+");
+            var kp = 0;
 
-                    //表单输入框放弃
-                    if (opt['inputDisabled']) {
-                        var elt;
-                        if (e.target) elt = e.target;
-                        else if (e.srcElement) elt = e.srcElement;
-                        if (elt.nodeType == 3) elt = elt.parentNode;
-                        if (elt.tagName == 'INPUT' || elt.tagName == 'TEXTAREA') return;
-                    }
+            //
+            var modifiers = {
+                shift: {
+                    wanted: false,
+                    pressed: evt.shiftKey ? true : false
+                },
+                ctrl: {
+                    wanted: false,
+                    pressed: evt.ctrlKey ? true : false
+                },
+                alt: {
+                    wanted: false,
+                    pressed: evt.altKey ? true : false
+                }
+            };
+            for (var i = 0, l = keys.length, k; k = keys[i], i < l; i++) {
+                switch (k) {
+                    case 'ctrl':
+                    case 'control':
+                        kp++;
+                        modifiers.ctrl.wanted = true;
+                        break;
+                    case 'shift':
+                    case 'alt':
+                    case 'meta':
+                        kp++;
+                        modifiers[k].wanted = true;
+                        break;
+                }
 
-                    // 找按键
-                    if (e.keyCode) code = e.keyCode;
-                    else if (e.which) code = e.which;
-                    var character = String.fromCharCode(code).toLowerCase();
-
-                    if (code == 188) character = ",";
-                    if (code == 190) character = ".";
-
-                    var keys = label.split("+");
-                    var kp = 0;
-                    var shift_nums = {
-                        "`": "~",
-                        "1": "!",
-                        "2": "@",
-                        "3": "#",
-                        "4": "$",
-                        "5": "%",
-                        "6": "^",
-                        "7": "&",
-                        "8": "*",
-                        "9": "(",
-                        "0": ")",
-                        "-": "_",
-                        "=": "+",
-                        ";": ":",
-                        "'": "\"",
-                        ",": "<",
-                        ".": ">",
-                        "/": "?",
-                        "\\": "|"
-                    };
-                    var special_keys = {
-                        'esc': 27,
-                        'escape': 27,
-                        'tab': 9,
-                        'space': 32,
-                        'return': 13,
-                        'enter': 13,
-                        'backspace': 8,
-
-                        'scrolllock': 145,
-                        'scroll_lock': 145,
-                        'scroll': 145,
-                        'capslock': 20,
-                        'caps_lock': 20,
-                        'caps': 20,
-                        'numlock': 144,
-                        'num_lock': 144,
-                        'num': 144,
-
-                        'pause': 19,
-                        'break': 19,
-
-                        'insert': 45,
-                        'home': 36,
-                        'delete': 46,
-                        'end': 35,
-
-                        'pageup': 33,
-                        'page_up': 33,
-                        'pu': 33,
-
-                        'pagedown': 34,
-                        'page_down': 34,
-                        'pd': 34,
-
-                        'left': 37,
-                        'up': 38,
-                        'right': 39,
-                        'down': 40,
-
-                        'f1': 112,
-                        'f2': 113,
-                        'f3': 114,
-                        'f4': 115,
-                        'f5': 116,
-                        'f6': 117,
-                        'f7': 118,
-                        'f8': 119,
-                        'f9': 120,
-                        'f10': 121,
-                        'f11': 122,
-                        'f12': 123
-                    };
-                    var modifiers = {
-                        shift: {
-                            wanted: false,
-                            pressed: e.shiftKey ? true : false
-                        },
-                        ctrl: {
-                            wanted: false,
-                            pressed: e.ctrlKey ? true : false
-                        },
-                        alt: {
-                            wanted: false,
-                            pressed: e.altKey ? true : false
-                        },
-                        meta: { //Meta is Mac specific
-                            wanted: false,
-                            pressed: e.metaKey ? true : false
-                        }
-                    };
-                    for (var i = 0, l = keys.length; k = keys[i], i < l; i++) {
-                        switch (k) {
-                            case 'ctrl':
-                            case 'control':
-                                kp++;
-                                modifiers.ctrl.wanted = true;
-                                break;
-                            case 'shift':
-                            case 'alt':
-                            case 'meta':
-                                kp++;
-                                modifiers[k].wanted = true;
-                                break;
-                        }
-
-                        if (k.length > 1) {
-                            if (special_keys[k] == code) kp++;
-                        } else if (opt['keyCode']) {
-                            if (opt['keyCode'] == code) kp++;
-                        } else {
+                if (k.length > 1) {
+                    if (special_keys[k] == code) kp++;
+                } else if (opt['keyCode']) {
+                    if (opt['keyCode'] == code) kp++;
+                } else {
+                    if (character == k) kp++;
+                    else {
+                        if (shift_nums[character] && e.shiftKey) {
+                            character = shift_nums[character];
                             if (character == k) kp++;
-                            else {
-                                if (shift_nums[character] && e.shiftKey) {
-                                    character = shift_nums[character];
-                                    if (character == k) kp++;
-                                }
-                            }
                         }
                     }
+                }
+            }
 
-                    if (kp == keys.length &&
-                        modifiers.ctrl.pressed == modifiers.ctrl.wanted &&
-                        modifiers.shift.pressed == modifiers.shift.wanted &&
-                        modifiers.alt.pressed == modifiers.alt.wanted &&
-                        modifiers.meta.pressed == modifiers.meta.wanted) {
-                        $timeout(function () {
-                            callback(e);
-                        }, 1);
+            if (kp == keys.length &&
+                modifiers.ctrl.pressed == modifiers.ctrl.wanted &&
+                modifiers.shift.pressed == modifiers.shift.wanted &&
+                modifiers.alt.pressed == modifiers.alt.wanted &&
+                modifiers.meta.pressed == modifiers.meta.wanted) {
+                this.timeout(function () {
+                    callback(e);
+                }, 1);
 
-                        if (!opt['propagate']) {
-                            e.cancelBubble = true;
-                            e.returnValue = false;
+                if (opt.propagation) {
+                    evt.stopPropagation();
+                }
+            }
 
-                            if (e.stopPropagation) {
-                                e.stopPropagation();
-                                e.preventDefault();
-                            }
-                            return false;
-                        }
-                    }
+        };
+    MIXIN$0(Shortcut.prototype,proto$0);proto$0=void 0;return Shortcut;})();
 
-                };
-                keyboardManagerService.keyboardEvent[label] = {
-                    'callback': fct,
-                    'target': elt,
-                    'event': opt['type']
-                };
-                if (elt.addEventListener) elt.addEventListener(opt['type'], fct, false);
-                else if (elt.attachEvent) elt.attachEvent('on' + opt['type'], fct);
-                else elt['on' + opt['type']] = fct;
-            };
-            keyboardManagerService.unbind = function (label) {
-                label = label.toLowerCase();
-                var binding = keyboardManagerService.keyboardEvent[label];
-                delete(keyboardManagerService.keyboardEvent[label]);
-                if (!binding) return;
-                var type = binding['event'],
-                    elt = binding['target'],
-                    callback = binding['callback'];
-                if (elt.detachEvent) elt.detachEvent('on' + type, callback);
-                else if (elt.removeEventListener) elt.removeEventListener(type, callback, false);
-                else elt['on' + type] = false;
-            };
-            return keyboardManagerService;
-        });
+
+    angular.module('admin.service')
+        .factory('ShortcutFactory', Shortcut);
 })();
 //-----------------------------------------------------------------------------------------------
 //

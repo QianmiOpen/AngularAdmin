@@ -34,5 +34,5 @@
 
     angular.module('admin.service')
         .service('logger', () => Logger)
-        .service('Logger', () => Logger)
+        .service('Logger', () => Logger);
 })();
