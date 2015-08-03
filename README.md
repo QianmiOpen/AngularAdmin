@@ -29,6 +29,9 @@
 * ```<ui-state-button class="btn-danger" ng-click="" target="">点击</ui-state-button>```
     * ngClick 是controller里面的方法, 可以返回pormise方法
     * target 如果设置, 点击会锁屏幕, css3表达式
+* ```<ui-breadcrumb  datas="" url="" />```
+    * datas, [{name: .., url: ..}]
+    * url, 如果想远程加载设置这个, post请求
 
 ## 图表
 
