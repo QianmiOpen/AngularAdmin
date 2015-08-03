@@ -1394,24 +1394,6 @@ angular.module('admin.component')
         };
     });
 
-/**
- *
- */
-angular.module('admin.component')
-    .directive('uiScatterChart', function (uiChartFactory) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: false,
-            link: function(scope, element, attrs){
-                var chart = new uiChartFactory(scope, element, attrs);
-                chart.setType('line');
-            },
-            templateUrl: 'tpl.chart'
-        };
-    });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -1563,6 +1545,24 @@ angular.module('admin.component')
         };
         return Chart;
     });
+/**
+ *
+ */
+angular.module('admin.component')
+    .directive('uiScatterChart', function (uiChartFactory) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: false,
+            link: function(scope, element, attrs){
+                var chart = new uiChartFactory(scope, element, attrs);
+                chart.setType('line');
+            },
+            templateUrl: 'tpl.chart'
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5449,8 +5449,8 @@ angular.module('admin.component')
 
         proto$0.disable = function(isD) {
             //
-            if(this.scope.target){
-                Me
+            if (this.scope.target) {
+                Metronic[(("" + (isD ? '' : 'un')) + "blockUI")](this.scope.target);
             }
 
             //
@@ -5468,27 +5468,9 @@ angular.module('admin.component')
                     target: '@target',
                     clickHandler: '&ngClick'
                 },
-                link: function (scope, element, attrs, ctr, transclude) {
+                link: function (scope, element, attrs) {
                     var button = new UIStateButton(scope, element, attrs);
                     button.init();
-
-                    var c = transclude().text(),
-                        clickHandlerName = attrs;
-                    element.html(c);
-                    if (clickHandlerName) {
-                        element.click(function () {
-                            element.prop('disabled', true);
-                            var r = scope[clickHandlerName]();
-                            if (r.finally) {
-                                r.finally(function () {
-                                    element.prop('disabled', false);
-                                });
-                            }
-                            else {
-                                element.prop('disabled', false);
-                            }
-                        });
-                    }
                 },
                 template: 'tpl.button.state'
             };
@@ -5500,34 +5482,61 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiBreadcrumb', function () {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            template: function (el, attrs) {
-                var dataList = attrs.data.split(','),
-                    h = [];
-                for (var i = 0; i < dataList.length; i++) {
-                    var data = dataList[i].split(':');
-                    h.push([
-                        '<li>',
-                            '<a href="' + (data[1] || '#') + '">' + data[0] + '</a>',
-                            i != dataList.length - 1 ? '<i class="fa fa-angle-right"></i>' : '',
-                        '</li>'
-                    ].join(''));
-                }
-                return [
-                    '<div class="page-bar">',
-                        '<ul class="page-breadcrumb">',
-                            h.join(''),
-                        '</ul>',
-                    '</div>'
-                ].join('');
+(function () {
+
+    var UIBreadcrumb = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIBreadcrumb, super$0);var proto$0={};
+        function UIBreadcrumb(scope) {
+            this.scope = scope;
+            this.message = new Message('uiBreadcrumb');
+            this.ajax = new Ajax();
+        }if(super$0!==null)SP$0(UIBreadcrumb,super$0);UIBreadcrumb.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIBreadcrumb,"configurable":true,"writable":true}});DP$0(UIBreadcrumb,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+        proto$0.init = function() {var this$0 = this;
+            if (this.scope.datas) {
+                this.handler(this.scope.datas);
+            }
+            else if (this.scope.url) {
+                this.ajax.post(this.scope.url).then(function(datas)  {return this$0.handler(datas)});
+            }
+            else {
+                this.message.error("至少设置data或者url来配置面包屑");
             }
         };
-    });
+
+        proto$0.handler = function(dataList) {
+            this.scope.items = (dataList || []).map(function(item)  {
+                return {name: item.name ? item.name : item, url: item.url ? item.url : ''};
+            });
+        };
+    MIXIN$0(UIBreadcrumb.prototype,proto$0);proto$0=void 0;return UIBreadcrumb;})(Event);
+
+
+    angular.module('admin.component')
+        .directive('uiBreadcrumb', function () {
+            return {
+                restrict: 'E',
+                replace: true,
+                transclude: true,
+                scope: {
+                    datas: '@',
+                    url: '@'
+                },
+                link: function (scope) {
+                    new UIBreadcrumb(scope).init();
+                },
+                template: ("\
+\n                    <div class=\"page-bar\">\
+\n                        <ul class=\"page-breadcrumb\">\
+\n                            <li ng-repeat=\"item in items\">\
+\n                                <a ng-href=\"item.url\" ng-bind=\"item.name\"></a>\
+\n                                <i ng-if=\"!last\" class=\"fa fa-angle-right\"></li>\
+\n                            </li>\
+\n                        </ul>\
+\n                    </div>\
+\n                ")
+            };
+        });
+})();
 //-----------------------------------------------------------------------------------------------
 //
 //
