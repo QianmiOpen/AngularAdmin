@@ -8,7 +8,7 @@
     * template   custom control template
     * admin.js   entry file
 
-## configuration
+## 配置项
 ```javascript
 .config((AjaxProvider, MessageProvider) => {
     //
@@ -36,6 +36,9 @@
 ## 图表
 
 ## 容器
+
+* ```<ui-container controller="" />```
+    * controller, 可以angular.module('').controller或者function xxCtrl两种, 该组件主要是等待子组件全部完毕后才会调用controller
 
 ## 表单
 

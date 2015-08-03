@@ -4,51 +4,69 @@
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiContainer', function ($timeout, $controller, $injector) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: false,
-            controller: function ($scope, $attrs, $element, $transclude) {
-                $scope.$on('componentComplete', function (evt, o) {
-                    if (o) {
-                        $scope[o.ref] = o.component;
-                    }
-                });
-                if($attrs.sameScope !== undefined){
-                    $element.append($transclude($scope));
+(function () {
+
+    angular.module('admin.component')
+        .directive('uiContainer', function ($timeout, $controller, $injector) {
+
+            class UIContainer extends Event {
+
+                constructor(scope, element, $transclude) {
+                    this.scope = scope;
+                    this.element = element;
+                    this.content = $transclude(scope);
+                    this.scope.$on('componentComplete', this.initHandler.bind(this));
                 }
-            },
-            link: function (scope, element, attrs) {
-                element.show();
-                $timeout(function(){
-                    if (attrs.controller && window[attrs.controller]) {
-                        var ctrlArgs = /\(([^\)]+)\)/.exec(window[attrs.controller].toString())[1],
-                            args = {$scope: scope};
-                        ctrlArgs = ctrlArgs.split(',');
-                        for (var i = 1, arg; i < ctrlArgs.length; i++) {
-                            arg = $.trim(ctrlArgs[i]);
-                            args[arg] = $injector.get(arg);
+
+                init() {
+                    this.element
+                        .show()
+                        .append(this.content);
+
+                    this.lazyInit();
+                }
+
+                lazyInit() {
+                    var ctrl = this.scope.controller;
+                    $timeout(() => {
+                        // 全局定义
+                        if (ctrl && window[ctrl]) {
+                            var ctrlArgs = /\(([^\)]+)\)/.exec(window[ctrl].toString())[1],
+                                args = {$scope: this.scope};
+                            ctrlArgs = ctrlArgs.split(',');
+                            for (var i = 1, arg; i < ctrlArgs.length; i++) {
+                                arg = $.trim(ctrlArgs[i]);
+                                args[arg] = $injector.get(arg);
+                            }
+                            $controller(window[ctrl], args);
                         }
-                        $controller(window[attrs.controller], args);
-                    }
-                    else if(attrs.controller){
-                        $controller(attrs.controller, {$scope: scope});
-                    }
-                    else {
-                        scope.$emit('uicontainer.ready'); // 触发
-                    }
-                });
-            },
-            template: function (elemet, attrs) {
-                if(attrs.sameScope !== undefined){
-                    return '<div></div>';
+                        //
+                        else if (ctrl) {
+                            $controller(ctrl, {$scope: this.scope});
+                        }
+                        this.scope.$emit('uicontainer.ready'); // 触发
+                    });
                 }
-                else{
-                    return '<div ng-transclude></div>';
+
+                initHandler(evt, args) {
+                    if (args)
+                        this.scope[args.ref] = args.component;
                 }
             }
-        };
-    });
+
+            return {
+                restrict: 'E',
+                replace: true,
+                transclude: true,
+                scope: {
+                    controller: '@'
+                },
+                link: function (scope, element, attrs, ctrl, tranclude) {
+                    new UIContainer(scope, element, tranclude).init();
+                },
+                template: `
+                    <div></div>
+                `
+            };
+        });
+})();

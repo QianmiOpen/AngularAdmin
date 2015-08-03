@@ -6,12 +6,11 @@
 //
 //-----------------------------------------------------------------------------------------------
 class Ajax {
-    constructor(q, Message, util, logger, provider) {
+    constructor(q, util, provider) {
         this.q = q;
         this.msg = new Message("Ajax");
         this.util = util;
         this.provder = provider;
-        this.logger = new logger('Ajax');
     }
 
     _execute(method, url, data) {
@@ -74,8 +73,8 @@ class AjaxProvider {
         this.failHandler = handler;
     }
 
-    $get($q, Message, util, Logger) {
-        return new Ajax($q, Message, util, Logger, this);
+    $get($q, util) {
+        return new Ajax($q, util, this);
     }
 }
 

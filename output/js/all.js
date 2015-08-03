@@ -37,12 +37,11 @@ var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var
 //
 //-----------------------------------------------------------------------------------------------
 var Ajax = (function(){"use strict";var proto$0={};
-    function Ajax(q, Message, util, logger, provider) {
+    function Ajax(q, util, provider) {
         this.q = q;
         this.msg = new Message("Ajax");
         this.util = util;
         this.provder = provider;
-        this.logger = new logger('Ajax');
     }DP$0(Ajax,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
     proto$0._execute = function(method, url, data) {var this$0 = this;
@@ -105,8 +104,8 @@ var AjaxProvider = (function(){"use strict";function AjaxProvider() {}DP$0(AjaxP
         this.failHandler = handler;
     };
 
-    proto$0.$get = function($q, Message, util, Logger) {
-        return new Ajax($q, Message, util, Logger, this);
+    proto$0.$get = function($q, util) {
+        return new Ajax($q, util, this);
     };
 MIXIN$0(AjaxProvider.prototype,proto$0);proto$0=void 0;return AjaxProvider;})();
 
@@ -567,7 +566,7 @@ var Event = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={
 MIXIN$0(Event.prototype,proto$0);proto$0=void 0;return Event;})();
 
 angular.module('admin.service')
-    .service('Event', Event);
+    .service('Event', function()  {return Event});
 (function () {
     if (!window.Handlebars) {
         return;
@@ -1119,7 +1118,7 @@ angular.module('admin.service')
              * @param str
              */
             toJSON: function (str) {
-                return JSON.parse(str);
+                return eval((("(" + str) + ")"));
             },
 
             /**
@@ -1394,6 +1393,24 @@ angular.module('admin.component')
         };
     });
 
+/**
+ *
+ */
+angular.module('admin.component')
+    .directive('uiScatterChart', function (uiChartFactory) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: false,
+            link: function(scope, element, attrs){
+                var chart = new uiChartFactory(scope, element, attrs);
+                chart.setType('line');
+            },
+            templateUrl: 'tpl.chart'
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -1545,24 +1562,6 @@ angular.module('admin.component')
         };
         return Chart;
     });
-/**
- *
- */
-angular.module('admin.component')
-    .directive('uiScatterChart', function (uiChartFactory) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: false,
-            link: function(scope, element, attrs){
-                var chart = new uiChartFactory(scope, element, attrs);
-                chart.setType('line');
-            },
-            templateUrl: 'tpl.chart'
-        };
-    });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5484,35 +5483,35 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 (function () {
 
-    var UIBreadcrumb = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIBreadcrumb, super$0);var proto$0={};
-        function UIBreadcrumb(scope) {
-            this.scope = scope;
-            this.message = new Message('uiBreadcrumb');
-            this.ajax = new Ajax();
-        }if(super$0!==null)SP$0(UIBreadcrumb,super$0);UIBreadcrumb.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIBreadcrumb,"configurable":true,"writable":true}});DP$0(UIBreadcrumb,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-        proto$0.init = function() {var this$0 = this;
-            if (this.scope.datas) {
-                this.handler(this.scope.datas);
-            }
-            else if (this.scope.url) {
-                this.ajax.post(this.scope.url).then(function(datas)  {return this$0.handler(datas)});
-            }
-            else {
-                this.message.error("至少设置data或者url来配置面包屑");
-            }
-        };
-
-        proto$0.handler = function(dataList) {
-            this.scope.items = (dataList || []).map(function(item)  {
-                return {name: item.name ? item.name : item, url: item.url ? item.url : ''};
-            });
-        };
-    MIXIN$0(UIBreadcrumb.prototype,proto$0);proto$0=void 0;return UIBreadcrumb;})(Event);
-
-
     angular.module('admin.component')
-        .directive('uiBreadcrumb', function () {
+        .directive('uiBreadcrumb', function (util) {
+
+            var UIBreadcrumb = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIBreadcrumb, super$0);var proto$0={};
+                function UIBreadcrumb(scope) {
+                    this.scope = scope;
+                    this.message = new Message('uiBreadcrumb');
+                    this.ajax = new Ajax();
+                }if(super$0!==null)SP$0(UIBreadcrumb,super$0);UIBreadcrumb.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIBreadcrumb,"configurable":true,"writable":true}});DP$0(UIBreadcrumb,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.init = function() {var this$0 = this;
+                    if (this.scope.datas) {
+                        this.handler(util.toJSON(this.scope.datas));
+                    }
+                    else if (this.scope.url) {
+                        this.ajax.post(this.scope.url).then(function(datas)  {return this$0.handler(datas)});
+                    }
+                    else {
+                        this.message.error("至少设置data或者url来配置面包屑");
+                    }
+                };
+
+                proto$0.handler = function(dataList) {
+                    this.scope.items = (dataList || []).map(function(item)  {
+                        return {name: item.name ? item.name : item, url: item.url ? item.url : ''};
+                    });
+                };
+            MIXIN$0(UIBreadcrumb.prototype,proto$0);proto$0=void 0;return UIBreadcrumb;})(Event);
+
             return {
                 restrict: 'E',
                 replace: true,
@@ -5529,7 +5528,7 @@ angular.module('admin.component')
 \n                        <ul class=\"page-breadcrumb\">\
 \n                            <li ng-repeat=\"item in items\">\
 \n                                <a ng-href=\"item.url\" ng-bind=\"item.name\"></a>\
-\n                                <i ng-if=\"!last\" class=\"fa fa-angle-right\"></li>\
+\n                                <i ng-if=\"!$last\" class=\"fa fa-angle-right\"></i>\
 \n                            </li>\
 \n                        </ul>\
 \n                    </div>\
@@ -5543,54 +5542,72 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiContainer', function ($timeout, $controller, $injector) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: false,
-            controller: function ($scope, $attrs, $element, $transclude) {
-                $scope.$on('componentComplete', function (evt, o) {
-                    if (o) {
-                        $scope[o.ref] = o.component;
-                    }
-                });
-                if($attrs.sameScope !== undefined){
-                    $element.append($transclude($scope));
-                }
-            },
-            link: function (scope, element, attrs) {
-                element.show();
-                $timeout(function(){
-                    if (attrs.controller && window[attrs.controller]) {
-                        var ctrlArgs = /\(([^\)]+)\)/.exec(window[attrs.controller].toString())[1],
-                            args = {$scope: scope};
-                        ctrlArgs = ctrlArgs.split(',');
-                        for (var i = 1, arg; i < ctrlArgs.length; i++) {
-                            arg = $.trim(ctrlArgs[i]);
-                            args[arg] = $injector.get(arg);
+(function () {
+
+    angular.module('admin.component')
+        .directive('uiContainer', function ($timeout, $controller, $injector) {
+
+            var UIContainer = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIContainer, super$0);var proto$0={};
+
+                function UIContainer(scope, element, $transclude) {
+                    this.scope = scope;
+                    this.element = element;
+                    this.content = $transclude(scope);
+                    this.scope.$on('componentComplete', this.initHandler.bind(this));
+                }if(super$0!==null)SP$0(UIContainer,super$0);UIContainer.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIContainer,"configurable":true,"writable":true}});DP$0(UIContainer,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.init = function() {
+                    this.element
+                        .show()
+                        .append(this.content);
+
+                    this.lazyInit();
+                };
+
+                proto$0.lazyInit = function() {var this$0 = this;
+                    var ctrl = this.scope.controller;
+                    $timeout(function()  {
+                        // 全局定义
+                        if (ctrl && window[ctrl]) {
+                            var ctrlArgs = /\(([^\)]+)\)/.exec(window[ctrl].toString())[1],
+                                args = {$scope: this$0.scope};
+                            ctrlArgs = ctrlArgs.split(',');
+                            for (var i = 1, arg; i < ctrlArgs.length; i++) {
+                                arg = $.trim(ctrlArgs[i]);
+                                args[arg] = $injector.get(arg);
+                            }
+                            $controller(window[ctrl], args);
                         }
-                        $controller(window[attrs.controller], args);
-                    }
-                    else if(attrs.controller){
-                        $controller(attrs.controller, {$scope: scope});
-                    }
-                    else {
-                        scope.$emit('uicontainer.ready'); // 触发
-                    }
-                });
-            },
-            template: function (elemet, attrs) {
-                if(attrs.sameScope !== undefined){
-                    return '<div></div>';
-                }
-                else{
-                    return '<div ng-transclude></div>';
-                }
-            }
-        };
-    });
+                        //
+                        else if (ctrl) {
+                            $controller(ctrl, {$scope: this$0.scope});
+                        }
+                        this$0.scope.$emit('uicontainer.ready'); // 触发
+                    });
+                };
+
+                proto$0.initHandler = function(evt, args) {
+                    if (args)
+                        this.scope[args.ref] = args.component;
+                };
+            MIXIN$0(UIContainer.prototype,proto$0);proto$0=void 0;return UIContainer;})(Event);
+
+            return {
+                restrict: 'E',
+                replace: true,
+                transclude: true,
+                scope: {
+                    controller: '@'
+                },
+                link: function (scope, element, attrs, ctrl, tranclude) {
+                    new UIContainer(scope, element, tranclude).init();
+                },
+                template: ("\
+\n                    <div></div>\
+\n                ")
+            };
+        });
+})();
 //------------------------------------------------------
 //
 //

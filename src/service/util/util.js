@@ -84,7 +84,7 @@ angular.module('admin.service')
              * @param str
              */
             toJSON: function (str) {
-                return JSON.parse(str);
+                return eval(`(${str})`);
             },
 
             /**

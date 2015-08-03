@@ -2,59 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
-    <title>如何使用</title>
+    <title>Demo</title>
     <link rel="stylesheet" href="../output/css/all.css"/>
-    <link href="http://pic.ofcard.com/themes/admin/plugins/zTree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet"
-          type="text/css"/>
-    <link rel="stylesheet" href="../output/assets/css/animate.css">
 </head>
 <body style="background-color: #fff !important;" ng-app="admin">
-    <div class="container">
-        <h1 data-wow-duration="0.5s" class="wow fadeIn animated">
-            首先感谢您使用该框架 O(∩_∩)O
-        </h1>
+<ui-container style="display: none" controller="CC">
 
-        <div class="alert alert-success wow bounceInLeft animated" data-wow-delay="1s">
-            <h2>第<b data-wow-iteration="infinite" class="wow pulse animated" style="color: #ff1d71;margin:0 4px;">1</b>步 加入下列代码到你的head</h2>
-            <code>
-&lt;link rel="stylesheet" href="http://172.21.4.38/css/all.css"/&gt;<br/>
-&lt;link href="http://pic.ofcard.com/themes/admin/plugins/zTree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet" type="text/css"/&gt;
-            </code>
-        </div>
+    <ui-breadcrumb datas="['A', 'B', 'C', 'D', 'E']"></ui-breadcrumb>
 
-        <div class="alert alert-success wow bounceInLeft animated" data-wow-delay="2s">
-            <h2>第<b data-wow-iteration="infinite" class="wow pulse animated" style="color: #ff1d71;margin:0 4px;">2</b>步 加入下列代码到你的body的下面</h2>
-            <code>
-                &lt;script src="http://172.21.4.38/js/lib.js"&gt;&lt;/script&gt;<br/>
-                &lt;script src="http://pic.ofcard.com/themes/admin/plugins/zTree/jquery.ztree.core-3.5.min.js" type="text/javascript"&gt;&lt;/script&gt;<br/>
-                &lt;script src="http://pic.ofcard.com/themes/admin/plugins/zTree/jquery.ztree.excheck-3.5.js" type="text/javascript"&gt;&lt;/script&gt;<br/>
-                &lt;script src="http://pic.ofcard.com/themes/admin/plugins/zTree/jquery.ztree.exedit-3.5.js" type="text/javascript"&gt;&lt;/script&gt;<br/>
-                &lt;script src="http://172.21.4.38/js/all.js"&gt;&lt;script&gt;<br/>
-            </code>
-        </div>
-
-        <div class="row" style="margin-bottom: 40px" >
-            <div class="col-md-6">
-                <a href="doc.html" data-wow-delay="3s" class="wow flipInX animated btn btn-success btn-block btn-lg">点我见文档</a>
-            </div>
-            <div class="col-md-6">
-                <a href="setup.html" data-wow-delay="3s" class="wow flipInX animated btn btn-info btn-block btn-lg">点我见装配</a>
-            </div>
-        </div>
-    </div>
+</ui-container>
 </body>
-
-<script src="../output/assets/js/wow.js"></script>
+<script src="../output/js/lib.js"></script>
+<script src="../output/js/all.js"></script>
 <script>
-    var wow = new WOW(
-            {
-                boxClass:     'wow',      // default
-                animateClass: 'animated', // default
-                offset:       0,          // default
-                mobile:       true,       // default
-                live:         true        // default
-            }
-    );
-    wow.init();
+    function CC($scope, Message){
+        new Message('uicontainer').success('成功');
+    }
 </script>
 </html>

@@ -26,4 +26,4 @@ class Event {
 }
 
 angular.module('admin.service')
-    .service('Event', Event);
+    .service('Event', () => Event);
