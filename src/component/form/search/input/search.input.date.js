@@ -6,31 +6,28 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchDate', function (uiDateFactory, componentHelper) {
+    .directive('uiSearchDate', function (UIDateService) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiDateFactory,
-            template: function (element, attrs) {
-                var format = [];
-                if(attrs.mode){
-                    if (!attrs.mode || attrs.mode.indexOf('date') != -1)
-                        format.push('YYYY-MM-DD');
-                    if (!attrs.mode || attrs.mode.indexOf('time') != -1)
-                        format.push('HH:mm:ss');
-                }
-                else{ //兼容老属性
-                    if (!attrs.date)
-                        format.push('YYYY-MM-DD');
-                    if (!attrs.time)
-                        format.push('HH:mm:ss');
-                }
-                return componentHelper.getTemplate('tpl.searchform.input', $.extend({
-                    other: [
-                        {key: 'data-date-format', val: format.join(' ')},
-                        {key: 'readonly', val: ''}
-                    ]
-                }, attrs));
-            }
-        };
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                css: '@',
+                placeholder: '@'
+            },
+            link: function (s, e, a) {
+                new UIDateService(s, e, a);
+            },
+            template: `
+                 <div class="input-inline search-item">
+                    <div class="input-group">
+                        <div ng-if="label" class="input-group-addon">{{label}}</div>
+                        <input class="form-control" name="{{name}}" placeholder="{{placeholder}}" ng-model="model" ng-change="change()" readonly="true"/>
+                    </div>
+                </div>
+            `
+        }
     });

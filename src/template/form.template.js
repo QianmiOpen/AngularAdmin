@@ -18,7 +18,7 @@
              */
             componentHelper.setTemplate('tpl.form.input', [
                 '<div class="form-group">',
-                    '<label class="col-md-{{leftCol}} control-label">{{{label}}}</label>',
+                    '<label class="col-md-{{{leftCol}}} control-label">{{{label}}}</label>',
                     '<div class="col-md-{{rightCol}}">',
                         '<input {{#if type}}type="{{type}}"{{else}}type="text"{{/if}} class="form-control" name="{{name}}" placeholder="{{placeholder}}"  {{#if value}}value="{{value}}"{{/if}} {{#if readonly}}readonly="{{readonly}}"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}}/>',
                         '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',

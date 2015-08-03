@@ -1,93 +1,77 @@
 /**
  * 表单控件
  */
+class UIFormControl extends ComponentEvent {
+    constructor(scope, element, attrs) {
+        this.scope = scope;
+        this.element = element;
+        this.attrs = attrs;
+        this.isSearchControl = element.parents('.ui-search-form').length > 0;
+        this.formPrefix = this.isSearchControl ? '$search' : '$form';
+        this.formResetEventName = this.isSearchControl ? 'uisearchform.reset' : 'uiform.reset';
+        this.init();
+        this.initEvents();
+        this.cleanElement();
+        this.render();
+    }
+
+    init() {
+        this.scope.lcol = this.scope.lcol !== undefined ? this.scope.lcol : 2;
+        this.scope.rcol = this.scope.rcol !== undefined ? this.scope.rcol : 10;
+        this.triggerComplete(this.scope, this.attrs.ref || '$' + this.formPrefix + this.className, this);
+    }
+
+    initEvents() {
+        this.scope.$on(this.formResetEventName, () => this.reset());
+    }
+
+    cleanElement() {
+        this.element.removeAttr('name').removeAttr('model').removeAttr('readonly').removeAttr('disabled');
+    }
+
+    attr(k, v) {
+        if (this.formEl) {
+            if (k && v) {
+                this.formEl.prop(k, v);
+                return this;
+            }
+            else {
+                return this.formEl.prop(k);
+            }
+        }
+    }
+
+    val(v) {
+        if (this.formEl) {
+            if (v) {
+                this.formEl.val(v);
+                return this;
+            }
+            else {
+                return this.formEl.val();
+            }
+        }
+    }
+
+    destroy() {
+        delete this.listenerMap;
+        this.resetListener();
+    }
+
+    change(fn) {
+        this.$on('change', fn);
+    }
+
+    render() {
+    }
+
+    reset() {
+        if (this.formEl) {
+            this.formEl.val('');
+        }
+    }
+}
+
+
 angular.module('admin.component')
-    .factory('uiFormControl', function (msg, Event, componentHelper) {
-        var FormControl = function (scope, element, attrs) {
-            if (!scope) {
-                return;
-            }
-            Event.call(this);
-            this.scope = scope;
-            this.element = element;
-            this.attrs = attrs;
-            this.name = attrs.name;
-            this.isSearchControl = element.parents('.ui-search-form').length > 0;
-            this.formPrefix = this.isSearchControl ? '$search' : '$form';
-            this.formResetEventName = this.isSearchControl ? 'uisearchform.reset' : 'uiform.reset';
-            this._init();
-            this._cleanElement();
-            this.render();
-            this._complete();
-        };
-        FormControl.prototype = {
-
-            /**
-             *
-             */
-            _init: function () {
-            },
-
-            /**
-             *
-             * @private
-             */
-            _cleanElement: function () {
-                this.element.removeAttr('name').removeAttr('model').removeAttr('readonly').removeAttr('disabled');
-            },
-
-            /**
-             *
-             * @private
-             */
-            _complete: function () {
-                componentHelper.tiggerComplete(this.scope, this.attrs.ref || '$' + this.formPrefix + this.className, this);
-                this.resetListener = this.scope.$on(this.formResetEventName, function () {
-                    this.reset();
-                }.bind(this));
-            },
-
-            /**
-             *
-             */
-            disabled: function(){
-            },
-
-            /**
-             *
-             */
-            render: function () {
-            },
-
-            /**
-             *
-             */
-            destroy: function () {
-                delete this.listenerMap;
-                this.resetListener();
-            },
-
-            /**
-             *
-             */
-            reset: function () {
-            },
-
-            /**
-             *
-             * @param fn
-             */
-            change: function (fn) {
-                this.$on('change', fn);
-            },
-
-            /**
-             *
-             * @param v
-             * @returns {*}
-             */
-            val: function (v) {
-            }
-        };
-        return FormControl;
-    });
+    .service('uiFormControl', () => UIFormControl);

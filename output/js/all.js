@@ -1238,6 +1238,15 @@ angular.module('admin.service')
 //
 //
 //-----------------------------------------------------------------------------------------------
+var ComponentEvent = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;function ComponentEvent() {if(super$0!==null)super$0.apply(this, arguments)}if(!PRS$0)MIXIN$0(ComponentEvent, super$0);if(super$0!==null)SP$0(ComponentEvent,super$0);ComponentEvent.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":ComponentEvent,"configurable":true,"writable":true}});DP$0(ComponentEvent,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
+
+    proto$0.triggerComplete = function(scope, ref, component) {
+        scope[ref] = component;
+        scope.$emit('componentComplete', {ref: ref, component: component});
+    };
+MIXIN$0(ComponentEvent.prototype,proto$0);proto$0=void 0;return ComponentEvent;})(Event);
+
+
 angular.module('admin.component', [])
     .service('componentHelper', function ($templateCache) {
 
@@ -1614,7 +1623,7 @@ angular.module('admin.component')
                         componentHelper.tiggerComplete(scope, ref, form);
                     },
                     post: function () {
-                        setTimeout(function(){
+                        setTimeout(function () {
                             form.initValidation();
                         }, 300);
                     }
@@ -1729,96 +1738,80 @@ angular.module('admin.component')
 /**
  * 表单控件
  */
+var UIFormControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIFormControl, super$0);var proto$0={};
+    function UIFormControl(scope, element, attrs) {
+        this.scope = scope;
+        this.element = element;
+        this.attrs = attrs;
+        this.isSearchControl = element.parents('.ui-search-form').length > 0;
+        this.formPrefix = this.isSearchControl ? '$search' : '$form';
+        this.formResetEventName = this.isSearchControl ? 'uisearchform.reset' : 'uiform.reset';
+        this.init();
+        this.initEvents();
+        this.cleanElement();
+        this.render();
+    }if(super$0!==null)SP$0(UIFormControl,super$0);UIFormControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIFormControl,"configurable":true,"writable":true}});DP$0(UIFormControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+    proto$0.init = function() {
+        this.scope.lcol = this.scope.lcol !== undefined ? this.scope.lcol : 2;
+        this.scope.rcol = this.scope.rcol !== undefined ? this.scope.rcol : 10;
+        this.triggerComplete(this.scope, this.attrs.ref || '$' + this.formPrefix + this.className, this);
+    };
+
+    proto$0.initEvents = function() {var this$0 = this;
+        this.scope.$on(this.formResetEventName, function()  {return this$0.reset()});
+    };
+
+    proto$0.cleanElement = function() {
+        this.element.removeAttr('name').removeAttr('model').removeAttr('readonly').removeAttr('disabled');
+    };
+
+    proto$0.attr = function(k, v) {
+        if (this.formEl) {
+            if (k && v) {
+                this.formEl.prop(k, v);
+                return this;
+            }
+            else {
+                return this.formEl.prop(k);
+            }
+        }
+    };
+
+    proto$0.val = function(v) {
+        if (this.formEl) {
+            if (v) {
+                this.formEl.val(v);
+                return this;
+            }
+            else {
+                return this.formEl.val();
+            }
+        }
+    };
+
+    proto$0.destroy = function() {
+        delete this.listenerMap;
+        this.resetListener();
+    };
+
+    proto$0.change = function(fn) {
+        this.$on('change', fn);
+    };
+
+    proto$0.render = function() {
+    };
+
+    proto$0.reset = function() {
+        if (this.formEl) {
+            this.formEl.val('');
+        }
+    };
+MIXIN$0(UIFormControl.prototype,proto$0);proto$0=void 0;return UIFormControl;})(ComponentEvent);
+
+
 angular.module('admin.component')
-    .factory('uiFormControl', function (msg, Event, componentHelper) {
-        var FormControl = function (scope, element, attrs) {
-            if (!scope) {
-                return;
-            }
-            Event.call(this);
-            this.scope = scope;
-            this.element = element;
-            this.attrs = attrs;
-            this.name = attrs.name;
-            this.isSearchControl = element.parents('.ui-search-form').length > 0;
-            this.formPrefix = this.isSearchControl ? '$search' : '$form';
-            this.formResetEventName = this.isSearchControl ? 'uisearchform.reset' : 'uiform.reset';
-            this._init();
-            this._cleanElement();
-            this.render();
-            this._complete();
-        };
-        FormControl.prototype = {
-
-            /**
-             *
-             */
-            _init: function () {
-            },
-
-            /**
-             *
-             * @private
-             */
-            _cleanElement: function () {
-                this.element.removeAttr('name').removeAttr('model').removeAttr('readonly').removeAttr('disabled');
-            },
-
-            /**
-             *
-             * @private
-             */
-            _complete: function () {
-                componentHelper.tiggerComplete(this.scope, this.attrs.ref || '$' + this.formPrefix + this.className, this);
-                this.resetListener = this.scope.$on(this.formResetEventName, function () {
-                    this.reset();
-                }.bind(this));
-            },
-
-            /**
-             *
-             */
-            disabled: function(){
-            },
-
-            /**
-             *
-             */
-            render: function () {
-            },
-
-            /**
-             *
-             */
-            destroy: function () {
-                delete this.listenerMap;
-                this.resetListener();
-            },
-
-            /**
-             *
-             */
-            reset: function () {
-            },
-
-            /**
-             *
-             * @param fn
-             */
-            change: function (fn) {
-                this.$on('change', fn);
-            },
-
-            /**
-             *
-             * @param v
-             * @returns {*}
-             */
-            val: function (v) {
-            }
-        };
-        return FormControl;
-    });
+    .service('uiFormControl', function()  {return UIFormControl});
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -1826,80 +1819,120 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .factory('uiDateFactory', function (msg, uiFormControl, util) {
-        var m = new msg('Date'),
-            InputDate = function (scope, element, attrs) {
-                this.className = 'Date';
-                this.inputElement = element.find('input');
-                this.format = null;
-                this.default = attrs.value;
-                this.dateMode = attrs.mode ? attrs.mode.indexOf('date') != -1 : true;
-                this.timeMode = attrs.mode ? attrs.mode.indexOf('time') != -1 : true;
-                uiFormControl.apply(this, arguments);
-            };
-        InputDate.prototype = $.extend(new uiFormControl(), {
+(function () {
 
-            _init: function () {
-                var format = [];
-                if (this.dateMode)
-                    format.push('yyyy-MM-dd');
-                if (this.timeMode)
-                    format.push('HH:mm:ss');
-                this.format = format.join(' ');
-                this.val(this.default);
-            },
+    var UIDateFactory = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDateFactory, super$0);var proto$0={};
+        function UIDateFactory(s, e, a) {
+            this.className = 'Date';
+            this.message = new Message('uiDate');
+            this.formEl = e.find('input');
+            this.dateMode = a.mode ? a.mode.indexOf('date') != -1 : true;
+            this.timeMode = a.mode ? a.mode.indexOf('time') != -1 : true;
+            super$0.call(this, s, e, a);
+        }if(super$0!==null)SP$0(UIDateFactory,super$0);UIDateFactory.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDateFactory,"configurable":true,"writable":true}});DP$0(UIDateFactory,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
-            /**
-             *
-             */
-            render: function () {
-                this.inputElement.datetimepicker({
-                    language: 'zh-CN',
-                    pickDate: this.dateMode,
-                    useCurrent: false,
-                    pickTime: this.timeMode,
-                    useSeconds: this.timeMode
-                });
-                return this;
-            },
-
-            /**
-             *
-             */
-            reset: function () {
-                this.inputElement.val('');
-                return this;
-            },
-
-            /**
-             *
-             * @param fn
-             */
-            change: function (fn) {
-                this.inputElement.change(fn);
-                return this;
-            },
-
-            /**
-             *
-             * @param v
-             * @returns {*}
-             */
-            val: function (v) {
-                if (v !== undefined) {
-                    this.inputElement.val(v ? util.dateFormatStr(v, this.format) : '');
-                    return this;
-                }
-                else {
-                    return this.inputElement.val();
-                }
-            }
-        });
-        return function (s, e, a, c, t) {
-            return new InputDate(s, e, a, c, t);
+        proto$0.init = function() {
+            super$0.prototype.init.call(this);
+            var format = [];
+            if (this.dateMode)
+                format.push('yyyy-MM-dd');
+            if (this.timeMode)
+                format.push('HH:mm:ss');
+            this.format = format.join(' ');
         };
-    });
+
+        proto$0.initEvents = function() {
+            super$0.prototype.initEvents.call(this);
+        };
+
+        proto$0.render = function(){
+            this.formEl.datetimepicker({
+                language: 'zh-CN',
+                pickDate: this.dateMode,
+                useCurrent: false,
+                pickTime: this.timeMode,
+                useSeconds: this.timeMode
+            });
+        };
+    MIXIN$0(UIDateFactory.prototype,proto$0);proto$0=void 0;return UIDateFactory;})(UIFormControl);
+
+
+    angular.module('admin.component')
+        .service('UIDateService', function()  {return UIDateFactory})
+        .factory('uiDateFactory', function (msg, uiFormControl, util) {
+            var m = new msg('Date'),
+                InputDate = function (scope, element, attrs) {
+                    this.className = 'Date';
+                    this.inputElement = element.find('input');
+                    this.format = null;
+                    this.default = attrs.value;
+                    this.dateMode = attrs.mode ? attrs.mode.indexOf('date') != -1 : true;
+                    this.timeMode = attrs.mode ? attrs.mode.indexOf('time') != -1 : true;
+                    uiFormControl.apply(this, arguments);
+                };
+            InputDate.prototype = $.extend(new uiFormControl(), {
+
+                _init: function () {
+                    var format = [];
+                    if (this.dateMode)
+                        format.push('yyyy-MM-dd');
+                    if (this.timeMode)
+                        format.push('HH:mm:ss');
+                    this.format = format.join(' ');
+                    this.val(this.default);
+                },
+
+                /**
+                 *
+                 */
+                render: function () {
+                    this.inputElement.datetimepicker({
+                        language: 'zh-CN',
+                        pickDate: this.dateMode,
+                        useCurrent: false,
+                        pickTime: this.timeMode,
+                        useSeconds: this.timeMode
+                    });
+                    return this;
+                },
+
+                /**
+                 *
+                 */
+                reset: function () {
+                    this.inputElement.val('');
+                    return this;
+                },
+
+                /**
+                 *
+                 * @param fn
+                 */
+                change: function (fn) {
+                    this.inputElement.change(fn);
+                    return this;
+                },
+
+                /**
+                 *
+                 * @param v
+                 * @returns {*}
+                 */
+                val: function (v) {
+                    if (v !== undefined) {
+                        this.inputElement.val(v ? util.dateFormatStr(v, this.format) : '');
+                        return this;
+                    }
+                    else {
+                        return this.inputElement.val();
+                    }
+                }
+            });
+            return function (s, e, a, c, t) {
+                return new InputDate(s, e, a, c, t);
+            };
+        });
+})();
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4850,36 +4883,33 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormDate', function (uiDateFactory, componentHelper, defaultCol) {
+    .directive('uiFormDate', function (UIDateService) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiDateFactory,
-            template: function (element, attrs) {
-                //
-                var format = [],
-                    cc = (attrs.col || defaultCol).split(':');
-                if(attrs.mode){
-                    if (!attrs.mode || attrs.mode.indexOf('date') != -1)
-                        format.push('YYYY-MM-DD');
-                    if (!attrs.mode || attrs.mode.indexOf('time') != -1)
-                        format.push('HH:mm:ss');
-                }
-                else{ //兼容老属性
-                    if (!attrs.date)
-                        format.push('YYYY-MM-DD');
-                    if (!attrs.time)
-                        format.push('HH:mm:ss');
-                }
-                return componentHelper.getTemplate('tpl.form.input', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1],
-                    other: [
-                        {key: 'data-date-format', val: format.join(' ')},
-                        {key: 'readonly', val: ''}
-                    ]
-                }, attrs));
-            }
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                placeholder: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function (scope, element, attrs) {
+                new UIDateService(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change()\" ng-model=\"model\" readonly=\"true\"/>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------
@@ -5137,33 +5167,30 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchDate', function (uiDateFactory, componentHelper) {
+    .directive('uiSearchDate', function (UIDateService) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiDateFactory,
-            template: function (element, attrs) {
-                var format = [];
-                if(attrs.mode){
-                    if (!attrs.mode || attrs.mode.indexOf('date') != -1)
-                        format.push('YYYY-MM-DD');
-                    if (!attrs.mode || attrs.mode.indexOf('time') != -1)
-                        format.push('HH:mm:ss');
-                }
-                else{ //兼容老属性
-                    if (!attrs.date)
-                        format.push('YYYY-MM-DD');
-                    if (!attrs.time)
-                        format.push('HH:mm:ss');
-                }
-                return componentHelper.getTemplate('tpl.searchform.input', $.extend({
-                    other: [
-                        {key: 'data-date-format', val: format.join(' ')},
-                        {key: 'readonly', val: ''}
-                    ]
-                }, attrs));
-            }
-        };
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                css: '@',
+                placeholder: '@'
+            },
+            link: function (s, e, a) {
+                new UIDateService(s, e, a);
+            },
+            template: ("\
+\n                 <div class=\"input-inline search-item\">\
+\n                    <div class=\"input-group\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
+\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change()\" readonly=\"true\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        }
     });
 //-----------------------------------------------------------------------------------------------
 //
@@ -7143,7 +7170,7 @@ angular.module('admin.component')
              */
             componentHelper.setTemplate('tpl.form.input', [
                 '<div class="form-group">',
-                    '<label class="col-md-{{leftCol}} control-label">{{{label}}}</label>',
+                    '<label class="col-md-{{{leftCol}}} control-label">{{{label}}}</label>',
                     '<div class="col-md-{{rightCol}}">',
                         '<input {{#if type}}type="{{type}}"{{else}}type="text"{{/if}} class="form-control" name="{{name}}" placeholder="{{placeholder}}"  {{#if value}}value="{{value}}"{{/if}} {{#if readonly}}readonly="{{readonly}}"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}}/>',
                         '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',

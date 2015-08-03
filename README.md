@@ -30,7 +30,7 @@
     * ngClick 是controller里面的方法, 可以返回pormise方法
     * target 如果设置, 点击会锁屏幕, css3表达式
 * ```<ui-breadcrumb  datas="" url="" />```
-    * datas, [{name: .., url: ..}]
+    * datas, [{name: .., url: ..}] 或者 ['A', 'B', 'C']
     * url, 如果想远程加载设置这个, post请求
 
 ## 图表
@@ -42,7 +42,19 @@
 
 ## 表单
 
+* ```<ui-form-date mode="date" label="日期:" placeholder="什么鬼" help="醉了" model="formDate" change="dateChangeHandler()"></ui-form-date>```
+    * mode, [date, datetime, time, month, year] 选其一
+    * model, 双向绑定
+    * change, scope里面的方法
+    * 其他都比较简单
+
 ## 查询
+
+* ```<ui-search-date mode="date" label="日期:" placeholder="什么鬼" model="formDate" change="dateChangeHandler()"></ui-search-date>```
+    * mode, [date, datetime, time, month, year] 选其一
+    * model, 双向绑定
+    * change, scope里面的方法
+    * 其他都比较简单
 
 ## 表格
 

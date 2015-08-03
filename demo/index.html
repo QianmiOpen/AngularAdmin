@@ -10,13 +10,32 @@
 
     <ui-breadcrumb datas="['A', 'B', 'C', 'D', 'E']"></ui-breadcrumb>
 
+    <h4>输入表单</h4>
+    <form action="#" class="form-horizontal">
+         <ui-form-date mode="date" label="日期:" placeholder="什么鬼" help="醉了" model="formDate" change="dateChangeHandler()"></ui-form-date>
+    </form>
+
+    <h4>查询表单</h4>
+    <form action="#" class="form-inline">
+         <ui-search-date mode="date" label="日期:" placeholder="什么鬼" model="formDate" change="dateChangeHandler()"></ui-search-date>
+    </form>
+
 </ui-container>
 </body>
 <script src="../output/js/lib.js"></script>
 <script src="../output/js/all.js"></script>
 <script>
-    function CC($scope, Message){
+    function CC($scope, Message, $timeout) {
         new Message('uicontainer').success('成功');
+        $scope.dateChangeHandler = function () {
+            alert(1);
+        }
+        $timeout(function () {
+            $scope.formDate = new Date();
+            $scope.dateChangeHandler = function () {
+                alert(1);
+            }
+        }, 1000);
     }
 </script>
 </html>

@@ -6,35 +6,32 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormDate', function (uiDateFactory, componentHelper, defaultCol) {
+    .directive('uiFormDate', function (UIDateService) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiDateFactory,
-            template: function (element, attrs) {
-                //
-                var format = [],
-                    cc = (attrs.col || defaultCol).split(':');
-                if(attrs.mode){
-                    if (!attrs.mode || attrs.mode.indexOf('date') != -1)
-                        format.push('YYYY-MM-DD');
-                    if (!attrs.mode || attrs.mode.indexOf('time') != -1)
-                        format.push('HH:mm:ss');
-                }
-                else{ //兼容老属性
-                    if (!attrs.date)
-                        format.push('YYYY-MM-DD');
-                    if (!attrs.time)
-                        format.push('HH:mm:ss');
-                }
-                return componentHelper.getTemplate('tpl.form.input', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1],
-                    other: [
-                        {key: 'data-date-format', val: format.join(' ')},
-                        {key: 'readonly', val: ''}
-                    ]
-                }, attrs));
-            }
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                placeholder: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function (scope, element, attrs) {
+                new UIDateService(scope, element, attrs);
+            },
+            template: `
+                <div class="form-group">
+                   <label class="col-md-{{lcol || DefaultCol.l}} control-label">{{label}}</label>
+                   <div class="col-md-{{rcol || DefaultCol.r}}">
+                       <input type="text" class="form-control {{css}}" name="{{name}}" placeholder="{{placeholder}}" ng-change="change()" ng-model="model" readonly="true"/>
+                       <span ng-if="help" class="help-block">{{help}}</span>
+                   </div>
+               </div>'
+            `
         };
     });

@@ -24,7 +24,7 @@ angular.module('admin.component')
                         componentHelper.tiggerComplete(scope, ref, form);
                     },
                     post: function () {
-                        setTimeout(function(){
+                        setTimeout(function () {
                             form.initValidation();
                         }, 300);
                     }
