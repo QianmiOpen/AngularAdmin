@@ -9,6 +9,7 @@
     * admin.js   entry file
 
 ## 配置项
+
 ```javascript
 .config((AjaxProvider, MessageProvider) => {
     //
