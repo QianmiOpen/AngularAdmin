@@ -6,7 +6,7 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormDate', function (UIDateService) {
+    .directive('uiFormDate', function (UIDateControl) {
         return {
             restrict: 'E',
             replace: true,
@@ -15,14 +15,14 @@ angular.module('admin.component')
                 rcol: '@',
                 label: '@',
                 css: '@',
-                name: '@',
                 placeholder: '@',
+                name: '@',
                 model: '=',
                 change: '&',
                 help: '@'
             },
             link: function (scope, element, attrs) {
-                new UIDateService(scope, element, attrs);
+                new UIDateControl(scope, element, attrs);
             },
             template: `
                 <div class="form-group">

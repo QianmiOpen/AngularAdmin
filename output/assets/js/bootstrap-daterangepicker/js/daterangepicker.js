@@ -23,11 +23,11 @@
                 '<div class="calendar right"></div>' +
                 '<div class="ranges">' +
                   '<div class="range_inputs">' +
-                    '<div class="daterangepicker_start_input" style="float: left;display: inline-block">' +
+                    '<div class="daterangepicker_start_input" style="float: left;display: none;">' +
                       '<label for="daterangepicker_start" style="float: left"></label>' +
                       '<input class="input-mini form-control" style="float: left" type="text" name="'+this.fromName+'" value="" disabled/>' +
                     '</div>' +
-                    '<div class="daterangepicker_end_input" style="float: left;display: inline-block">' +
+                    '<div class="daterangepicker_end_input" style="float: left;display: none;">' +
                       '<label for="daterangepicker_end" style="float: left"></label>' +
                       '<input class="input-mini form-control" style="float: left" type="text" name="'+this.toName+'" value="" disabled />' +
                     '</div>' +

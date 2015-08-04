@@ -6,7 +6,7 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchDate', function (UIDateService) {
+    .directive('uiSearchDate', function (UIDateControl) {
         return {
             restrict: 'E',
             replace: true,
@@ -19,7 +19,7 @@ angular.module('admin.component')
                 placeholder: '@'
             },
             link: function (s, e, a) {
-                new UIDateService(s, e, a);
+                new UIDateControl(s, e, a);
             },
             template: `
                  <div class="input-inline search-item">
@@ -29,5 +29,5 @@ angular.module('admin.component')
                     </div>
                 </div>
             `
-        }
+        };
     });

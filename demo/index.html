@@ -12,12 +12,14 @@
 
     <h4>输入表单</h4>
     <form action="#" class="form-horizontal">
-         <ui-form-date mode="date" label="日期:" placeholder="什么鬼" help="醉了" model="formDate" change="dateChangeHandler()"></ui-form-date>
+        <ui-form-date mode="datetime" label="日期:" placeholder="什么鬼" help="醉了" model="formDate" change="dateChangeHandler()"></ui-form-date>
+        <ui-form-date-range mode="datetime" label="日期范围:" help="醉了3" from-model="formRangeFromDate" to-model="formRangeToDate" change="dateRangeChangeHandler()"></ui-form-date-range>
     </form>
 
     <h4>查询表单</h4>
     <form action="#" class="form-inline">
-         <ui-search-date mode="date" label="日期:" placeholder="什么鬼" model="formDate" change="dateChangeHandler()"></ui-search-date>
+        <ui-search-date mode="datetime" class="input-medium" label="日期:" placeholder="什么鬼" model="formDate" change="dateChangeHandler()"></ui-search-date>
+        <ui-search-date-range mode="datetime" placeholder="什么鬼2" from-model="formRangeFromDate" to-model="formRangeToDate" change="dateRangeChangeHandler()"></ui-search-date-range>
     </form>
 
 </ui-container>
@@ -28,14 +30,16 @@
     function CC($scope, Message, $timeout) {
         new Message('uicontainer').success('成功');
         $scope.dateChangeHandler = function () {
-            alert(1);
-        }
-        $timeout(function () {
-            $scope.formDate = new Date();
-            $scope.dateChangeHandler = function () {
-                alert(1);
-            }
-        }, 1000);
+            new Message('[日期控件]数据变动').success('成功');
+        };
+        $scope.dateRangeChangeHandler = function () {
+            new Message('[日期范围控件]数据变动').success('成功');
+        };
+
+        //双向绑定测试
+        $scope.formDate = moment().format('YYYY-MM-DD HH:mm:ss');
+        $scope.formRangeFromDate = moment().format('YYYY-MM-DD HH:mm:ss');
+        $scope.formRangeToDate = moment().add(3, 'h').format('YYYY-MM-DD HH:mm:ss')
     }
 </script>
 </html>

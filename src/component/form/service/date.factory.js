@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------------------------------
 (function () {
 
-    class UIDateFactory extends UIFormControl {
+    class UIDateControl extends UIFormControl {
         constructor(s, e, a) {
             this.className = 'Date';
             this.message = new Message('uiDate');
@@ -44,5 +44,5 @@
 
 
     angular.module('admin.component')
-        .service('UIDateService', () => UIDateFactory);
+        .service('UIDateControl', () => UIDateControl);
 })();

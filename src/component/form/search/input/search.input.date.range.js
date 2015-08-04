@@ -6,13 +6,29 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchDateRange', function (uiDateRangeService, componentHelper) {
+    .directive('uiSearchDateRange', function (UIDateRangeControl) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiDateRangeService,
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.daterange', attrs);
-            }
+            link: function (s, e, a) {
+                new UIDateRangeControl(s, e, a);
+            },
+            scope: {
+                css: '@',
+                name: '@',
+                fromModel: '=',
+                toModel: '=',
+                change: '&',
+                label: '@'
+            },
+            template: `
+                 <div class="input-inline search-item input-mlarge {{css}}">
+                    <div class="input-group">
+                        <input type="text" readonly class="form-control" name="{{fromName}}" ng-model="fromModel"/>
+                        <span class="input-group-addon">{{label || '到'}}</span>
+                        <input type="text" readonly class="form-control" name="{{toName}}" ng-model="toModel"/>
+                    </div>
+                </div>
+            `
         };
     });

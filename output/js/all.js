@@ -1346,7 +1346,7 @@ angular.module('admin.component')
  *
  */
 angular.module('admin.component')
-    .directive('uiLineChart', function (uiChartFactory) {
+    .directive('uiMixedChart', function (uiChartFactory) {
         return {
             restrict: 'E',
             replace: true,
@@ -1362,7 +1362,7 @@ angular.module('admin.component')
  *
  */
 angular.module('admin.component')
-    .directive('uiMixedChart', function (uiChartFactory) {
+    .directive('uiLineChart', function (uiChartFactory) {
         return {
             restrict: 'E',
             replace: true,
@@ -1821,15 +1821,15 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 (function () {
 
-    var UIDateFactory = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDateFactory, super$0);var proto$0={};
-        function UIDateFactory(s, e, a) {
+    var UIDateControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDateControl, super$0);var proto$0={};
+        function UIDateControl(s, e, a) {
             this.className = 'Date';
             this.message = new Message('uiDate');
             this.formEl = e.find('input');
             this.dateMode = a.mode ? a.mode.indexOf('date') != -1 : true;
             this.timeMode = a.mode ? a.mode.indexOf('time') != -1 : true;
             super$0.call(this, s, e, a);
-        }if(super$0!==null)SP$0(UIDateFactory,super$0);UIDateFactory.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDateFactory,"configurable":true,"writable":true}});DP$0(UIDateFactory,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+        }if(super$0!==null)SP$0(UIDateControl,super$0);UIDateControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDateControl,"configurable":true,"writable":true}});DP$0(UIDateControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
         proto$0.init = function() {
             super$0.prototype.init.call(this);
@@ -1854,11 +1854,11 @@ angular.module('admin.component')
                 useSeconds: this.timeMode
             });
         };
-    MIXIN$0(UIDateFactory.prototype,proto$0);proto$0=void 0;return UIDateFactory;})(UIFormControl);
+    MIXIN$0(UIDateControl.prototype,proto$0);proto$0=void 0;return UIDateControl;})(UIFormControl);
 
 
     angular.module('admin.component')
-        .service('UIDateService', function()  {return UIDateFactory});
+        .service('UIDateControl', function()  {return UIDateControl});
 })();
 //-----------------------------------------------------------------------------------------------
 //
@@ -1868,23 +1868,117 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 (function () {
 
-    var UIDateRangeFactory = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDateRangeFactory, super$0);
-        function UIDateRangeFactory(s, e, a){
-            super$0.call(this, s, e, a)
-        }if(super$0!==null)SP$0(UIDateRangeFactory,super$0);UIDateRangeFactory.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDateRangeFactory,"configurable":true,"writable":true}});DP$0(UIDateRangeFactory,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-    ;return UIDateRangeFactory;})(UIFormControl);
+    var uiDateRangeDefaultRange = {
+        '今天': [moment().startOf('day'), moment().endOf('day')],
+        '昨天': [moment().subtract('days', 1).startOf('day'), moment().subtract('days', 1).endOf('day')],
+        '最近7天': [moment().subtract('days', 6).startOf('day'), moment().endOf('day')],
+        '最近30天': [moment().subtract('days', 29).startOf('day'), moment().endOf('day')],
+        '当前月': [moment().startOf('month'), moment().endOf('month')],
+        '上个月': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
+        '最近六个月': [moment().subtract('days', 182).startOf('day'), moment().endOf('day')]
+    };
+
+    var uiDateRangeDefaultConfig = {
+        opens: ('right'),
+        minDate: moment().subtract('year', 40).startOf('year'),
+        maxDate: moment().add('year', 10).endOf('year'),
+        showDropdowns: true,
+        showWeekNumbers: false,
+        timePickerIncrement: 1,
+        timePicker12Hour: false,
+        buttonClasses: ['btn', 'btn-sm'],
+        applyClass: 'green',
+        cancelClass: 'default',
+        separator: ' - ',
+        locale: {
+            applyLabel: '确定',
+            cancelLabel: '取消',
+            resetLabel: '重置',
+            fromLabel: '从',
+            toLabel: '至',
+            customRangeLabel: '自定义',
+            daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+            monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+            firstDay: 1
+        }
+    };
+
+    var UIDateRangeControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDateRangeControl, super$0);var proto$0={};
+        function UIDateRangeControl(s, e, a) {
+            this.className = 'DateRange';
+            this.startDateElement = e.find('.input-group').find('input:first');
+            this.endDateElement = e.find('.input-group').find('input:last');
+
+            this.hasDefaultDateRange = !!a.range;
+            this.isDateTimeMode = a.mode !== 'date' || a.time !== undefined;
+            this.format = a.format || (this.isDateTimeMode ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD');
+
+            this.limit = a.limit;
+            super$0.call(this, s, e, a);
+        }if(super$0!==null)SP$0(UIDateRangeControl,super$0);UIDateRangeControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDateRangeControl,"configurable":true,"writable":true}});DP$0(UIDateRangeControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+        proto$0.init = function() {
+            super$0.prototype.init.call(this);
+
+            //默认值
+            var dateRange = uiDateRangeDefaultRange[this.attrs.range] || [];
+            this.defaultStartDate = this.attrs.fromValue || dateRange[0];
+            this.defaultEndDate = this.attrs.toValue || dateRange[1];
+
+            //
+            this.config = $.extend({}, uiDateRangeDefaultConfig, {
+                ranges: uiDateRangeDefaultRange,
+                timePicker: this.isDateTimeMode,
+                format: this.format
+            });
+
+            //要小心设置这个值
+            if (this.limit) {
+                this.config.dateLimit = {days: this.limit};
+            }
+
+            //默认值
+            if (this.hasDefaultDateRange) {
+                this.config.startDate = this.defaultStartDate;
+                this.config.endDate = this.defaultEndDate;
+            }
+        };
+
+        proto$0.render = function() {var this$0 = this;
+            this.element.find("div").daterangepicker(this.config, function(startVal, endVal)  {
+                startVal = startVal ? startVal.format(this$0.format) : "";
+                endVal = endVal ? endVal.format(this$0.format) : "";
+                this$0.val(startVal, endVal);
+                this$0.scope.change();
+            });
+        };
+
+        proto$0.reset = function() {
+            this.startDateElement.val('');
+            this.endDateElement.val('');
+        };
+
+        proto$0.val = function(sv, ev) {
+            if (sv) {
+                this.startDateElement.val(sv);
+            }
+            if (ev) {
+                this.endDateElement.val(ev);
+            }
+            if (!sv && !ev) {
+                return [this.startDateElement.val(), this.endDateElement.val()];
+            }
+            else {
+                return this;
+            }
+        };
+
+
+    MIXIN$0(UIDateRangeControl.prototype,proto$0);proto$0=void 0;return UIDateRangeControl;})(UIFormControl);
 
 
     angular.module('admin.component')
-        .value('uiDateRangeDefaultRange', {
-            '今天': [moment().startOf('day'), moment().endOf('day')],
-            '昨天': [moment().subtract('days', 1).startOf('day'), moment().subtract('days', 1).endOf('day')],
-            '最近7天': [moment().subtract('days', 6).startOf('day'), moment().endOf('day')],
-            '最近30天': [moment().subtract('days', 29).startOf('day'), moment().endOf('day')],
-            '当前月': [moment().startOf('month'), moment().endOf('month')],
-            '上个月': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')],
-            '最近六个月': [moment().subtract('days', 182).startOf('day'), moment().endOf('day')]
-        })
+        .service('UIDateRangeControl', function()  {return UIDateRangeControl})
         .value('uiDateRangeDefaultConfig', {
             opens: ('right'),
             minDate: moment().subtract('year', 40).startOf('year'),
@@ -1977,7 +2071,7 @@ angular.module('admin.component')
                     }
                 }
             });
-            return function(s, e, a, c, t){
+            return function (s, e, a, c, t) {
                 return new DateRange(s, e, a, c, t);
             };
         });
@@ -4819,7 +4913,7 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormDate', function (UIDateService) {
+    .directive('uiFormDate', function (UIDateControl) {
         return {
             restrict: 'E',
             replace: true,
@@ -4828,14 +4922,14 @@ angular.module('admin.component')
                 rcol: '@',
                 label: '@',
                 css: '@',
-                name: '@',
                 placeholder: '@',
+                name: '@',
                 model: '=',
                 change: '&',
                 help: '@'
             },
             link: function (scope, element, attrs) {
-                new UIDateService(scope, element, attrs);
+                new UIDateControl(scope, element, attrs);
             },
             template: ("\
 \n                <div class=\"form-group\">\
@@ -4856,18 +4950,39 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormDateRange', function (uiDateRangeService, componentHelper, defaultCol) {
+    .directive('uiFormDateRange', function (UIDateRangeControl) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiDateRangeService,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.input.daterange', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
+            link: function (s, e, a) {
+                new UIDateRangeControl(s, e, a);
+            },
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                fromModel: '=',
+                toModel: '=',
+                change: '&',
+                help: '@'
+            },
+            template: ("\
+\n               <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol}}\">\
+\n                       <div class=\"input-date-range input-inline\">\
+\n                           <div class=\"input-group\">\
+\n                               <input type=\"text\" class=\"form-control\" name=\"{{fromName}}\" ng-model=\"fromModel\" value=\"{{fromValue}}\" readonly>\
+\n                               <span class=\"input-group-addon\">至</span>\
+\n                               <input type=\"text\" class=\"form-control\" name=\"{{toName}}\" ng-model=\"toModel\" value=\"{{toValue}}\" readonly>\
+\n                           </div>\
+\n                       </div>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------
@@ -4921,39 +5036,6 @@ angular.module('admin.component')
             template: function (element, attrs) {
                 var cc = (attrs.col || defaultCol).split(':');
                 return componentHelper.getTemplate('tpl.form.textarea', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  参数
-//      p -- 省, 开关, 默认开, 可不填
-//      c -- 市, 开关, 默认开, 可不填
-//      s -- 区, 开关, 默认开, 可不填
-//      a -- 地址, 开关, 默认关
-//
-//      s-name -- 区域的name
-//      a-name -- 详细地址的name
-//
-//
-//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
-//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
-//      s-value -- 区域默认值
-//      a-value -- 地址值
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormRegion', function (uiRegionService, componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: uiRegionService,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.region', $.extend({
                     leftCol: cc[0],
                     rightCol: cc[1]
                 }, attrs));
@@ -5052,6 +5134,39 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
+//  参数
+//      p -- 省, 开关, 默认开, 可不填
+//      c -- 市, 开关, 默认开, 可不填
+//      s -- 区, 开关, 默认开, 可不填
+//      a -- 地址, 开关, 默认关
+//
+//      s-name -- 区域的name
+//      a-name -- 详细地址的name
+//
+//
+//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
+//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
+//      s-value -- 区域默认值
+//      a-value -- 地址值
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormRegion', function (uiRegionService, componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: uiRegionService,
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.form.region', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
 //  针对input的封装
 //
 //
@@ -5103,7 +5218,7 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchDate', function (UIDateService) {
+    .directive('uiSearchDate', function (UIDateControl) {
         return {
             restrict: 'E',
             replace: true,
@@ -5116,7 +5231,7 @@ angular.module('admin.component')
                 placeholder: '@'
             },
             link: function (s, e, a) {
-                new UIDateService(s, e, a);
+                new UIDateControl(s, e, a);
             },
             template: ("\
 \n                 <div class=\"input-inline search-item\">\
@@ -5126,7 +5241,7 @@ angular.module('admin.component')
 \n                    </div>\
 \n                </div>\
 \n            ")
-        }
+        };
     });
 //-----------------------------------------------------------------------------------------------
 //
@@ -5136,14 +5251,30 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchDateRange', function (uiDateRangeService, componentHelper) {
+    .directive('uiSearchDateRange', function (UIDateRangeControl) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiDateRangeService,
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.daterange', attrs);
-            }
+            link: function (s, e, a) {
+                new UIDateRangeControl(s, e, a);
+            },
+            scope: {
+                css: '@',
+                name: '@',
+                fromModel: '=',
+                toModel: '=',
+                change: '&',
+                label: '@'
+            },
+            template: ("\
+\n                 <div class=\"input-inline search-item input-mlarge {{css}}\">\
+\n                    <div class=\"input-group\">\
+\n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{fromName}}\" ng-model=\"fromModel\"/>\
+\n                        <span class=\"input-group-addon\">{{label || '到'}}</span>\
+\n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{toName}}\" ng-model=\"toModel\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------
