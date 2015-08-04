@@ -1293,7 +1293,7 @@ angular.module('admin.component', [])
  *
  */
 angular.module('admin.component')
-    .directive('uiAreaChart', function (uiChartFactory) {
+    .directive('uiBubbleChart', function (uiChartFactory) {
         return {
             restrict: 'E',
             replace: true,
@@ -1311,7 +1311,7 @@ angular.module('admin.component')
  *
  */
 angular.module('admin.component')
-    .directive('uiBubbleChart', function (uiChartFactory) {
+    .directive('uiAreaChart', function (uiChartFactory) {
         return {
             restrict: 'E',
             replace: true,
@@ -1346,7 +1346,7 @@ angular.module('admin.component')
  *
  */
 angular.module('admin.component')
-    .directive('uiMixedChart', function (uiChartFactory) {
+    .directive('uiLineChart', function (uiChartFactory) {
         return {
             restrict: 'E',
             replace: true,
@@ -1362,7 +1362,7 @@ angular.module('admin.component')
  *
  */
 angular.module('admin.component')
-    .directive('uiLineChart', function (uiChartFactory) {
+    .directive('uiMixedChart', function (uiChartFactory) {
         return {
             restrict: 'E',
             replace: true,
@@ -1755,7 +1755,7 @@ var UIFormControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o
     proto$0.init = function() {
         this.scope.lcol = this.scope.lcol !== undefined ? this.scope.lcol : 2;
         this.scope.rcol = this.scope.rcol !== undefined ? this.scope.rcol : 10;
-        this.triggerComplete(this.scope, this.attrs.ref || '$' + this.formPrefix + this.className, this);
+        this.triggerComplete(this.scope, this.attrs.ref || (this.formPrefix + this.className), this);
     };
 
     proto$0.initEvents = function() {var this$0 = this;
@@ -5045,6 +5045,39 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
+//  参数
+//      p -- 省, 开关, 默认开, 可不填
+//      c -- 市, 开关, 默认开, 可不填
+//      s -- 区, 开关, 默认开, 可不填
+//      a -- 地址, 开关, 默认关
+//
+//      s-name -- 区域的name
+//      a-name -- 详细地址的name
+//
+//
+//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
+//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
+//      s-value -- 区域默认值
+//      a-value -- 地址值
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormRegion', function (uiRegionService, componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: uiRegionService,
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.form.region', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
 //  针对select的封装
 //
 //
@@ -5131,39 +5164,6 @@ angular.module('admin.component')
         };
     });
 
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  参数
-//      p -- 省, 开关, 默认开, 可不填
-//      c -- 市, 开关, 默认开, 可不填
-//      s -- 区, 开关, 默认开, 可不填
-//      a -- 地址, 开关, 默认关
-//
-//      s-name -- 区域的name
-//      a-name -- 详细地址的name
-//
-//
-//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
-//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
-//      s-value -- 区域默认值
-//      a-value -- 地址值
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormRegion', function (uiRegionService, componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: uiRegionService,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.region', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5646,8 +5646,8 @@ angular.module('admin.component')
                 function UIContainer(scope, element, $transclude) {
                     this.scope = scope;
                     this.element = element;
-                    this.content = $transclude(scope);
                     this.scope.$on('componentComplete', this.initHandler.bind(this));
+                    this.content = $transclude(scope);
                 }if(super$0!==null)SP$0(UIContainer,super$0);UIContainer.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIContainer,"configurable":true,"writable":true}});DP$0(UIContainer,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
                 proto$0.init = function() {
@@ -5681,8 +5681,15 @@ angular.module('admin.component')
                 };
 
                 proto$0.initHandler = function(evt, args) {
-                    if (args)
-                        this.scope[args.ref] = args.component;
+                    if (args) {
+                        if (this.scope[args.ref]) {
+                            this.scope[args.ref] = [].concat(this.scope[args.ref]);
+                            this.scope[args.ref].push(args.component);
+                        }
+                        else {
+                            this.scope[args.ref] = args.component;
+                        }
+                    }
                 };
             MIXIN$0(UIContainer.prototype,proto$0);proto$0=void 0;return UIContainer;})(Event);
 

@@ -14,8 +14,8 @@
                 constructor(scope, element, $transclude) {
                     this.scope = scope;
                     this.element = element;
-                    this.content = $transclude(scope);
                     this.scope.$on('componentComplete', this.initHandler.bind(this));
+                    this.content = $transclude(scope);
                 }
 
                 init() {
@@ -49,8 +49,15 @@
                 }
 
                 initHandler(evt, args) {
-                    if (args)
-                        this.scope[args.ref] = args.component;
+                    if (args) {
+                        if (this.scope[args.ref]) {
+                            this.scope[args.ref] = [].concat(this.scope[args.ref]);
+                            this.scope[args.ref].push(args.component);
+                        }
+                        else {
+                            this.scope[args.ref] = args.component;
+                        }
+                    }
                 }
             }
 

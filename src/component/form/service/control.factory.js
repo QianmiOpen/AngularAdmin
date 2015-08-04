@@ -18,7 +18,7 @@ class UIFormControl extends ComponentEvent {
     init() {
         this.scope.lcol = this.scope.lcol !== undefined ? this.scope.lcol : 2;
         this.scope.rcol = this.scope.rcol !== undefined ? this.scope.rcol : 10;
-        this.triggerComplete(this.scope, this.attrs.ref || '$' + this.formPrefix + this.className, this);
+        this.triggerComplete(this.scope, this.attrs.ref || (this.formPrefix + this.className), this);
     }
 
     initEvents() {
