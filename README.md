@@ -47,7 +47,7 @@
     * mode, [date, datetime, time, month, year] 选其一
     * model, 双向绑定
     * change, scope里面的方法
-*```<ui-form-date-range mode="datetime" label="日期范围:" help="醉了3" from-model="formRangeFromDate" to-model="formRangeToDate" change="dateRangeChangeHandler()"></ui-form-date-range>```
+* ```<ui-form-date-range mode="datetime" label="日期范围:" help="醉了3" from-model="formRangeFromDate" to-model="formRangeToDate" change="dateRangeChangeHandler()"></ui-form-date-range>```
     * mod, [date, datetime, time, month, year] 选其一
     * form-model, 开始时间的双向绑定
     * to-model, 结束时间的双向绑定
@@ -59,7 +59,7 @@
     * mode, [date, datetime, time, month, year] 选其一
     * model, 双向绑定
     * change, scope里面的方法
-*```<ui-search-date-range mode="datetime" label="日期范围:" from-model="formRangeFromDate" to-model="formRangeToDate" change="dateRangeChangeHandler()"></ui-search-date-range>```
+* ```<ui-search-date-range mode="datetime" label="日期范围:" from-model="formRangeFromDate" to-model="formRangeToDate" change="dateRangeChangeHandler()"></ui-search-date-range>```
     * mod, [date, datetime, time, month, year] 选其一
     * form-model, 开始时间的双向绑定
     * to-model, 结束时间的双向绑定
