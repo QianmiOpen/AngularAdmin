@@ -15,6 +15,11 @@
         <ui-form-date mode="datetime" label="日期:" placeholder="什么鬼" help="醉了" model="item.formDate" change="dateChangeHandler()"></ui-form-date>
         <ui-form-date-range mode="datetime" label="日期范围:" help="醉了3" from-model="item.formRangeFromDate" to-model="item.formRangeToDate" change="dateRangeChangeHandler()"></ui-form-date-range>
         <ui-form-input label="输入框" help="醉了4" model="item.formInput" change="inputChangeHandler()"></ui-form-input>
+        <ui-form-select label="下拉框" help="醉了5" model="item.formSelect" change="selectChangeHandler()">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+        </ui-form-select>
     </form>
 
     <h4>查询表单</h4>
@@ -22,6 +27,11 @@
         <ui-search-date mode="datetime" class="input-medium" label="日期:" placeholder="什么鬼" model="item.formDate" change="dateChangeHandler()"></ui-search-date>
         <ui-search-date-range mode="datetime" placeholder="什么鬼2" from-model="item.formRangeFromDate" to-model="item.formRangeToDate" change="dateRangeChangeHandler()"></ui-search-date-range>
         <ui-search-input class="input-medium" label="输入框" model="item.formInput" change="inputChangeHandler()"></ui-search-input>
+        <ui-search-select class="input-medium" label="下拉框" model="item.formSelect" change="selectChangeHandler()">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+        </ui-search-select>
     </form>
 
 </ui-container>
@@ -32,14 +42,17 @@
     function CC($scope, Message, $timeout) {
         new Message('uicontainer').success('成功');
         $scope.dateChangeHandler = function () {
-            new Message('[日期控件]数据变动').success('成功');
+            new Message('[date]数据变动').success('成功');
         };
         $scope.dateRangeChangeHandler = function () {
-            new Message('[日期范围控件]数据变动').success('成功');
+            new Message('[dateRange]数据变动').success('成功');
         };
         $scope.inputChangeHandler = function () {
-            new Message('[输入框]数据变动').success('成功');
-        }
+            new Message('[input]数据变动').success('成功');
+        };
+        $scope.selectChangeHandler = function () {
+            new Message('[select]数据变动').success('成功');
+        };
 
         //双向绑定测试
         $scope.item = {};

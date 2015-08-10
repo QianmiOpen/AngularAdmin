@@ -2935,180 +2935,306 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .factory('uiSelectFactory', function (msg, ajax, uiFormControl, ValueService) {
-        var m = new msg('Select'),
-            Select = function (scope, element, attrs) {
-                this.selectElement = element.find('select');
-                this.dataKeyName = attrs.keyName || 'key';
-                this.dataValueName = attrs.valueName || 'text';
-                this.defaultResetValue = attrs.isMulti ? '' : (this.selectElement.find('option:eq(0)')[0] ? this.selectElement.find('option:eq(0)').val() : '');
-                this.model = attrs.model;
-                this.init = false;
-                uiFormControl.apply(this, arguments);
-            };
-        Select.prototype = $.extend(new uiFormControl(), {
+(function () {
 
-            _init: function () {
-                var self = this;
-                if (this.model) {
+    var UISelectControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UISelectControl, super$0);var proto$0={};
 
-                    //监听一下model的变化
-                    this.watch = this.scope.$watch(this.model, function (newValue) {
-                        if (newValue !== undefined)
-                            this.val(newValue);
-                        else
-                            this.val(this.defaultResetValue);
-                    }.bind(this));
+        function UISelectControl(s, e, a) {
+            this.className = 'Select';
+            this.formEl = e.find('Select');
+            this.ajax = new Ajax();
+            super$0.call(this, s, e, a);
+        }if(super$0!==null)SP$0(UISelectControl,super$0);UISelectControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UISelectControl,"configurable":true,"writable":true}});DP$0(UISelectControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
-                    //如果model没有值, 默认选择第一个
-                    if (!ValueService.get(this.scope, this.model)) {
-                        var val = this.attrs.value ? this.attrs.value : this.defaultResetValue;
-                        ValueService.set(this.scope, this.model, val);
-                    }
-                }
+        proto$0.init = function() {
+            super$0.prototype.init.call(this);
 
-                //远程加载数据
-                if (this.attrs.url) {
-                    this.load(this.attrs.url);
-                }
-
-                if (!this.model && this.attrs.value) {
-                    this.val(this.attrs.value);
-                }
-                this.element.removeAttr('value');
-            },
-
-            load: function (url, value, isClean) {
-                var self = this;
-                return ajax.post(url).then(function (responseData) {
-                    self.setData(responseData, isClean);
-                    if (value) {
-                        self.val(value);
-                    }
-                    else{
-                        var val = self.val(),
-                            m = /^\?.+:(.+)\s+\?$/.exec(val);
-                        self.val(m ? m[1] : val);
-                    }
-                });
-            },
-
-            /**
-             *
-             */
-            disabled: function (open) {
-                this.selectElement.prop('disabled', open);
-                this.render();
-            },
-
-            /**
-             *
-             */
-            render: function () {
-                if (this.init) {
-                    this.selectElement.selectpicker('refresh');
-                }
-                else {
-                    this.selectElement.selectpicker({
-                        iconBase: 'fa',
-                        tickIcon: 'fa-check'
-                    });
-                    this.init = true;
-                }
-            },
-
-            /**
-             *
-             * @param data
-             * @param isClean
-             */
-            setData: function (data, isClean, dataName, dataValue) {
-                dataName = dataName || this.dataKeyName;
-                dataValue = dataValue || this.dataValueName;
-                if (isClean) {
-                    this.selectElement.html('');
-                }
-                if ($.isArray(data)) {
-                    $.each(data, function (i, item) {
-                        this.selectElement.append(this.toOption(item, dataName, dataValue));
-                    }.bind(this));
-                }
-                else {
-                    $.each(data, function (group, items) {
-                        var $optiongroup = this.toOptionGroup(group);
-                        $.each(items, function (i, item) {
-                            $optiongroup.append(this.toOption(item, dataName, dataValue));
-                        }.bind(this));
-                        this.selectElement.append($optiongroup);
-                    }.bind(this));
-                }
-                this.reset();
-            },
-
-            /**
-             *
-             * @param item
-             * @param dataName
-             * @param dataValue
-             * @returns {*|jQuery}
-             */
-            toOption: function (item, dataName, dataValue) {
-                var isString = angular.isString(item),
-                    itemName = isString ? item : item[dataName],
-                    itemValue = isString ? item : item[dataValue];
-                var $option = $('<option/>').attr('value', itemName).html(itemValue);
-                this.$emit('uiselect.onOption', $option, item);
-                $option.data('item', item);
-                return $option;
-            },
-
-            /**
-             *
-             * @param name
-             * @returns {*|jQuery}
-             */
-            toOptionGroup: function (name) {
-                var $option = $('<optgroup/>').attr('label', name);
-                return $option;
-            },
-
-            /**
-             *
-             */
-            reset: function () {
-                this.selectElement.val(this.defaultResetValue);
-                this.render();
-            },
-
-            /**
-             *
-             * @param fn
-             */
-            change: function (fn) {
-                this.selectElement.change(fn);
-            },
-
-            /**
-             *
-             * @param v
-             * @returns {*}
-             */
-            val: function (v) {
-                if (v !== undefined) {
-                    this.selectElement.val(v);
-                    this.render();
-                    return this;
-                }
-                else {
-                    return this.selectElement.val();
-                }
+            //是否多选
+            if (this.attrs.multiple) {
+                this.formEl.prop('multiple', 'multiple');
             }
-        });
-        return function (s, e, a, c, t) {
-            return new Select(s, e, a, c, t);
+
+            //初始化数值
+            this.defaultValue = this.scope.value || this.formEl.find('option:eq(0)').val() || '';
+            if (!this.scope.model && this.defaultValue) {
+                this.scope.model = this.defaultValue;
+                this.val(this.defaultValue);
+            }
+
+            //远程加载数据
+            if (this.attrs.url) {
+                this.load(this.attrs.url);
+            }
         };
-    });
+
+        proto$0.initEvents = function() {var this$0 = this;
+            super$0.prototype.initEvents.call(this);
+            this.scope.$watch('model', function(nv)  {
+                if (nv !== undefined) {
+                    this$0.val(nv);
+                    this$0.scope.change();
+                }
+                else
+                    this$0.val(this$0.defaultValue);
+            });
+            this.formEl.change(function()  {
+                this$0.scope.model = this$0.formEl.val();
+                this$0.scope.$apply();
+            });
+        };
+
+        proto$0.render = function() {
+            if (this.init) {
+                this.formEl.selectpicker('refresh');
+            }
+            else {
+                this.formEl.selectpicker({
+                    iconBase: 'fa',
+                    tickIcon: 'fa-check'
+                });
+                this.init = true;
+            }
+        };
+
+        proto$0.val = function(val) {
+            super$0.prototype.val.call(this, val);
+            if (val)
+                this.render();
+        };
+
+        proto$0.load = function(url, value, isClean) {var this$0 = this;
+            return this.ajax.post(url).then(function(responseData)  {
+                this$0.setData(responseData, isClean);
+                if (value) {
+                    this$0.val(value);
+                }
+                else {
+                    var val = self.val(),
+                        m = /^\?.+:(.+)\s+\?$/.exec(val);
+                    this$0.val(m ? m[1] : val);
+                }
+            });
+        };
+
+        proto$0.setData = function(data, isClean, dataName, dataValue) {var this$0 = this;
+            dataName = dataName || this.scope.dataKeyName;
+            dataValue = dataValue || this.scope.dataValueName;
+            if (isClean) {
+                this.formEl.html('');
+            }
+            if (_.isArray(data)) {
+                $.each(data, function(i, item)  {
+                    this$0.formEl.append(this$0.toOption(item, dataName, dataValue));
+                });
+            }
+            else {
+                $.each(data, function(group, items)  {
+                    var $optionGroup = this$0.toOptionGroup(group);
+                    $.each(items, function(i, item)  {
+                        $optionGroup.append(this$0.toOption(item, dataName, dataValue));
+                    });
+                    this$0.formEl.append($optionGroup);
+                });
+            }
+            this.reset();
+        };
+
+        proto$0.toOption = function(item, dataName, dataValue) {
+            var isString = _.isString(item),
+                itemName = isString ? item : item[dataName],
+                itemValue = isString ? item : item[dataValue];
+            var $option = $('<option/>').attr('value', itemName).html(itemValue),
+                renderHtml = this.scope.render($option, item);
+            if (renderHtml) {
+                $option.data('content', renderHtml);
+            }
+            $option.data('item', item);
+            return $option;
+        };
+
+        proto$0.toOptionGroup = function(name) {
+            var $option = $('<optgroup/>').attr('label', name);
+            return $option;
+        };
+    MIXIN$0(UISelectControl.prototype,proto$0);proto$0=void 0;return UISelectControl;})(UIFormControl);
+
+
+    angular.module('admin.component')
+        .service('UISelectControl', function()  {return UISelectControl})
+        .factory('uiSelectFactory', function (msg, ajax, uiFormControl, ValueService) {
+            var m = new msg('Select'),
+                Select = function (scope, element, attrs) {
+                    this.selectElement = element.find('select');
+                    this.dataKeyName = attrs.keyName || 'key';
+                    this.dataValueName = attrs.valueName || 'text';
+                    this.defaultResetValue = attrs.isMulti ? '' : (this.selectElement.find('option:eq(0)')[0] ? this.selectElement.find('option:eq(0)').val() : '');
+                    this.model = attrs.model;
+                    this.init = false;
+                    uiFormControl.apply(this, arguments);
+                };
+            Select.prototype = $.extend(new uiFormControl(), {
+
+                _init: function () {
+                    var self = this;
+                    if (this.model) {
+
+                        //监听一下model的变化
+                        this.watch = this.scope.$watch(this.model, function (newValue) {
+                            if (newValue !== undefined)
+                                this.val(newValue);
+                            else
+                                this.val(this.defaultResetValue);
+                        }.bind(this));
+
+                        //如果model没有值, 默认选择第一个
+                        if (!ValueService.get(this.scope, this.model)) {
+                            var val = this.attrs.value ? this.attrs.value : this.defaultResetValue;
+                            ValueService.set(this.scope, this.model, val);
+                        }
+                    }
+
+                    //远程加载数据
+                    if (this.attrs.url) {
+                        this.load(this.attrs.url);
+                    }
+
+                    if (!this.model && this.attrs.value) {
+                        this.val(this.attrs.value);
+                    }
+                    this.element.removeAttr('value');
+                },
+
+                load: function (url, value, isClean) {
+                    var self = this;
+                    return ajax.post(url).then(function (responseData) {
+                        self.setData(responseData, isClean);
+                        if (value) {
+                            self.val(value);
+                        }
+                        else {
+                            var val = self.val(),
+                                m = /^\?.+:(.+)\s+\?$/.exec(val);
+                            self.val(m ? m[1] : val);
+                        }
+                    });
+                },
+
+                /**
+                 *
+                 */
+                disabled: function (open) {
+                    this.selectElement.prop('disabled', open);
+                    this.render();
+                },
+
+                /**
+                 *
+                 */
+                render: function () {
+                    if (this.init) {
+                        this.selectElement.selectpicker('refresh');
+                    }
+                    else {
+                        this.selectElement.selectpicker({
+                            iconBase: 'fa',
+                            tickIcon: 'fa-check'
+                        });
+                        this.init = true;
+                    }
+                },
+
+                /**
+                 *
+                 * @param data
+                 * @param isClean
+                 */
+                setData: function (data, isClean, dataName, dataValue) {
+                    dataName = dataName || this.dataKeyName;
+                    dataValue = dataValue || this.dataValueName;
+                    if (isClean) {
+                        this.selectElement.html('');
+                    }
+                    if ($.isArray(data)) {
+                        $.each(data, function (i, item) {
+                            this.selectElement.append(this.toOption(item, dataName, dataValue));
+                        }.bind(this));
+                    }
+                    else {
+                        $.each(data, function (group, items) {
+                            var $optiongroup = this.toOptionGroup(group);
+                            $.each(items, function (i, item) {
+                                $optiongroup.append(this.toOption(item, dataName, dataValue));
+                            }.bind(this));
+                            this.selectElement.append($optiongroup);
+                        }.bind(this));
+                    }
+                    this.reset();
+                },
+
+                /**
+                 *
+                 * @param item
+                 * @param dataName
+                 * @param dataValue
+                 * @returns {*|jQuery}
+                 */
+                toOption: function (item, dataName, dataValue) {
+                    var isString = angular.isString(item),
+                        itemName = isString ? item : item[dataName],
+                        itemValue = isString ? item : item[dataValue];
+                    var $option = $('<option/>').attr('value', itemName).html(itemValue);
+                    this.$emit('uiselect.onOption', $option, item);
+                    $option.data('item', item);
+                    return $option;
+                },
+
+                /**
+                 *
+                 * @param name
+                 * @returns {*|jQuery}
+                 */
+                toOptionGroup: function (name) {
+                    var $option = $('<optgroup/>').attr('label', name);
+                    return $option;
+                },
+
+                /**
+                 *
+                 */
+                reset: function () {
+                    this.selectElement.val(this.defaultResetValue);
+                    this.render();
+                },
+
+                /**
+                 *
+                 * @param fn
+                 */
+                change: function (fn) {
+                    this.selectElement.change(fn);
+                },
+
+                /**
+                 *
+                 * @param v
+                 * @returns {*}
+                 */
+                val: function (v) {
+                    if (v !== undefined) {
+                        this.selectElement.val(v);
+                        this.render();
+                        return this;
+                    }
+                    else {
+                        return this.selectElement.val();
+                    }
+                }
+            });
+            return function (s, e, a, c, t) {
+                return new Select(s, e, a, c, t);
+            };
+        });
+})();
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5062,19 +5188,35 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormSelect', function (uiSelectFactory, componentHelper, defaultCol) {
+    .directive('uiFormSelect', function (UISelectControl) {
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: uiSelectFactory,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.select', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@',
+                multiple: '@',
+                render: '&'
+            },
+            link: function (s, e, a) {
+                new UISelectControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                    <label class=\"col-md-{{lcol}} control-label\">{{label}}</label>\
+\n                    <div class=\"col-md-{{rcol}}\">\
+\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" title=\"{{placeholder}}\" ng-transclude></select>\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                    </div>\
+\n                </div>\
+\n            ")
         };
     });
 
@@ -5297,38 +5439,6 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchNumberInput', function (componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: function (scope, element) {
-                //
-                var $input = element.find('input');
-                scope.$on('uisearchform.reset', function () {
-                    $input.val('');
-                });
-                $input.onkeyup(function(evt){
-                    var v = this.value;
-                    v = v.replace(/[^\d]/g, '');
-                    this.value = v;
-                });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.input', attrs);
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
     .directive('uiSearchInputSelect', function (uiSelectFactory, uiInputFactory, componentHelper, msg) {
         var m = new msg('SearchInputSelect');
         return {
@@ -5397,15 +5507,32 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchSelect', function (uiSelectFactory, componentHelper) {
+    .directive('uiSearchSelect', function (UISelectControl) {
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: uiSelectFactory,
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.select', attrs);
-            }
+            scope: {
+                label: '@',
+                placeholder: '@',
+                name: '@',
+                css: '@',
+                model: '=',
+                change: '&',
+                multiple: '@',
+                render: '&'
+            },
+            link: function (s, e, a) {
+                new UISelectControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"input-inline search-item\">\
+\n                    <div class=\"input-group\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
+\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" title=\"{{placeholder}}\" ng-transclude></select>\
+\n                    </div>\
+\n                </div>\
+\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------

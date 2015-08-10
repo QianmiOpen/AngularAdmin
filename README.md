@@ -53,6 +53,11 @@
     * to-model, 结束时间的双向绑定
     * change, scope里面的方法
 * ```<ui-form-input label="输入框" help="醉了4" model="item.formInput" change="inputChangeHandler()"></ui-form-input>```
+* ```<ui-form-select label="下拉框" url="" date-key-name="" date-value-name="" help="醉了5" model="item.formSelect" change="selectChangeHandler()"><option value="1">1</option><option value="2">2</option><option value="3">3</option></ui-form-select>```
+    * url, 远程数据地址
+    * dataKeyName, 键的名称
+    * dateValueName, 值的名称
+    * render, scope里面的方法, 用于美化option
 
 ## 查询
 
@@ -66,6 +71,12 @@
     * to-model, 结束时间的双向绑定
     * change, scope里面的方法
 * ```<ui-search-input label="输入框" help="醉了4" model="item.formInput" change="inputChangeHandler()"></ui-search-input>```
+* ```<ui-search-select label="下拉框" url="" date-key-name="" date-value-name="" help="醉了5" model="item.formSelect" change="selectChangeHandler()"><option value="1">1</option><option value="2">2</option><option value="3">3</option></ui-search-select>```
+    * url, 远程数据地址
+    * dataKeyName, 键的名称
+    * dateValueName, 值的名称
+    * render, scope里面的方法, 用于美化option
+
 
 ## 表格
 

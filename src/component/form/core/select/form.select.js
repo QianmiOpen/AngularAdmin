@@ -6,18 +6,34 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormSelect', function (uiSelectFactory, componentHelper, defaultCol) {
+    .directive('uiFormSelect', function (UISelectControl) {
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: uiSelectFactory,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.select', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@',
+                multiple: '@',
+                render: '&'
+            },
+            link: function (s, e, a) {
+                new UISelectControl(s, e, a);
+            },
+            template: `
+                <div class="form-group">
+                    <label class="col-md-{{lcol}} control-label">{{label}}</label>
+                    <div class="col-md-{{rcol}}">
+                        <select class="form-control show-tick" data-live-search="true" data-style="{{buttonClass}}" name="{{name}}" title="{{placeholder}}" ng-transclude></select>
+                        <span ng-if="help" class="help-block">{{help}}</span>
+                    </div>
+                </div>
+            `
         };
     });
