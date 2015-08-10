@@ -6,13 +6,28 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchInput', function (uiInputFactory, componentHelper) {
+    .directive('uiSearchInput', function (UIInputControl) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiInputFactory,
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.input', attrs);
-            }
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                css: '@',
+                placeholder: '@'
+            },
+            link: function (s, e, a) {
+                new UIInputControl(s, e, a);
+            },
+            template: `
+                 <div class="input-inline search-item">
+                    <div class="input-group">
+                        <div ng-if="label" class="input-group-addon">{{label}}</div>
+                        <input class="form-control" name="{{name}}" placeholder="{{placeholder}}" ng-model="model" ng-change="change()"/>
+                    </div>
+                </div>
+            `
         };
     });

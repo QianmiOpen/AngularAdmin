@@ -48,10 +48,11 @@
     * model, 双向绑定
     * change, scope里面的方法
 * ```<ui-form-date-range mode="datetime" label="日期范围:" help="醉了3" from-model="formRangeFromDate" to-model="formRangeToDate" change="dateRangeChangeHandler()"></ui-form-date-range>```
-    * mod, [date, datetime, time, month, year] 选其一
+    * mode, [date, datetime, time, month, year] 选其一
     * form-model, 开始时间的双向绑定
     * to-model, 结束时间的双向绑定
     * change, scope里面的方法
+* ```<ui-form-input label="输入框" help="醉了4" model="item.formInput" change="inputChangeHandler()"></ui-form-input>```
 
 ## 查询
 
@@ -64,6 +65,7 @@
     * form-model, 开始时间的双向绑定
     * to-model, 结束时间的双向绑定
     * change, scope里面的方法
+* ```<ui-search-input label="输入框" help="醉了4" model="item.formInput" change="inputChangeHandler()"></ui-search-input>```
 
 ## 表格
 

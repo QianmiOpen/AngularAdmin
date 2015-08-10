@@ -5,55 +5,18 @@
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .constant('uiInputMaskMap', {
-        'backcard': '9999 9999 9999 9999'
-    })
-    .factory('uiInputFactory', function (msg, uiInputMaskMap, uiFormControl) {
-        var m = new msg('Input'),
-            Input = function (scope, element, attrs) {
-                this.inputElement = element.find('input');
-                this.attrs = attrs;
-                this.mask = attrs.mask || uiInputMaskMap[attrs.type];
-                uiFormControl.apply(this, arguments);
-            };
-        Input.prototype = $.extend(new uiFormControl(), {
+(function () {
 
-            render: function () {
-                if (this.mask && $.fn.inputmask) {
-                    this.inputElement.inputmask(this.mask);
-                }
-                this.element.removeAttr('type');
-            },
+    class UIInputControl extends UIFormControl {
 
-            reset: function () {
-                this.inputElement.val('');
-            },
+        constructor(s, e, a) {
+            this.className = 'Input';
+            this.formEl = e.find('input');
+            super(s, e, a);
+        }
+    }
 
-            disabled: function (open) {
-                this.attr('disabled', open);
-            },
 
-            attr: function (k, v) {
-                if (v) {
-                    this.inputElement.attr(k, v);
-                }
-                else {
-                    return this.inputElement.attr(k);
-                }
-            },
-
-            val: function (v) {
-                if (v !== undefined) {
-                    this.inputElement.val(v);
-                    return this;
-                }
-                else {
-                    return this.inputElement.val();
-                }
-            }
-        });
-        return function (s, e, a, c, t) {
-            return new Input(s, e, a, c, t);
-        };
-    });
+    angular.module('admin.component')
+        .service('UIInputControl', () => UIInputControl);
+})();

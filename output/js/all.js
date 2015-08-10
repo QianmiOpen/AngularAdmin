@@ -1293,7 +1293,7 @@ angular.module('admin.component', [])
  *
  */
 angular.module('admin.component')
-    .directive('uiBubbleChart', function (uiChartFactory) {
+    .directive('uiAreaChart', function (uiChartFactory) {
         return {
             restrict: 'E',
             replace: true,
@@ -1311,7 +1311,7 @@ angular.module('admin.component')
  *
  */
 angular.module('admin.component')
-    .directive('uiAreaChart', function (uiChartFactory) {
+    .directive('uiBubbleChart', function (uiChartFactory) {
         return {
             restrict: 'E',
             replace: true,
@@ -1753,6 +1753,7 @@ var UIFormControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o
     }if(super$0!==null)SP$0(UIFormControl,super$0);UIFormControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIFormControl,"configurable":true,"writable":true}});DP$0(UIFormControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
     proto$0.init = function() {
+        this.message = new Message('Input');
         this.scope.lcol = this.scope.lcol !== undefined ? this.scope.lcol : 2;
         this.scope.rcol = this.scope.rcol !== undefined ? this.scope.rcol : 10;
         this.triggerComplete(this.scope, this.attrs.ref || (this.formPrefix + this.className), this);
@@ -1824,7 +1825,6 @@ angular.module('admin.component')
     var UIDateControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDateControl, super$0);var proto$0={};
         function UIDateControl(s, e, a) {
             this.className = 'Date';
-            this.message = new Message('uiDate');
             this.formEl = e.find('input');
             this.dateMode = a.mode ? a.mode.indexOf('date') != -1 : true;
             this.timeMode = a.mode ? a.mode.indexOf('time') != -1 : true;
@@ -2345,58 +2345,21 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .constant('uiInputMaskMap', {
-        'backcard': '9999 9999 9999 9999'
-    })
-    .factory('uiInputFactory', function (msg, uiInputMaskMap, uiFormControl) {
-        var m = new msg('Input'),
-            Input = function (scope, element, attrs) {
-                this.inputElement = element.find('input');
-                this.attrs = attrs;
-                this.mask = attrs.mask || uiInputMaskMap[attrs.type];
-                uiFormControl.apply(this, arguments);
-            };
-        Input.prototype = $.extend(new uiFormControl(), {
+(function () {
 
-            render: function () {
-                if (this.mask && $.fn.inputmask) {
-                    this.inputElement.inputmask(this.mask);
-                }
-                this.element.removeAttr('type');
-            },
+    var UIInputControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIInputControl, super$0);
 
-            reset: function () {
-                this.inputElement.val('');
-            },
+        function UIInputControl(s, e, a) {
+            this.className = 'Input';
+            this.formEl = e.find('input');
+            super$0.call(this, s, e, a);
+        }if(super$0!==null)SP$0(UIInputControl,super$0);UIInputControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIInputControl,"configurable":true,"writable":true}});DP$0(UIInputControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+    ;return UIInputControl;})(UIFormControl);
 
-            disabled: function (open) {
-                this.attr('disabled', open);
-            },
 
-            attr: function (k, v) {
-                if (v) {
-                    this.inputElement.attr(k, v);
-                }
-                else {
-                    return this.inputElement.attr(k);
-                }
-            },
-
-            val: function (v) {
-                if (v !== undefined) {
-                    this.inputElement.val(v);
-                    return this;
-                }
-                else {
-                    return this.inputElement.val();
-                }
-            }
-        });
-        return function (s, e, a, c, t) {
-            return new Input(s, e, a, c, t);
-        };
-    });
+    angular.module('admin.component')
+        .service('UIInputControl', function()  {return UIInputControl});
+})();
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4993,18 +4956,34 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormInput', function (uiInputFactory, componentHelper, defaultCol) {
+    .directive('uiFormInput', function (UIInputControl) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiInputFactory,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.input', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@',
+                type: '@'
+            },
+            link: function (scope, element, attrs) {
+                new UIInputControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <input type=\"{{type || 'text'}}\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change()\" ng-model=\"model\"/>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------
@@ -5285,14 +5264,29 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchInput', function (uiInputFactory, componentHelper) {
+    .directive('uiSearchInput', function (UIInputControl) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiInputFactory,
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.input', attrs);
-            }
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                css: '@',
+                placeholder: '@'
+            },
+            link: function (s, e, a) {
+                new UIInputControl(s, e, a);
+            },
+            template: ("\
+\n                 <div class=\"input-inline search-item\">\
+\n                    <div class=\"input-group\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
+\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change()\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------

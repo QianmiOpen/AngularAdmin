@@ -10,7 +10,6 @@
     class UIDateControl extends UIFormControl {
         constructor(s, e, a) {
             this.className = 'Date';
-            this.message = new Message('uiDate');
             this.formEl = e.find('input');
             this.dateMode = a.mode ? a.mode.indexOf('date') != -1 : true;
             this.timeMode = a.mode ? a.mode.indexOf('time') != -1 : true;
