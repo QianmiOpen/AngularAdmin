@@ -1793,7 +1793,7 @@ var UIFormControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o
 
     proto$0.destroy = function() {
         delete this.listenerMap;
-        this.resetListener();
+        this.reset();
     };
 
     proto$0.change = function(fn) {
@@ -1812,7 +1812,7 @@ MIXIN$0(UIFormControl.prototype,proto$0);proto$0=void 0;return UIFormControl;})(
 
 
 angular.module('admin.component')
-    .service('uiFormControl', function()  {return UIFormControl});
+    .factory('uiFormControl', function()  {return UIFormControl});
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -1821,44 +1821,45 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 (function () {
-
-    var UIDateControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDateControl, super$0);var proto$0={};
-        function UIDateControl(s, e, a) {
-            this.className = 'Date';
-            this.formEl = e.find('input');
-            this.dateMode = a.mode ? a.mode.indexOf('date') != -1 : true;
-            this.timeMode = a.mode ? a.mode.indexOf('time') != -1 : true;
-            super$0.call(this, s, e, a);
-        }if(super$0!==null)SP$0(UIDateControl,super$0);UIDateControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDateControl,"configurable":true,"writable":true}});DP$0(UIDateControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-        proto$0.init = function() {
-            super$0.prototype.init.call(this);
-            var format = [];
-            if (this.dateMode)
-                format.push('yyyy-MM-dd');
-            if (this.timeMode)
-                format.push('HH:mm:ss');
-            this.format = format.join(' ');
-        };
-
-        proto$0.initEvents = function() {
-            super$0.prototype.initEvents.call(this);
-        };
-
-        proto$0.render = function(){
-            this.formEl.datetimepicker({
-                language: 'zh-CN',
-                pickDate: this.dateMode,
-                useCurrent: false,
-                pickTime: this.timeMode,
-                useSeconds: this.timeMode
-            });
-        };
-    MIXIN$0(UIDateControl.prototype,proto$0);proto$0=void 0;return UIDateControl;})(UIFormControl);
-
-
     angular.module('admin.component')
-        .service('UIDateControl', function()  {return UIDateControl});
+        .service('UIDateControl', function()  {
+            var UIDateControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDateControl, super$0);var proto$0={};
+                function UIDateControl(s, e, a) {
+                    this.className = 'Date';
+                    this.formEl = e.find('input');
+                    this.dateMode = a.mode ? a.mode.indexOf('date') != -1 : true;
+                    this.timeMode = a.mode ? a.mode.indexOf('time') != -1 : true;
+                    super$0.call(this, s, e, a);
+                }if(super$0!==null)SP$0(UIDateControl,super$0);UIDateControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDateControl,"configurable":true,"writable":true}});DP$0(UIDateControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.init = function() {
+                    super$0.prototype.init.call(this);
+                    var format = [];
+                    if (this.dateMode)
+                        format.push('yyyy-MM-dd');
+                    if (this.timeMode)
+                        format.push('HH:mm:ss');
+                    this.format = format.join(' ');
+                };
+
+                proto$0.initEvents = function() {
+                    super$0.prototype.initEvents.call(this);
+                };
+
+                proto$0.render = function(){
+                    this.formEl.datetimepicker({
+                        language: 'zh-CN',
+                        pickDate: this.dateMode,
+                        useCurrent: false,
+                        pickTime: this.timeMode,
+                        useSeconds: this.timeMode
+                    });
+                };
+            MIXIN$0(UIDateControl.prototype,proto$0);proto$0=void 0;return UIDateControl;})(UIFormControl);
+
+            alert(1);
+            return UIDateControl;
+        });
 })();
 //-----------------------------------------------------------------------------------------------
 //
@@ -1978,103 +1979,7 @@ angular.module('admin.component')
 
 
     angular.module('admin.component')
-        .service('UIDateRangeControl', function()  {return UIDateRangeControl})
-        .value('uiDateRangeDefaultConfig', {
-            opens: ('right'),
-            minDate: moment().subtract('year', 40).startOf('year'),
-            maxDate: moment().add('year', 10).endOf('year'),
-            showDropdowns: true,
-            showWeekNumbers: false,
-            timePickerIncrement: 1,
-            timePicker12Hour: false,
-            buttonClasses: ['btn', 'btn-sm'],
-            applyClass: 'green',
-            cancelClass: 'default',
-            separator: ' - ',
-            locale: {
-                applyLabel: '确定',
-                cancelLabel: '取消',
-                resetLabel: '重置',
-                fromLabel: '从',
-                toLabel: '至',
-                customRangeLabel: '自定义',
-                daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
-                monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
-                firstDay: 1
-            }
-        })
-        .factory('uiDateRangeService', function (msg, uiDateRangeDefaultConfig, uiDateRangeDefaultRange, uiFormControl) {
-            var m = new msg('DateRange'),
-                DateRange = function (scope, element, attrs) {
-                    this.className = 'DateRange';
-                    this.element = element;
-                    this.startDateElement = element.find('.input-group').find('input:first');
-                    this.endDateElement = element.find('.input-group').find('input:last');
-                    this.attrs = attrs;
-
-                    this.hasDefaultDateRange = !!this.attrs.range;
-                    this.isDateTimeMode = attrs.mode !== 'date' || attr.time !== undefined;
-                    this.format = attrs.format || (this.isDateTimeMode ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD');
-                    var dateRange = uiDateRangeDefaultRange[this.attrs.range] || [];
-                    this.defaultStartDate = attrs.fromValue || dateRange[0];
-                    this.defaultEndDate = attrs.toValue || dateRange[1];
-                    this.limit = attrs.limit;
-                    uiFormControl.apply(this, arguments);
-                };
-            DateRange.prototype = $.extend(new uiFormControl(), {
-                _init: function () {
-                    this.config = $.extend({}, uiDateRangeDefaultConfig, {
-                        ranges: uiDateRangeDefaultRange,
-                        timePicker: this.isDateTimeMode,
-                        format: this.format
-                    });
-
-                    //要小心设置这个值
-                    if (this.limit) {
-                        this.config.dateLimit = {days: this.limit};
-                    }
-
-                    //默认值
-                    if (this.hasDefaultDateRange) {
-                        this.config.startDate = this.defaultStartDate;
-                        this.config.endDate = this.defaultEndDate;
-                    }
-                },
-
-                render: function () {
-                    this.element.find("div").daterangepicker(this.config, function (start, end) {
-                        start = start ? start.format(this.format) : "";
-                        end = end ? end.format(this.format) : "";
-                        this.startDateElement.val(start);
-                        this.endDateElement.val(end);
-                        this.$emit('change', this, start, end);
-                    }.bind(this));
-                },
-
-                reset: function () {
-                    this.startDateElement.val('');
-                    this.endDateElement.val('');
-                },
-
-                val: function (sv, ev) {
-                    if (sv) {
-                        this.startDateElement.val(sv);
-                    }
-                    if (ev) {
-                        this.endDateElement.val(ev);
-                    }
-                    if (!sv && !ev) {
-                        return [this.startDateElement.val(), this.endDateElement.val()];
-                    }
-                    else {
-                        return this;
-                    }
-                }
-            });
-            return function (s, e, a, c, t) {
-                return new DateRange(s, e, a, c, t);
-            };
-        });
+        .factory('UIDateRangeControl', function()  {return UIDateRangeControl});
 })();
 //------------------------------------------------------
 //
@@ -2358,7 +2263,7 @@ angular.module('admin.component')
 
 
     angular.module('admin.component')
-        .service('UIInputControl', function()  {return UIInputControl});
+        .factory('UIInputControl', function()  {return UIInputControl});
 })();
 //-----------------------------------------------------------------------------------------------
 //
@@ -2936,303 +2841,133 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 (function () {
-
-    var UISelectControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UISelectControl, super$0);var proto$0={};
-
-        function UISelectControl(s, e, a) {
-            this.className = 'Select';
-            this.formEl = e.find('Select');
-            this.ajax = new Ajax();
-            super$0.call(this, s, e, a);
-        }if(super$0!==null)SP$0(UISelectControl,super$0);UISelectControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UISelectControl,"configurable":true,"writable":true}});DP$0(UISelectControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-        proto$0.init = function() {
-            super$0.prototype.init.call(this);
-
-            //是否多选
-            if (this.attrs.multiple) {
-                this.formEl.prop('multiple', 'multiple');
-            }
-
-            //初始化数值
-            this.defaultValue = this.scope.value || this.formEl.find('option:eq(0)').val() || '';
-            if (!this.scope.model && this.defaultValue) {
-                this.scope.model = this.defaultValue;
-                this.val(this.defaultValue);
-            }
-
-            //远程加载数据
-            if (this.attrs.url) {
-                this.load(this.attrs.url);
-            }
-        };
-
-        proto$0.initEvents = function() {var this$0 = this;
-            super$0.prototype.initEvents.call(this);
-            this.scope.$watch('model', function(nv)  {
-                if (nv !== undefined) {
-                    this$0.val(nv);
-                    this$0.scope.change();
-                }
-                else
-                    this$0.val(this$0.defaultValue);
-            });
-            this.formEl.change(function()  {
-                this$0.scope.model = this$0.formEl.val();
-                this$0.scope.$apply();
-            });
-        };
-
-        proto$0.render = function() {
-            if (this.init) {
-                this.formEl.selectpicker('refresh');
-            }
-            else {
-                this.formEl.selectpicker({
-                    iconBase: 'fa',
-                    tickIcon: 'fa-check'
-                });
-                this.init = true;
-            }
-        };
-
-        proto$0.val = function(val) {
-            super$0.prototype.val.call(this, val);
-            if (val)
-                this.render();
-        };
-
-        proto$0.load = function(url, value, isClean) {var this$0 = this;
-            return this.ajax.post(url).then(function(responseData)  {
-                this$0.setData(responseData, isClean);
-                if (value) {
-                    this$0.val(value);
-                }
-                else {
-                    var val = self.val(),
-                        m = /^\?.+:(.+)\s+\?$/.exec(val);
-                    this$0.val(m ? m[1] : val);
-                }
-            });
-        };
-
-        proto$0.setData = function(data, isClean, dataName, dataValue) {var this$0 = this;
-            dataName = dataName || this.scope.dataKeyName;
-            dataValue = dataValue || this.scope.dataValueName;
-            if (isClean) {
-                this.formEl.html('');
-            }
-            if (_.isArray(data)) {
-                $.each(data, function(i, item)  {
-                    this$0.formEl.append(this$0.toOption(item, dataName, dataValue));
-                });
-            }
-            else {
-                $.each(data, function(group, items)  {
-                    var $optionGroup = this$0.toOptionGroup(group);
-                    $.each(items, function(i, item)  {
-                        $optionGroup.append(this$0.toOption(item, dataName, dataValue));
-                    });
-                    this$0.formEl.append($optionGroup);
-                });
-            }
-            this.reset();
-        };
-
-        proto$0.toOption = function(item, dataName, dataValue) {
-            var isString = _.isString(item),
-                itemName = isString ? item : item[dataName],
-                itemValue = isString ? item : item[dataValue];
-            var $option = $('<option/>').attr('value', itemName).html(itemValue),
-                renderHtml = this.scope.render($option, item);
-            if (renderHtml) {
-                $option.data('content', renderHtml);
-            }
-            $option.data('item', item);
-            return $option;
-        };
-
-        proto$0.toOptionGroup = function(name) {
-            var $option = $('<optgroup/>').attr('label', name);
-            return $option;
-        };
-    MIXIN$0(UISelectControl.prototype,proto$0);proto$0=void 0;return UISelectControl;})(UIFormControl);
-
-
     angular.module('admin.component')
-        .service('UISelectControl', function()  {return UISelectControl})
-        .factory('uiSelectFactory', function (msg, ajax, uiFormControl, ValueService) {
-            var m = new msg('Select'),
-                Select = function (scope, element, attrs) {
-                    this.selectElement = element.find('select');
-                    this.dataKeyName = attrs.keyName || 'key';
-                    this.dataValueName = attrs.valueName || 'text';
-                    this.defaultResetValue = attrs.isMulti ? '' : (this.selectElement.find('option:eq(0)')[0] ? this.selectElement.find('option:eq(0)').val() : '');
-                    this.model = attrs.model;
-                    this.init = false;
-                    uiFormControl.apply(this, arguments);
-                };
-            Select.prototype = $.extend(new uiFormControl(), {
+        .factory('UISelectControl',function()  {
 
-                _init: function () {
-                    var self = this;
-                    if (this.model) {
+            //
+            var UISelectControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UISelectControl, super$0);var proto$0={};
 
-                        //监听一下model的变化
-                        this.watch = this.scope.$watch(this.model, function (newValue) {
-                            if (newValue !== undefined)
-                                this.val(newValue);
-                            else
-                                this.val(this.defaultResetValue);
-                        }.bind(this));
+                function UISelectControl(s, e, a) {
+                    this.className = 'Select';
+                    this.formEl = e.find('Select');
+                    this.ajax = new Ajax();
+                    super$0.call(this, s, e, a);
+                }if(super$0!==null)SP$0(UISelectControl,super$0);UISelectControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UISelectControl,"configurable":true,"writable":true}});DP$0(UISelectControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
-                        //如果model没有值, 默认选择第一个
-                        if (!ValueService.get(this.scope, this.model)) {
-                            var val = this.attrs.value ? this.attrs.value : this.defaultResetValue;
-                            ValueService.set(this.scope, this.model, val);
-                        }
+                proto$0.init = function() {
+                    super$0.prototype.init.call(this);
+
+                    //是否多选
+                    if (this.attrs.multiple) {
+                        this.formEl.prop('multiple', 'multiple');
+                    }
+
+                    //初始化数值
+                    this.defaultValue = this.scope.value || this.formEl.find('option:eq(0)').val() || '';
+                    if (!this.scope.model && this.defaultValue) {
+                        this.scope.model = this.defaultValue;
+                        this.val(this.defaultValue);
                     }
 
                     //远程加载数据
                     if (this.attrs.url) {
                         this.load(this.attrs.url);
                     }
+                };
 
-                    if (!this.model && this.attrs.value) {
-                        this.val(this.attrs.value);
-                    }
-                    this.element.removeAttr('value');
-                },
-
-                load: function (url, value, isClean) {
-                    var self = this;
-                    return ajax.post(url).then(function (responseData) {
-                        self.setData(responseData, isClean);
-                        if (value) {
-                            self.val(value);
+                proto$0.initEvents = function() {var this$0 = this;
+                    super$0.prototype.initEvents.call(this);
+                    this.scope.$watch('model', function(nv)  {
+                        if (nv !== undefined) {
+                            this$0.val(nv);
+                            this$0.scope.change();
                         }
-                        else {
-                            var val = self.val(),
-                                m = /^\?.+:(.+)\s+\?$/.exec(val);
-                            self.val(m ? m[1] : val);
-                        }
+                        else
+                            this$0.val(this$0.defaultValue);
                     });
-                },
+                    this.formEl.change(function()  {
+                        this$0.scope.model = this$0.formEl.val();
+                        this$0.scope.$apply();
+                    });
+                };
 
-                /**
-                 *
-                 */
-                disabled: function (open) {
-                    this.selectElement.prop('disabled', open);
-                    this.render();
-                },
-
-                /**
-                 *
-                 */
-                render: function () {
+                proto$0.render = function() {
                     if (this.init) {
-                        this.selectElement.selectpicker('refresh');
+                        this.formEl.selectpicker('refresh');
                     }
                     else {
-                        this.selectElement.selectpicker({
+                        this.formEl.selectpicker({
                             iconBase: 'fa',
                             tickIcon: 'fa-check'
                         });
                         this.init = true;
                     }
-                },
+                };
 
-                /**
-                 *
-                 * @param data
-                 * @param isClean
-                 */
-                setData: function (data, isClean, dataName, dataValue) {
-                    dataName = dataName || this.dataKeyName;
-                    dataValue = dataValue || this.dataValueName;
+                proto$0.val = function(val) {
+                    super$0.prototype.val.call(this, val);
+                    if (val)
+                        this.render();
+                };
+
+                proto$0.load = function(url, value, isClean) {var this$0 = this;
+                    return this.ajax.post(url).then(function(responseData)  {
+                        this$0.setData(responseData, isClean);
+                        if (value) {
+                            this$0.val(value);
+                        }
+                        else {
+                            var val = self.val(),
+                                m = /^\?.+:(.+)\s+\?$/.exec(val);
+                            this$0.val(m ? m[1] : val);
+                        }
+                    });
+                };
+
+                proto$0.setData = function(data, isClean, dataName, dataValue) {var this$0 = this;
+                    dataName = dataName || this.scope.dataKeyName;
+                    dataValue = dataValue || this.scope.dataValueName;
                     if (isClean) {
-                        this.selectElement.html('');
+                        this.formEl.html('');
                     }
-                    if ($.isArray(data)) {
-                        $.each(data, function (i, item) {
-                            this.selectElement.append(this.toOption(item, dataName, dataValue));
-                        }.bind(this));
+                    if (_.isArray(data)) {
+                        $.each(data, function(i, item)  {
+                            this$0.formEl.append(this$0.toOption(item, dataName, dataValue));
+                        });
                     }
                     else {
-                        $.each(data, function (group, items) {
-                            var $optiongroup = this.toOptionGroup(group);
-                            $.each(items, function (i, item) {
-                                $optiongroup.append(this.toOption(item, dataName, dataValue));
-                            }.bind(this));
-                            this.selectElement.append($optiongroup);
-                        }.bind(this));
+                        $.each(data, function(group, items)  {
+                            var $optionGroup = this$0.toOptionGroup(group);
+                            $.each(items, function(i, item)  {
+                                $optionGroup.append(this$0.toOption(item, dataName, dataValue));
+                            });
+                            this$0.formEl.append($optionGroup);
+                        });
                     }
                     this.reset();
-                },
+                };
 
-                /**
-                 *
-                 * @param item
-                 * @param dataName
-                 * @param dataValue
-                 * @returns {*|jQuery}
-                 */
-                toOption: function (item, dataName, dataValue) {
-                    var isString = angular.isString(item),
+                proto$0.toOption = function(item, dataName, dataValue) {
+                    var isString = _.isString(item),
                         itemName = isString ? item : item[dataName],
                         itemValue = isString ? item : item[dataValue];
-                    var $option = $('<option/>').attr('value', itemName).html(itemValue);
-                    this.$emit('uiselect.onOption', $option, item);
+                    var $option = $('<option/>').attr('value', itemName).html(itemValue),
+                        renderHtml = this.scope.render($option, item);
+                    if (renderHtml) {
+                        $option.data('content', renderHtml);
+                    }
                     $option.data('item', item);
                     return $option;
-                },
+                };
 
-                /**
-                 *
-                 * @param name
-                 * @returns {*|jQuery}
-                 */
-                toOptionGroup: function (name) {
+                proto$0.toOptionGroup = function(name) {
                     var $option = $('<optgroup/>').attr('label', name);
                     return $option;
-                },
+                };
+            MIXIN$0(UISelectControl.prototype,proto$0);proto$0=void 0;return UISelectControl;})(UIFormControl);
 
-                /**
-                 *
-                 */
-                reset: function () {
-                    this.selectElement.val(this.defaultResetValue);
-                    this.render();
-                },
-
-                /**
-                 *
-                 * @param fn
-                 */
-                change: function (fn) {
-                    this.selectElement.change(fn);
-                },
-
-                /**
-                 *
-                 * @param v
-                 * @returns {*}
-                 */
-                val: function (v) {
-                    if (v !== undefined) {
-                        this.selectElement.val(v);
-                        this.render();
-                        return this;
-                    }
-                    else {
-                        return this.selectElement.val();
-                    }
-                }
-            });
-            return function (s, e, a, c, t) {
-                return new Select(s, e, a, c, t);
-            };
+            //
+            return UISelectControl;
         });
 })();
 //-----------------------------------------------------------------------------------------------
@@ -4492,39 +4227,6 @@ angular.module('admin.component')
 
 
 
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .controller('uiPortletContainerController', function ($scope, $attrs, $element) {
-        $element.data('portlet', $scope.portlet).load($scope.portlet.url, function(){
-            $scope.$emit('portletComplete');
-        });
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiPortletContainer', function () {
-        return {
-            restrict: 'E',
-            replace: true,
-            controller: 'uiPortletContainerController',
-            templateUrl: 'tpl.portal.portlet.container'
-        };
-    });
-
-
-
-
 //------------------------------------------------------
 //
 //
@@ -4997,6 +4699,39 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .controller('uiPortletContainerController', function ($scope, $attrs, $element) {
+        $element.data('portlet', $scope.portlet).load($scope.portlet.url, function(){
+            $scope.$emit('portletComplete');
+        });
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiPortletContainer', function () {
+        return {
+            restrict: 'E',
+            replace: true,
+            controller: 'uiPortletContainerController',
+            templateUrl: 'tpl.portal.portlet.container'
+        };
+    });
+
+
+
+
+//-----------------------------------------------------------------------------------------------
+//
+//
 //  针对input的封装
 //
 //
@@ -5217,35 +4952,6 @@ angular.module('admin.component')
 \n                    </div>\
 \n                </div>\
 \n            ")
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormMultiSelect', function (util, uiSelectFactory, componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: uiSelectFactory,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.select', $.extend({
-                    isMulti: true,
-                    leftCol: cc[0],
-                    rightCol: cc[1],
-                    other: [
-                        {key: 'multiple', val: ''},
-                        {key: 'title', val: attrs.tip || '请选择'}
-                    ]
-                }, attrs));
-            }
         };
     });
 
@@ -5533,30 +5239,6 @@ angular.module('admin.component')
 \n                    </div>\
 \n                </div>\
 \n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchMultiSelect', function (uiSelectFactory, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: uiSelectFactory,
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.select', $.extend({
-                    isMulti: true,
-                    other: [
-                        {key: 'multiple', val: ''},
-                        {key: 'title', val: attrs.tip || '请选择'}
-                    ]
-                }, attrs));
-            }
         };
     });
 //-----------------------------------------------------------------------------------------------

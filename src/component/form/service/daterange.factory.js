@@ -41,126 +41,32 @@
         }
     };
 
-    class UIDateRangeControl extends UIFormControl {
-        constructor(s, e, a) {
-            this.className = 'DateRange';
-            this.startDateElement = e.find('.input-group').find('input:first');
-            this.endDateElement = e.find('.input-group').find('input:last');
-
-            this.hasDefaultDateRange = !!a.range;
-            this.isDateTimeMode = a.mode !== 'date' || a.time !== undefined;
-            this.format = a.format || (this.isDateTimeMode ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD');
-
-            this.limit = a.limit;
-            super(s, e, a);
-        }
-
-        init() {
-            super.init();
-
-            //默认值
-            let dateRange = uiDateRangeDefaultRange[this.attrs.range] || [];
-            this.defaultStartDate = this.attrs.fromValue || dateRange[0];
-            this.defaultEndDate = this.attrs.toValue || dateRange[1];
-
-            //
-            this.config = $.extend({}, uiDateRangeDefaultConfig, {
-                ranges: uiDateRangeDefaultRange,
-                timePicker: this.isDateTimeMode,
-                format: this.format
-            });
-
-            //要小心设置这个值
-            if (this.limit) {
-                this.config.dateLimit = {days: this.limit};
-            }
-
-            //默认值
-            if (this.hasDefaultDateRange) {
-                this.config.startDate = this.defaultStartDate;
-                this.config.endDate = this.defaultEndDate;
-            }
-        }
-
-        render() {
-            this.element.find("div").daterangepicker(this.config, (startVal, endVal) => {
-                startVal = startVal ? startVal.format(this.format) : "";
-                endVal = endVal ? endVal.format(this.format) : "";
-                this.val(startVal, endVal);
-                this.scope.change();
-            });
-        }
-
-        reset() {
-            this.startDateElement.val('');
-            this.endDateElement.val('');
-        }
-
-        val(sv, ev) {
-            if (sv) {
-                this.startDateElement.val(sv);
-            }
-            if (ev) {
-                this.endDateElement.val(ev);
-            }
-            if (!sv && !ev) {
-                return [this.startDateElement.val(), this.endDateElement.val()];
-            }
-            else {
-                return this;
-            }
-        }
-
-
-    }
-
 
     angular.module('admin.component')
-        .service('UIDateRangeControl', () => UIDateRangeControl)
-        .value('uiDateRangeDefaultConfig', {
-            opens: ('right'),
-            minDate: moment().subtract('year', 40).startOf('year'),
-            maxDate: moment().add('year', 10).endOf('year'),
-            showDropdowns: true,
-            showWeekNumbers: false,
-            timePickerIncrement: 1,
-            timePicker12Hour: false,
-            buttonClasses: ['btn', 'btn-sm'],
-            applyClass: 'green',
-            cancelClass: 'default',
-            separator: ' - ',
-            locale: {
-                applyLabel: '确定',
-                cancelLabel: '取消',
-                resetLabel: '重置',
-                fromLabel: '从',
-                toLabel: '至',
-                customRangeLabel: '自定义',
-                daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
-                monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
-                firstDay: 1
-            }
-        })
-        .factory('uiDateRangeService', function (msg, uiDateRangeDefaultConfig, uiDateRangeDefaultRange, uiFormControl) {
-            var m = new msg('DateRange'),
-                DateRange = function (scope, element, attrs) {
+        .factory('UIDateRangeControl', () => {
+            class UIDateRangeControl extends UIFormControl {
+                constructor(s, e, a) {
                     this.className = 'DateRange';
-                    this.element = element;
-                    this.startDateElement = element.find('.input-group').find('input:first');
-                    this.endDateElement = element.find('.input-group').find('input:last');
-                    this.attrs = attrs;
+                    this.startDateElement = e.find('.input-group').find('input:first');
+                    this.endDateElement = e.find('.input-group').find('input:last');
 
-                    this.hasDefaultDateRange = !!this.attrs.range;
-                    this.isDateTimeMode = attrs.mode !== 'date' || attr.time !== undefined;
-                    this.format = attrs.format || (this.isDateTimeMode ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD');
-                    var dateRange = uiDateRangeDefaultRange[this.attrs.range] || [];
-                    this.defaultStartDate = attrs.fromValue || dateRange[0];
-                    this.defaultEndDate = attrs.toValue || dateRange[1];
-                    this.limit = attrs.limit;
-                    uiFormControl.apply(this, arguments);
-                };
-            DateRange.prototype = $.extend(new uiFormControl(), {
-                _init: function () {
+                    this.hasDefaultDateRange = !!a.range;
+                    this.isDateTimeMode = a.mode !== 'date' || a.time !== undefined;
+                    this.format = a.format || (this.isDateTimeMode ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD');
+
+                    this.limit = a.limit;
+                    super(s, e, a);
+                }
+
+                init() {
+                    super.init();
+
+                    //默认值
+                    let dateRange = uiDateRangeDefaultRange[this.attrs.range] || [];
+                    this.defaultStartDate = this.attrs.fromValue || dateRange[0];
+                    this.defaultEndDate = this.attrs.toValue || dateRange[1];
+
+                    //
                     this.config = $.extend({}, uiDateRangeDefaultConfig, {
                         ranges: uiDateRangeDefaultRange,
                         timePicker: this.isDateTimeMode,
@@ -177,24 +83,23 @@
                         this.config.startDate = this.defaultStartDate;
                         this.config.endDate = this.defaultEndDate;
                     }
-                },
+                }
 
-                render: function () {
-                    this.element.find("div").daterangepicker(this.config, function (start, end) {
-                        start = start ? start.format(this.format) : "";
-                        end = end ? end.format(this.format) : "";
-                        this.startDateElement.val(start);
-                        this.endDateElement.val(end);
-                        this.$emit('change', this, start, end);
-                    }.bind(this));
-                },
+                render() {
+                    this.element.find("div").daterangepicker(this.config, (startVal, endVal) => {
+                        startVal = startVal ? startVal.format(this.format) : "";
+                        endVal = endVal ? endVal.format(this.format) : "";
+                        this.val(startVal, endVal);
+                        this.scope.change();
+                    });
+                }
 
-                reset: function () {
+                reset() {
                     this.startDateElement.val('');
                     this.endDateElement.val('');
-                },
+                }
 
-                val: function (sv, ev) {
+                val(sv, ev) {
                     if (sv) {
                         this.startDateElement.val(sv);
                     }
@@ -208,9 +113,8 @@
                         return this;
                     }
                 }
-            });
-            return function (s, e, a, c, t) {
-                return new DateRange(s, e, a, c, t);
-            };
+            }
+
+            return UIDateRangeControl;
         });
 })();

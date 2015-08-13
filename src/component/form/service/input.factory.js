@@ -18,5 +18,5 @@
 
 
     angular.module('admin.component')
-        .service('UIInputControl', () => UIInputControl);
+        .factory('UIInputControl', () => UIInputControl);
 })();

@@ -56,7 +56,7 @@ class UIFormControl extends ComponentEvent {
 
     destroy() {
         delete this.listenerMap;
-        this.resetListener();
+        this.reset();
     }
 
     change(fn) {
@@ -75,4 +75,4 @@ class UIFormControl extends ComponentEvent {
 
 
 angular.module('admin.component')
-    .service('uiFormControl', () => UIFormControl);
+    .factory('uiFormControl', () => UIFormControl);

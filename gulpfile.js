@@ -7,6 +7,7 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var es6transpiler = require('gulp-es6-transpiler');
+var livereload = require('gulp-livereload');
 
 var scripts = [
     './src/filter/index.js',
@@ -52,9 +53,14 @@ gulp.task('scripts', function () {
 gulp.task('default', function () {
     gulp.run('lint', 'scripts');
 
+    livereload.listen();
+
     // 监听文件变化
-    gulp.watch(scripts, function () {
+    gulp.watch(scripts, function (file) {
         gulp.run('lint', 'scripts', function (o) {
+            setTimeout(function () {
+                livereload.reload();
+            }, 5 * 1000);
         });
     });
 });
