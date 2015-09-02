@@ -2188,17 +2188,214 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
+(function () {
+    angular.module('admin.component')
+        .factory('UIRemoteSelectControl', function($q, Util, Ajax)  {
+            var UIRemoteSelectControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIRemoteSelectControl, super$0);var proto$0={};
+                function UIRemoteSelectControl(s, e, a) {
+                    this.className = 'RemoteSelect';
+                    this.inputElement = e.find('input');
+                    super$0.call(this, s, e, a);
+                }if(super$0!==null)SP$0(UIRemoteSelectControl,super$0);UIRemoteSelectControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIRemoteSelectControl,"configurable":true,"writable":true}});DP$0(UIRemoteSelectControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.init = function() {
+                    super$0.prototype.init.call(this);
+                };
+
+                proto$0.render = function() {
+                    super$0.prototype.render.call(this);
+                    var config = this._getConfig();
+                    this.inputElement.select2(config);
+                };
+
+                proto$0._getConfig = function() {
+                    var selectOption = {
+                        openOnEnter: false,
+                        formatNoMatches: function () {
+                            return '没有符合的数据';
+                        },
+                        formatInputTooShort: function (t, m) {
+                            return '输入' + m + '个字符后开始查询';
+                        },
+                        formatSelectionTooBig: function (m) {
+                            return '最大可以选中' + m + '个数据';
+                        },
+                        formatSearching: function () {
+                            return '正在加载数据...';
+                        },
+                        formatAjaxError: function () {
+                            return '加载数据失败';
+                        }
+                    };
+
+                    if (this.attrs.multi !== undefined) {  //开启多选, select元素不能开启
+                        selectOption.multiple = true;
+                    }
+                    if (this.attrs.url !== undefined) { //开启远程查询
+                        selectOption.createSearchChoice = $.proxy(self.createSearchChoice, self);
+                        selectOption.query = $.proxy(self.filterData, self);
+                        selectOption.initSelection = $.proxy(self.initSelection, self);
+                        selectOption.id = $.proxy(self.formatId, self);
+                        selectOption.formatSelection = $.proxy(self.formatResult, self);
+                        selectOption.formatResult = $.proxy(self.formatResult, self);
+                    }
+                    if (this.attrs.minmum) { //输入几个字符以后才能搜索
+                        selectOption.minimumInputLength = this.attrs.minmum;
+                    }
+                    if (this.attrs.maxSize) { //最大选中几个
+                        selectOption.maximumSelectionSize = this.attrs.maxSize;
+                    }
+                    selectOption.closeOnSelect = false;
+                    return selectOption;
+                };
+
+                proto$0.createSearchChoice = function(term, data) {
+                    if ($(data).filter(function () {
+                            return this.name.indexOf(term) === 0;
+                        }).length === 0) {
+                        return data.length <= 10 ? {id: term, name: term, isNew: true} : null; //最多10个
+                    }
+                };
+
+                proto$0.useParams = function(o) {
+                    return $.extend(this.params, o || {}); //TODO: 额外查询参数
+                };
+
+                proto$0.loadData = function() {
+                    var self = this,
+                        d = $q.defer();
+                    if (self.datas) {
+                        d.resolve(self.datas);
+                    }
+                    else {
+                        Ajax.post(this.attrs.url, this.useParams).then(function (r) {
+                            self.datas = r ? r.aaData || r : [];
+                            $.each(self.datas, function (i, dd) { //遍历所有属性, 放入一个特殊变量, 用于后期查询使用
+                                var s = [];
+                                for (var k in dd) {
+                                    s.push(k + '=' + (dd[k] || '').toString().toLowerCase());
+                                }
+                                dd.__string = s.join(',');
+                            });
+                            d.resolve(self.datas);
+                        });
+                    }
+                    return d.promise;
+                };
+
+                proto$0.filterData = function(o) {
+                    var self = this,
+                        sfs = (this.attrs.search || '').toLowerCase().split(','),
+                        keyword = o.term.toLowerCase();
+                    this.loadData().then(function (rs) {
+                        var os = [];
+                        $.each(rs, function (i, r) {
+                            var isC = false;
+                            if (o.init) { //初始化, 那么只会根据
+                                isC = self.attrs.multi ? o.term.indexOf(self.formatId(r)) != -1 : self.formatId(r) == o.term;
+                            }
+                            else { //根据属性过滤
+                                if (sfs.length === 0 || sfs[0] === '') {
+                                    isC = r.__string.indexOf(keyword) != -1;
+                                }
+                                else {   //针对特定属性
+                                    $.each(sfs, function (ii, sf) {
+                                        isC = (r[sf] || '').toString().toLowerCase().indexOf(keyword) != -1;
+                                    });
+                                }
+                            }
+                            if (isC) {
+                                os.push(r);
+                            }
+                        });
+
+                        o.callback({results: os});
+                    });
+                };
+
+                proto$0.initSelection = function(element, callback) {
+                    var self = this,
+                        handler = function (data) {
+                            if (self.attrs.multi !== undefined) {
+                                callback(data.results);
+                            }
+                            else {
+                                callback(data.results[0]);
+                            }
+                        };
+                    if (self.isFocusInit) {
+                        self.isFocusInit = false;
+                        self.isInit = false;
+                        handler({results: self.selectItems});
+                    }
+                    else if (element.val() !== undefined) {
+                        self.isInit = false;
+                        this.filterData({
+                            term: element.val(),
+                            init: true,
+                            callback: handler
+                        });
+                    }
+                    else if (self.isInit) {
+                        self.isInit = false;
+                        handler({results: []});
+                    }
+                };
+
+                proto$0.formatId = function(o) {
+                    return o[this.attrs.valueName || 'id'];
+                };
+
+                proto$0.formatResult = function(item, container, query) {
+                    return item[this.attrs.labelName || 'name'];
+                };
+
+                proto$0.reset = function() {
+                    this.selectItems = [];
+                    this.selectValues = [];
+                    this.inputElement.select2('val', '');
+                };
+
+                proto$0.val = function(vals) {
+                    if (vals) {
+                        this.inputElement.select2('val', vals);
+                        if (this.attrs.multi) {
+                            this.selectValues = vals;
+                        }
+                        else {
+                            this.selectValues = [vals];
+                        }
+                        var values = ',' + this.selectValues.join(',') + ',',
+                            self = this;
+                        this.loadData().then(function (datas) {
+                            self.selectItems = $.grep(datas, function (data) {
+                                return values.indexOf(',' + self.formatId(data) + ',') != -1;
+                            });
+                        });
+                    }
+                    else {
+                        if (this.attrs.multi) {
+                            return this.selectValues;
+                        }
+                        else {
+                            return this.selectValues[0];
+                        }
+                    }
+                };
+
+                proto$0.item = function() {
+                    if (this.attrs.multi) {
+                        return this.selectItems;
+                    }
+                    else {
+                        return this.selectItems[0];
+                    }
+                };
+            MIXIN$0(UIRemoteSelectControl.prototype,proto$0);proto$0=void 0;return UIRemoteSelectControl;})(UIFormControl);
+            return UIRemoteSelectControl;
+        });
+})();
 angular.module('admin.component')
-    .constant('userConfig', {
-        url: '/sysconfig/orguser/select',
-        labelName: 'name',
-        valueName: 'staffno'
-    })
-    .constant('tagConfig', {
-        url: '/sysconfig/tag/list?classify=',
-        labelName: 'name',
-        valueName: 'id'
-    })
     .factory('uiMultiSelectFactory', function ($q, ajax, logger, msg, util, Event, ValueService) {
         var m = new msg('MultiSelect'),
             MultiSelect = function (scope, element, attrs) {
@@ -2918,31 +3115,33 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormRemoteSelect', function (uiMultiSelectFactory, componentHelper, defaultCol) {
+    .directive('uiFormRemoteSelect', function (UIRemoteSelectControl) {
         return {
             restrict: 'E',
-            replace: false,
-            transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                var select = uiMultiSelectFactory(scope, element, $.extend({multi: true}, attrs));
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formRemoteSelect', select);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    select.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
             },
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.input', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
+            link: function (scope, element, attrs) {
+                new UIRemoteSelectControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <div>\
+\n                            <input type=\"text\" class=\"form-control\" name=\"{{name}}\"/>\
+\n                       </div>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
         };
     });
 

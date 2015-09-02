@@ -6,30 +6,32 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormRemoteSelect', function (uiMultiSelectFactory, componentHelper, defaultCol) {
+    .directive('uiFormRemoteSelect', function (UIRemoteSelectControl) {
         return {
             restrict: 'E',
-            replace: false,
-            transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                var select = uiMultiSelectFactory(scope, element, $.extend({multi: true}, attrs));
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formRemoteSelect', select);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    select.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
             },
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.input', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
+            link: function (scope, element, attrs) {
+                new UIRemoteSelectControl(scope, element, attrs);
+            },
+            template: `
+                <div class="form-group">
+                   <label class="col-md-{{lcol || DefaultCol.l}} control-label">{{label}}</label>
+                   <div class="col-md-{{rcol || DefaultCol.r}}">
+                       <div>
+                            <input type="text" class="form-control" name="{{name}}"/>
+                       </div>
+                       <span ng-if="help" class="help-block">{{help}}</span>
+                   </div>
+               </div>
+            `
         };
     });
