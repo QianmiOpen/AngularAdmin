@@ -17,17 +17,37 @@
 //      a-value -- 地址值
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormRegion', function (uiRegionService, componentHelper, defaultCol) {
+    .directive('uiFormRegion', function (UIRegionControl) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiRegionService,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.region', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@',
+                type: '@',
+                mode: '@'
+            },
+            link: (s, e, a) => {
+                new UIRegionControl(s, e, a);
+            },
+            template: `
+                <div class="form-group">
+                   <label class="col-md-{{lcol || DefaultCol.l}} control-label">{{label}}</label>
+                   <div class="col-md-{{rcol || DefaultCol.r}}">
+                        <input type="hidden" name="{{name}}" ng-value={{value}}/>
+                        <input type="text" class="input-small form-control input-inline" name="province"/>
+                        <input ng-if="!mode || mode == 's' || mode == 'c'" type="text" class="input-small form-control input-inline" name="city"/>
+                        <input ng-if="!mode || mode == 's'" type="text" class="input-small form-control input-inline" name="area"/>
+                        <input ng-if="!mode" type="text" class="input-medium form-control input-inline" name="address" ng-value={{aValue}}/>
+                        <span ng-if="help" class="help-block">{{help}}</span>
+                   </div>
+               </div>'
+            `
         };
     });

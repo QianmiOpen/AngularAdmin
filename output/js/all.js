@@ -1809,6 +1809,69 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
+(function () {
+    angular.module('admin.component')
+        .factory('UIRegionControl', function(uiRegionHelper)  {
+            var UIRegionControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIRegionControl, super$0);var proto$0={};
+                function UIRegionControl(s, e, a) {
+                    this.className = 'Region';
+                    this.$inputDom = e.find('input:hidden');
+                    this.$pDom = e.find('[name="province"]');
+                    this.$cDom = e.find('[name="city"]');
+                    this.$sDom = e.find('[name="area"]');
+                    this.$aDom = e.find('[name="address"]');
+                    this.valueType = a.valueType || 'text'; //保存的是文字还是ID
+                    super$0.call(this, s, e, a);
+                }if(super$0!==null)SP$0(UIRegionControl,super$0);UIRegionControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIRegionControl,"configurable":true,"writable":true}});DP$0(UIRegionControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.init = function() {
+                    super$0.prototype.init.call(this);
+                };
+
+                proto$0.render = function() {var this$0 = this;
+                    super$0.prototype.render.call(this);
+                    if (/^\d+$/g.test(this.codeValue)) {  //有区域ID
+                        uiRegionHelper.htmlById(this.codeValue)
+                            .then(function (ts) {
+                                return ts.concat(uiRegionHelper.getProvince());
+                            })
+                            .then(function(p, c, s, data)  {
+                                this$0.$pDom.select2(this$0.toProvinceData(data));
+                                if (p) {
+                                    this$0.$pDom.select2('val', p.id);
+                                    this$0.$pDom.val(p[self.valueType]);
+                                    return [c, s, uiRegionHelper.getCity(p.id)]
+                                }
+                                throw new Error();
+                            })
+                            .then(function(c, s, data)  {
+                                this$0.$cDom.select2(self.toCityData(data));
+                                if (c) {
+                                    this$0.$cDom.select2('val', c.id);
+                                    this$0.$cDom.val(c[self.valueType]);
+                                    return [s, uiRegionHelper.getStreet(c.id)];
+                                }
+                                throw new Error();
+                            })
+                            .then(function(s, data)  {
+                                this$0.$sDom.select2(self.toStreetData(data));
+                                if (s) {
+                                    self.$sDom.select2('val', s.id);
+                                    self.$sDom.val(s[self.valueType]);
+                                }
+                            });
+                    }
+                    else { //没有则直接加载省
+                        uiRegionHelper.getProvince().then(function(data)  {
+                            this$0.$pDom.select2(this$0.toProvinceData(data));
+                        });
+                    }
+                };
+            MIXIN$0(UIRegionControl.prototype,proto$0);proto$0=void 0;return UIRegionControl;})(UIFormControl);
+
+            return UIRegionControl;
+        });
+})();
 angular.module('admin.component')
     .factory('uiRegionService', function (uiRegionHelper, msg, uiFormControl) {
         var m = new msg('Region'),
@@ -1838,34 +1901,34 @@ angular.module('admin.component')
                             s = ts[0];
                             return uiRegionHelper.getProvince();
                         })
-                        .then(function(data){
+                        .then(function (data) {
                             self.$pDom.select2(self.toProvinceData(data));
-                            if(p){
+                            if (p) {
                                 self.$pDom.select2('val', p.id);
                                 self.$pDom.val(p[self.valueType]);
                                 return uiRegionHelper.getCity(p.id);
                             }
-                            else{
+                            else {
                                 return null;
                             }
                         })
-                        .then(function(data){
-                            if(data){
+                        .then(function (data) {
+                            if (data) {
                                 self.$cDom.select2(self.toCityData(data));
-                                if(c){
+                                if (c) {
                                     self.$cDom.select2('val', c.id);
                                     self.$cDom.val(c[self.valueType]);
                                     return uiRegionHelper.getStreet(c.id);
                                 }
-                                else{
+                                else {
                                     return null;
                                 }
                             }
                         })
-                        .then(function(data){
-                            if(data){
+                        .then(function (data) {
+                            if (data) {
                                 self.$sDom.select2(self.toStreetData(data));
-                                if(s){
+                                if (s) {
                                     self.$sDom.select2('val', s.id);
                                     self.$sDom.val(s[self.valueType]);
                                 }
@@ -1880,7 +1943,7 @@ angular.module('admin.component')
                 }
 
                 //
-                if(this.attrs.aValue){
+                if (this.attrs.aValue) {
                     this.$aDom.val(this.attrs.aValue);
                 }
 
@@ -1919,7 +1982,7 @@ angular.module('admin.component')
 
                 //
                 this.$pDom.change(function (evt) {
-                    if(evt.val){
+                    if (evt.val) {
                         uiRegionHelper.getCity(evt.val).then(function (data) {
                             self.$cDom.select2(self.toCityData(data));
                             self.$sDom.select2(self.toStreetData());
@@ -1927,21 +1990,21 @@ angular.module('admin.component')
                         this.$pDom.val(evt.added[this.valueType]);
                         this.$inputDom.val(evt.val);
                     }
-                    else{
+                    else {
                         this.reset();
                     }
                 }.bind(this));
 
                 //
                 this.$cDom.change(function (evt) {
-                    if(evt.val){
+                    if (evt.val) {
                         uiRegionHelper.getStreet(evt.val).then(function (data) {
                             self.$sDom.select2(self.toStreetData(data));
                         });
                         this.$cDom.val(evt.added[this.valueType]);
                         this.$inputDom.val(evt.val);
                     }
-                    else{
+                    else {
                         this.$sDom.select2(this.toStreetData());
                         this.$cDom.val('');
                         this.$inputDom.val('');
@@ -1950,26 +2013,26 @@ angular.module('admin.component')
 
                 //
                 this.$sDom.change(function (evt) {
-                    if(evt.val){
+                    if (evt.val) {
                         this.$sDom.val(evt.added[this.valueType]);
                         this.$inputDom.val(evt.val);
                     }
-                    else{
+                    else {
                         this.$sDom.val('');
                         this.$inputDom.val('');
                     }
                 }.bind(this));
             },
 
-            toProvinceData: function(data){
+            toProvinceData: function (data) {
                 return {data: data || [], allowClear: true, placeholder: '请选择省'};
             },
 
-            toCityData: function(data){
+            toCityData: function (data) {
                 return {data: data || [], allowClear: true, placeholder: '请选择市'};
             },
 
-            toStreetData: function(data){
+            toStreetData: function (data) {
                 return {data: data || [], allowClear: true, placeholder: '请选择区'};
             },
 
@@ -1980,7 +2043,7 @@ angular.module('admin.component')
                 this.$sDom.val('').select2(this.toStreetData());
             }
         });
-        return function(s, e, a, c, t){
+        return function (s, e, a, c, t) {
             return new Region(s, e, a, c, t);
         };
     });
@@ -3076,18 +3139,38 @@ angular.module('admin.component')
 //      a-value -- 地址值
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormRegion', function (uiRegionService, componentHelper, defaultCol) {
+    .directive('uiFormRegion', function (UIRegionControl) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiRegionService,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.region', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@',
+                type: '@',
+                mode: '@'
+            },
+            link: function(s, e, a)  {
+                new UIRegionControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                        <input type=\"hidden\" name=\"{{name}}\" ng-value={{value}}/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
+\n                        <input ng-if=\"!mode || mode == 's' || mode == 'c'\" type=\"text\" class=\"input-small form-control input-inline\" name=\"city\"/>\
+\n                        <input ng-if=\"!mode || mode == 's'\" type=\"text\" class=\"input-small form-control input-inline\" name=\"area\"/>\
+\n                        <input ng-if=\"!mode\" type=\"text\" class=\"input-medium form-control input-inline\" name=\"address\" ng-value={{aValue}}/>\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------
@@ -3122,7 +3205,7 @@ angular.module('admin.component')
 \n                <div class=\"form-group\">\
 \n                    <label class=\"col-md-{{lcol}} control-label\">{{label}}</label>\
 \n                    <div class=\"col-md-{{rcol}}\">\
-\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" title=\"{{placeholder}}\" ng-transclude></select>\
+\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" title=\"{{placeholder || '请选择'}}\" ng-transclude></select>\
 \n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
 \n                    </div>\
 \n                </div>\
@@ -3148,6 +3231,7 @@ angular.module('admin.component')
                 label: '@',
                 name: '@',
                 model: '=',
+                placeholder: '@',
                 change: '&',
                 help: '@'
             },

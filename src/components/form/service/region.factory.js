@@ -5,6 +5,69 @@
 //
 //
 //-----------------------------------------------------------------------------------------------
+(function () {
+    angular.module('admin.component')
+        .factory('UIRegionControl', (uiRegionHelper) => {
+            class UIRegionControl extends UIFormControl {
+                constructor(s, e, a) {
+                    this.className = 'Region';
+                    this.$inputDom = e.find('input:hidden');
+                    this.$pDom = e.find('[name="province"]');
+                    this.$cDom = e.find('[name="city"]');
+                    this.$sDom = e.find('[name="area"]');
+                    this.$aDom = e.find('[name="address"]');
+                    this.valueType = a.valueType || 'text'; //保存的是文字还是ID
+                    super(s, e, a);
+                }
+
+                init() {
+                    super.init();
+                }
+
+                render() {
+                    super.render();
+                    if (/^\d+$/g.test(this.codeValue)) {  //有区域ID
+                        uiRegionHelper.htmlById(this.codeValue)
+                            .then(function (ts) {
+                                return ts.concat(uiRegionHelper.getProvince());
+                            })
+                            .then((p, c, s, data) => {
+                                this.$pDom.select2(this.toProvinceData(data));
+                                if (p) {
+                                    this.$pDom.select2('val', p.id);
+                                    this.$pDom.val(p[self.valueType]);
+                                    return [c, s, uiRegionHelper.getCity(p.id)]
+                                }
+                                throw new Error();
+                            })
+                            .then((c, s, data) => {
+                                this.$cDom.select2(self.toCityData(data));
+                                if (c) {
+                                    this.$cDom.select2('val', c.id);
+                                    this.$cDom.val(c[self.valueType]);
+                                    return [s, uiRegionHelper.getStreet(c.id)];
+                                }
+                                throw new Error();
+                            })
+                            .then((s, data) => {
+                                this.$sDom.select2(self.toStreetData(data));
+                                if (s) {
+                                    self.$sDom.select2('val', s.id);
+                                    self.$sDom.val(s[self.valueType]);
+                                }
+                            });
+                    }
+                    else { //没有则直接加载省
+                        uiRegionHelper.getProvince().then((data) => {
+                            this.$pDom.select2(this.toProvinceData(data));
+                        });
+                    }
+                }
+            }
+
+            return UIRegionControl;
+        });
+})();
 angular.module('admin.component')
     .factory('uiRegionService', function (uiRegionHelper, msg, uiFormControl) {
         var m = new msg('Region'),
@@ -34,34 +97,34 @@ angular.module('admin.component')
                             s = ts[0];
                             return uiRegionHelper.getProvince();
                         })
-                        .then(function(data){
+                        .then(function (data) {
                             self.$pDom.select2(self.toProvinceData(data));
-                            if(p){
+                            if (p) {
                                 self.$pDom.select2('val', p.id);
                                 self.$pDom.val(p[self.valueType]);
                                 return uiRegionHelper.getCity(p.id);
                             }
-                            else{
+                            else {
                                 return null;
                             }
                         })
-                        .then(function(data){
-                            if(data){
+                        .then(function (data) {
+                            if (data) {
                                 self.$cDom.select2(self.toCityData(data));
-                                if(c){
+                                if (c) {
                                     self.$cDom.select2('val', c.id);
                                     self.$cDom.val(c[self.valueType]);
                                     return uiRegionHelper.getStreet(c.id);
                                 }
-                                else{
+                                else {
                                     return null;
                                 }
                             }
                         })
-                        .then(function(data){
-                            if(data){
+                        .then(function (data) {
+                            if (data) {
                                 self.$sDom.select2(self.toStreetData(data));
-                                if(s){
+                                if (s) {
                                     self.$sDom.select2('val', s.id);
                                     self.$sDom.val(s[self.valueType]);
                                 }
@@ -76,7 +139,7 @@ angular.module('admin.component')
                 }
 
                 //
-                if(this.attrs.aValue){
+                if (this.attrs.aValue) {
                     this.$aDom.val(this.attrs.aValue);
                 }
 
@@ -115,7 +178,7 @@ angular.module('admin.component')
 
                 //
                 this.$pDom.change(function (evt) {
-                    if(evt.val){
+                    if (evt.val) {
                         uiRegionHelper.getCity(evt.val).then(function (data) {
                             self.$cDom.select2(self.toCityData(data));
                             self.$sDom.select2(self.toStreetData());
@@ -123,21 +186,21 @@ angular.module('admin.component')
                         this.$pDom.val(evt.added[this.valueType]);
                         this.$inputDom.val(evt.val);
                     }
-                    else{
+                    else {
                         this.reset();
                     }
                 }.bind(this));
 
                 //
                 this.$cDom.change(function (evt) {
-                    if(evt.val){
+                    if (evt.val) {
                         uiRegionHelper.getStreet(evt.val).then(function (data) {
                             self.$sDom.select2(self.toStreetData(data));
                         });
                         this.$cDom.val(evt.added[this.valueType]);
                         this.$inputDom.val(evt.val);
                     }
-                    else{
+                    else {
                         this.$sDom.select2(this.toStreetData());
                         this.$cDom.val('');
                         this.$inputDom.val('');
@@ -146,26 +209,26 @@ angular.module('admin.component')
 
                 //
                 this.$sDom.change(function (evt) {
-                    if(evt.val){
+                    if (evt.val) {
                         this.$sDom.val(evt.added[this.valueType]);
                         this.$inputDom.val(evt.val);
                     }
-                    else{
+                    else {
                         this.$sDom.val('');
                         this.$inputDom.val('');
                     }
                 }.bind(this));
             },
 
-            toProvinceData: function(data){
+            toProvinceData: function (data) {
                 return {data: data || [], allowClear: true, placeholder: '请选择省'};
             },
 
-            toCityData: function(data){
+            toCityData: function (data) {
                 return {data: data || [], allowClear: true, placeholder: '请选择市'};
             },
 
-            toStreetData: function(data){
+            toStreetData: function (data) {
                 return {data: data || [], allowClear: true, placeholder: '请选择区'};
             },
 
@@ -176,7 +239,7 @@ angular.module('admin.component')
                 this.$sDom.val('').select2(this.toStreetData());
             }
         });
-        return function(s, e, a, c, t){
+        return function (s, e, a, c, t) {
             return new Region(s, e, a, c, t);
         };
     });

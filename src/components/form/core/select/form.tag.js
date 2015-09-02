@@ -16,6 +16,7 @@ angular.module('admin.component')
                 label: '@',
                 name: '@',
                 model: '=',
+                placeholder: '@',
                 change: '&',
                 help: '@'
             },

@@ -30,7 +30,7 @@ angular.module('admin.component')
                 <div class="form-group">
                     <label class="col-md-{{lcol}} control-label">{{label}}</label>
                     <div class="col-md-{{rcol}}">
-                        <select class="form-control show-tick" data-live-search="true" data-style="{{buttonClass}}" name="{{name}}" title="{{placeholder}}" ng-transclude></select>
+                        <select class="form-control show-tick" data-live-search="true" data-style="{{buttonClass}}" name="{{name}}" title="{{placeholder || '请选择'}}" ng-transclude></select>
                         <span ng-if="help" class="help-block">{{help}}</span>
                     </div>
                 </div>
