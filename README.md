@@ -63,6 +63,11 @@
     * max, 最大值
     * step, 步数
     * change 改变以后的回调
+* ```<ui-form-switch label="开关:" model="item.formSwitch" help="醉了6" on-text="男" off-text="女" change="switchChangeHandler(val)"></ui-form-switch>```
+    * on-text, 左边的文字, 默认是开
+    * off-text, 右边的文字, 默认是关
+    * on-value, 左边的文件, 默认是1
+    * off-value, 右边的文字, 默认是0
 
 ## 查询
 

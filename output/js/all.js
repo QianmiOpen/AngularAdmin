@@ -2587,157 +2587,92 @@ angular.module('admin.component')
                         val = min;
                     }
                     this.scope.model = val;
-                    this.scope.$apply();
                     this.scope.change({val: val});
                 };
             MIXIN$0(UISpinnerControl.prototype,proto$0);proto$0=void 0;return UISpinnerControl;})(UIFormControl);
             return UISpinnerControl;
         });
 })();
-angular.module('admin.component')
-    .factory('uiSpinnerFactory', function (msg, uiFormControl, ValueService) {
-        var m = new msg('Spinner'),
-            Spinner = function (scope, element, attrs) {
-                this.inputElement = element.find('input');
-                this.spinner = null;
-                uiFormControl.apply(this, arguments);
-            };
-        Spinner.prototype = $.extend(new uiFormControl(), {
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+    angular.module('admin.component')
+        .factory('UISwitchControl', function()  {
+            var UISwitchControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UISwitchControl, super$0);var proto$0={};
+                function UISwitchControl(s, e, a) {
+                    this.className = 'Switch';
+                    this.formEl = e.find('input');
+                    this.checkEl = this.formEl[0];
+                    super$0.call(this, s, e, a);
+                }if(super$0!==null)SP$0(UISwitchControl,super$0);UISwitchControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UISwitchControl,"configurable":true,"writable":true}});DP$0(UISwitchControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
-            render: function () {
-                this.spinner = this.element.spinner(this.attrs);
-                if (this.attrs.model) {
-                    if (this.attrs.value) {
-                        ValueService.set(this.scope, this.attrs.model, this.attrs.value);
-                    }
-                    this.element.on('changed', function () {
-                        ValueService.set(this.scope, this.attrs.model, this.val());
-                        this.$emit('change', this.val());
-                    }.bind(this));
+                proto$0.init = function() {
+                    super$0.prototype.init.call(this);
+                    this.onValue = this.attrs.onValue || '1';
+                    this.offValue = this.attrs.offValue || '0';
+                    this.onText = this.attrs.onText || '开';
+                    this.offText = this.attrs.offText || '关';
+                };
 
-                    this.scope.$watch(this.attrs.model, function (newValue) {
-                        if (newValue !== this.val()) {
-                            this.val(newValue === undefined ? '0' : newValue);
+                proto$0.initEvents = function() {
+                    super$0.prototype.initEvents.call(this);
+                };
+
+                proto$0.render = function() {var this$0 = this;
+                    this.formEl.bootstrapSwitch({
+                        size: 'normal',
+                        onText: this.onText,
+                        offText: this.offText,
+                        onSwitchChange: function(evt, state)  {
+                            this$0._change(state)
                         }
-                    }.bind(this));
-                }
-            },
+                    });
+                    this.formEl.bootstrapSwitch('state', this.attrs.value == this.onValue);
+                    this.checkEl.checked = true;
 
-            change: function (fn) {
-                this.$on('change', fn);
-            },
-
-            reset: function () {
-                this.inputElement.val('');
-            },
-
-            disabled: function (open) {
-                this.attr('disabled', open);
-            },
-
-            attr: function (k, v) {
-                if (v) {
-                    this.inputElement.attr(k, v);
-                }
-                else {
-                    return this.inputElement.attr(k);
-                }
-            },
-
-            val: function (v) {
-                if (v !== undefined) {
-                    this.inputElement.val(v);
-                    return this;
-                }
-                else {
-                    return this.inputElement.val();
-                }
-            }
-        });
-        return function (s, e, a, c, t) {
-            return new Spinner(s, e, a, c, t);
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .factory('uiSwitchFactory', function (msg, uiFormControl, ValueService) {
-        var m = new msg('Switch'),
-            Switch = function (scope, element, attrs) {
-                this.inputElement = element.find('input');
-                this.onValue = attrs.onValue || 'on';
-                this.offValue = attrs.offValue || 'off';
-                this.attrs = attrs;
-                this.model = attrs.model;
-                uiFormControl.apply(this, arguments);
-            };
-        Switch.prototype = $.extend(new uiFormControl(), {
-
-            render: function () {
-                if ($.fn.bootstrapSwitch) {
-                    this.inputElement.bootstrapSwitch({
-                        size: 'small',
-                        onSwitchChange: this.onChangeHandler.bind(this)
+                    this.scope.$watch('model', function(newValue)  {
+                        if (newValue != this$0.val()) {
+                            this$0.val(newValue);
+                        }
                     });
 
-                    //初始值
-                    this.inputElement.bootstrapSwitch('state', this.attrs.value == this.onValue);
-                }
-                this.inputElement[0].checked = true;
-
-                if(this.model){
-                    this.scope.$watch(this.model, function(newValue){
-                        if(newValue != this.val()){
-                            this.val(newValue);
-                        }
-                    }.bind(this));
-
-                    //如果model没有值, 默认选择offvalue
-                    if(!ValueService.get(this.scope, this.model)){
+                    if (!this.scope.model) {
                         var val = this.offValue;
-                        ValueService.set(this.scope, this.model, val || this.offValue);
+                        this.scope.model = val;
                     }
-                }
-            },
+                };
 
-            onChangeHandler: function (evt, state) {
-                var v = state ? this.onValue : this.offValue;
-                this.inputElement.val(v);
-                this.inputElement[0].checked = true;
-                this.$emit('change');
-                if(this.model){
-                    ValueService.set(this.scope, this.model, v);
-                }
-            },
-
-            reset: function () {
-                this.inputElement.val();
-            },
-
-            disabled: function (open) {
-                this.inputElement.bootstrapSwitch('disabled',open=='true');
-            },
+                proto$0.disabled = function(open) {
+                    this.formEl.bootstrapSwitch('disabled', open == 'true');
+                };
 
 
-            val: function (val) {
-                if (val !== undefined) {
-                    this.inputElement.bootstrapSwitch('state', val == this.onValue);
-                    return this;
-                }
-                else {
-                    return this.inputElement.val();
-                }
-            }
+                proto$0.val = function(val) {
+                    if (val !== undefined) {
+                        this.formEl.bootstrapSwitch('state', val == this.onValue);
+                        return this;
+                    }
+                    else {
+                        return this.formEl.val();
+                    }
+                };
+
+                proto$0._change = function(state) {
+                    var v = state ? this.onValue : this.offValue;
+                    this.val(v);
+                    this.checkEl.checked = true;
+                    this.scope.model = v;
+                    this.scope.change({val: v});
+                };
+            MIXIN$0(UISwitchControl.prototype,proto$0);proto$0=void 0;return UISwitchControl;})(UIFormControl);
+            return UISwitchControl;
         });
-        return function(s, e, a, c, t){
-            return new Switch(s, e, a, c, t);
-        };
-    });
+})();
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -3003,30 +2938,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSwitch', function (uiSwitchFactory, componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: uiSwitchFactory,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.switch', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
 //  针对input的封装
 //
 //
@@ -3044,7 +2955,6 @@ angular.module('admin.component')
                 placeholder: '@',
                 name: '@',
                 model: '=',
-                step: '@',
                 change: '&',
                 help: '@'
             },
@@ -3070,6 +2980,43 @@ angular.module('admin.component')
 \n            ")
         };
     });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSwitch', function (UISwitchControl) {
+        return {
+            restrict: 'E',
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function(s, e, a)  {
+                new UISwitchControl(s, e, a);
+            },
+            template: ("\
+\n               <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //

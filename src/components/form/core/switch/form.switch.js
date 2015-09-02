@@ -6,18 +6,31 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormSwitch', function (uiSwitchFactory, componentHelper, defaultCol) {
+    .directive('uiFormSwitch', function (UISwitchControl) {
         return {
             restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: uiSwitchFactory,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.switch', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: (s, e, a) => {
+                new UISwitchControl(s, e, a);
+            },
+            template: `
+               <div class="form-group">
+                   <label class="col-md-{{lcol || DefaultCol.l}} control-label">{{label}}</label>
+                   <div class="col-md-{{rcol || DefaultCol.r}}">
+                        <input type="checkbox" class="form-control {{css}}" name="{{name}}" />
+                        <span ng-if="help" class="help-block">{{help}}</span>
+                   </div>
+               </div>
+            `
         };
     });

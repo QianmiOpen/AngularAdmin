@@ -1,80 +1,80 @@
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  针对input的封装
+//
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .factory('uiSwitchFactory', function (msg, uiFormControl, ValueService) {
-        var m = new msg('Switch'),
-            Switch = function (scope, element, attrs) {
-                this.inputElement = element.find('input');
-                this.onValue = attrs.onValue || 'on';
-                this.offValue = attrs.offValue || 'off';
-                this.attrs = attrs;
-                this.model = attrs.model;
-                uiFormControl.apply(this, arguments);
-            };
-        Switch.prototype = $.extend(new uiFormControl(), {
-
-            render: function () {
-                if ($.fn.bootstrapSwitch) {
-                    this.inputElement.bootstrapSwitch({
-                        size: 'small',
-                        onSwitchChange: this.onChangeHandler.bind(this)
-                    });
-
-                    //初始值
-                    this.inputElement.bootstrapSwitch('state', this.attrs.value == this.onValue);
+(function () {
+    angular.module('admin.component')
+        .factory('UISwitchControl', () => {
+            class UISwitchControl extends UIFormControl {
+                constructor(s, e, a) {
+                    this.className = 'Switch';
+                    this.formEl = e.find('input');
+                    this.checkEl = this.formEl[0];
+                    super(s, e, a);
                 }
-                this.inputElement[0].checked = true;
 
-                if(this.model){
-                    this.scope.$watch(this.model, function(newValue){
-                        if(newValue != this.val()){
+                init() {
+                    super.init();
+                    this.onValue = this.attrs.onValue || '1';
+                    this.offValue = this.attrs.offValue || '0';
+                    this.onText = this.attrs.onText || '开';
+                    this.offText = this.attrs.offText || '关';
+                }
+
+                initEvents() {
+                    super.initEvents();
+                }
+
+                render() {
+                    this.formEl.bootstrapSwitch({
+                        size: 'normal',
+                        onText: this.onText,
+                        offText: this.offText,
+                        onSwitchChange: (evt, state) => {
+                            this._change(state)
+                        }
+                    });
+                    this.formEl.bootstrapSwitch('state', this.attrs.value == this.onValue);
+                    this.checkEl.checked = true;
+
+                    this.scope.$watch('model', (newValue) => {
+                        if (newValue != this.val()) {
                             this.val(newValue);
                         }
-                    }.bind(this));
+                    });
 
-                    //如果model没有值, 默认选择offvalue
-                    if(!ValueService.get(this.scope, this.model)){
-                        var val = this.offValue;
-                        ValueService.set(this.scope, this.model, val || this.offValue);
+                    if (!this.scope.model) {
+                        let val = this.offValue;
+                        this.scope.model = val;
                     }
                 }
-            },
 
-            onChangeHandler: function (evt, state) {
-                var v = state ? this.onValue : this.offValue;
-                this.inputElement.val(v);
-                this.inputElement[0].checked = true;
-                this.$emit('change');
-                if(this.model){
-                    ValueService.set(this.scope, this.model, v);
+                disabled(open) {
+                    this.formEl.bootstrapSwitch('disabled', open == 'true');
                 }
-            },
-
-            reset: function () {
-                this.inputElement.val();
-            },
-
-            disabled: function (open) {
-                this.inputElement.bootstrapSwitch('disabled',open=='true');
-            },
 
 
-            val: function (val) {
-                if (val !== undefined) {
-                    this.inputElement.bootstrapSwitch('state', val == this.onValue);
-                    return this;
+                val(val) {
+                    if (val !== undefined) {
+                        this.formEl.bootstrapSwitch('state', val == this.onValue);
+                        return this;
+                    }
+                    else {
+                        return this.formEl.val();
+                    }
                 }
-                else {
-                    return this.inputElement.val();
+
+                _change(state) {
+                    var v = state ? this.onValue : this.offValue;
+                    this.val(v);
+                    this.checkEl.checked = true;
+                    this.scope.model = v;
+                    this.scope.change({val: v});
                 }
             }
+            return UISwitchControl;
         });
-        return function(s, e, a, c, t){
-            return new Switch(s, e, a, c, t);
-        };
-    });
+})();

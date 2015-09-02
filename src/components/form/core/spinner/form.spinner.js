@@ -18,7 +18,6 @@ angular.module('admin.component')
                 placeholder: '@',
                 name: '@',
                 model: '=',
-                step: '@',
                 change: '&',
                 help: '@'
             },

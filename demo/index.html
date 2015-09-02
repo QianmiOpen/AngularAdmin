@@ -21,6 +21,7 @@
             <option value="3">3</option>
         </ui-form-select>
         <ui-form-spinner label="计数器:" model="item.formSpinner" help="醉了6" value="1" min="0" max="100" step="5" change="spinnerChangeHandler(val)"></ui-form-spinner>
+        <ui-form-switch label="开关:" model="item.formSwitch" help="醉了6" on-text="男" off-text="女" change="switchChangeHandler(val)"></ui-form-switch>
     </form>
 
     <h4>查询表单</h4>
@@ -56,7 +57,10 @@
         };
         $scope.spinnerChangeHandler = function (val) {
             new Message('[spinner]数据变动').success('成功');
-        }
+        };
+        $scope.switchChangeHandler = function (val) {
+            new Message('[switch]数据变动').success('成功');
+        };
 
         //双向绑定测试
         $scope.item = {};
@@ -65,6 +69,7 @@
         $scope.item.formRangeToDate = moment().add(3, 'h').format('YYYY-MM-DD HH:mm:ss');
         $scope.item.formInput = '我是输入框';
         $scope.item.formSpinner = 1;
+        $scope.item.formSwitch = 1;
     }
 </script>
 </html>
