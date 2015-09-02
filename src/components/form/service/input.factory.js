@@ -7,16 +7,16 @@
 //-----------------------------------------------------------------------------------------------
 (function () {
 
-    class UIInputControl extends UIFormControl {
-
-        constructor(s, e, a) {
-            this.className = 'Input';
-            this.formEl = e.find('input');
-            super(s, e, a);
-        }
-    }
-
-
     angular.module('admin.component')
-        .factory('UIInputControl', () => UIInputControl);
+        .factory('UIInputControl', () => {
+            class UIInputControl extends UIFormControl {
+
+                constructor(s, e, a) {
+                    this.className = 'Input';
+                    this.formEl = e.find('input');
+                    super(s, e, a);
+                }
+            }
+            return UIInputControl;
+        });
 })();
