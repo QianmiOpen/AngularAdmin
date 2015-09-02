@@ -28,10 +28,10 @@ angular.module('admin.component')
                 <div class="form-group">
                    <label class="col-md-{{lcol || DefaultCol.l}} control-label">{{label}}</label>
                    <div class="col-md-{{rcol || DefaultCol.r}}">
-                       <input type="text" class="form-control {{css}}" name="{{name}}" placeholder="{{placeholder}}" ng-change="change()" ng-model="model" readonly="true"/>
+                       <input type="text" class="form-control {{css}}" name="{{name}}" placeholder="{{placeholder}}" ng-change="change({val: model})" ng-model="model" readonly="true"/>
                        <span ng-if="help" class="help-block">{{help}}</span>
                    </div>
-               </div>'
+               </div>
             `
         };
     });

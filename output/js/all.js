@@ -935,7 +935,7 @@ var UIFormControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o
 
     proto$0.val = function(v) {
         if (this.formEl) {
-            if (v) {
+            if (v !== undefined) {
                 this.formEl.val(v);
                 return this;
             }
@@ -1106,7 +1106,7 @@ angular.module('admin.component')
                         startVal = startVal ? startVal.format(this$0.format) : "";
                         endVal = endVal ? endVal.format(this$0.format) : "";
                         this$0.val(startVal, endVal);
-                        this$0.scope.change();
+                        this$0.scope.change({startVal: startVal, endVal: endVal});
                     });
                 };
 
@@ -2549,10 +2549,51 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  针对input的封装
+//
 //
 //
 //-----------------------------------------------------------------------------------------------
+(function () {
+    angular.module('admin.component')
+        .factory('UISpinnerControl', function()  {
+            var UISpinnerControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UISpinnerControl, super$0);var proto$0={};
+                function UISpinnerControl(s, e, a) {
+                    this.className = 'Spinner';
+                    this.formEl = e.find('input');
+                    super$0.call(this, s, e, a);
+                }if(super$0!==null)SP$0(UISpinnerControl,super$0);UISpinnerControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UISpinnerControl,"configurable":true,"writable":true}});DP$0(UISpinnerControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.init = function() {
+                    super$0.prototype.init.call(this);
+                };
+
+                proto$0.initEvents = function() {var this$0 = this;
+                    super$0.prototype.initEvents.call(this);
+                    this.element.on('mousedown', '.spinner-up', function()  {return this$0._changeValue(true)});
+                    this.element.on('mousedown', '.spinner-down', function()  {return this$0._changeValue(false)});
+                };
+
+                proto$0._changeValue = function(isAdd) {
+                    var step = (this.attrs.step || 1) * 1,
+                        min = (this.attrs.min || 0) * 1,
+                        max = (this.attrs.max || Number.MAX_VALUE) * 1,
+                        val = this.val();
+                    val = val !== undefined ? parseInt(val) : this.attrs.value;
+                    val = val + (step * ( isAdd ? 1 : -1));
+                    if (val > max) {
+                        val = max;
+                    }
+                    if (val < min) {
+                        val = min;
+                    }
+                    this.scope.model = val;
+                    this.scope.$apply();
+                    this.scope.change({val: val});
+                };
+            MIXIN$0(UISpinnerControl.prototype,proto$0);proto$0=void 0;return UISpinnerControl;})(UIFormControl);
+            return UISpinnerControl;
+        });
+})();
 angular.module('admin.component')
     .factory('uiSpinnerFactory', function (msg, uiFormControl, ValueService) {
         var m = new msg('Spinner'),
@@ -2574,8 +2615,8 @@ angular.module('admin.component')
                         this.$emit('change', this.val());
                     }.bind(this));
 
-                    this.scope.$watch(this.attrs.model, function(newValue){
-                        if(newValue !== this.val()){
+                    this.scope.$watch(this.attrs.model, function (newValue) {
+                        if (newValue !== this.val()) {
                             this.val(newValue === undefined ? '0' : newValue);
                         }
                     }.bind(this));
@@ -2727,10 +2768,10 @@ angular.module('admin.component')
 \n                <div class=\"form-group\">\
 \n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
 \n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change()\" ng-model=\"model\" readonly=\"true\"/>\
+\n                       <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change({val: model})\" ng-model=\"model\" readonly=\"true\"/>\
 \n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
 \n                   </div>\
-\n               </div>'\
+\n               </div>\
 \n            ")
         };
     });
@@ -2808,7 +2849,7 @@ angular.module('admin.component')
 \n                <div class=\"form-group\">\
 \n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
 \n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <input type=\"{{type || 'text'}}\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change()\" ng-model=\"model\"/>\
+\n                       <input type=\"{{type || 'text'}}\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change({val: model})\" ng-model=\"model\"/>\
 \n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
 \n                   </div>\
 \n               </div>'\
@@ -2962,28 +3003,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSpinner', function (uiSpinnerFactory, componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: uiSpinnerFactory,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.spinner', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
 //  针对select的封装
 //
 //
@@ -3013,6 +3032,52 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
+    .directive('uiFormSpinner', function (UISpinnerControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                step: '@',
+                change: '&',
+                help: '@'
+            },
+            link: function(s, e, a)  {
+                new UISpinnerControl(s, e, a)
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <div class=\"input-group\" style=\"width:150px;\">\
+\n                           <div class=\"spinner-buttons input-group-btn\">\
+\n                               <button type=\"button\" class=\"btn spinner-up blue\"><i class=\"fa fa-plus\"></i></button>\
+\n                           </div>\
+\n                           <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" readonly=\"true\"/>\
+\n                           <div class=\"spinner-buttons input-group-btn\">\
+\n                               <button type=\"button\" class=\"btn spinner-down red\"><i class=\"fa fa-minus\"></i></button>\
+\n                           </div>\
+\n                       </div>\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                    </div>\
+\n               </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
     .directive('uiSearchDate', function (UIDateControl) {
         return {
             restrict: 'E',
@@ -3032,7 +3097,7 @@ angular.module('admin.component')
 \n                 <div class=\"input-inline search-item\">\
 \n                    <div class=\"input-group\">\
 \n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change()\" readonly=\"true\"/>\
+\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\" readonly=\"true\"/>\
 \n                    </div>\
 \n                </div>\
 \n            ")
@@ -3099,7 +3164,7 @@ angular.module('admin.component')
 \n                 <div class=\"input-inline search-item\">\
 \n                    <div class=\"input-group\">\
 \n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change()\"/>\
+\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\"/>\
 \n                    </div>\
 \n                </div>\
 \n            ")

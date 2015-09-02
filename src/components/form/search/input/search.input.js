@@ -25,7 +25,7 @@ angular.module('admin.component')
                  <div class="input-inline search-item">
                     <div class="input-group">
                         <div ng-if="label" class="input-group-addon">{{label}}</div>
-                        <input class="form-control" name="{{name}}" placeholder="{{placeholder}}" ng-model="model" ng-change="change()"/>
+                        <input class="form-control" name="{{name}}" placeholder="{{placeholder}}" ng-model="model" ng-change="change({val: model})"/>
                     </div>
                 </div>
             `

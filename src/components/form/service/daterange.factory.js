@@ -90,7 +90,7 @@
                         startVal = startVal ? startVal.format(this.format) : "";
                         endVal = endVal ? endVal.format(this.format) : "";
                         this.val(startVal, endVal);
-                        this.scope.change();
+                        this.scope.change({startVal, endVal});
                     });
                 }
 

@@ -58,6 +58,11 @@
     * dataKeyName, 键的名称
     * dateValueName, 值的名称
     * render, scope里面的方法, 用于美化option
+* ```<ui-form-spinner label="计数器:" model="item.formSpinner" help="醉了6" min="0" max="100" step="5" change="spinnerChangeHandler(val)"></ui-form-spinner>```
+    * min, 最小值
+    * max, 最大值
+    * step, 步数
+    * change 改变以后的回调
 
 ## 查询
 

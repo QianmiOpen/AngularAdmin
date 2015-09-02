@@ -44,7 +44,7 @@ class UIFormControl extends ComponentEvent {
 
     val(v) {
         if (this.formEl) {
-            if (v) {
+            if (v !== undefined) {
                 this.formEl.val(v);
                 return this;
             }
