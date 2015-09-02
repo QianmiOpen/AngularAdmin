@@ -34,7 +34,7 @@
                         onText: this.onText,
                         offText: this.offText,
                         onSwitchChange: (evt, state) => {
-                            this._change(state)
+                            this._change(state);
                         }
                     });
                     this.formEl.bootstrapSwitch('state', this.attrs.value == this.onValue);

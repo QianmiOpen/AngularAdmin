@@ -1,12 +1,12 @@
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  针对select的封装
+//
 //
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormRemoteSelect', function (UIRemoteSelectControl) {
+    .directive('uiFormTag', function (UITagControl) {
         return {
             restrict: 'E',
             replace: true,
@@ -20,7 +20,7 @@ angular.module('admin.component')
                 help: '@'
             },
             link: function (scope, element, attrs) {
-                new UIRemoteSelectControl(scope, element, attrs);
+                new UITagControl(scope, element, attrs);
             },
             template: `
                 <div class="form-group">

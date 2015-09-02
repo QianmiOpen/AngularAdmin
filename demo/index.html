@@ -5,7 +5,7 @@
     <title>Demo</title>
     <link rel="stylesheet" href="../output/css/all.css"/>
 </head>
-<body style="background-color: #fff !important;" ng-app="admin">
+<body style="background-color: #fff !important;padding: 10px;" ng-app="admin">
 <ui-container style="display: none" controller="CC">
 
     <ui-breadcrumb datas="['A', 'B', 'C', 'D', 'E']"></ui-breadcrumb>
@@ -22,7 +22,7 @@
         </ui-form-select>
         <ui-form-spinner label="计数器:" model="item.formSpinner" help="醉了6" value="1" min="0" max="100" step="5" change="spinnerChangeHandler(val)"></ui-form-spinner>
         <ui-form-switch label="开关:" model="item.formSwitch" help="醉了6" on-text="男" off-text="女" change="switchChangeHandler(val)"></ui-form-switch>
-        <ui-form-remote-select label="高级下拉:" model="item.formRemoteSelect" help="醉了7"></ui-form-remote-select>
+        <ui-form-tag label="多选:" model="item.formRemoteSelect" help="醉了7" url="/test/remote/select" change="tagChangeHandler(val, item, vals, items)"></ui-form-tag>
     </form>
 
     <h4>查询表单</h4>
@@ -41,7 +41,26 @@
 </body>
 <script src="../output/js/lib.js"></script>
 <script src="../output/js/all.js"></script>
+<script src="../output/assets/js/jquery.mockjax.js"></script>
 <script>
+    var remoteSelects = [];
+    for(var i = 0; i < 50; i++){
+        remoteSelects.push({
+            id: (new Date().getTime() + '').substr(7) + i + 1,
+            name: (new Date().getTime() + '').substr(7) + i
+        });
+    }
+    $.mockjax({
+        url: '/test/remote/select',
+        response: function () {
+            this.responseText = {
+                data: remoteSelects,
+                type: 1
+            }
+        }
+    });
+
+
     function CC($scope, Message, $timeout) {
         new Message('uicontainer').success('成功');
         $scope.dateChangeHandler = function (val) {
@@ -62,6 +81,9 @@
         $scope.switchChangeHandler = function (val) {
             new Message('[switch]数据变动').success('成功');
         };
+        $scope.tagChangeHandler = function (val, item, vals, items) {
+            new Message('[tag]数据变动').success('成功');
+        }
 
         //双向绑定测试
         $scope.item = {};

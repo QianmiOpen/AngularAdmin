@@ -42,7 +42,7 @@
                 init() {
                     super.init();
                     this.scope.$on('componentComplete', (evt, o) => {
-                        this.formControlMap[o.name] = o.component
+                        this.formControlMap[o.name] = o.component;
                     });
                 }
 

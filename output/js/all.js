@@ -1178,7 +1178,7 @@ angular.module('admin.component')
                 proto$0.init = function() {var this$0 = this;
                     super$0.prototype.init.call(this);
                     this.scope.$on('componentComplete', function(evt, o)  {
-                        this$0.formControlMap[o.name] = o.component
+                        this$0.formControlMap[o.name] = o.component;
                     });
                 };
 
@@ -2190,15 +2190,183 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 (function () {
     angular.module('admin.component')
-        .factory('UIRemoteSelectControl', function($q, Util, Ajax)  {
+        .factory('UISpinnerControl', function()  {
+            var UISpinnerControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UISpinnerControl, super$0);var proto$0={};
+                function UISpinnerControl(s, e, a) {
+                    this.className = 'Spinner';
+                    this.formEl = e.find('input');
+                    super$0.call(this, s, e, a);
+                }if(super$0!==null)SP$0(UISpinnerControl,super$0);UISpinnerControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UISpinnerControl,"configurable":true,"writable":true}});DP$0(UISpinnerControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.init = function() {
+                    super$0.prototype.init.call(this);
+                };
+
+                proto$0.initEvents = function() {var this$0 = this;
+                    super$0.prototype.initEvents.call(this);
+                    this.element.on('mousedown', '.spinner-up', function()  {return this$0._changeValue(true)});
+                    this.element.on('mousedown', '.spinner-down', function()  {return this$0._changeValue(false)});
+                    this.scope.$watch('model', function(n)  {
+                        var cn = this$0._checkValue(n);
+                        if (cn != n) {
+                            this$0.scope.model = cn;
+                        }
+                    });
+                };
+
+                proto$0._changeValue = function(isAdd) {
+                    var step = (this.attrs.step || 1) * 1,
+                        val = this.val();
+                    val = val !== undefined ? parseInt(val) : this.attrs.value;
+                    val = val + (step * ( isAdd ? 1 : -1));
+                    val = this._changeValue(val);
+                    this.scope.model = val;
+                    this.scope.change({val: val});
+                };
+
+                proto$0._checkValue = function(value) {
+                    var min = (this.attrs.min || 0) * 1,
+                        max = (this.attrs.max || Number.MAX_VALUE) * 1;
+                    if (value > max) {
+                        value = max;
+                    }
+                    if (value < min) {
+                        value = min;
+                    }
+                    return value;
+                };
+            MIXIN$0(UISpinnerControl.prototype,proto$0);proto$0=void 0;return UISpinnerControl;})(UIFormControl);
+            return UISpinnerControl;
+        });
+})();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+    angular.module('admin.component')
+        .factory('UISwitchControl', function()  {
+            var UISwitchControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UISwitchControl, super$0);var proto$0={};
+                function UISwitchControl(s, e, a) {
+                    this.className = 'Switch';
+                    this.formEl = e.find('input');
+                    this.checkEl = this.formEl[0];
+                    super$0.call(this, s, e, a);
+                }if(super$0!==null)SP$0(UISwitchControl,super$0);UISwitchControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UISwitchControl,"configurable":true,"writable":true}});DP$0(UISwitchControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.init = function() {
+                    super$0.prototype.init.call(this);
+                    this.onValue = this.attrs.onValue || '1';
+                    this.offValue = this.attrs.offValue || '0';
+                    this.onText = this.attrs.onText || '开';
+                    this.offText = this.attrs.offText || '关';
+                };
+
+                proto$0.initEvents = function() {
+                    super$0.prototype.initEvents.call(this);
+                };
+
+                proto$0.render = function() {var this$0 = this;
+                    this.formEl.bootstrapSwitch({
+                        size: 'normal',
+                        onText: this.onText,
+                        offText: this.offText,
+                        onSwitchChange: function(evt, state)  {
+                            this$0._change(state);
+                        }
+                    });
+                    this.formEl.bootstrapSwitch('state', this.attrs.value == this.onValue);
+                    this.checkEl.checked = true;
+
+                    this.scope.$watch('model', function(newValue)  {
+                        if (newValue != this$0.val()) {
+                            this$0.val(newValue);
+                        }
+                    });
+
+                    if (!this.scope.model) {
+                        var val = this.offValue;
+                        this.scope.model = val;
+                    }
+                };
+
+                proto$0.disabled = function(open) {
+                    this.formEl.bootstrapSwitch('disabled', open == 'true');
+                };
+
+
+                proto$0.val = function(val) {
+                    if (val !== undefined) {
+                        this.formEl.bootstrapSwitch('state', val == this.onValue);
+                        return this;
+                    }
+                    else {
+                        return this.formEl.val();
+                    }
+                };
+
+                proto$0._change = function(state) {
+                    var v = state ? this.onValue : this.offValue;
+                    this.val(v);
+                    this.checkEl.checked = true;
+                    this.scope.model = v;
+                    this.scope.change({val: v});
+                };
+            MIXIN$0(UISwitchControl.prototype,proto$0);proto$0=void 0;return UISwitchControl;})(UIFormControl);
+            return UISwitchControl;
+        });
+})();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+    angular.module('admin.component')
+        .factory('UITagControl', function($q, Util, Ajax)  {
             var UIRemoteSelectControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIRemoteSelectControl, super$0);var proto$0={};
                 function UIRemoteSelectControl(s, e, a) {
                     this.className = 'RemoteSelect';
+                    this.selectValues = [];
+                    this.selectItems = [];
                     super$0.call(this, s, e, a);
                 }if(super$0!==null)SP$0(UIRemoteSelectControl,super$0);UIRemoteSelectControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIRemoteSelectControl,"configurable":true,"writable":true}});DP$0(UIRemoteSelectControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
                 proto$0.init = function() {
                     super$0.prototype.init.call(this);
+                };
+
+                proto$0.initEvents = function(){var this$0 = this;
+                    super$0.prototype.initEvents.call(this);
+
+                    //选中
+                    this.element.on('select2-selecting', function(evt)  {
+                        if (evt.object.isNew && this$0.attrs.editable == 'false') {  //不可编辑, 只能选择
+                            return false;
+                        }
+                        this$0.selectValues.push(evt.val);
+                        this$0.selectItems.push(evt.object);
+                        this$0.scope.model = this$0.selectValues;
+                        this$0.scope.change({val: evt.val, item: evt.object, vals: this$0.selectValues, items: this$0.selectItems});
+                        return true;
+                    });
+
+                    //移除
+                    this.element.on('select2-removing', function(evt)  {
+                        this$0.selectValues = $.grep(this$0.selectValues, function (value) {
+                            return value != evt.val;
+                        });
+                        this$0.selectItems = $.grep(this$0.selectItems, function (item) {
+                            return item != evt.choice;
+                        });
+                        this$0.scope.model = this$0.selectValues;
+                        this$0.scope.change({val: evt.val, item: evt.object, vals: this$0.selectValues, items: this$0.selectItems});
+                    });
                 };
 
                 proto$0.render = function() {
@@ -2211,11 +2379,12 @@ angular.module('admin.component')
                     var selectOption = {
                         openOnEnter: false,
                         multiple: true,
-                        formatResult: $.proxy(this.formatResult, this),
-                        formatSelection: $.proxy(this.formatResult, this),
-                        id: $.proxy(this.formatId, this),
-                        initSelection: $.proxy(this.initSelection, this),
-                        query: $.proxy(this.filterData, this),
+                        createSearchChoice: $.proxy(this._createSearchChoice, this),
+                        formatResult: $.proxy(this._formatResult, this),
+                        formatSelection: $.proxy(this._formatResult, this),
+                        id: $.proxy(this._formatId, this),
+                        initSelection: $.proxy(this._initSelection, this),
+                        query: $.proxy(this._filterData, this),
                         formatNoMatches: function () {
                             return '没有符合的数据';
                         },
@@ -2243,7 +2412,32 @@ angular.module('admin.component')
                     return selectOption;
                 };
 
-                proto$0.createSearchChoice = function(term, data) {
+                proto$0.useParams = function(o) {
+                    return $.extend(this.params, o || {}); //TODO: 额外查询参数
+                };
+
+                proto$0.loadData = function() {var this$0 = this;
+                    var defer = $q.defer();
+                    if (this.datas) {
+                        defer.resolve(this.datas);
+                    }
+                    else {
+                        Ajax.get(this.attrs.url, this.useParams()).then(function(r)  {
+                            this$0.datas = r ? r.aaData || r : [];
+                            $.each(this$0.datas, function (i, dd) { //遍历所有属性, 放入一个特殊变量, 用于后期查询使用
+                                var s = [];
+                                for (var k in dd) {
+                                    s.push(k + '=' + (dd[k] || '').toString().toLowerCase());
+                                }
+                                dd.__string = s.join(',');
+                            });
+                            defer.resolve(this$0.datas);
+                        });
+                    }
+                    return defer.promise;
+                };
+
+                proto$0._createSearchChoice = function(term, data) {
                     if ($(data).filter(function () {
                             return this.name.indexOf(term) === 0;
                         }).length === 0) {
@@ -2251,42 +2445,15 @@ angular.module('admin.component')
                     }
                 };
 
-                proto$0.useParams = function(o) {
-                    return $.extend(this.params, o || {}); //TODO: 额外查询参数
-                };
-
-                proto$0.loadData = function() {
-                    var self = this,
-                        d = $q.defer();
-                    if (self.datas) {
-                        d.resolve(self.datas);
-                    }
-                    else {
-                        Ajax.post(this.attrs.url, this.useParams).then(function (r) {
-                            self.datas = r ? r.aaData || r : [];
-                            $.each(self.datas, function (i, dd) { //遍历所有属性, 放入一个特殊变量, 用于后期查询使用
-                                var s = [];
-                                for (var k in dd) {
-                                    s.push(k + '=' + (dd[k] || '').toString().toLowerCase());
-                                }
-                                dd.__string = s.join(',');
-                            });
-                            d.resolve(self.datas);
-                        });
-                    }
-                    return d.promise;
-                };
-
-                proto$0.filterData = function(o) {
-                    var self = this,
-                        sfs = (this.attrs.search || '').toLowerCase().split(','),
+                proto$0._filterData = function(o) {var this$0 = this;
+                    var sfs = (this.attrs.search || '').toLowerCase().split(','),
                         keyword = o.term.toLowerCase();
-                    this.loadData().then(function (rs) {
+                    this.loadData().then(function(rs)  {
                         var os = [];
-                        $.each(rs, function (i, r) {
+                        $.each(rs, function(i, r)  {
                             var isC = false;
                             if (o.init) { //初始化, 那么只会根据
-                                isC = self.attrs.multi ? o.term.indexOf(self.formatId(r)) != -1 : self.formatId(r) == o.term;
+                                isC = this$0.attrs.multi ? o.term.indexOf(this$0.formatId(r)) != -1 : this$0.formatId(r) == o.term;
                             }
                             else { //根据属性过滤
                                 if (sfs.length === 0 || sfs[0] === '') {
@@ -2302,12 +2469,11 @@ angular.module('admin.component')
                                 os.push(r);
                             }
                         });
-
                         o.callback({results: os});
                     });
                 };
 
-                proto$0.initSelection = function(element, callback) {
+                proto$0._initSelection = function(element, callback) {
                     var self = this,
                         handler = function (data) {
                             if (self.attrs.multi !== undefined) {
@@ -2336,11 +2502,11 @@ angular.module('admin.component')
                     }
                 };
 
-                proto$0.formatId = function(o) {
+                proto$0._formatId = function(o) {
                     return o[this.attrs.valueName || 'id'];
                 };
 
-                proto$0.formatResult = function(item, container, query) {
+                proto$0._formatResult = function(item, container, query) {
                     return item[this.attrs.labelName || 'name'];
                 };
 
@@ -2740,144 +2906,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-(function () {
-    angular.module('admin.component')
-        .factory('UISpinnerControl', function()  {
-            var UISpinnerControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UISpinnerControl, super$0);var proto$0={};
-                function UISpinnerControl(s, e, a) {
-                    this.className = 'Spinner';
-                    this.formEl = e.find('input');
-                    super$0.call(this, s, e, a);
-                }if(super$0!==null)SP$0(UISpinnerControl,super$0);UISpinnerControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UISpinnerControl,"configurable":true,"writable":true}});DP$0(UISpinnerControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-                proto$0.init = function() {
-                    super$0.prototype.init.call(this);
-                };
-
-                proto$0.initEvents = function() {var this$0 = this;
-                    super$0.prototype.initEvents.call(this);
-                    this.element.on('mousedown', '.spinner-up', function()  {return this$0._changeValue(true)});
-                    this.element.on('mousedown', '.spinner-down', function()  {return this$0._changeValue(false)});
-                    this.scope.$watch('model', function(n)  {
-                        var cn = this$0._checkValue(n);
-                        if (cn != n) {
-                            this$0.scope.model = cn;
-                        }
-                    });
-                };
-
-                proto$0._changeValue = function(isAdd) {
-                    var step = (this.attrs.step || 1) * 1,
-                        val = this.val();
-                    val = val !== undefined ? parseInt(val) : this.attrs.value;
-                    val = val + (step * ( isAdd ? 1 : -1));
-                    val = this._changeValue(val);
-                    this.scope.model = val;
-                    this.scope.change({val: val});
-                };
-
-                proto$0._checkValue = function(value) {
-                    var min = (this.attrs.min || 0) * 1,
-                        max = (this.attrs.max || Number.MAX_VALUE) * 1;
-                    if (value > max) {
-                        value = max;
-                    }
-                    if (value < min) {
-                        value = min;
-                    }
-                    return value;
-                };
-            MIXIN$0(UISpinnerControl.prototype,proto$0);proto$0=void 0;return UISpinnerControl;})(UIFormControl);
-            return UISpinnerControl;
-        });
-})();
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-(function () {
-    angular.module('admin.component')
-        .factory('UISwitchControl', function()  {
-            var UISwitchControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UISwitchControl, super$0);var proto$0={};
-                function UISwitchControl(s, e, a) {
-                    this.className = 'Switch';
-                    this.formEl = e.find('input');
-                    this.checkEl = this.formEl[0];
-                    super$0.call(this, s, e, a);
-                }if(super$0!==null)SP$0(UISwitchControl,super$0);UISwitchControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UISwitchControl,"configurable":true,"writable":true}});DP$0(UISwitchControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-                proto$0.init = function() {
-                    super$0.prototype.init.call(this);
-                    this.onValue = this.attrs.onValue || '1';
-                    this.offValue = this.attrs.offValue || '0';
-                    this.onText = this.attrs.onText || '开';
-                    this.offText = this.attrs.offText || '关';
-                };
-
-                proto$0.initEvents = function() {
-                    super$0.prototype.initEvents.call(this);
-                };
-
-                proto$0.render = function() {var this$0 = this;
-                    this.formEl.bootstrapSwitch({
-                        size: 'normal',
-                        onText: this.onText,
-                        offText: this.offText,
-                        onSwitchChange: function(evt, state)  {
-                            this$0._change(state)
-                        }
-                    });
-                    this.formEl.bootstrapSwitch('state', this.attrs.value == this.onValue);
-                    this.checkEl.checked = true;
-
-                    this.scope.$watch('model', function(newValue)  {
-                        if (newValue != this$0.val()) {
-                            this$0.val(newValue);
-                        }
-                    });
-
-                    if (!this.scope.model) {
-                        var val = this.offValue;
-                        this.scope.model = val;
-                    }
-                };
-
-                proto$0.disabled = function(open) {
-                    this.formEl.bootstrapSwitch('disabled', open == 'true');
-                };
-
-
-                proto$0.val = function(val) {
-                    if (val !== undefined) {
-                        this.formEl.bootstrapSwitch('state', val == this.onValue);
-                        return this;
-                    }
-                    else {
-                        return this.formEl.val();
-                    }
-                };
-
-                proto$0._change = function(state) {
-                    var v = state ? this.onValue : this.offValue;
-                    this.val(v);
-                    this.checkEl.checked = true;
-                    this.scope.model = v;
-                    this.scope.change({val: v});
-                };
-            MIXIN$0(UISwitchControl.prototype,proto$0);proto$0=void 0;return UISwitchControl;})(UIFormControl);
-            return UISwitchControl;
-        });
-})();
-//-----------------------------------------------------------------------------------------------
-//
-//
 //  针对input的封装
 //
 //
@@ -3064,6 +3092,82 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSelect', function (UISelectControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@',
+                multiple: '@',
+                render: '&'
+            },
+            link: function (s, e, a) {
+                new UISelectControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                    <label class=\"col-md-{{lcol}} control-label\">{{label}}</label>\
+\n                    <div class=\"col-md-{{rcol}}\">\
+\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" title=\"{{placeholder}}\" ng-transclude></select>\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormTag', function (UITagControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function (scope, element, attrs) {
+                new UITagControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <input type=\"text\" class=\"form-control\" name=\"{{name}}\"/>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
 //  针对input的封装
 //
 //
@@ -3085,7 +3189,7 @@ angular.module('admin.component')
                 help: '@'
             },
             link: function(s, e, a)  {
-                new UISpinnerControl(s, e, a)
+                new UISpinnerControl(s, e, a);
             },
             template: ("\
 \n                <div class=\"form-group\">\
@@ -3137,82 +3241,6 @@ angular.module('admin.component')
 \n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
 \n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
 \n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>\
-\n            ")
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSelect', function (UISelectControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                placeholder: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@',
-                multiple: '@',
-                render: '&'
-            },
-            link: function (s, e, a) {
-                new UISelectControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                    <label class=\"col-md-{{lcol}} control-label\">{{label}}</label>\
-\n                    <div class=\"col-md-{{rcol}}\">\
-\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" title=\"{{placeholder}}\" ng-transclude></select>\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormRemoteSelect', function (UIRemoteSelectControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function (scope, element, attrs) {
-                new UIRemoteSelectControl(scope, element, attrs);
-            },
-            template: ("\
-\n                <div class=\"form-group\"> \
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <input type=\"text\" class=\"form-control\" name=\"{{name}}\"/>\
-\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
 \n                   </div>\
 \n               </div>\
 \n            ")

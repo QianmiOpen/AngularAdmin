@@ -7,15 +7,45 @@
 //-----------------------------------------------------------------------------------------------
 (function () {
     angular.module('admin.component')
-        .factory('UIRemoteSelectControl', ($q, Util, Ajax) => {
+        .factory('UITagControl', ($q, Util, Ajax) => {
             class UIRemoteSelectControl extends UIFormControl {
                 constructor(s, e, a) {
                     this.className = 'RemoteSelect';
+                    this.selectValues = [];
+                    this.selectItems = [];
                     super(s, e, a);
                 }
 
                 init() {
                     super.init();
+                }
+
+                initEvents(){
+                    super.initEvents();
+
+                    //选中
+                    this.element.on('select2-selecting', (evt) => {
+                        if (evt.object.isNew && this.attrs.editable == 'false') {  //不可编辑, 只能选择
+                            return false;
+                        }
+                        this.selectValues.push(evt.val);
+                        this.selectItems.push(evt.object);
+                        this.scope.model = this.selectValues;
+                        this.scope.change({val: evt.val, item: evt.object, vals: this.selectValues, items: this.selectItems});
+                        return true;
+                    });
+
+                    //移除
+                    this.element.on('select2-removing', (evt) => {
+                        this.selectValues = $.grep(this.selectValues, function (value) {
+                            return value != evt.val;
+                        });
+                        this.selectItems = $.grep(this.selectItems, function (item) {
+                            return item != evt.choice;
+                        });
+                        this.scope.model = this.selectValues;
+                        this.scope.change({val: evt.val, item: evt.object, vals: this.selectValues, items: this.selectItems});
+                    });
                 }
 
                 render() {
@@ -28,11 +58,12 @@
                     var selectOption = {
                         openOnEnter: false,
                         multiple: true,
-                        formatResult: $.proxy(this.formatResult, this),
-                        formatSelection: $.proxy(this.formatResult, this),
-                        id: $.proxy(this.formatId, this),
-                        initSelection: $.proxy(this.initSelection, this),
-                        query: $.proxy(this.filterData, this),
+                        createSearchChoice: $.proxy(this._createSearchChoice, this),
+                        formatResult: $.proxy(this._formatResult, this),
+                        formatSelection: $.proxy(this._formatResult, this),
+                        id: $.proxy(this._formatId, this),
+                        initSelection: $.proxy(this._initSelection, this),
+                        query: $.proxy(this._filterData, this),
                         formatNoMatches: function () {
                             return '没有符合的数据';
                         },
@@ -60,7 +91,32 @@
                     return selectOption;
                 }
 
-                createSearchChoice(term, data) {
+                useParams(o) {
+                    return $.extend(this.params, o || {}); //TODO: 额外查询参数
+                }
+
+                loadData() {
+                    var defer = $q.defer();
+                    if (this.datas) {
+                        defer.resolve(this.datas);
+                    }
+                    else {
+                        Ajax.get(this.attrs.url, this.useParams()).then((r) => {
+                            this.datas = r ? r.aaData || r : [];
+                            $.each(this.datas, function (i, dd) { //遍历所有属性, 放入一个特殊变量, 用于后期查询使用
+                                var s = [];
+                                for (var k in dd) {
+                                    s.push(k + '=' + (dd[k] || '').toString().toLowerCase());
+                                }
+                                dd.__string = s.join(',');
+                            });
+                            defer.resolve(this.datas);
+                        });
+                    }
+                    return defer.promise;
+                }
+
+                _createSearchChoice(term, data) {
                     if ($(data).filter(function () {
                             return this.name.indexOf(term) === 0;
                         }).length === 0) {
@@ -68,42 +124,15 @@
                     }
                 }
 
-                useParams(o) {
-                    return $.extend(this.params, o || {}); //TODO: 额外查询参数
-                }
-
-                loadData() {
-                    var self = this,
-                        d = $q.defer();
-                    if (self.datas) {
-                        d.resolve(self.datas);
-                    }
-                    else {
-                        Ajax.post(this.attrs.url, this.useParams).then(function (r) {
-                            self.datas = r ? r.aaData || r : [];
-                            $.each(self.datas, function (i, dd) { //遍历所有属性, 放入一个特殊变量, 用于后期查询使用
-                                var s = [];
-                                for (var k in dd) {
-                                    s.push(k + '=' + (dd[k] || '').toString().toLowerCase());
-                                }
-                                dd.__string = s.join(',');
-                            });
-                            d.resolve(self.datas);
-                        });
-                    }
-                    return d.promise;
-                }
-
-                filterData(o) {
-                    var self = this,
-                        sfs = (this.attrs.search || '').toLowerCase().split(','),
+                _filterData(o) {
+                    var sfs = (this.attrs.search || '').toLowerCase().split(','),
                         keyword = o.term.toLowerCase();
-                    this.loadData().then(function (rs) {
+                    this.loadData().then((rs) => {
                         var os = [];
-                        $.each(rs, function (i, r) {
+                        $.each(rs, (i, r) => {
                             var isC = false;
                             if (o.init) { //初始化, 那么只会根据
-                                isC = self.attrs.multi ? o.term.indexOf(self.formatId(r)) != -1 : self.formatId(r) == o.term;
+                                isC = this.attrs.multi ? o.term.indexOf(this.formatId(r)) != -1 : this.formatId(r) == o.term;
                             }
                             else { //根据属性过滤
                                 if (sfs.length === 0 || sfs[0] === '') {
@@ -119,12 +148,11 @@
                                 os.push(r);
                             }
                         });
-
                         o.callback({results: os});
                     });
                 }
 
-                initSelection(element, callback) {
+                _initSelection(element, callback) {
                     var self = this,
                         handler = function (data) {
                             if (self.attrs.multi !== undefined) {
@@ -153,11 +181,11 @@
                     }
                 }
 
-                formatId(o) {
+                _formatId(o) {
                     return o[this.attrs.valueName || 'id'];
                 }
 
-                formatResult(item, container, query) {
+                _formatResult(item, container, query) {
                     return item[this.attrs.labelName || 'name'];
                 }
 

@@ -68,6 +68,9 @@
     * off-text, 右边的文字, 默认是关
     * on-value, 左边的文件, 默认是1
     * off-value, 右边的文字, 默认是0
+* ```<ui-form-tag label="开关:" model="item.formTag" url="/test/remote/select" editable="true" change="tagChangeHandler(val, item, vals, items)"></ui-form-tag>```
+    * url, 远程加载的数据地址
+    * editable, 是否可以按回车自动新增一个, 默认是true
 
 ## 查询
 

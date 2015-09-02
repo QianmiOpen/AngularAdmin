@@ -22,7 +22,7 @@ angular.module('admin.component')
                 help: '@'
             },
             link: (s, e, a) => {
-                new UISpinnerControl(s, e, a)
+                new UISpinnerControl(s, e, a);
             },
             template: `
                 <div class="form-group">
