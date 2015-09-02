@@ -26,9 +26,7 @@ angular.module('admin.component')
                 <div class="form-group">
                    <label class="col-md-{{lcol || DefaultCol.l}} control-label">{{label}}</label>
                    <div class="col-md-{{rcol || DefaultCol.r}}">
-                       <div>
-                            <input type="text" class="form-control" name="{{name}}"/>
-                       </div>
+                       <input type="text" class="form-control" name="{{name}}"/>
                        <span ng-if="help" class="help-block">{{help}}</span>
                    </div>
                </div>

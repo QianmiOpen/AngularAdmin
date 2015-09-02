@@ -2194,7 +2194,6 @@ angular.module('admin.component')
             var UIRemoteSelectControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIRemoteSelectControl, super$0);var proto$0={};
                 function UIRemoteSelectControl(s, e, a) {
                     this.className = 'RemoteSelect';
-                    this.inputElement = e.find('input');
                     super$0.call(this, s, e, a);
                 }if(super$0!==null)SP$0(UIRemoteSelectControl,super$0);UIRemoteSelectControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIRemoteSelectControl,"configurable":true,"writable":true}});DP$0(UIRemoteSelectControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
@@ -2205,12 +2204,18 @@ angular.module('admin.component')
                 proto$0.render = function() {
                     super$0.prototype.render.call(this);
                     var config = this._getConfig();
-                    this.inputElement.select2(config);
+                    this.element.find('input').select2(config);
                 };
 
                 proto$0._getConfig = function() {
                     var selectOption = {
                         openOnEnter: false,
+                        multiple: true,
+                        formatResult: $.proxy(this.formatResult, this),
+                        formatSelection: $.proxy(this.formatResult, this),
+                        id: $.proxy(this.formatId, this),
+                        initSelection: $.proxy(this.initSelection, this),
+                        query: $.proxy(this.filterData, this),
                         formatNoMatches: function () {
                             return '没有符合的数据';
                         },
@@ -2228,17 +2233,6 @@ angular.module('admin.component')
                         }
                     };
 
-                    if (this.attrs.multi !== undefined) {  //开启多选, select元素不能开启
-                        selectOption.multiple = true;
-                    }
-                    if (this.attrs.url !== undefined) { //开启远程查询
-                        selectOption.createSearchChoice = $.proxy(self.createSearchChoice, self);
-                        selectOption.query = $.proxy(self.filterData, self);
-                        selectOption.initSelection = $.proxy(self.initSelection, self);
-                        selectOption.id = $.proxy(self.formatId, self);
-                        selectOption.formatSelection = $.proxy(self.formatResult, self);
-                        selectOption.formatResult = $.proxy(self.formatResult, self);
-                    }
                     if (this.attrs.minmum) { //输入几个字符以后才能搜索
                         selectOption.minimumInputLength = this.attrs.minmum;
                     }
@@ -3070,84 +3064,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSelect', function (UISelectControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                placeholder: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@',
-                multiple: '@',
-                render: '&'
-            },
-            link: function (s, e, a) {
-                new UISelectControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                    <label class=\"col-md-{{lcol}} control-label\">{{label}}</label>\
-\n                    <div class=\"col-md-{{rcol}}\">\
-\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" title=\"{{placeholder}}\" ng-transclude></select>\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormRemoteSelect', function (UIRemoteSelectControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function (scope, element, attrs) {
-                new UIRemoteSelectControl(scope, element, attrs);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <div>\
-\n                            <input type=\"text\" class=\"form-control\" name=\"{{name}}\"/>\
-\n                       </div>\
-\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>\
-\n            ")
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
 //  针对input的封装
 //
 //
@@ -3221,6 +3137,82 @@ angular.module('admin.component')
 \n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
 \n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
 \n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSelect', function (UISelectControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@',
+                multiple: '@',
+                render: '&'
+            },
+            link: function (s, e, a) {
+                new UISelectControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                    <label class=\"col-md-{{lcol}} control-label\">{{label}}</label>\
+\n                    <div class=\"col-md-{{rcol}}\">\
+\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" title=\"{{placeholder}}\" ng-transclude></select>\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormRemoteSelect', function (UIRemoteSelectControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function (scope, element, attrs) {
+                new UIRemoteSelectControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"form-group\"> \
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <input type=\"text\" class=\"form-control\" name=\"{{name}}\"/>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
 \n                   </div>\
 \n               </div>\
 \n            ")

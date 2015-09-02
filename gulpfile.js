@@ -64,7 +64,7 @@ gulp.task('default', function () {
         gulp.run('lint', 'scripts', function (o) {
             setTimeout(function () {
                 livereload.reload();
-            }, 2 * 1000);
+            }, 1 * 1000);
         });
     });
 });

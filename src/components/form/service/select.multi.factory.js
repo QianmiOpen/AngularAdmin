@@ -11,7 +11,6 @@
             class UIRemoteSelectControl extends UIFormControl {
                 constructor(s, e, a) {
                     this.className = 'RemoteSelect';
-                    this.inputElement = e.find('input');
                     super(s, e, a);
                 }
 
@@ -22,12 +21,18 @@
                 render() {
                     super.render();
                     let config = this._getConfig();
-                    this.inputElement.select2(config);
+                    this.element.find('input').select2(config);
                 }
 
                 _getConfig() {
                     var selectOption = {
                         openOnEnter: false,
+                        multiple: true,
+                        formatResult: $.proxy(this.formatResult, this),
+                        formatSelection: $.proxy(this.formatResult, this),
+                        id: $.proxy(this.formatId, this),
+                        initSelection: $.proxy(this.initSelection, this),
+                        query: $.proxy(this.filterData, this),
                         formatNoMatches: function () {
                             return '没有符合的数据';
                         },
@@ -45,17 +50,6 @@
                         }
                     };
 
-                    if (this.attrs.multi !== undefined) {  //开启多选, select元素不能开启
-                        selectOption.multiple = true;
-                    }
-                    if (this.attrs.url !== undefined) { //开启远程查询
-                        selectOption.createSearchChoice = $.proxy(self.createSearchChoice, self);
-                        selectOption.query = $.proxy(self.filterData, self);
-                        selectOption.initSelection = $.proxy(self.initSelection, self);
-                        selectOption.id = $.proxy(self.formatId, self);
-                        selectOption.formatSelection = $.proxy(self.formatResult, self);
-                        selectOption.formatResult = $.proxy(self.formatResult, self);
-                    }
                     if (this.attrs.minmum) { //输入几个字符以后才能搜索
                         selectOption.minimumInputLength = this.attrs.minmum;
                     }
