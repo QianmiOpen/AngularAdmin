@@ -6,7 +6,7 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.service')
-    .factory('Util', function ($rootScope, $compile, $filter, $parse, $q) {
+    .factory('util', function ($rootScope, $compile, $filter, $parse, $q) {
         return {
 
             /**

@@ -10,14 +10,18 @@ var es6transpiler = require('gulp-es6-transpiler');
 var livereload = require('gulp-livereload');
 
 var scripts = [
+
+    './src/core/event.js',
+    './src/core/component.event.js',
+
     './src/filter/index.js',
     './src/filter/**/*.js',
 
     './src/service/index.js',
     './src/service/**/*.js',
 
-    './src/component/index.js',
-    './src/component/**/*.js',
+    './src/components/index.js',
+    './src/components/**/*.js',
 
     './src/template/index.js',
     './src/template/**/*.js',

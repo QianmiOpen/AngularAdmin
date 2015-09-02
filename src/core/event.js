@@ -24,6 +24,3 @@ class Event {
         }.bind(this));
     }
 }
-
-angular.module('admin.service')
-    .service('Event', () => Event);

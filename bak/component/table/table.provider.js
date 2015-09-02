@@ -6,7 +6,6 @@
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
     .provider('uiTableDelegate', function () {
-
         return {
             $get: function (util, ajax, logger) {
                 return function (table, element, attrs, columns) {
