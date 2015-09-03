@@ -12,6 +12,8 @@
 
 ```javascript
 .config((AjaxProvider, MessageProvider) => {
+    let baseJsUrl = 'http://localhost:63342/AngularAdmin/output/assets/js/';
+
     //
     // ajax 默认返回处理
     //
@@ -21,7 +23,12 @@
     //
     // 通知位置
     //
-    MessageProvider.setPostion('bottom', 'right');
+    MessageProvider.setPosition('bottom', 'right');
+
+    //
+    // 百度编辑器的库地址
+    //
+    UIEditorControlProvider.setUrl(`${baseJsUrl}/ueditor/ueditor.config.js`, `${baseJsUrl}/ueditor/ueditor.all.js`);
 });
 ```
 
@@ -73,6 +80,8 @@
     * editable, 是否可以按回车自动新增一个, 默认是true
 * ```<ui-form-region label="地域:" model="item.formRegion" help="醉了8" change="regionChangeHandler(mode, val, p, c, s)"></ui-form-region>```
     * mode, p = 只显示省, c = 只显示省和市, s = 只显示省和市和区, a = 全部显示, 默认是a
+* ```<ui-form-editor label="百度编辑器:" model="item.formEdiotr" help="醉了9" change="editorChangeHandler(val)"></ui-form-editor>```
+    * 尚无
 
 ## 查询
 

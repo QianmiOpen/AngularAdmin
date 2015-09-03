@@ -24,6 +24,7 @@
         <ui-form-switch label="开关:" model="item.formSwitch" help="醉了6" on-text="男" off-text="女" change="switchChangeHandler(val)"></ui-form-switch>
         <ui-form-tag label="多选:" model="item.formRemoteSelect" help="醉了7" url="/test/remote/select" change="tagChangeHandler(isAdd, val, item, vals, items)"></ui-form-tag>
         <ui-form-region label="地域:" model="item.formRegion" help="醉了8" change="regionChangeHandler(mode, val, p, c, s)"></ui-form-region>
+        <ui-form-editor label="百度编辑器:" model="item.formEditor" help="醉了9" change="editorChangeHandler(val)"></ui-form-editor>
     </form>
 
     <h4>查询表单</h4>
@@ -88,6 +89,9 @@
         $scope.regionChangeHandler = function (mode, val, p, c, s) {
             new Message('[region]数据变动').success('成功');
         };
+        $scope.editorChangeHandler = function (val) {
+            new Message('[editor]数据变动').success('成功');
+        }
 
         //双向绑定测试
         $scope.item = {};

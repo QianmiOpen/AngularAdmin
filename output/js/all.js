@@ -1134,6 +1134,92 @@ angular.module('admin.component')
             return UIDateRangeControl;
         });
 })();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+
+    angular.module('admin.component')
+        .provider('UIEditorControl', function()  {
+            var configUrl, allUrl,
+                result = {
+                    setUrl: function(_configUrl, _allUrl) {
+                        configUrl = _configUrl;
+                        allUrl = _allUrl;
+                    },
+
+                    $get: function() {
+                        var UIEditorControl = (function(super$0){var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIEditorControl, super$0);var proto$0={};
+
+                            function UIEditorControl(s, e, a) {
+                                this.className = 'Editor';
+                                this.$scriptElement = e.find('script');
+                                super$0.call(this, s, e, a);
+                            }if(super$0!==null)SP$0(UIEditorControl,super$0);UIEditorControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIEditorControl,"configurable":true,"writable":true}});DP$0(UIEditorControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                            proto$0.init = function() {
+                                super$0.prototype.init.call(this);
+                                this.editorId = 'uiFromEditor' + new Date().getTime();
+                                this.$scriptElement.attr('id', this.editorId);
+                            };
+
+                            proto$0.render = function() {var this$0 = this;
+                                super$0.prototype.render.call(this);
+                                if (window.UE) {
+                                    this._initEditor();
+                                }
+                                else {
+                                    $.getScript(configUrl, function()  {
+                                        $.getScript(allUrl, function()  {
+                                            this$0._initEditor();
+                                        });
+                                    });
+                                }
+                            };
+
+                            proto$0.reset = function() {
+                                this.editor.setContent('');
+                            };
+
+                            proto$0.val = function(val) {
+                                if (val !== undefined) {
+                                    this.editor.setContent(val);
+                                    return this;
+                                }
+                                else {
+                                    return this.editor.getContent();
+                                }
+                            };
+
+                            proto$0.getEditor = function() {
+                                return this.editor;
+                            };
+
+                            proto$0._initEditor = function() {var this$0 = this;
+                                this.editor = UE.getEditor(this.editorId, {
+                                    autoHeightEnabled: true
+                                });
+                                this.editor.addListener('contentChange', function()  {
+                                    this$0._change();
+                                });
+                            };
+
+                            proto$0._change = function() {
+                                var content = this.val();
+                                this.scope.model = content;
+                                this.scope.change({val: content});
+                            };
+                        MIXIN$0(UIEditorControl.prototype,proto$0);proto$0=void 0;return UIEditorControl;})(UIFormControl);
+                        return UIEditorControl;
+                    }
+                };
+            return result;
+        });
+})();
 //------------------------------------------------------
 //
 //
@@ -2699,6 +2785,42 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
+    .directive('uiFormEditor', function (UIEditorControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function (scope, element, attrs) {
+                new UIEditorControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <script name=\"{{name}}\" type=\"text/plain\"></script>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
     .directive('uiFormDate', function (UIDateControl) {
         return {
             restrict: 'E',
@@ -3540,7 +3662,8 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 (function () {
     angular.module('admin', ['admin.service', 'admin.filter', 'admin.component'])
-        .config(function(AjaxProvider, MessageProvider)  {
+        .config(function(AjaxProvider, MessageProvider, UIEditorControlProvider)  {
+            var baseJsUrl = 'http://localhost:63342/AngularAdmin/output/assets/js/';
 
             //
             // ajax 默认返回处理
@@ -3552,5 +3675,10 @@ angular.module('admin.component')
             // 通知位置
             //
             MessageProvider.setPosition('bottom', 'right');
+
+            //
+            // 百度编辑器的库地址
+            //
+            UIEditorControlProvider.setUrl((("" + baseJsUrl) + "/ueditor/ueditor.config.js"), (("" + baseJsUrl) + "/ueditor/ueditor.all.js"));
         });
 })();
