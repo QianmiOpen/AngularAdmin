@@ -71,6 +71,8 @@
 * ```<ui-form-tag label="开关:" model="item.formTag" url="/test/remote/select" editable="true" change="tagChangeHandler(val, item, vals, items)"></ui-form-tag>```
     * url, 远程加载的数据地址
     * editable, 是否可以按回车自动新增一个, 默认是true
+* ```<ui-form-region label="地域:" model="item.formRegion" help="醉了8" change="regionChangeHandler(mode, val, p, c, s)"></ui-form-region>```
+    * mode, p = 只显示省, c = 只显示省和市, s = 只显示省和市和区, a = 全部显示, 默认是a
 
 ## 查询
 
