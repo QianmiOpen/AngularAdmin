@@ -22,8 +22,8 @@
         </ui-form-select>
         <ui-form-spinner label="计数器:" model="item.formSpinner" help="醉了6" value="1" min="0" max="100" step="5" change="spinnerChangeHandler(val)"></ui-form-spinner>
         <ui-form-switch label="开关:" model="item.formSwitch" help="醉了6" on-text="男" off-text="女" change="switchChangeHandler(val)"></ui-form-switch>
-        <ui-form-tag label="多选:" model="item.formRemoteSelect" help="醉了7" url="/test/remote/select" change="tagChangeHandler(val, item, vals, items)"></ui-form-tag>
-        <ui-form-region label="地域:"></ui-form-region>
+        <ui-form-tag label="多选:" model="item.formRemoteSelect" help="醉了7" url="/test/remote/select" change="tagChangeHandler(isAdd, val, item, vals, items)"></ui-form-tag>
+        <ui-form-region label="地域:" model="item.formRegion" help="醉了8" change="regionChangeHandler(mode, val, p, c, s)"></ui-form-region>
     </form>
 
     <h4>查询表单</h4>
@@ -82,9 +82,12 @@
         $scope.switchChangeHandler = function (val) {
             new Message('[switch]数据变动').success('成功');
         };
-        $scope.tagChangeHandler = function (val, item, vals, items) {
+        $scope.tagChangeHandler = function (isAdd, val, item, vals, items) {
             new Message('[tag]数据变动').success('成功');
-        }
+        };
+        $scope.regionChangeHandler = function (mode, val, p, c, s) {
+            new Message('[region]数据变动').success('成功');
+        };
 
         //双向绑定测试
         $scope.item = {};

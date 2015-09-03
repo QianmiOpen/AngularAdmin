@@ -11,7 +11,7 @@
             class UIRegionControl extends UIFormControl {
                 constructor(s, e, a) {
                     this.className = 'Region';
-                    this.$inputDom = e.find('input:hidden');
+                    this.$inputDom = e.find('input:eq(0)');
                     this.$pDom = e.find('[name="province"]');
                     this.$cDom = e.find('[name="city"]');
                     this.$sDom = e.find('[name="area"]');
@@ -22,7 +22,7 @@
 
                 init() {
                     super.init();
-                    switch(this.attrs.mode){
+                    switch (this.attrs.mode) {
                         case 'p':
                             this.$cDom.hide();
                             this.$sDom.hide();
@@ -38,7 +38,7 @@
                     }
                 }
 
-                initEvents(){
+                initEvents() {
                     super.initEvents();
                     this.$pDom.change((evt) => {
                         if (evt.val) {
@@ -48,6 +48,7 @@
                             });
                             this.$pDom.val(evt.added[this.valueType]);
                             this.$inputDom.val(evt.val);
+                            this._change('p');
                         }
                         else {
                             this.reset();
@@ -62,6 +63,7 @@
                             });
                             this.$cDom.val(evt.added[this.valueType]);
                             this.$inputDom.val(evt.val);
+                            this._change('c');
                         }
                         else {
                             this.$sDom.select2(this.toStreetData());
@@ -75,6 +77,7 @@
                         if (evt.val) {
                             this.$sDom.val(evt.added[this.valueType]);
                             this.$inputDom.val(evt.val);
+                            this._change('s');
                         }
                         else {
                             this.$sDom.val('');
@@ -97,7 +100,7 @@
                                     this.$pDom.val(p[self.valueType]);
                                     return [c, s, uiRegionHelper.getCity(p.id)];
                                 }
-                                else{
+                                else {
                                     this.$cDom.select2(this.toCityData([]));
                                     this.$sDom.select2(this.toStreetData([]));
                                 }
@@ -110,7 +113,7 @@
                                     this.$cDom.val(c[self.valueType]);
                                     return [s, uiRegionHelper.getStreet(c.id)];
                                 }
-                                else{
+                                else {
                                     this.$sDom.select2(this.toStreetData([]));
                                 }
                                 throw new Error();
@@ -150,6 +153,15 @@
                     this.$pDom.val('').select2('val', '');
                     this.$cDom.val('').select2(this.toCityData());
                     this.$sDom.val('').select2(this.toStreetData());
+                }
+
+                _change(mode) {
+                    this.scope.model = this.$inputDom.val();
+                    let val = this.scope.mode,
+                        p = this.$pDom.val(),
+                        c = this.$cDom.val(),
+                        s = this.$sDom.val();
+                    this.scope.change({mode, val, p, c, s});
                 }
             }
 

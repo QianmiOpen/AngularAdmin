@@ -44,7 +44,7 @@ angular.module('admin.component')
                         <input type="text" class="input-small form-control input-inline" name="province"/>
                         <input type="text" class="input-small form-control input-inline" name="city"/>
                         <input type="text" class="input-small form-control input-inline" name="area"/>
-                        <input type="text" class="input-medium form-control input-inline" name="address" ng-value={{aValue}} />
+                        <input type="text" class="input-medium form-control input-inline" name="address" ng-value="{{aValue}}" placeholder="请输入详细地址" />
                         <span ng-if="help" class="help-block">{{help}}</span>
                    </div>
                </div>'
