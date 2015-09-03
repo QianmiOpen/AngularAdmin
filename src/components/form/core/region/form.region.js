@@ -39,12 +39,12 @@ angular.module('admin.component')
             template: `
                 <div class="form-group">
                    <label class="col-md-{{lcol || DefaultCol.l}} control-label">{{label}}</label>
-                   <div class="col-md-{{rcol || DefaultCol.r}}">
-                        <input type="hidden" name="{{name}}" ng-value={{value}}/>
+                   <div class="col-md-{{rcol || DefaultCol.r}} ui-form-region">
+                        <input type="hidden" name="{{name}}"/>
                         <input type="text" class="input-small form-control input-inline" name="province"/>
-                        <input ng-if="!mode || mode == 's' || mode == 'c'" type="text" class="input-small form-control input-inline" name="city"/>
-                        <input ng-if="!mode || mode == 's'" type="text" class="input-small form-control input-inline" name="area"/>
-                        <input ng-if="!mode" type="text" class="input-medium form-control input-inline" name="address" ng-value={{aValue}}/>
+                        <input type="text" class="input-small form-control input-inline" name="city"/>
+                        <input type="text" class="input-small form-control input-inline" name="area"/>
+                        <input type="text" class="input-medium form-control input-inline" name="address" ng-value={{aValue}} />
                         <span ng-if="help" class="help-block">{{help}}</span>
                    </div>
                </div>'

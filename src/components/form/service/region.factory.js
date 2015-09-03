@@ -22,6 +22,65 @@
 
                 init() {
                     super.init();
+                    switch(this.attrs.mode){
+                        case 'p':
+                            this.$cDom.hide();
+                            this.$sDom.hide();
+                            this.$aDom.hide();
+                            break;
+                        case 'c':
+                            this.$sDom.hide();
+                            this.$aDom.hide();
+                            break;
+                        case 's':
+                            this.$aDom.hide();
+                            break;
+                    }
+                }
+
+                initEvents(){
+                    super.initEvents();
+                    this.$pDom.change((evt) => {
+                        if (evt.val) {
+                            uiRegionHelper.getCity(evt.val).then((data) => {
+                                this.$cDom.select2(this.toCityData(data));
+                                this.$sDom.select2(this.toStreetData());
+                            });
+                            this.$pDom.val(evt.added[this.valueType]);
+                            this.$inputDom.val(evt.val);
+                        }
+                        else {
+                            this.reset();
+                        }
+                    });
+
+                    //
+                    this.$cDom.change((evt) => {
+                        if (evt.val) {
+                            uiRegionHelper.getStreet(evt.val).then((data) => {
+                                this.$sDom.select2(this.toStreetData(data));
+                            });
+                            this.$cDom.val(evt.added[this.valueType]);
+                            this.$inputDom.val(evt.val);
+                        }
+                        else {
+                            this.$sDom.select2(this.toStreetData());
+                            this.$cDom.val('');
+                            this.$inputDom.val('');
+                        }
+                    });
+
+                    //
+                    this.$sDom.change((evt) => {
+                        if (evt.val) {
+                            this.$sDom.val(evt.added[this.valueType]);
+                            this.$inputDom.val(evt.val);
+                        }
+                        else {
+                            this.$sDom.val('');
+                            this.$inputDom.val('');
+                        }
+                    });
                 }
 
                 render() {
@@ -36,7 +95,11 @@
                                 if (p) {
                                     this.$pDom.select2('val', p.id);
                                     this.$pDom.val(p[self.valueType]);
-                                    return [c, s, uiRegionHelper.getCity(p.id)]
+                                    return [c, s, uiRegionHelper.getCity(p.id)];
+                                }
+                                else{
+                                    this.$cDom.select2(this.toCityData([]));
+                                    this.$sDom.select2(this.toStreetData([]));
                                 }
                                 throw new Error();
                             })
@@ -47,6 +110,9 @@
                                     this.$cDom.val(c[self.valueType]);
                                     return [s, uiRegionHelper.getStreet(c.id)];
                                 }
+                                else{
+                                    this.$sDom.select2(this.toStreetData([]));
+                                }
                                 throw new Error();
                             })
                             .then((s, data) => {
@@ -56,12 +122,34 @@
                                     self.$sDom.val(s[self.valueType]);
                                 }
                             });
+                        this.$inputDom.val(this.codeValue);
                     }
                     else { //没有则直接加载省
                         uiRegionHelper.getProvince().then((data) => {
                             this.$pDom.select2(this.toProvinceData(data));
+                            this.$cDom.select2(this.toCityData([]));
+                            this.$sDom.select2(this.toStreetData([]));
                         });
                     }
+                }
+
+                toProvinceData(data) {
+                    return {data: data || [], allowClear: true, placeholder: '请选择省'};
+                }
+
+                toCityData(data) {
+                    return {data: data || [], allowClear: true, placeholder: '请选择市'};
+                }
+
+                toStreetData(data) {
+                    return {data: data || [], allowClear: true, placeholder: '请选择区'};
+                }
+
+                reset() {
+                    this.$inputDom.val('');
+                    this.$pDom.val('').select2('val', '');
+                    this.$cDom.val('').select2(this.toCityData());
+                    this.$sDom.val('').select2(this.toStreetData());
                 }
             }
 
