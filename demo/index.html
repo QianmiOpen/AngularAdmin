@@ -4,6 +4,12 @@
     <meta charset="utf-8"/>
     <title>Demo</title>
     <link rel="stylesheet" href="../output/css/all.css"/>
+    <style type="text/css">
+        .uploadImage{
+            width: 200px;
+            height: 200px;
+        }
+    </style>
 </head>
 <body style="background-color: #fff !important;padding: 10px;" ng-app="admin">
 <ui-container style="display: none" controller="CC">
@@ -25,6 +31,7 @@
         <ui-form-tag label="多选:" model="item.formRemoteSelect" help="醉了7" url="/test/remote/select" change="tagChangeHandler(isAdd, val, item, vals, items)"></ui-form-tag>
         <ui-form-region label="地域:" model="item.formRegion" help="醉了8" change="regionChangeHandler(mode, val, p, c, s)"></ui-form-region>
         <ui-form-editor label="百度编辑器:" model="item.formEditor" help="醉了9" change="editorChangeHandler(val)"></ui-form-editor>
+        <ui-form-upload label="七牛上传:" model="item.formUpload" help="醉了10" change="uploadChangeHandler(val, name)" css="uploadImage"></ui-form-upload>
     </form>
 
     <h4>查询表单</h4>
@@ -91,6 +98,9 @@
         };
         $scope.editorChangeHandler = function (val) {
             new Message('[editor]数据变动').success('成功');
+        };
+        $scope.uploadChangeHandler = function (val, name) {
+            new Message('[upload]数据变动').success('成功');
         }
 
         //双向绑定测试

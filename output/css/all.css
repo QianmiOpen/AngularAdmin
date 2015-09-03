@@ -28,3 +28,5 @@
 .select2-container-multi{width: 100% !important;}
 
 .ui-form-region .select2-container{width: 120px !important;}
+
+.ui-form-upload div {margin-bottom: 4px}
