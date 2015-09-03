@@ -5,21 +5,25 @@
     <title>Demo</title>
     <link rel="stylesheet" href="../output/css/all.css"/>
 </head>
-<body style="background-color: #fff !important;" ng-app="admin">
+<body style="background-color: #fff !important;padding: 10px;" ng-app="admin">
 <ui-container style="display: none" controller="CC">
 
     <ui-breadcrumb datas="['A', 'B', 'C', 'D', 'E']"></ui-breadcrumb>
 
     <h4>输入表单</h4>
     <form action="#" class="form-horizontal">
-        <ui-form-date mode="datetime" label="日期:" placeholder="什么鬼" help="醉了" model="item.formDate" change="dateChangeHandler()"></ui-form-date>
-        <ui-form-date-range mode="datetime" label="日期范围:" help="醉了3" from-model="item.formRangeFromDate" to-model="item.formRangeToDate" change="dateRangeChangeHandler()"></ui-form-date-range>
-        <ui-form-input label="输入框" help="醉了4" model="item.formInput" change="inputChangeHandler()"></ui-form-input>
-        <ui-form-select label="下拉框" help="醉了5" model="item.formSelect" change="selectChangeHandler()">
+        <ui-form-date mode="datetime" label="日期:" placeholder="什么鬼" help="醉了" model="item.formDate" change="dateChangeHandler(val)"></ui-form-date>
+        <ui-form-date-range mode="datetime" label="日期范围:" help="醉了3" from-model="item.formRangeFromDate" to-model="item.formRangeToDate" change="dateRangeChangeHandler(startVal, endVal)"></ui-form-date-range>
+        <ui-form-input label="输入框:" help="醉了4" model="item.formInput" change="inputChangeHandler()"></ui-form-input>
+        <ui-form-select label="下拉框:" help="醉了5" model="item.formSelect" change="selectChangeHandler()">
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
         </ui-form-select>
+        <ui-form-spinner label="计数器:" model="item.formSpinner" help="醉了6" value="1" min="0" max="100" step="5" change="spinnerChangeHandler(val)"></ui-form-spinner>
+        <ui-form-switch label="开关:" model="item.formSwitch" help="醉了6" on-text="男" off-text="女" change="switchChangeHandler(val)"></ui-form-switch>
+        <ui-form-tag label="多选:" model="item.formRemoteSelect" help="醉了7" url="/test/remote/select" change="tagChangeHandler(val, item, vals, items)"></ui-form-tag>
+        <ui-form-region label="地域:" mode="s"></ui-form-region>
     </form>
 
     <h4>查询表单</h4>
@@ -38,13 +42,32 @@
 </body>
 <script src="../output/js/lib.js"></script>
 <script src="../output/js/all.js"></script>
+<script src="../output/assets/js/jquery.mockjax.js"></script>
 <script>
+    var remoteSelects = [];
+    for(var i = 0; i < 50; i++){
+        remoteSelects.push({
+            id: (new Date().getTime() + '').substr(7) + i + 1,
+            name: (new Date().getTime() + '').substr(7) + i
+        });
+    }
+    $.mockjax({
+        url: '/test/remote/select',
+        response: function () {
+            this.responseText = {
+                data: remoteSelects,
+                type: 1
+            }
+        }
+    });
+
+
     function CC($scope, Message, $timeout) {
         new Message('uicontainer').success('成功');
-        $scope.dateChangeHandler = function () {
+        $scope.dateChangeHandler = function (val) {
             new Message('[date]数据变动').success('成功');
         };
-        $scope.dateRangeChangeHandler = function () {
+        $scope.dateRangeChangeHandler = function (startVal, endVal) {
             new Message('[dateRange]数据变动').success('成功');
         };
         $scope.inputChangeHandler = function () {
@@ -53,6 +76,15 @@
         $scope.selectChangeHandler = function () {
             new Message('[select]数据变动').success('成功');
         };
+        $scope.spinnerChangeHandler = function (val) {
+            new Message('[spinner]数据变动').success('成功');
+        };
+        $scope.switchChangeHandler = function (val) {
+            new Message('[switch]数据变动').success('成功');
+        };
+        $scope.tagChangeHandler = function (val, item, vals, items) {
+            new Message('[tag]数据变动').success('成功');
+        }
 
         //双向绑定测试
         $scope.item = {};
@@ -60,6 +92,8 @@
         $scope.item.formRangeFromDate = moment().format('YYYY-MM-DD HH:mm:ss');
         $scope.item.formRangeToDate = moment().add(3, 'h').format('YYYY-MM-DD HH:mm:ss');
         $scope.item.formInput = '我是输入框';
+        $scope.item.formSpinner = 1000;
+        $scope.item.formSwitch = 1;
     }
 </script>
 </html>

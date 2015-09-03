@@ -7,7 +7,7 @@
 //------------------------------------------------------
 angular.module('admin.component')
     .constant('defaultCol', '2:10')
-    .directive('uiForm', function (uiFormFactory, componentHelper) {
+    .directive('uiForm', function (UIFormControl) {
         return {
             restrict: 'E',
             replace: true,
@@ -17,13 +17,10 @@ angular.module('admin.component')
                 var form = null;
                 return {
                     pre: function (scope, element, attrs, controller, transclude) {
-                        form = new uiFormFactory(scope, element, attrs, transclude(scope));
-                        form.layout();
-                        var ref = attrs.ref || '$form';
-                        scope[ref] = form;
-                        componentHelper.tiggerComplete(scope, ref, form);
+                        form = new UIFormControl(scope, element, attrs, transclude(scope));
                     },
                     post: function () {
+                        form.layout();
                         setTimeout(function () {
                             form.initValidation();
                         }, 300);

@@ -27,82 +27,42 @@
         }
     };
 
-
-    class UIFormControlProvider {
-
-    }
-
     angular.module('admin.component')
         .factory('UIFormControl', () => {
             class UIFormControl extends UIFormControl {
 
-                constructor(s, e, a){
+                constructor(s, e, a, formItems) {
+                    this.className = 'form';
                     this.action = this.attrs.action.replace(/#/g, '');
-                    this.formContrlMap = {};
-                    super(s,e,a);
+                    this.formItems = formItems;
+                    this.formControlMap = {};
+                    super(s, e, a);
                 }
 
                 init() {
                     super.init();
-                    this.scope.$on('componentComplete', (evt, o) => {this.formControlMap[o.name] = o.component});
-                    this.layout();
+                    this.scope.$on('componentComplete', (evt, o) => {
+                        this.formControlMap[o.name] = o.component;
+                    });
                 }
 
-                initEvents(){
+                initEvents() {
                     super.initEvents();
                 }
 
-                layout(rowColumn){
-                    rowColumn = parseInt(rowColumn !== undefined ? rowColumn : this.column);
-                    if (column > 1) {
-                        var eachColumn = 12 / column,
-                            $body = this.element.find(' > div'),
-                            doms = []; //没列占多少
-                        $body.html();
-                        var i, dom;
-                        for (i = 0; i < this.formItems.length; i++) { //过滤一下
-                            dom = this.formItems[i];
-                            if (dom.innerHTML !== undefined) {
-                                if (dom.type == 'hidden') {
-                                    $body.append(dom);
-                                }
-                                else {
-                                    doms.push(dom);
-                                }
-                            }
-                        }
-                        var otherHandler = function (i, dom) {
-                            $body.append(dom);
-                        };
-                        for (i = 0; i < doms.length; i = i + column) {
-                            var $rowDom = $('<div/>').addClass('row'),
-                                tempI = i,
-                                tempColumn = i,
-                                other = [];
-                            while (tempColumn < tempI + column && doms[tempColumn]) {
-                                dom = doms[tempColumn];
-                                if (dom.className.indexOf('row') != -1) {
-                                    other.push(dom);
-                                    i++; //多用了一个
-                                    tempI++;
-                                }
-                                else {
-                                    var $cellDom = $('<div/>').addClass('col-md-' + eachColumn);
-                                    $cellDom.append(doms[tempColumn]);
-                                    $rowDom.append($cellDom);
-                                }
-                                tempColumn++;
-                            }
-                            $body.append($rowDom);
-                            $.each(other, otherHandler);
-                        }
-                    }
-                    else {
-                        this.element.find(' > div').append(this.formItems);
+                changeValidateRule(ruleName, ruleConfig) {
+                    var validator = this.element.data().validator;
+                    if (validator) {
+                        var oldConfig = validator.settings.rules[ruleName];
+                        validator.settings.rules[ruleName] = $.extend(oldConfig, ruleConfig);
                     }
                 }
-            }
 
+                startValidate() {
+                    this.element.valid();
+                }
+
+            }
             return UIFormControl;
         })
         .constant('uiFormValidateConfig', {
@@ -357,4 +317,5 @@
             });
             return Form;
         });
-})(jQuery);
+})
+(jQuery);

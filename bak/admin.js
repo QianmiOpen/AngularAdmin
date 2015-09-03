@@ -6,7 +6,7 @@
 //
 //-----------------------------------------------------------------------------------------------
 (function () {
-    angular.module('admin', ['admin.service', 'admin.filter', 'admin.component'])
+    angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'admin.template'])
         .config((AjaxProvider, MessageProvider) => {
 
             //
@@ -21,3 +21,8 @@
             MessageProvider.setPosition('bottom', 'right');
         });
 })();
+
+//
+if($.fn.modal){
+    $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+}

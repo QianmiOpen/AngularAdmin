@@ -5,546 +5,6 @@
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.filter', []);
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.filter')
-    .filter('safeFilter', function ($sce) {
-        return function (p) {
-            return $sce.trustAsHtml(p);
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.service', []);
-
-var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-var Ajax = (function(){"use strict";var proto$0={};
-    function Ajax(q, util, provider) {
-        this.q = q;
-        this.msg = new Message("Ajax");
-        this.util = util;
-        this.provder = provider;
-    }DP$0(Ajax,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-    proto$0._execute = function(method, url, data) {var this$0 = this;
-        var defer = this.q.defer();
-        $.ajax({
-            url: url, cache: false, data: data, type: method, dataType: 'json',
-            success: function(resData)  {
-                var success = this$0.provider.successHandler(resData),
-                    error = this$0.provder.failHandler(resData);
-                if (success) {
-                    defer.resolve(success);
-                }
-                else {
-                    defer.resolve(error);
-                }
-            },
-            error: function(xhr, status)  {
-                var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
-                this$0.msg.error(errMsg || '服务器出现了问题,请稍后重试');
-            }
-        });
-        return defer.promise;
-    };
-
-    proto$0.get = function(url, data) {
-        return this._execute('GET', url, data);
-    };
-
-    proto$0.post = function(url, data) {
-        return this._execute('POST', url, data);
-    };
-
-    proto$0.message = function(url, data, successMsg, failMsg) {var this$0 = this;
-        return this.post(url, data)
-            .then(function()  {return this$0.msg.success(successMsg)})
-            .catch(function()  {return this$0.msg.error(failMsg)});
-    };
-
-    proto$0.add = function(url, data) {
-        return this.message(url, data, '添加数据成功', '添加数据失败');
-    };
-
-    proto$0.update = function(url, data) {
-        return this.message(url, data, '更新数据成功', '更新数据失败');
-    };
-
-    proto$0.remove = function(url, data, options) {var this$0 = this;
-        return this.util.confirm((("您确认删除该" + (options.label || '数据')) + "吗?"))
-            .then(function()  {return this$0.message(url, data, '删除数据成功', '删除数据失败')});
-    };
-MIXIN$0(Ajax.prototype,proto$0);proto$0=void 0;return Ajax;})();
-
-var AjaxProvider = (function(){"use strict";function AjaxProvider() {}DP$0(AjaxProvider,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
-
-    proto$0.setSuccessHandler = function(handler) {
-        this.successHandler = handler;
-    };
-
-    proto$0.setFailHandler = function(handler) {
-        this.failHandler = handler;
-    };
-
-    proto$0.$get = function($q, util) {
-        return new Ajax($q, util, this);
-    };
-MIXIN$0(AjaxProvider.prototype,proto$0);proto$0=void 0;return AjaxProvider;})();
-
-angular.module('admin.service')
-    .provider('ajax', AjaxProvider)
-    .provider('Ajax', AjaxProvider);
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.service')
-    .factory('uiDialog', function (msg, $compile, $q, $controller, $timeout, Event) {
-
-        var m = new msg('Dialog'),
-            Dialog = function (url, scope, ctrlName, resolve) {
-                Event.call(this);
-                this.url = url;
-                this.ctrlName = ctrlName;
-                this.scope = scope.$new();
-                this.scope.dialog = this;
-                this.resolve = $.extend(resolve || {}, {$scope: this.scope});
-                this.start();
-            };
-
-        Dialog.prototype = {
-
-            /**
-             * 快捷增加关闭事件
-             * @param fn
-             */
-            onClose: function (fn) {
-                this.$on('hidden.bs.modal', fn);
-            },
-
-            /**
-             * 开始弹出
-             */
-            start: function () {
-                var $dom = $('<div/>').hide().appendTo(document.body),
-                    defer = $q.defer();
-                $dom.load(this.url, function (html) {
-                    var $e = this.build(html);
-                    $dom.remove(); //
-                    defer.resolve($e);
-                }.bind(this));
-                this.result = defer.promise;
-            },
-
-            /**
-             * 创建
-             * @param html
-             */
-            build: function (html) {
-                var angularDomEl = angular.element(html),
-                    e = $compile(angularDomEl)(this.scope);
-
-                //
-                this.element = e;
-                this.element.one('hidden.bs.modal', function () {
-                    this.$emit('uiDialog.doHide');
-                    this.element.remove();
-                    $('.modal-backdrop').remove();
-                    this.scope.$destroy();
-                }.bind(this));
-                this.element.one('shown.bs.modal', function () {
-                    if (this.ctrlName) {
-                        $timeout(function () {
-                            try{
-                                $controller(window[this.ctrlName] || this.ctrlName, this.resolve);
-                            }
-                            catch (e){
-                                console.error('加载controller失败');
-                            }
-                        }.bind(this));
-                    }
-                    this.$emit('uiDialog.doShow');
-                }.bind(this));
-
-                //
-                this.element.modal({
-                    "keyboard": true,
-                    "show": true
-                });
-                this.scope.$apply();
-            },
-
-            close: function () {
-                if (this.element) {
-                    this.element.modal('hide');
-                }
-            }
-        };
-
-        return {
-            load: function (url, ctrlName, scope, reslove) {
-                return new Dialog(url, ctrlName, scope, reslove);
-            },
-
-            //
-            show: function () {
-            }
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------
-angular.module('admin.service')
-    .factory('uiEditableChooseFactory', function (msg, uiEditableCommonFactory, uiSelectFactory) {
-        var m = new msg('EditableChoose'),
-            EditableChoose = function (element, attrs, option, other) {
-                this.selectData = other;
-                uiEditableCommonFactory.apply(this, arguments);
-            };
-        EditableChoose.prototype = $.extend({}, uiEditableCommonFactory.prototype, {
-            beforeRender: function () {
-                this.option.type = 'select';
-                this.option.source = this.selectData;
-            },
-
-            render: function($form){
-                this.select = uiSelectFactory($form, {});
-            }
-        });
-        return function (element, attrs, option, other) {
-            return new EditableChoose(element, attrs, option, other);
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------
-
-jQuery.fn.editable.defaults.inputclass = 'form-control';
-jQuery.fn.editable.defaults.ajaxOptions = {
-    type: 'post',
-    dataType: 'json'
-};
-angular.module('admin.service')
-    .factory('uiEditableCommonFactory', function (msg, util) {
-        var m = new msg('EditableCommon'),
-            EditableCommon = function (element, attrs, option) {
-                this.element = $(element);
-                this.name = option.name;
-                this.rule = option.rule;
-                this.attrs = attrs;
-                this.isRender = false;
-
-                //
-                this.option = $.extend(true, option, {
-                    emptytext: '-',
-                    placement: 'right',
-                    mode: 'popup',
-                    doAfter: function(){
-                        if(this.render && !this.isRender){
-                            this.isRender = true;
-                            this.render.call(this, this.element.data('editableContainer').$form);
-                        }
-                    }.bind(this),
-                    validate: this.validation.bind(this),
-                    success: function (json, value) {
-                        json = json || {};
-                        if (json.result == 'ok') {
-                            return true;
-                        }
-                        else {
-                            msg.error(json.msg);
-                            return false;
-                        }
-                    }
-                });
-
-                //
-                this.beforeRender();
-
-                //
-                this.element.editable(this.option);
-
-                //
-                this.afterRender();
-            };
-        EditableCommon.prototype = {
-            beforeRender: function(){},
-            afterRender: function(){},
-
-            validation: function(val){
-                var inputVal = this.element.data('editableContainer').$form.find('[name="' + this.name + '"]').val();
-                val = inputVal !== undefined ? inputVal : val;
-                if (this.rule) {
-                    return util.checkValueUseRules(this.name, val, this.rule);
-                }
-                return null;
-            },
-
-            show: function(){
-                this.element.editable('toggleDisabled');
-                return this;
-            },
-            hide: function(){
-                this.element.editable('toggleDisabled');
-                return this;
-            }
-        };
-        return EditableCommon;
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------
-angular.module('admin.service')
-    .factory('uiEditableImageFactory', function (msg, uiEditableCommonFactory) {
-        var m = new msg('EditableImage'),
-            EditableImage = function () {
-                uiEditableCommonFactory.apply(this, arguments);
-            };
-        EditableImage.prototype = $.extend({}, uiEditableCommonFactory.prototype, {
-            beforeRender: function () {
-                this.option.type = 'text';
-            }
-        });
-        return function (element, attrs, option, other) {
-            return new EditableImage(element, attrs, option, other);
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------
-angular.module('admin.service')
-    .factory('uiEditableDateInputFactory', function (msg, uiEditableCommonFactory) {
-        var m = new msg('EditableDateInput'),
-            EditableDateInput = function () {
-                uiEditableCommonFactory.apply(this, arguments);
-            };
-        EditableDateInput.prototype = $.extend({}, uiEditableCommonFactory.prototype, {
-            beforeRender: function () {
-                this.option.type = 'text';
-                this.option.tpl = $('<input type="text" readonly>').datetimepicker({
-                    language: 'zh-CN',
-                    format: this.attrs.format || "YYYY-MM-DD"
-                });
-            }
-        });
-        return function (element, attrs, option, other) {
-            return new EditableDateInput(element, attrs, option, other);
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------
-angular.module('admin.service')
-    .factory('uiEditableInputFactory', function (msg, uiEditableCommonFactory) {
-        var m = new msg('EditableInput'),
-            EditableInput = function () {
-                uiEditableCommonFactory.apply(this, arguments);
-            };
-        EditableInput.prototype = $.extend({}, uiEditableCommonFactory.prototype, {
-            beforeRender: function () {
-                this.option.type = 'text';
-            }
-        });
-        return function (element, attrs, option, other) {
-            return new EditableInput(element, attrs, option, other);
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------
-angular.module('admin.service')
-    .factory('uiEditableRegionFactory', function (msg, uiEditableCommonFactory, $compile, $rootScope) {
-        var m = new msg('EditableRegion'),
-            EditableRegion = function () {
-                uiEditableCommonFactory.apply(this, arguments);
-            };
-        EditableRegion.prototype = $.extend({}, uiEditableCommonFactory.prototype, {
-
-            /**
-             *
-             */
-            beforeRender: function () {
-                this.option.display = function (value, sourceData) {
-                    var container = this.element.data('editableContainer');
-                    if (container) {
-                        var $form = container.$form.find('form');
-                        var nvs = $form.serializeArray();
-                        var province = "";
-                        var city = "";
-                        $.each(nvs, function (i, item) {
-                            if (item.name == 'province') {
-                                province = item.value;
-                            }
-                            if (item.name == 'city') {
-                                city = item.value;
-                            }
-                        });
-                    }
-                }.bind(this);
-
-                this.option.clear = false;
-                this.option.params = function (params) {
-                    var $form = this.element.data('editableContainer').$form.find('form'),
-                        nvs = $form.serializeArray();
-                    $.each(nvs, function (i, item) {
-                        params[item.name] = item.value;
-                    });
-                    params.value = params[params.name];
-                    return params;
-                }.bind(this);
-
-                this.option.validateChange = function () {
-                    var $form = this.element.data('editableContainer').$form.find('form'),
-                        nvs = $form.serializeArray();
-                    var noChange = true;
-                    $.each(nvs, function (i, item) {
-                        if (item.name == this.option.name) {
-                            noChange = this.option.value == item.value;
-                        }
-                    });
-                    return noChange;
-                }.bind(this);
-            },
-
-            render: function($form){
-                var angularDomEl = angular.element('<ui-search-region s-value="' + this.option.value + '" s-name="' + this.option.name + '" mode="text"></ui--search-region>'),
-                    e = $compile(angularDomEl)($rootScope.$new(true));
-                $form.find('.editable-input').html('').append(e);
-            }
-        });
-        return function (element, attrs, option, other) {
-            return new EditableRegion(element, attrs, option, other);
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------
-angular.module('admin.service')
-    .factory('uiEditableUserFactory', function (msg, uiEditableCommonFactory, uiMultiSelectFactory, userConfig) {
-        var m = new msg('EditableUser'),
-            EditableUser = function () {
-                uiEditableCommonFactory.apply(this, arguments);
-            };
-        EditableUser.prototype = $.extend({}, uiEditableCommonFactory.prototype, {
-            beforeRender: function () {
-
-                this.option.type = 'text';
-                this.option.doAfter = function () {
-                    var $element = this.data('editableContainer').$form.find('input');
-                    this.select = uiMultiSelectFactory({}, $element, userConfig);
-                }.bind(this);
-
-
-                this.option.display = function (value, sourceData) {
-                    var $this = $(this),
-                        container = $this.data('editableContainer');
-                    if (container) {
-                        var item = $(container.$form.find('input')[1]).data('uiSelect.data');
-                        if (item)
-                            $this.html(item.name);
-                    }
-                };
-
-
-                this.option.clear = false;
-            }
-        });
-        return function (element, attrs, option, other) {
-            return new EditableUser(element, attrs, option, other);
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.service')
-    .factory('CascadeFactory', function (msg, Event) {
-        var m = new msg('CascadeFactory'),
-            T = {
-                U: 'url',
-                C: 'callback'
-            },
-            CascadeFactory = function(){
-                this.levelList = [];
-                Event.call(this);
-            };
-        CascadeFactory.prototype = {
-
-            addUrl: function(url, paramName){
-                return this.addUrlByIndex(-1, url, paramName);
-            },
-
-            addUrlByIndex: function(index, url, paramName){
-                paramName = paramName || 'id';
-                this.levelList.push({
-                    url: url,
-                    type: T.U,
-                    paramName: paramName
-                });
-                return this;
-            }
-        };
-        return CascadeFactory;
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
 var Event = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var proto$0={};
     function Event() {
         this.listenerMap = {};
@@ -564,52 +24,13 @@ var Event = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={
         }.bind(this));
     };
 MIXIN$0(Event.prototype,proto$0);proto$0=void 0;return Event;})();
+var ComponentEvent = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;function ComponentEvent() {if(super$0!==null)super$0.apply(this, arguments)}if(!PRS$0)MIXIN$0(ComponentEvent, super$0);if(super$0!==null)SP$0(ComponentEvent,super$0);ComponentEvent.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":ComponentEvent,"configurable":true,"writable":true}});DP$0(ComponentEvent,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
 
-angular.module('admin.service')
-    .service('Event', function()  {return Event});
-(function () {
-    if (!window.Handlebars) {
-        return;
-    }
-
-    Handlebars.registerHelper("math", function (lvalue, operator, rvalue, options) {
-        lvalue = parseFloat(lvalue);
-        rvalue = parseFloat(rvalue);
-
-        return {
-            "+": lvalue + rvalue,
-            "-": lvalue - rvalue,
-            "*": lvalue * rvalue,
-            "/": lvalue / rvalue,
-            "%": lvalue % rvalue
-        }[operator];
-    });
-
-    Handlebars.registerHelper('sif', function (v1, operator, v2, options) {
-        switch (operator) {
-            case '!=':
-                return (v1 != v2) ? options.fn(this) : options.inverse(this);
-            case '==':
-                return (v1 == v2) ? options.fn(this) : options.inverse(this);
-            case '===':
-                return (v1 === v2) ? options.fn(this) : options.inverse(this);
-            case '<':
-                return (v1 < v2) ? options.fn(this) : options.inverse(this);
-            case '<=':
-                return (v1 <= v2) ? options.fn(this) : options.inverse(this);
-            case '>':
-                return (v1 > v2) ? options.fn(this) : options.inverse(this);
-            case '>=':
-                return (v1 >= v2) ? options.fn(this) : options.inverse(this);
-            case '&&':
-                return (v1 && v2) ? options.fn(this) : options.inverse(this);
-            case '||':
-                return (v1 || v2) ? options.fn(this) : options.inverse(this);
-            default:
-                return options.inverse(this);
-        }
-    });
-})();
+    proto$0.triggerComplete = function(scope, ref, component) {
+        scope[ref] = component;
+        scope.$emit('componentComplete', {ref: ref, component: component});
+    };
+MIXIN$0(ComponentEvent.prototype,proto$0);proto$0=void 0;return ComponentEvent;})(Event);
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -617,34 +38,93 @@ angular.module('admin.service')
 //
 //
 //-----------------------------------------------------------------------------------------------
-var Logger = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var proto$0={};
-    function Logger(className) {
-        this.className = className;
-        this.console = window.console;
-        this.isEnableDebug = location.hash.indexOf("debug") != -1;
-    }DP$0(Logger,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+angular.module('admin.filter', []);
 
-    proto$0.debug = function(m) {
-        m = (("" + (this.className)) + (": " + m) + "");
-        if (this.isEnableDebug && this.console) {
-            this.console.debug ? this.console.debug(m) : this.console.log(m);
-        }
-    };
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.service', []);
 
-    proto$0.info = function(m) {
-        m = (("" + (this.className)) + (": " + m) + "");
-        this.console.info ? this.console.info(m) : this.console.log(m);
-    };
-
-    proto$0.error = function(m) {
-        m = (("" + (this.className)) + (": " + m) + "");
-        this.console.error ? this.console.error(m) : this.console.log(m);
-    };
-MIXIN$0(Logger.prototype,proto$0);proto$0=void 0;return Logger;})();
-
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
 angular.module('admin.service')
-    .service('logger', function()  {return Logger})
-    .service('Logger', function()  {return Logger});
+    .provider('Ajax', function()  {
+        var successHandler,
+            failHandler,
+            result = {
+                setSuccessHandler: function(handler) {
+                    successHandler = handler;
+                },
+
+                setFailHandler: function(handler) {
+                    failHandler = handler;
+                },
+
+                $get: function($q, Util, Message) {
+                    var _msg = new Message('Ajax'),
+                        _execute = function(method, url, data)  {
+                            var defer = $q.defer();
+                            $.ajax({
+                                url: url, cache: false, data: data, type: method, dataType: 'json',
+                                success: function(resData)  {
+                                    var success = successHandler(resData),
+                                        error = failHandler(resData);
+                                    if (success) {
+                                        defer.resolve(success);
+                                    }
+                                    else {
+                                        defer.reject(error);
+                                    }
+                                },
+                                error: function(xhr, status)  {
+                                    var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
+                                    _msg.error(errMsg || '服务器出现了问题,请稍后重试');
+                                }
+                            });
+                            return defer.promise;
+                        };
+                    return {
+
+                        get: function(url, data) {
+                            return _execute('GET', url, data);
+                        },
+
+                        post: function(url, data) {
+                            return _execute('POST', url, data);
+                        },
+
+                        message: function(url, data, successMsg, failMsg) {
+                            return this.post(url, data)
+                                .then(function()  {return _msg.success(successMsg)})
+                                .catch(function()  {return _msg.error(failMsg)});
+                        },
+
+                        add: function(url, data) {
+                            return this.message(url, data, '添加数据成功', '添加数据失败');
+                        },
+
+                        update: function(url, data) {
+                            return this.message(url, data, '更新数据成功', '更新数据失败');
+                        },
+
+                        remove: function(url, data, options) {var this$0 = this;
+                            return util.confirm((("您确认删除该" + (options.label || '数据')) + "吗?"))
+                                .then(function()  {return this$0.message(url, data, '删除数据成功', '删除数据失败')});
+                        }
+                    };
+                }
+            };
+        return result;
+    });
 var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};//-----------------------------------------------------------------------------------------------
 //
 //
@@ -729,100 +209,59 @@ MIXIN$0(MessageProvider.prototype,proto$0);proto$0=void 0;return MessageProvider
  */
 angular.module('admin.service')
     .provider('msg', MessageProvider)
-    .provider('Message', MessageProvider);
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-(function () {
-    var Pagination = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(Pagination, super$0);var proto$0={};
-        function Pagination(url, index, size, pageLimit, dataName, totalName) {
-            this.url = url;
-            this.pageIndex = parseInt(index || 0);
-            this.pageSize = parseInt(size || 10);
-            this.maxPage = 0;
-            this.pageLimit = parseInt(pageLimit || 10);
-            this.dataName = dataName || 'data';
-            this.totalName = totalName || 'total';
-            this.ajax = new Ajax();
-        }if(super$0!==null)SP$0(Pagination,super$0);Pagination.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":Pagination,"configurable":true,"writable":true}});DP$0(Pagination,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+    .provider('Message', function()  {
+        var result = {
+            setPosition: function(v, h) {
+                toastr.options.positionClass = 'toast-' + v + '-' + h;
+            },
 
-        proto$0.load = function() {
-            var self = this;
-            return this.ajax
-                .post(this.url, {pageIndex: this.pageIndex, pageSize: this.pageSize})
-                .then(function (r) {
-                    return self.analyze(r);
-                });
-        };
+            $get: function() {
+                var Message = (function(){var static$0={},proto$0={};
+                    function Message(className) {
+                        this.className = className ? className + ': ' : '';
+                    }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
-        proto$0.analyze = function(r) {
-            var total = r[this.totalName],
-                to, s, e, pageList = [];
-            this.maxPage = Math.ceil(total / this.pageSize);
-            to = this.maxPage - (this.pageIndex + this.pageLimit);
-            if (to >= 0) { //够放
-                s = this.pageIndex;
-                e = s + this.pageLimit;
+                    proto$0.success = function(msg, title) {
+                        Message.success(this.className + msg, title);
+                    };
+
+                    static$0.success = function(msg, title) {
+                        title = title || '成功';
+                        toastr.success((this.className || '') + msg, title);
+                    };
+
+                    proto$0.info = function(msg, title) {
+                        Message.info(this.className + msg, title);
+                    };
+
+                    static$0.info = function(msg, title) {
+                        title = title || '消息';
+                        toastr.info((this.className || '') + msg, title);
+                    };
+
+                    proto$0.warning = function(msg, title) {
+                        Message.warning(this.className + msg, title);
+                    };
+
+                    static$0.warning = function(msg, title) {
+                        title = title || '警告';
+                        toastr.warning(msg, title);
+                    };
+
+                    proto$0.error = function(msg, title) {
+                        Message.error(this.className + msg, title);
+                    };
+
+                    static$0.error = function(msg, title) {
+                        title = title || '错误';
+                        toastr.error(msg, title);
+                    };
+                MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
+                return Message;
             }
-            else { //不够放,往前移动
-                s = this.pageIndex - Math.abs(to);
-                s = s < 0 ? 0 : s;
-                e = this.pageIndex + (this.pageLimit - Math.abs(to));
-            }
-            //
-            //if(s - 1 >= 0 && e != this.maxPage){
-            //    s--;
-            //    e--;
-            //}
-
-            //
-            for (var i = s; i < e; i++) {
-                pageList.push({
-                    index: i + 1,
-                    current: i == this.pageIndex
-                });
-            }
-            return $.extend(r, {
-                dataList: r[this.dataName],
-                pageList: pageList,
-                isFirst: this.pageIndex === 0,
-                isLast: this.pageIndex == this.maxPage - 1
-            });
         };
-
-        proto$0.prePage = function() {
-            this.pageIndex--;
-            this.pageIndex = this.pageIndex < 0 ? 0 : this.pageIndex;
-            return this.getPage(this.pageIndex);
-        };
-
-        proto$0.nextPage = function() {
-            this.pageIndex++;
-            this.pageIndex = this.pageIndex > this.maxPage - 1 ? (this.maxPage - 1) : this.pageIndex;
-            return this.getPage(this.pageIndex);
-        };
-
-        proto$0.firstPage = function() {
-            return this.getPage(0);
-        };
-
-        proto$0.lastPage = function() {
-            return this.getPage(this.maxPage);
-        };
-
-        proto$0.getPage = function(pageIndex) {
-            this.pageIndex = pageIndex;
-            return this.load();
-        };
-    MIXIN$0(Pagination.prototype,proto$0);proto$0=void 0;return Pagination;})(Event);
-
-    angular.module('admin.service')
-        .service('PaginationFactory', Pagination);
-})();
+        return result;
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -1030,7 +469,7 @@ angular.module('admin.service')
 
 
     angular.module('admin.service')
-        .factory('ShortcutFactory', Shortcut);
+        .factory('Shortcut', Shortcut);
 })();
 //-----------------------------------------------------------------------------------------------
 //
@@ -1040,7 +479,7 @@ angular.module('admin.service')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.service')
-    .factory('util', function ($rootScope, $compile, $filter, $parse, $q) {
+    .factory('Util', function ($rootScope, $compile, $filter, $parse, $q) {
         return {
 
             /**
@@ -1207,11 +646,11 @@ angular.module('admin.service')
  */
 (function () {
 
-    var ValueService = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};function ValueService() {}DP$0(ValueService,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
+    var ValueService = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var proto$0={};
 
-        proto$0.constrcutor = function($parse) {
+        function ValueService($parse) {
             this.$parse = $parse;
-        };
+        }DP$0(ValueService,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
         proto$0.set = function(scope, express, value) {
             var getter = this.$parse(express);
@@ -1289,288 +728,6 @@ angular.module('admin.component', [])
         };
     });
 
-/**
- *
- */
-angular.module('admin.component')
-    .directive('uiAreaChart', function (uiChartFactory) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: false,
-            link: function(scope, element, attrs){
-                var chart = new uiChartFactory(scope, element, attrs);
-                chart.setType('line');
-            },
-            templateUrl: 'tpl.chart'
-        };
-    });
-
-/**
- *
- */
-angular.module('admin.component')
-    .directive('uiBubbleChart', function (uiChartFactory) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: false,
-            link: function(scope, element, attrs){
-                var chart = new uiChartFactory(scope, element, attrs);
-                chart.setType('line');
-            },
-            templateUrl: 'tpl.chart'
-        };
-    });
-
-/**
- *
- */
-angular.module('admin.component')
-    .directive('uiColumnChart', function (uiChartFactory) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: false,
-            link: function(scope, element, attrs){
-                new uiChartFactory(scope, element, attrs);
-            },
-            templateUrl: 'tpl.chart.column'
-        };
-    });
-
-/**
- *
- */
-angular.module('admin.component')
-    .directive('uiLineChart', function (uiChartFactory) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: false,
-            link: function (scope, element, attrs) {
-                new uiChartFactory(scope, element, attrs);
-            },
-            templateUrl: 'tpl.chart.line'
-        };
-    });
-
-/**
- *
- */
-angular.module('admin.component')
-    .directive('uiMixedChart', function (uiChartFactory) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: false,
-            link: function (scope, element, attrs) {
-                new uiChartFactory(scope, element, attrs);
-            },
-            templateUrl: 'tpl.chart.line'
-        };
-    });
-
-/**
- *
- */
-angular.module('admin.component')
-    .directive('uiPieChart', function (uiChartFactory) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: false,
-            link: function (scope, element, attrs) {
-                var factory = new uiChartFactory(scope, element, attrs);
-                factory.setData = function (data) {
-                    this.config.series = [{
-                        type: 'pie',
-                        data: data.map(function (d) {
-                            for (var k in d) {
-                                return [k, d[k]];
-                            }
-                        })
-                    }];
-                    this.build();
-                };
-            },
-            templateUrl: 'tpl.chart.pie'
-        };
-    });
-
-/**
- *
- */
-angular.module('admin.component')
-    .directive('uiScatterChart', function (uiChartFactory) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: false,
-            link: function(scope, element, attrs){
-                var chart = new uiChartFactory(scope, element, attrs);
-                chart.setType('line');
-            },
-            templateUrl: 'tpl.chart'
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .factory('uiChartFactory', function (componentHelper, msg, Event, ajax) {
-        var m = new msg('Chart'),
-            Chart = function (scope, element, attrs) {
-                Event.call(this);
-                this.scope = scope;
-                this.element = element;
-                this.elementTarget = element.find('div');
-                this.attrs = attrs;
-                this.instance = null;
-                this.xAxisName = this.attrs.xaxis;
-                this.categories = this.attrs.categories ? this.attrs.categories.split(',') : [];
-                this.pageData = null;
-                this.config = {
-                    title: {},
-                    subtitle: {},
-                    chart: {},
-                    xAxis: {},
-                    yAxis: {},
-                    legend: {},
-                    series: {}
-                };
-                this.init();
-            };
-
-        //
-        Chart.prototype = {
-
-            /**
-             *
-             */
-            init: function () {
-                this.config.title.text = this.attrs.title || '';
-                this.config.subtitle.text = this.attrs.subTitle || '';
-                this.config.chart.type = this.attrs.type;
-
-                if (this.attrs.url) {
-                    this.refresh(this.attrs.url);
-                }
-                componentHelper.tiggerComplete(this.scope, this.attrs.ref || ('$' + this.attrs.type + 'chart'), this);
-            },
-
-            /**
-             *
-             * @param url
-             * @param params
-             */
-            refresh: function (url, params) {
-                var self = this;
-                ajax.post(url, params || {}).then(function (data) {
-                    self.setData(data);
-                });
-            },
-
-            /**
-             *
-             * @param type
-             */
-            setType: function (type) {
-                this.config.chart.type = type;
-                if (this.instance) {
-                    this.instance.redraw();
-                }
-            },
-
-            /**
-             * 设置分组值
-             */
-            setCategories: function (categories, isClean) {
-                this.categories = isClean ? categories : this.categories.concat(categories);
-                if (this.pageData) {
-                    this.setData(this.pageData);
-                }
-            },
-
-            /**
-             *
-             * @param data
-             */
-            setXAxisData: function (data) {
-                if (this.instance) {
-                    this.instance.xAxis[0].setCategories(data, false);
-                }
-                else {
-                    this.config.xAxis.categories = data;
-                }
-            },
-
-            /**
-             *
-             */
-            setData: function (data) {
-                var self = this,
-                    c = [],
-                    r = [];
-
-                //
-                this.pageData = data;
-
-                //遍历数据
-                $.each(data, function (i, item) {
-                    if (self.xAxisName) {
-                        c.push(item[self.xAxisName] || '');
-                    }
-                    self.dataToSeriesData(item, r);
-                });
-
-                //
-                this.setXAxisData(c);
-
-                //
-                if (this.instance) {
-                    this.instance.series = r;
-                    this.instance.redraw();
-                }
-                else {
-                    this.config.series = r;
-                    this.build();
-                }
-            },
-
-            /**
-             *
-             */
-            dataToSeriesData: function (data, r) {
-                r = r || [];
-                $.each(this.categories, function (j, category) { //遍历组字段
-                    var v = data[category],
-                        o = r[j] || {name: category, data: []};
-                    o.data.push(v);
-                    r[j] = o;
-                });
-            },
-
-            /**
-             *
-             */
-            build: function () {
-                console.info(this.config);
-                this.instance = this.elementTarget.highcharts(this.config);
-            }
-        };
-        return Chart;
-    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -1606,7 +763,7 @@ angular.module('admin.component')
 //------------------------------------------------------
 angular.module('admin.component')
     .constant('defaultCol', '2:10')
-    .directive('uiForm', function (uiFormFactory, componentHelper) {
+    .directive('uiForm', function (UIFormControl) {
         return {
             restrict: 'E',
             replace: true,
@@ -1616,13 +773,10 @@ angular.module('admin.component')
                 var form = null;
                 return {
                     pre: function (scope, element, attrs, controller, transclude) {
-                        form = new uiFormFactory(scope, element, attrs, transclude(scope));
-                        form.layout();
-                        var ref = attrs.ref || '$form';
-                        scope[ref] = form;
-                        componentHelper.tiggerComplete(scope, ref, form);
+                        form = new UIFormControl(scope, element, attrs, transclude(scope));
                     },
                     post: function () {
+                        form.layout();
                         setTimeout(function () {
                             form.initValidation();
                         }, 300);
@@ -1781,7 +935,7 @@ var UIFormControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o
 
     proto$0.val = function(v) {
         if (this.formEl) {
-            if (v) {
+            if (v !== undefined) {
                 this.formEl.val(v);
                 return this;
             }
@@ -1822,7 +976,7 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 (function () {
     angular.module('admin.component')
-        .service('UIDateControl', function()  {
+        .factory('UIDateControl', function()  {
             var UIDateControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDateControl, super$0);var proto$0={};
                 function UIDateControl(s, e, a) {
                     this.className = 'Date';
@@ -1857,7 +1011,6 @@ angular.module('admin.component')
                 };
             MIXIN$0(UIDateControl.prototype,proto$0);proto$0=void 0;return UIDateControl;})(UIFormControl);
 
-            alert(1);
             return UIDateControl;
         });
 })();
@@ -1904,82 +1057,82 @@ angular.module('admin.component')
         }
     };
 
-    var UIDateRangeControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDateRangeControl, super$0);var proto$0={};
-        function UIDateRangeControl(s, e, a) {
-            this.className = 'DateRange';
-            this.startDateElement = e.find('.input-group').find('input:first');
-            this.endDateElement = e.find('.input-group').find('input:last');
-
-            this.hasDefaultDateRange = !!a.range;
-            this.isDateTimeMode = a.mode !== 'date' || a.time !== undefined;
-            this.format = a.format || (this.isDateTimeMode ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD');
-
-            this.limit = a.limit;
-            super$0.call(this, s, e, a);
-        }if(super$0!==null)SP$0(UIDateRangeControl,super$0);UIDateRangeControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDateRangeControl,"configurable":true,"writable":true}});DP$0(UIDateRangeControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-        proto$0.init = function() {
-            super$0.prototype.init.call(this);
-
-            //默认值
-            var dateRange = uiDateRangeDefaultRange[this.attrs.range] || [];
-            this.defaultStartDate = this.attrs.fromValue || dateRange[0];
-            this.defaultEndDate = this.attrs.toValue || dateRange[1];
-
-            //
-            this.config = $.extend({}, uiDateRangeDefaultConfig, {
-                ranges: uiDateRangeDefaultRange,
-                timePicker: this.isDateTimeMode,
-                format: this.format
-            });
-
-            //要小心设置这个值
-            if (this.limit) {
-                this.config.dateLimit = {days: this.limit};
-            }
-
-            //默认值
-            if (this.hasDefaultDateRange) {
-                this.config.startDate = this.defaultStartDate;
-                this.config.endDate = this.defaultEndDate;
-            }
-        };
-
-        proto$0.render = function() {var this$0 = this;
-            this.element.find("div").daterangepicker(this.config, function(startVal, endVal)  {
-                startVal = startVal ? startVal.format(this$0.format) : "";
-                endVal = endVal ? endVal.format(this$0.format) : "";
-                this$0.val(startVal, endVal);
-                this$0.scope.change();
-            });
-        };
-
-        proto$0.reset = function() {
-            this.startDateElement.val('');
-            this.endDateElement.val('');
-        };
-
-        proto$0.val = function(sv, ev) {
-            if (sv) {
-                this.startDateElement.val(sv);
-            }
-            if (ev) {
-                this.endDateElement.val(ev);
-            }
-            if (!sv && !ev) {
-                return [this.startDateElement.val(), this.endDateElement.val()];
-            }
-            else {
-                return this;
-            }
-        };
-
-
-    MIXIN$0(UIDateRangeControl.prototype,proto$0);proto$0=void 0;return UIDateRangeControl;})(UIFormControl);
-
 
     angular.module('admin.component')
-        .factory('UIDateRangeControl', function()  {return UIDateRangeControl});
+        .factory('UIDateRangeControl', function()  {
+            var UIDateRangeControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDateRangeControl, super$0);var proto$0={};
+                function UIDateRangeControl(s, e, a) {
+                    this.className = 'DateRange';
+                    this.startDateElement = e.find('.input-group').find('input:first');
+                    this.endDateElement = e.find('.input-group').find('input:last');
+
+                    this.hasDefaultDateRange = !!a.range;
+                    this.isDateTimeMode = a.mode !== 'date' || a.time !== undefined;
+                    this.format = a.format || (this.isDateTimeMode ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD');
+
+                    this.limit = a.limit;
+                    super$0.call(this, s, e, a);
+                }if(super$0!==null)SP$0(UIDateRangeControl,super$0);UIDateRangeControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDateRangeControl,"configurable":true,"writable":true}});DP$0(UIDateRangeControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.init = function() {
+                    super$0.prototype.init.call(this);
+
+                    //默认值
+                    var dateRange = uiDateRangeDefaultRange[this.attrs.range] || [];
+                    this.defaultStartDate = this.attrs.fromValue || dateRange[0];
+                    this.defaultEndDate = this.attrs.toValue || dateRange[1];
+
+                    //
+                    this.config = $.extend({}, uiDateRangeDefaultConfig, {
+                        ranges: uiDateRangeDefaultRange,
+                        timePicker: this.isDateTimeMode,
+                        format: this.format
+                    });
+
+                    //要小心设置这个值
+                    if (this.limit) {
+                        this.config.dateLimit = {days: this.limit};
+                    }
+
+                    //默认值
+                    if (this.hasDefaultDateRange) {
+                        this.config.startDate = this.defaultStartDate;
+                        this.config.endDate = this.defaultEndDate;
+                    }
+                };
+
+                proto$0.render = function() {var this$0 = this;
+                    this.element.find("div").daterangepicker(this.config, function(startVal, endVal)  {
+                        startVal = startVal ? startVal.format(this$0.format) : "";
+                        endVal = endVal ? endVal.format(this$0.format) : "";
+                        this$0.val(startVal, endVal);
+                        this$0.scope.change({startVal: startVal, endVal: endVal});
+                    });
+                };
+
+                proto$0.reset = function() {
+                    this.startDateElement.val('');
+                    this.endDateElement.val('');
+                };
+
+                proto$0.val = function(sv, ev) {
+                    if (sv) {
+                        this.startDateElement.val(sv);
+                    }
+                    if (ev) {
+                        this.endDateElement.val(ev);
+                    }
+                    if (!sv && !ev) {
+                        return [this.startDateElement.val(), this.endDateElement.val()];
+                    }
+                    else {
+                        return this;
+                    }
+                };
+            MIXIN$0(UIDateRangeControl.prototype,proto$0);proto$0=void 0;return UIDateRangeControl;})(UIFormControl);
+
+            return UIDateRangeControl;
+        });
 })();
 //------------------------------------------------------
 //
@@ -1989,7 +1142,65 @@ angular.module('admin.component')
 //
 //------------------------------------------------------
 (function () {
+
+    var defaultFormValidateConfig = {
+        errorElement: 'span',
+        errorClass: 'help-block',
+        focusInvalid: false,
+        ignore: '',
+        rules: {},
+        highlight: function (element) {
+            $(element).closest('.form-group').addClass('has-error');
+        },
+        unhighlight: function (element) {
+            $(element).closest('.form-group').removeClass('has-error');
+        },
+        success: function (label, element) {
+            label.closest('.form-group').removeClass('has-error');
+        },
+        errorPlacement: function (error, element, message) {
+            $(error).appendTo($(element).parent());
+        }
+    };
+
     angular.module('admin.component')
+        .factory('UIFormControl', function()  {
+            var UIFormControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIFormControl, super$0);var proto$0={};
+
+                function UIFormControl(s, e, a, formItems) {
+                    this.className = 'form';
+                    this.action = this.attrs.action.replace(/#/g, '');
+                    this.formItems = formItems;
+                    this.formControlMap = {};
+                    super$0.call(this, s, e, a);
+                }if(super$0!==null)SP$0(UIFormControl,super$0);UIFormControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIFormControl,"configurable":true,"writable":true}});DP$0(UIFormControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.init = function() {var this$0 = this;
+                    super$0.prototype.init.call(this);
+                    this.scope.$on('componentComplete', function(evt, o)  {
+                        this$0.formControlMap[o.name] = o.component;
+                    });
+                };
+
+                proto$0.initEvents = function() {
+                    super$0.prototype.initEvents.call(this);
+                };
+
+                proto$0.changeValidateRule = function(ruleName, ruleConfig) {
+                    var validator = this.element.data().validator;
+                    if (validator) {
+                        var oldConfig = validator.settings.rules[ruleName];
+                        validator.settings.rules[ruleName] = $.extend(oldConfig, ruleConfig);
+                    }
+                };
+
+                proto$0.startValidate = function() {
+                    this.element.valid();
+                };
+
+            MIXIN$0(UIFormControl.prototype,proto$0);proto$0=void 0;return UIFormControl;})(UIFormControl);
+            return UIFormControl;
+        })
         .constant('uiFormValidateConfig', {
             errorElement: 'span',
             errorClass: 'help-block',
@@ -2242,7 +1453,8 @@ angular.module('admin.component')
             });
             return Form;
         });
-})(jQuery);
+})
+(jQuery);
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -2252,18 +1464,18 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 (function () {
 
-    var UIInputControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIInputControl, super$0);
-
-        function UIInputControl(s, e, a) {
-            this.className = 'Input';
-            this.formEl = e.find('input');
-            super$0.call(this, s, e, a);
-        }if(super$0!==null)SP$0(UIInputControl,super$0);UIInputControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIInputControl,"configurable":true,"writable":true}});DP$0(UIInputControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-    ;return UIInputControl;})(UIFormControl);
-
-
     angular.module('admin.component')
-        .factory('UIInputControl', function()  {return UIInputControl});
+        .factory('UIInputControl', function()  {
+            var UIInputControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIInputControl, super$0);
+
+                function UIInputControl(s, e, a) {
+                    this.className = 'Input';
+                    this.formEl = e.find('input');
+                    super$0.call(this, s, e, a);
+                }if(super$0!==null)SP$0(UIInputControl,super$0);UIInputControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIInputControl,"configurable":true,"writable":true}});DP$0(UIInputControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+            ;return UIInputControl;})(UIFormControl);
+            return UIInputControl;
+        });
 })();
 //-----------------------------------------------------------------------------------------------
 //
@@ -2597,6 +1809,69 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
+(function () {
+    angular.module('admin.component')
+        .factory('UIRegionControl', function(uiRegionHelper)  {
+            var UIRegionControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIRegionControl, super$0);var proto$0={};
+                function UIRegionControl(s, e, a) {
+                    this.className = 'Region';
+                    this.$inputDom = e.find('input:hidden');
+                    this.$pDom = e.find('[name="province"]');
+                    this.$cDom = e.find('[name="city"]');
+                    this.$sDom = e.find('[name="area"]');
+                    this.$aDom = e.find('[name="address"]');
+                    this.valueType = a.valueType || 'text'; //保存的是文字还是ID
+                    super$0.call(this, s, e, a);
+                }if(super$0!==null)SP$0(UIRegionControl,super$0);UIRegionControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIRegionControl,"configurable":true,"writable":true}});DP$0(UIRegionControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.init = function() {
+                    super$0.prototype.init.call(this);
+                };
+
+                proto$0.render = function() {var this$0 = this;
+                    super$0.prototype.render.call(this);
+                    if (/^\d+$/g.test(this.codeValue)) {  //有区域ID
+                        uiRegionHelper.htmlById(this.codeValue)
+                            .then(function (ts) {
+                                return ts.concat(uiRegionHelper.getProvince());
+                            })
+                            .then(function(p, c, s, data)  {
+                                this$0.$pDom.select2(this$0.toProvinceData(data));
+                                if (p) {
+                                    this$0.$pDom.select2('val', p.id);
+                                    this$0.$pDom.val(p[self.valueType]);
+                                    return [c, s, uiRegionHelper.getCity(p.id)]
+                                }
+                                throw new Error();
+                            })
+                            .then(function(c, s, data)  {
+                                this$0.$cDom.select2(self.toCityData(data));
+                                if (c) {
+                                    this$0.$cDom.select2('val', c.id);
+                                    this$0.$cDom.val(c[self.valueType]);
+                                    return [s, uiRegionHelper.getStreet(c.id)];
+                                }
+                                throw new Error();
+                            })
+                            .then(function(s, data)  {
+                                this$0.$sDom.select2(self.toStreetData(data));
+                                if (s) {
+                                    self.$sDom.select2('val', s.id);
+                                    self.$sDom.val(s[self.valueType]);
+                                }
+                            });
+                    }
+                    else { //没有则直接加载省
+                        uiRegionHelper.getProvince().then(function(data)  {
+                            this$0.$pDom.select2(this$0.toProvinceData(data));
+                        });
+                    }
+                };
+            MIXIN$0(UIRegionControl.prototype,proto$0);proto$0=void 0;return UIRegionControl;})(UIFormControl);
+
+            return UIRegionControl;
+        });
+})();
 angular.module('admin.component')
     .factory('uiRegionService', function (uiRegionHelper, msg, uiFormControl) {
         var m = new msg('Region'),
@@ -2626,34 +1901,34 @@ angular.module('admin.component')
                             s = ts[0];
                             return uiRegionHelper.getProvince();
                         })
-                        .then(function(data){
+                        .then(function (data) {
                             self.$pDom.select2(self.toProvinceData(data));
-                            if(p){
+                            if (p) {
                                 self.$pDom.select2('val', p.id);
                                 self.$pDom.val(p[self.valueType]);
                                 return uiRegionHelper.getCity(p.id);
                             }
-                            else{
+                            else {
                                 return null;
                             }
                         })
-                        .then(function(data){
-                            if(data){
+                        .then(function (data) {
+                            if (data) {
                                 self.$cDom.select2(self.toCityData(data));
-                                if(c){
+                                if (c) {
                                     self.$cDom.select2('val', c.id);
                                     self.$cDom.val(c[self.valueType]);
                                     return uiRegionHelper.getStreet(c.id);
                                 }
-                                else{
+                                else {
                                     return null;
                                 }
                             }
                         })
-                        .then(function(data){
-                            if(data){
+                        .then(function (data) {
+                            if (data) {
                                 self.$sDom.select2(self.toStreetData(data));
-                                if(s){
+                                if (s) {
                                     self.$sDom.select2('val', s.id);
                                     self.$sDom.val(s[self.valueType]);
                                 }
@@ -2668,7 +1943,7 @@ angular.module('admin.component')
                 }
 
                 //
-                if(this.attrs.aValue){
+                if (this.attrs.aValue) {
                     this.$aDom.val(this.attrs.aValue);
                 }
 
@@ -2707,7 +1982,7 @@ angular.module('admin.component')
 
                 //
                 this.$pDom.change(function (evt) {
-                    if(evt.val){
+                    if (evt.val) {
                         uiRegionHelper.getCity(evt.val).then(function (data) {
                             self.$cDom.select2(self.toCityData(data));
                             self.$sDom.select2(self.toStreetData());
@@ -2715,21 +1990,21 @@ angular.module('admin.component')
                         this.$pDom.val(evt.added[this.valueType]);
                         this.$inputDom.val(evt.val);
                     }
-                    else{
+                    else {
                         this.reset();
                     }
                 }.bind(this));
 
                 //
                 this.$cDom.change(function (evt) {
-                    if(evt.val){
+                    if (evt.val) {
                         uiRegionHelper.getStreet(evt.val).then(function (data) {
                             self.$sDom.select2(self.toStreetData(data));
                         });
                         this.$cDom.val(evt.added[this.valueType]);
                         this.$inputDom.val(evt.val);
                     }
-                    else{
+                    else {
                         this.$sDom.select2(this.toStreetData());
                         this.$cDom.val('');
                         this.$inputDom.val('');
@@ -2738,26 +2013,26 @@ angular.module('admin.component')
 
                 //
                 this.$sDom.change(function (evt) {
-                    if(evt.val){
+                    if (evt.val) {
                         this.$sDom.val(evt.added[this.valueType]);
                         this.$inputDom.val(evt.val);
                     }
-                    else{
+                    else {
                         this.$sDom.val('');
                         this.$inputDom.val('');
                     }
                 }.bind(this));
             },
 
-            toProvinceData: function(data){
+            toProvinceData: function (data) {
                 return {data: data || [], allowClear: true, placeholder: '请选择省'};
             },
 
-            toCityData: function(data){
+            toCityData: function (data) {
                 return {data: data || [], allowClear: true, placeholder: '请选择市'};
             },
 
-            toStreetData: function(data){
+            toStreetData: function (data) {
                 return {data: data || [], allowClear: true, placeholder: '请选择区'};
             },
 
@@ -2768,7 +2043,7 @@ angular.module('admin.component')
                 this.$sDom.val('').select2(this.toStreetData());
             }
         });
-        return function(s, e, a, c, t){
+        return function (s, e, a, c, t) {
             return new Region(s, e, a, c, t);
         };
     });
@@ -2842,7 +2117,7 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 (function () {
     angular.module('admin.component')
-        .factory('UISelectControl',function()  {
+        .factory('UISelectControl',function(Ajax)  {
 
             //
             var UISelectControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UISelectControl, super$0);var proto$0={};
@@ -2850,7 +2125,6 @@ angular.module('admin.component')
                 function UISelectControl(s, e, a) {
                     this.className = 'Select';
                     this.formEl = e.find('Select');
-                    this.ajax = new Ajax();
                     super$0.call(this, s, e, a);
                 }if(super$0!==null)SP$0(UISelectControl,super$0);UISelectControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UISelectControl,"configurable":true,"writable":true}});DP$0(UISelectControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
@@ -2911,7 +2185,7 @@ angular.module('admin.component')
                 };
 
                 proto$0.load = function(url, value, isClean) {var this$0 = this;
-                    return this.ajax.post(url).then(function(responseData)  {
+                    return Ajax.get(url).then(function(responseData)  {
                         this$0.setData(responseData, isClean);
                         if (value) {
                             this$0.val(value);
@@ -2977,17 +2251,375 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
+(function () {
+    angular.module('admin.component')
+        .factory('UISpinnerControl', function()  {
+            var UISpinnerControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UISpinnerControl, super$0);var proto$0={};
+                function UISpinnerControl(s, e, a) {
+                    this.className = 'Spinner';
+                    this.formEl = e.find('input');
+                    super$0.call(this, s, e, a);
+                }if(super$0!==null)SP$0(UISpinnerControl,super$0);UISpinnerControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UISpinnerControl,"configurable":true,"writable":true}});DP$0(UISpinnerControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.init = function() {
+                    super$0.prototype.init.call(this);
+                };
+
+                proto$0.initEvents = function() {var this$0 = this;
+                    super$0.prototype.initEvents.call(this);
+                    this.element.on('mousedown', '.spinner-up', function()  {return this$0._changeValue(true)});
+                    this.element.on('mousedown', '.spinner-down', function()  {return this$0._changeValue(false)});
+                    this.scope.$watch('model', function(n)  {
+                        var cn = this$0._checkValue(n);
+                        if (cn != n) {
+                            this$0.scope.model = cn;
+                        }
+                    });
+                };
+
+                proto$0._changeValue = function(isAdd) {
+                    var step = (this.attrs.step || 1) * 1,
+                        val = this.val();
+                    val = val !== undefined ? parseInt(val) : this.attrs.value;
+                    val = val + (step * ( isAdd ? 1 : -1));
+                    val = this._checkValue(val);
+                    this.scope.model = val;
+                    this.scope.$apply();
+                    this.scope.change({val: val});
+                };
+
+                proto$0._checkValue = function(value) {
+                    var min = (this.attrs.min || 0) * 1,
+                        max = (this.attrs.max || Number.MAX_VALUE) * 1;
+                    if (value > max) {
+                        value = max;
+                    }
+                    if (value < min) {
+                        value = min;
+                    }
+                    return value;
+                };
+            MIXIN$0(UISpinnerControl.prototype,proto$0);proto$0=void 0;return UISpinnerControl;})(UIFormControl);
+            return UISpinnerControl;
+        });
+})();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+    angular.module('admin.component')
+        .factory('UISwitchControl', function()  {
+            var UISwitchControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UISwitchControl, super$0);var proto$0={};
+                function UISwitchControl(s, e, a) {
+                    this.className = 'Switch';
+                    this.formEl = e.find('input');
+                    this.checkEl = this.formEl[0];
+                    super$0.call(this, s, e, a);
+                }if(super$0!==null)SP$0(UISwitchControl,super$0);UISwitchControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UISwitchControl,"configurable":true,"writable":true}});DP$0(UISwitchControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.init = function() {
+                    super$0.prototype.init.call(this);
+                    this.onValue = this.attrs.onValue || '1';
+                    this.offValue = this.attrs.offValue || '0';
+                    this.onText = this.attrs.onText || '开';
+                    this.offText = this.attrs.offText || '关';
+                };
+
+                proto$0.initEvents = function() {
+                    super$0.prototype.initEvents.call(this);
+                };
+
+                proto$0.render = function() {var this$0 = this;
+                    this.formEl.bootstrapSwitch({
+                        size: 'normal',
+                        onText: this.onText,
+                        offText: this.offText,
+                        onSwitchChange: function(evt, state)  {
+                            this$0._change(state);
+                        }
+                    });
+                    this.formEl.bootstrapSwitch('state', this.attrs.value == this.onValue);
+                    this.checkEl.checked = true;
+
+                    this.scope.$watch('model', function(newValue)  {
+                        if (newValue != this$0.val()) {
+                            this$0.val(newValue);
+                        }
+                    });
+
+                    if (!this.scope.model) {
+                        var val = this.offValue;
+                        this.scope.model = val;
+                    }
+                };
+
+                proto$0.disabled = function(open) {
+                    this.formEl.bootstrapSwitch('disabled', open == 'true');
+                };
+
+
+                proto$0.val = function(val) {
+                    if (val !== undefined) {
+                        this.formEl.bootstrapSwitch('state', val == this.onValue);
+                        return this;
+                    }
+                    else {
+                        return this.formEl.val();
+                    }
+                };
+
+                proto$0._change = function(state) {
+                    var v = state ? this.onValue : this.offValue;
+                    this.val(v);
+                    this.checkEl.checked = true;
+                    this.scope.model = v;
+                    this.scope.change({val: v});
+                };
+            MIXIN$0(UISwitchControl.prototype,proto$0);proto$0=void 0;return UISwitchControl;})(UIFormControl);
+            return UISwitchControl;
+        });
+})();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+    angular.module('admin.component')
+        .factory('UITagControl', function($q, Util, Ajax)  {
+            var UIRemoteSelectControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIRemoteSelectControl, super$0);var proto$0={};
+                function UIRemoteSelectControl(s, e, a) {
+                    this.className = 'RemoteSelect';
+                    this.selectValues = [];
+                    this.selectItems = [];
+                    super$0.call(this, s, e, a);
+                }if(super$0!==null)SP$0(UIRemoteSelectControl,super$0);UIRemoteSelectControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIRemoteSelectControl,"configurable":true,"writable":true}});DP$0(UIRemoteSelectControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.init = function() {
+                    super$0.prototype.init.call(this);
+                };
+
+                proto$0.initEvents = function(){var this$0 = this;
+                    super$0.prototype.initEvents.call(this);
+
+                    //选中
+                    this.element.on('select2-selecting', function(evt)  {
+                        if (evt.object.isNew && this$0.attrs.editable == 'false') {  //不可编辑, 只能选择
+                            return false;
+                        }
+                        this$0.selectValues.push(evt.val);
+                        this$0.selectItems.push(evt.object);
+                        this$0.scope.model = this$0.selectValues;
+                        this$0.scope.change({val: evt.val, item: evt.object, vals: this$0.selectValues, items: this$0.selectItems});
+                        return true;
+                    });
+
+                    //移除
+                    this.element.on('select2-removing', function(evt)  {
+                        this$0.selectValues = $.grep(this$0.selectValues, function (value) {
+                            return value != evt.val;
+                        });
+                        this$0.selectItems = $.grep(this$0.selectItems, function (item) {
+                            return item != evt.choice;
+                        });
+                        this$0.scope.model = this$0.selectValues;
+                        this$0.scope.change({val: evt.val, item: evt.object, vals: this$0.selectValues, items: this$0.selectItems});
+                    });
+                };
+
+                proto$0.render = function() {
+                    super$0.prototype.render.call(this);
+                    var config = this._getConfig();
+                    this.element.find('input').select2(config);
+                };
+
+                proto$0._getConfig = function() {
+                    var selectOption = {
+                        openOnEnter: false,
+                        multiple: true,
+                        createSearchChoice: $.proxy(this._createSearchChoice, this),
+                        formatResult: $.proxy(this._formatResult, this),
+                        formatSelection: $.proxy(this._formatResult, this),
+                        id: $.proxy(this._formatId, this),
+                        initSelection: $.proxy(this._initSelection, this),
+                        query: $.proxy(this._filterData, this),
+                        formatNoMatches: function () {
+                            return '没有符合的数据';
+                        },
+                        formatInputTooShort: function (t, m) {
+                            return '输入' + m + '个字符后开始查询';
+                        },
+                        formatSelectionTooBig: function (m) {
+                            return '最大可以选中' + m + '个数据';
+                        },
+                        formatSearching: function () {
+                            return '正在加载数据...';
+                        },
+                        formatAjaxError: function () {
+                            return '加载数据失败';
+                        }
+                    };
+
+                    if (this.attrs.minmum) { //输入几个字符以后才能搜索
+                        selectOption.minimumInputLength = this.attrs.minmum;
+                    }
+                    if (this.attrs.maxSize) { //最大选中几个
+                        selectOption.maximumSelectionSize = this.attrs.maxSize;
+                    }
+                    selectOption.closeOnSelect = false;
+                    return selectOption;
+                };
+
+                proto$0.useParams = function(o) {
+                    return $.extend(this.params, o || {}); //TODO: 额外查询参数
+                };
+
+                proto$0.loadData = function() {var this$0 = this;
+                    var defer = $q.defer();
+                    if (this.datas) {
+                        defer.resolve(this.datas);
+                    }
+                    else {
+                        Ajax.get(this.attrs.url, this.useParams()).then(function(r)  {
+                            this$0.datas = r ? r.aaData || r : [];
+                            $.each(this$0.datas, function (i, dd) { //遍历所有属性, 放入一个特殊变量, 用于后期查询使用
+                                var s = [];
+                                for (var k in dd) {
+                                    s.push(k + '=' + (dd[k] || '').toString().toLowerCase());
+                                }
+                                dd.__string = s.join(',');
+                            });
+                            defer.resolve(this$0.datas);
+                        });
+                    }
+                    return defer.promise;
+                };
+
+                proto$0._createSearchChoice = function(term, data) {
+                    if ($(data).filter(function () {
+                            return this.name.indexOf(term) === 0;
+                        }).length === 0) {
+                        return data.length <= 10 ? {id: term, name: term, isNew: true} : null; //最多10个
+                    }
+                };
+
+                proto$0._filterData = function(o) {var this$0 = this;
+                    var sfs = (this.attrs.search || '').toLowerCase().split(','),
+                        keyword = o.term.toLowerCase();
+                    this.loadData().then(function(rs)  {
+                        var os = [];
+                        $.each(rs, function(i, r)  {
+                            var isC = false;
+                            if (o.init) { //初始化, 那么只会根据
+                                isC = this$0.attrs.multi ? o.term.indexOf(this$0.formatId(r)) != -1 : this$0.formatId(r) == o.term;
+                            }
+                            else { //根据属性过滤
+                                if (sfs.length === 0 || sfs[0] === '') {
+                                    isC = r.__string.indexOf(keyword) != -1;
+                                }
+                                else {   //针对特定属性
+                                    $.each(sfs, function (ii, sf) {
+                                        isC = (r[sf] || '').toString().toLowerCase().indexOf(keyword) != -1;
+                                    });
+                                }
+                            }
+                            if (isC) {
+                                os.push(r);
+                            }
+                        });
+                        o.callback({results: os});
+                    });
+                };
+
+                proto$0._initSelection = function(element, callback) {
+                    var self = this,
+                        handler = function (data) {
+                            if (self.attrs.multi !== undefined) {
+                                callback(data.results);
+                            }
+                            else {
+                                callback(data.results[0]);
+                            }
+                        };
+                    if (self.isFocusInit) {
+                        self.isFocusInit = false;
+                        self.isInit = false;
+                        handler({results: self.selectItems});
+                    }
+                    else if (element.val() !== undefined) {
+                        self.isInit = false;
+                        this.filterData({
+                            term: element.val(),
+                            init: true,
+                            callback: handler
+                        });
+                    }
+                    else if (self.isInit) {
+                        self.isInit = false;
+                        handler({results: []});
+                    }
+                };
+
+                proto$0._formatId = function(o) {
+                    return o[this.attrs.valueName || 'id'];
+                };
+
+                proto$0._formatResult = function(item, container, query) {
+                    return item[this.attrs.labelName || 'name'];
+                };
+
+                proto$0.reset = function() {
+                    this.selectItems = [];
+                    this.selectValues = [];
+                    this.inputElement.select2('val', '');
+                };
+
+                proto$0.val = function(vals) {
+                    if (vals) {
+                        this.inputElement.select2('val', vals);
+                        if (this.attrs.multi) {
+                            this.selectValues = vals;
+                        }
+                        else {
+                            this.selectValues = [vals];
+                        }
+                        var values = ',' + this.selectValues.join(',') + ',',
+                            self = this;
+                        this.loadData().then(function (datas) {
+                            self.selectItems = $.grep(datas, function (data) {
+                                return values.indexOf(',' + self.formatId(data) + ',') != -1;
+                            });
+                        });
+                    }
+                    else {
+                        if (this.attrs.multi) {
+                            return this.selectValues;
+                        }
+                        else {
+                            return this.selectValues[0];
+                        }
+                    }
+                };
+
+                proto$0.item = function() {
+                    if (this.attrs.multi) {
+                        return this.selectItems;
+                    }
+                    else {
+                        return this.selectItems[0];
+                    }
+                };
+            MIXIN$0(UIRemoteSelectControl.prototype,proto$0);proto$0=void 0;return UIRemoteSelectControl;})(UIFormControl);
+            return UIRemoteSelectControl;
+        });
+})();
 angular.module('admin.component')
-    .constant('userConfig', {
-        url: '/sysconfig/orguser/select',
-        labelName: 'name',
-        valueName: 'staffno'
-    })
-    .constant('tagConfig', {
-        url: '/sysconfig/tag/list?classify=',
-        labelName: 'name',
-        valueName: 'id'
-    })
     .factory('uiMultiSelectFactory', function ($q, ajax, logger, msg, util, Event, ValueService) {
         var m = new msg('MultiSelect'),
             MultiSelect = function (scope, element, attrs) {
@@ -3343,1400 +2975,6 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiSpinnerFactory', function (msg, uiFormControl, ValueService) {
-        var m = new msg('Spinner'),
-            Spinner = function (scope, element, attrs) {
-                this.inputElement = element.find('input');
-                this.spinner = null;
-                uiFormControl.apply(this, arguments);
-            };
-        Spinner.prototype = $.extend(new uiFormControl(), {
-
-            render: function () {
-                this.spinner = this.element.spinner(this.attrs);
-                if (this.attrs.model) {
-                    if (this.attrs.value) {
-                        ValueService.set(this.scope, this.attrs.model, this.attrs.value);
-                    }
-                    this.element.on('changed', function () {
-                        ValueService.set(this.scope, this.attrs.model, this.val());
-                        this.$emit('change', this.val());
-                    }.bind(this));
-
-                    this.scope.$watch(this.attrs.model, function(newValue){
-                        if(newValue !== this.val()){
-                            this.val(newValue === undefined ? '0' : newValue);
-                        }
-                    }.bind(this));
-                }
-            },
-
-            change: function (fn) {
-                this.$on('change', fn);
-            },
-
-            reset: function () {
-                this.inputElement.val('');
-            },
-
-            disabled: function (open) {
-                this.attr('disabled', open);
-            },
-
-            attr: function (k, v) {
-                if (v) {
-                    this.inputElement.attr(k, v);
-                }
-                else {
-                    return this.inputElement.attr(k);
-                }
-            },
-
-            val: function (v) {
-                if (v !== undefined) {
-                    this.inputElement.val(v);
-                    return this;
-                }
-                else {
-                    return this.inputElement.val();
-                }
-            }
-        });
-        return function (s, e, a, c, t) {
-            return new Spinner(s, e, a, c, t);
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .factory('uiSwitchFactory', function (msg, uiFormControl, ValueService) {
-        var m = new msg('Switch'),
-            Switch = function (scope, element, attrs) {
-                this.inputElement = element.find('input');
-                this.onValue = attrs.onValue || 'on';
-                this.offValue = attrs.offValue || 'off';
-                this.attrs = attrs;
-                this.model = attrs.model;
-                uiFormControl.apply(this, arguments);
-            };
-        Switch.prototype = $.extend(new uiFormControl(), {
-
-            render: function () {
-                if ($.fn.bootstrapSwitch) {
-                    this.inputElement.bootstrapSwitch({
-                        size: 'small',
-                        onSwitchChange: this.onChangeHandler.bind(this)
-                    });
-
-                    //初始值
-                    this.inputElement.bootstrapSwitch('state', this.attrs.value == this.onValue);
-                }
-                this.inputElement[0].checked = true;
-
-                if(this.model){
-                    this.scope.$watch(this.model, function(newValue){
-                        if(newValue != this.val()){
-                            this.val(newValue);
-                        }
-                    }.bind(this));
-
-                    //如果model没有值, 默认选择offvalue
-                    if(!ValueService.get(this.scope, this.model)){
-                        var val = this.offValue;
-                        ValueService.set(this.scope, this.model, val || this.offValue);
-                    }
-                }
-            },
-
-            onChangeHandler: function (evt, state) {
-                var v = state ? this.onValue : this.offValue;
-                this.inputElement.val(v);
-                this.inputElement[0].checked = true;
-                this.$emit('change');
-                if(this.model){
-                    ValueService.set(this.scope, this.model, v);
-                }
-            },
-
-            reset: function () {
-                this.inputElement.val();
-            },
-
-            disabled: function (open) {
-                this.inputElement.bootstrapSwitch('disabled',open=='true');
-            },
-
-
-            val: function (val) {
-                if (val !== undefined) {
-                    this.inputElement.bootstrapSwitch('state', val == this.onValue);
-                    return this;
-                }
-                else {
-                    return this.inputElement.val();
-                }
-            }
-        });
-        return function(s, e, a, c, t){
-            return new Switch(s, e, a, c, t);
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('uiTabFactory', function (msg, ajax, Event, $compile) {
-        var m = new msg('Tab'),
-            Tab = function (scope, element, attrs) {
-                Event.call(this);
-                this.element = element;
-                this.contentElement = element.find('.tab-content');
-                this.default = parseInt(attrs.default || 0);
-                this.attrs = attrs;
-                this.scope = scope;
-                this.activeItem = null;
-                this.items = [];
-            };
-        Tab.prototype = {
-
-            /**
-             *
-             */
-            init: function () {
-                this.showAtIndex(this.default);
-            },
-
-            /**
-             *
-             */
-            change: function (fn) {
-                this.$on('change', fn);
-            },
-
-            /**
-             *
-             */
-            remove: function (fn) {
-                this.$on('remove', fn);
-            },
-
-            /**
-             *
-             * @returns {*|Tab.contentElement}
-             */
-            getContainer: function () {
-                return this.contentElement;
-            },
-
-            /**
-             *
-             */
-            showAtItem: function (tabItem) {
-                if (!tabItem) {
-                    return;
-                }
-
-                //
-                if (this.activeItem) {
-                    this.activeItem.active(false).hide();
-                }
-
-                //
-                var container = this.getContainer();
-                tabItem.active(true).show().then(function (content) {
-                    if (content.parent().length === 0) {
-                        container.append(content);
-                    }
-                    content.show();
-                });
-
-                //
-                this.$emit('change', tabItem, tabItem.getIndex());
-
-                //
-                this.activeItem = tabItem;
-                return this;
-            },
-
-            /**
-             *
-             * @param index
-             */
-            showAtIndex: function (index) {
-                this.showAtItem(this.items[index]);
-            },
-
-            /**
-             *
-             * @param tabItem
-             */
-            addItem: function (tabItem) {
-                tabItem.index = this.items.length;
-                this.items.push(tabItem);
-                tabItem.onActive(this.onActiveHandler.bind(this));
-                tabItem.onRemove(this.onRemoveHandler.bind(this));
-            },
-
-            /**
-             *
-             */
-            onActiveHandler: function (tabItem) {
-                this.showAtItem(tabItem);
-            },
-
-            /**
-             *
-             */
-            onRemoveHandler: function (tabItem, index) {
-                this.items.splice(index, 1);
-                if (this.activeItem == tabItem) {
-                    var preIndex = index - 1,
-                        nextIndex = index;
-                    if (preIndex >= 0 && preIndex <= this.items.length - 1) {
-                        this.showAtIndex(preIndex);
-                    }
-                    else if (nextIndex >= 0 && nextIndex < this.items.length - 1) {
-                        this.showAtIndex(nextIndex);
-                    }
-                }
-                //
-                this.$emit('remove', tabItem, tabItem.getIndex());
-            },
-
-            /**
-             * 新增简单tab
-             */
-            addTab: function (head, content, active) {
-                var h = [
-                        '<ui-tab-item head="' + head + '">',
-                        content,
-                        '</ui-tab-item>'
-                    ],
-                    $e = $(h.join(''));
-                this.element.find('ul').append($e);
-                $compile($e)(this.scope);
-                if (active) {
-                    this.showAtIndex(this.items.length - 1);
-                }
-            }
-        };
-        return function (scope, element, attrs) {
-            return new Tab(scope, element, attrs);
-        };
-    });
-angular.module('admin.component')
-    .directive('uiTab', function (uiTabFactory, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            compile: function () {
-                var tab = null;
-                return {
-                    pre: function (scope, element, attrs) {
-                        tab = uiTabFactory(scope, element, attrs);
-                        var ref = attrs.ref || '$tab';
-                        scope[ref] = tab;
-                        componentHelper.tiggerComplete(scope, ref, tab);
-                    },
-                    post: function () {
-                        tab.init();
-                    }
-                };
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.tab', attrs);
-            }
-        };
-    });
-
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('uiTabItemFactory', function ($compile, msg, ajax, Event) {
-        var m = new msg('TabItem'),
-            TabItem = function (scope, element, attrs, $content) {
-                Event.call(this);
-                this.scope = scope;
-                this.element = element;
-                this.content = $content ? this.wrapperContent($content) : null;
-                this.elementTitle = element.find('span');
-                this.attrs = attrs;
-                this.scope = scope;
-                this.items = [];
-                this.dropdown = element.parent().hasClass('dropdown-menu');
-            };
-        TabItem.prototype = {
-
-            /**
-             *
-             */
-            onClickHandler: function () {
-                this.$emit('uitabitem.active', this);
-            },
-
-            /**
-             *
-             */
-            onRemoveHandler: function (evt) {
-                var index = this.getIndex();
-                if (this.content) {
-                    this.content.remove();
-                }
-                if (this.element) {
-                    this.element.remove();
-                }
-                this.$emit('uitabitem.remove', this, index);
-                delete this.listenerMap;
-                evt.stopPropagation();
-            },
-
-            /**
-             *
-             * @param fn
-             */
-            onActive: function (fn) {
-                this.$on('uitabitem.active', fn);
-            },
-
-            /**
-             *
-             */
-            onRemove: function (fn) {
-                this.$on('uitabitem.remove', fn);
-            },
-
-            /**
-             *
-             * @param isActive
-             */
-            active: function (isActive) {
-                var $dom = null;
-                if (this.dropdown) {
-                    $dom = this.element.parent().parent();
-                }
-                else {
-                    $dom = this.element;
-                }
-                $dom[isActive ? 'addClass' : 'removeClass']('active');
-                return this;
-            },
-
-            /**
-             *
-             */
-            wrapperContent: function (c) {
-                return $('<div/>').addClass('tab-pane fade').append(c);
-            },
-
-            /**
-             *
-             */
-            hide: function () {
-                if (this.content) {
-                    this.content.removeClass('active in').hide();
-                }
-                return this;
-            },
-
-            /**
-             *
-             */
-            title: function(t){
-                if(t){
-                    this.elementTitle.html(t);
-                }
-                else{
-                    return this.elementTitle.html();
-                }
-            },
-
-            /**
-             *
-             */
-            show: function () {
-                var defer = $.Deferred();
-                if (this.content) {
-                    defer.resolve(this.content);
-                }
-                else if (this.attrs.url) {
-                    $.get(this.attrs.url, function (r) {
-                        this.content = $compile(this.wrapperContent(r))(this.scope);
-                        defer.resolve(this.content);
-                    }.bind(this));
-                }
-                return defer.promise().then(function (c) {
-                    c.addClass('active in');
-                    return c;
-                });
-            },
-
-            /**
-             *
-             */
-            getIndex: function () {
-                return this.element.index();
-            }
-        };
-        return function (scope, element, attrs, $content) {
-            return new TabItem(scope, element, attrs, $content);
-        };
-    });
-angular.module('admin.component')
-    .directive('uiTabItem', function (uiTabItemFactory, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: true,
-            controller: function ($scope, $element, $attrs, $transclude) {
-                var tabRef = componentHelper.getComponentRef($element.parent(), '$tab'),
-                    uiTabItem = uiTabItemFactory($scope, $element, $attrs, $transclude($scope));
-                $scope.$tabItem = uiTabItem;
-                $scope[tabRef].addItem(uiTabItem);
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.tab.item', $.extend({
-                    tabRef: componentHelper.getComponentRef(element.parent(), '$tab'),
-                    index: element.index()
-                }, attrs));
-            }
-        };
-    });
-
-angular.module('admin.component')
-    .directive('uiTabListItem', function (componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: true,
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.tab.list.item', $.extend({
-                    tabRef: componentHelper.getComponentRef(element.parent(), '$tab')
-                }, attrs));
-            }
-        };
-    });
-
-angular.module('admin.component')
-    .directive('uiTabRemoteItem', function (uiTabItemFactory, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: true,
-            controller: function ($scope, $element, $attrs) {
-                var tabRef = componentHelper.getComponentRef($element.parent(), '$tab'),
-                    uiTabItem = uiTabItemFactory($scope, $element, $attrs);
-                $scope.$tabItem = uiTabItem;
-                $scope[tabRef].addItem(uiTabItem);
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.tab.item', $.extend({
-                    tabRef: componentHelper.getComponentRef(element.parent(), '$tab'),
-                    index: element.index()
-                }, attrs));
-            }
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .controller('uiPortalController', function ($scope, $attrs, $element, util, ajax, msg) {
-
-
-        var m = new msg('Portal');
-
-
-        //
-        var hasCompleteSize = 0;
-        $scope.$on('portletComplete', function (evt, portlet) {
-            if (++hasCompleteSize >= portletSize) { //全部加载完毕, 开始走起
-                var $originNext;
-                $element.sortable({
-                    connectWith: ".portlet-container",
-                    items: ".portlet-container",
-                    opacity: 0.8,
-                    coneHelperSize: true,
-                    placeholder: 'portlet-sortable-placeholder',
-                    forcePlaceholderSize: true,
-                    tolerance: "pointer",
-                    helper: "clone",
-                    cancel: ".portlet-sortable-empty, .portlet-fullscreen", // cancel dragging if portlet is in fullscreen mode
-                    revert: 250, // animation in milliseconds
-                    start: function(b, c){
-                        $originNext = c.item.next().next(); //第一个next是他拖动后的虚拟狂
-                    },
-                    stop: function (b, c) {
-                        var $item = c.item,
-                            $newNext = $item.next(),
-                            portlet = $item.data('portlet');
-                        //
-                        var i = $newNext ? $newNext.index() : null;
-                        while($newNext.length > 0){
-                            $newNext.data('portlet') && ($newNext.data('portlet').col = i++);
-                            $newNext = $newNext.next();
-                        }
-
-                        //
-                        var o = $originNext ? $originNext.index() : null;
-                        while($originNext.length > 0){
-                            $originNext.data('portlet') && ($originNext.data('portlet').col = o++);
-                            $originNext = $newNext.next();
-                        }
-
-                        //
-                        portlet.row = $item.parent().index();
-                        portlet.col = $item.index();
-
-                        $scope.storePortlets();
-
-                        //放在最后面
-                        $element.find('.portlet-sortable-empty').each(function(index, dom){
-                            var $dom = $(dom);
-                            $dom.appendTo($dom.parent());
-                        });
-                    }
-                });
-            }
-        });
-
-
-        $scope.storePortlets = function () {
-            var cookieValue = {};
-            $.each(portlets, function (index, portlet) {
-                cookieValue[portlet.url] = {row: portlet.row, col: portlet.col};
-            });
-            $.cookie(cookieKey, JSON.stringify(cookieValue));
-        };
-
-        //
-        var portletSize, portlets;
-        var cookieKey = $attrs.store || 'portal';
-        $scope.setPortlets = function (pp) {
-            var cookieValue = util.toJSON($.cookie(cookieKey) || '{}'),
-                remainPortlets = []; //未分配的portlet
-
-            //
-            hasCompleteSize = 0;
-            portletSize = pp.length;
-            portlets = pp;
-
-            //
-            $.each(portlets, function (index, portlet) {
-                var cPortlet = cookieValue[portlet.url], //从cookie取用户自定义的
-                    row = cPortlet ? cPortlet.row : portlet.row,
-                    col = cPortlet ? cPortlet.col : portlet.col;
-                if (row < $scope.columns.length) { //够放
-                    $scope.setPortlet(row, col, portlet);
-                }
-                else { //不够放, 后面排队去
-                    remainPortlets.push(portlet);
-                }
-            });
-
-            //放剩余的
-            $.each(remainPortlets, function (index, portlet) {
-                $scope.setPortlet(index, portlet.col, portlet);
-            });
-
-            //
-            $scope.resetColumns();
-
-            //设置到cookie
-            this.storePortlets();
-        };
-        $scope.setPortlet = function (row, col, portlet) {
-            var columnSize = $scope.columns.length;
-            row = row % columnSize;
-            col = col;
-            portlet.row = row;
-            portlet.col = col;
-            $scope.columns[row][col] = portlet;
-        };
-
-        $scope.resetColumns = function () {
-            var r = [];
-            for (var i = 0; i < $scope.columns.length; i++) {
-                r.push([]);
-            }
-            $.each($scope.columns, function (row, columns) {
-                $.each(columns, function(col, column){
-                    if(column){
-                        column.col = r[row].length;
-                        r[row].push(column);
-                        var p = r[row][col - 1];
-                        p && (p.next = column); //设置下一个
-                    }
-                });
-            });
-            $scope.columns = r;
-        };
-
-
-        //计算多少列
-        $scope.columns = [];
-        var column = $attrs.column || 2;
-        $scope.eachColumn = 12 / column;
-        for (var i = 0; i < column; i++) {
-            $scope.columns.push([]);
-        }
-
-        //
-        if ($attrs.url) {
-            ajax.get($attrs.url).then(function (responseData) {
-                $scope.setPortlets(responseData);
-            });
-        }
-        else {
-            $scope.setPortlets([
-                {url: '/static/portlet/portlet-1.jsp', row: 0, col: 0},
-                {url: '/static/portlet/portlet-2.jsp', row: 0, col: 1},
-                {url: '/static/portlet/portlet-3.jsp', row: 1, col: 0},
-                {url: '/static/portlet/portlet-4.jsp', row: 1, col: 1},
-                {url: '/static/portlet/portlet-5.jsp', row: 1, col: 2}
-            ]);
-            //m.error('必须设置url去获取portlet信息');
-        }
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiPortal', function () {
-        return {
-            restrict: 'E',
-            replace: true,
-            controller: 'uiPortalController',
-            templateUrl: 'tpl.portal'
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiPortletAction', function () {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            templateUrl: 'tpl.portal.portlet.action'
-        };
-    });
-
-
-
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiPortletActionPagination', function (PaginationFactory) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: function (scope, element, attrs) {
-                var url = attrs.url,
-                    pageIndex = attrs.pageIndex,
-                    pageSize = attrs.pageSize,
-                    pageLimit = attrs.pageLimit,
-                    pageDataName = attrs.pageDataName,
-                    pageTotalName = attrs.pageTotalName,
-                    init = false,
-                    paginationFactory = new PaginationFactory(url, pageIndex, pageSize, pageLimit, pageDataName, pageTotalName),
-                    handler = function (r) {
-                        $.extend(scope, r);
-                    };
-
-                //
-                scope.setUrl = function (url) {
-                    paginationFactory.url = url;
-                };
-
-                //
-                scope.load = function (index) {
-                    index--;
-                    if (index != paginationFactory.pageIndex || !init) {
-                        init = true;
-                        paginationFactory.getPage(index).then(handler);
-                    }
-                };
-                scope.loadFirst = function (isForce) {
-                    if(!scope.isFirst || isForce){
-                        paginationFactory.prePage().then(handler);
-                    }
-                };
-                scope.loadLast = function (isForce) {
-                    if(!scope.isLast || isForce){
-                        paginationFactory.nextPage().then(handler);
-                    }
-                };
-
-                //
-                scope.load(1);
-            },
-            templateUrl: 'tpl.portal.portlet.action.pagination'
-        };
-    });
-
-
-
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiPortletActionSearch', function (componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: function (scope, element, attrs) {
-                if (attrs.onEnter) {
-                    element.keydown(function (evt) {
-                        if (evt.keyCode == 13 && scope[attrs.onEnter]) {
-                            scope[attrs.onEnter](element.val());
-                        }
-                    });
-                }
-            },
-            template: function (el, attrs) {
-                return componentHelper.getTemplate('tpl.portal.portlet.action.search', attrs);
-            }
-        };
-    });
-
-
-
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiPortletActionTab', function (uiTabFactory, componentHelper, $timeout) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            compile: function () {
-                var tab = null;
-                return {
-                    pre: function (scope, element, attrs) {
-                        tab = uiTabFactory(scope, element, attrs);
-                        tab.getContainer = function(){
-                            return element.parents('.portlet').find('.portlet-body');
-                        };
-                        scope[attrs.ref] = tab;
-                    },
-                    post: function(){
-                        if(tab.items.length > 0){
-                            $timeout(function(){
-                                tab.showAtIndex(0);
-                            });
-                        }
-                    }
-                };
-            },
-            template: function (el, attrs) {
-                attrs.ref = attrs.ref || '$portletActionTab' + (new Date().getTime());
-                return componentHelper.getTemplate('tpl.portal.portlet.action.tab', attrs);
-            }
-        };
-    });
-
-
-
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiPortlet', function (componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: true,
-            controller: function ($scope, $element, $attrs, $transclude) {
-                var $content = $transclude($scope),
-                    $toolbar = $content.filter('.portlet-tool-bar');
-                if ($toolbar.length === 0) {
-                    $.each($content, function (i, c) {
-                        if (c.nodeName.indexOf('UI-PORTLET-ACTION') != -1) {
-                            $toolbar = $(c);
-                            return false;
-                        }
-                    });
-                }
-                $element.find('.portlet-body').append($content);
-                if ($toolbar.length !== 0) {
-                    $toolbar.insertAfter($element.find('.caption'));
-                }
-
-                componentHelper.tiggerComplete($scope, $attrs.ref || '$portlet', $scope);
-            },
-            template: function (el, attrs) {
-                return componentHelper.getTemplate('tpl.portal.portlet', attrs);
-            }
-        };
-    });
-
-
-
-
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTableCheckColumn', function (uiTableColumnService, componentHelper, msg) {
-        var m = new msg('tableCheckColumn');
-        return {
-            restrict: 'E',
-            replace: true,
-            controller: function ($scope, $element, $attrs) {
-                $attrs.checked = true;
-                var $dom = $element.find('input'),
-                    ref = componentHelper.getComponentRef($element.parents('table').parent(), '$table'),
-                    name = $attrs.name;
-
-                //
-                $dom.click(function (evt) {
-                    var isChecked = evt.target.checked;
-                    $scope[ref].selectAllHandler(isChecked, name);
-                    evt.stopPropagation();
-                });
-                $scope.$on('uitable.selectAllChecked', function (evt, isAll) {
-                    $dom[0].checked = isAll;
-                    $.fn.uniform && $dom.uniform();
-                });
-
-                //
-                var render = function (rowData) {
-
-                    //判断之前是否被选过
-                    var isContainValue = $scope[ref].containItem(rowData);
-                    if (isContainValue) {
-                        $scope[ref].pageSelectNum.push(true);
-                    }
-                    else{
-                        $scope[ref].pageSelectNum.push(false);
-                    }
-
-                    //
-                    $scope.$on('uitable.selectAll', function (evt, isAll) {
-                        $dom[0].checked = isAll;
-                        $.fn.uniform && $dom.uniform();
-                    });
-
-                    //
-                    var $dom = $('<input type="checkbox" pk="' + rowData[name] + '"/>').val(rowData[name]).click(function (evt) {
-                        $scope[ref].selectOneHandler(evt.target.checked, $attrs.name, rowData);
-                        evt.stopPropagation();
-                    });
-
-                    //
-                    $dom[0].checked = isContainValue;
-                    return $dom;
-                };
-
-                //
-                if ($scope[ref] && $scope[ref].addColumn) {
-                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render), $attrs.index);
-                    $scope[ref].idName = name;
-                }
-                else {
-                    m.error('uiTableCheckColumn必须放在uiTable里面');
-                }
-            },
-            templateUrl: 'tpl.table.column.checked'
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTableDateColumn', function (uiTableColumnService, uiEditableDateInputFactory, componentHelper, msg) {
-        var m = new msg('tableColumn');
-        return {
-            restrict: 'E',
-            replace: true,
-            controller: function ($scope, $element, $attrs, util) {
-                //
-                var ref = componentHelper.getComponentRef($element.parents('table').parent(), '$table'),
-                    format = $attrs.format || 'yyyy-MM-dd HH:mm:ss',
-                    name = $attrs.name,
-                    render = function (rowData) {
-                        var val = rowData[name];
-                        if (val) {
-                            val = util.dateFormatStr(val, format);
-                        }
-                        return $('<div/>').html(val);
-                    };
-
-                //
-                if ($scope[ref] && $scope[ref].addColumn) {
-                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render, uiEditableDateInputFactory), $attrs.index);
-                }
-                else {
-                    m.error('uiTableColumn必须放在uiTable里面');
-                }
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.table.column', attrs);
-            }
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTableImageColumn', function (uiTableColumnService, componentHelper, msg) {
-        var m = new msg('TableImageColumn');
-        return {
-            restrict: 'E',
-            replace: true,
-            controller: function ($scope, $element, $attrs) {
-
-                //
-                var ref = componentHelper.getComponentRef($element.parents('table').parent(), '$table'),
-                    placeholder = $attrs.placeholder || 'http://usr.im/110x30?text=What',
-                    name = $attrs.name,
-                    qiniu = $attrs.qiniu,
-                    styleWidth = $attrs.imageWidth,
-                    styleHeight = $attrs.imageHeight,
-                    render = function (rowData) {
-                        var val = rowData[name];
-                        val = val !== undefined ? val : placeholder;
-                        if(qiniu){
-                            val = val + qiniu;
-                        }
-                        return $('<img/>').attr('src', val).css({width: styleWidth, height: styleHeight});
-                    };
-
-                //
-                if ($scope[ref] && $scope[ref].addColumn) {
-                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render), $attrs.index);
-                }
-                else {
-                    m.error('uiTableColumn必须放在uiTable里面');
-                }
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.table.column', attrs);
-            }
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTableColumn', function (uiTableColumnService, componentHelper, msg, $injector) {
-        var m = new msg('tableColumn');
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            controller: function ($scope, $element, $attrs, $transclude) {
-                var ref = componentHelper.getComponentRef($element.parents('table').parent(), '$table'),
-                    hasTransclude = $transclude().length > 0,
-                    name = $attrs.name || '',
-                    render = function (rowData) {
-                        if (hasTransclude) {
-                            var $doms = null;
-                            $transclude($scope.$new(), function (c, s) {
-                                s.data = rowData;
-                                $doms = c;
-                            });
-                            return $doms;
-                        }
-                        else {
-                            var customRenderName = 'render' + name.charAt(0).toUpperCase() + name.substr(1),
-                                v = rowData[name];
-                            if ($scope[customRenderName]) {
-                                return $scope[customRenderName](rowData);
-                            }
-                            if (name && name.indexOf(".") != -1){
-                                var ns = name.split('.'), n;
-                                v = rowData;
-                                while((n = ns.shift()) && v){
-                                    v = v[n];
-                                }
-                            }
-                            return v !== undefined ? $('<div/>').html(v) : v;
-                        }
-                    };
-
-                //
-                if ($scope[ref] && $scope[ref].addColumn) {
-                    var editor = null;
-                    if ($attrs.editable !== undefined) {
-                        var editorName = 'uiEditable' + $attrs.editable.charAt(0).toUpperCase() + $attrs.editable.substring(1) + 'Factory';
-                        try {
-                            editor = $injector.get(editorName);
-                        }
-                        catch (e) {
-                            editor = $injector.get('uiEditableInputFactory');
-                        }
-                    }
-                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render, editor), $attrs.index);
-                }
-                else {
-                    m.error('uiTableColumn必须放在uiTable里面');
-                }
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.table.column', attrs);
-            }
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTableOperationColumn', function (uiTableColumnService, componentHelper, msg) {
-        var m = new msg('tableColumn');
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            controller: function ($scope, $element, $attrs, $transclude) {
-                //
-                var ref = componentHelper.getComponentRef($element.parents('table').parent(), '$table'),
-                    render = function (rowData) {
-                        var $doms = null;
-                        $transclude($scope.$new(), function (c, s) {
-                            s.data = rowData;
-                            $doms = c;
-                        });
-                        return $doms;
-                    };
-
-                //
-                if ($scope[ref] && $scope[ref].addColumn) {
-                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render), $attrs.index);
-                }
-                else {
-                    m.error('uiTableColumn必须放在uiTable里面');
-                }
-            },
-            template: function (element, attrs) {
-                attrs.head = attrs.head || '操作';
-                return componentHelper.getTemplate('tpl.table.column', attrs);
-            }
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .constant('uiTableProgressColumnTpl', [
-        '<div style="border: 1px solid #57b5e3;" class="progress progress-striped active" role="progressbar"style="margin-bottom:0px;">',
-        '<div class="progress-bar"></div>',
-        '</div>'
-    ].join(''))
-    .directive('uiTableProgressColumn', function (uiTableColumnService, componentHelper, uiTableProgressColumnTpl, msg) {
-        var m = new msg('TableProgressColumn');
-        return {
-            restrict: 'E',
-            replace: true,
-            controller: function ($scope, $element, $attrs) {
-
-                //
-                var ref = componentHelper.getComponentRef($element.parents('table').parent(), '$table'),
-                    name = $attrs.name,
-                    render = function (rowData) {
-                        var val = rowData[name],
-                            level = 'progress-bar-success';
-                        val = val !== undefined ? val : 0;
-                        if (val <= 25)
-                            level = 'progress-bar-danger';
-                        else if (val <= 50)
-                            level = 'progress-bar-danger';
-                        else if (val <= 75)
-                            level = 'progress-bar-info';
-
-                        var $d = $(uiTableProgressColumnTpl).attr('title', val + '%').find('div').addClass(level).animate({width: val + '%'}).end();
-                        return $d;
-                    };
-
-                //
-                if ($scope[ref] && $scope[ref].addColumn) {
-                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render), $attrs.index);
-                }
-                else {
-                    m.error('uiTableProgressColumn必须放在uiTable里面');
-                }
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.table.column', attrs);
-            }
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .filter('emptyFilter', function () {
-        return function (val, defaultV) {
-            return val || defaultV || '-';
-        };
-    })
-    .factory('uiTableColumnService', function (msg) {
-        var m = new msg('TableColumnService');
-        return function (tableId, $scope, $attrs, render, editorFactory, editorConfig) {
-            var columnConfig = {
-
-                //自定义的属性
-                sName: $attrs.name || '',
-                mTitle: $attrs.head,
-                bEditable: $attrs.editable,
-                bChecked: $attrs.checked,
-                mEditUrl: $attrs.editUrl,
-                mAttrs: $attrs,
-
-                //原生的属性
-                sClass: $attrs.css || '',
-                sWidth: $attrs.width || 'smart',
-                bVisible: $attrs.novisible === undefined,
-                bSortable: $attrs.sort !== undefined,
-                mDataProp: function (aData, type) {
-                    //
-                    if (type != 'display') {
-                        return '';
-                    }
-                    //datatable会调用两次，第一个获取数据，第二次用获取的数据，渲染数据....
-                    if (arguments.length == 3) {
-                        return arguments[2];
-                    }
-                    else {
-                        var r = render ? render.apply(this, arguments) : aData[$attrs.name];
-
-                        //针对字符串, 如果为空, 返回'-'
-                        r = r !== undefined ? r : '-'; //针对0或者false值
-                        if (r !== undefined && angular.isString(r)) {
-                            r = $.trim(r);
-                            r = r.length ? r : '-';
-                            r = '<div>' + r + '</div>';
-                        }
-
-                        //
-                        if ($attrs.editable !== undefined) {
-                            if (editorFactory) {
-                                var edit = null,
-                                    option = {
-                                        url: $scope[tableId].editUrl,
-                                        title: $attrs.head,
-                                        pk: $scope[tableId].getIdByData(aData),
-                                        name: $attrs.name,
-                                        rule: $scope[tableId].getRuleByName($attrs.name),
-                                        value: aData[$attrs.name]
-                                    };
-                                $scope.$on('uitable.editabled', function (evt, isEdit) {
-                                    if (isEdit && edit) {
-                                        edit.show();
-                                    }
-                                    else if (isEdit) {
-                                        edit = editorFactory(r, $attrs, option, editorConfig);
-                                    }
-                                    else {
-                                        edit.hide();
-                                    }
-                                });
-                            }
-                            else {
-                                //m.error($attrs.name + '没有编辑器, 无法编辑');
-                            }
-                        }
-
-                        //
-                        return r;
-                    }
-                }
-            };
-            return columnConfig;
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTableStateColumn', function (uiTableColumnService, uiEditableChooseFactory, componentHelper, msg) {
-        var m = new msg('tableColumn');
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            controller: function ($scope, $element, $attrs, $transclude) {
-                //
-                var ref = componentHelper.getComponentRef($element.parents('table').parent(), '$table'),
-                    tpl = $attrs.tpl,
-                    name = $attrs.name,
-                    defaultValue = $attrs.default,
-                    render = function (rowData) {
-                        var val = rowData[name],
-                            $dom = null;
-                        if (tpl) {
-                        }
-                        else {
-                            var $s = $scope.$new();
-                            $s.data = rowData;
-                            $transclude($s, function (clone) {
-                                $dom = clone.filter('[state="' + val + '"]');
-                                if ($dom.length === 0) { //用默认值
-                                    $dom = clone.filter('[state="' + defaultValue + '"]');
-                                }
-                                if ($dom.length === 0) { //还没有...
-                                    for (var i = 0, c; i < clone.length; i++) {
-                                        c = clone[i];
-                                        if (c.innerHTML && c.innerHTML.indexOf(defaultValue) != -1) {
-                                            $dom = $(c);
-                                            break;
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                        return $dom.length > 0 ? $dom : null;
-                    };
-
-                //
-                if ($scope[ref] && $scope[ref].addColumn) {
-                    var choosableData = [];
-                    $transclude().each(function (i, dom) {
-                        var $dom = $(dom),
-                            key = $dom.attr('state'),
-                            val = $dom.html();
-                        if (key && val) {
-                            choosableData.push({value: key, text: val});
-                        }
-                    });
-                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render, uiEditableChooseFactory, choosableData), $attrs.index);
-                }
-                else {
-                    m.error('uiTableColumn必须放在uiTable里面');
-                }
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.table.column', attrs);
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .controller('uiPortletContainerController', function ($scope, $attrs, $element) {
-        $element.data('portlet', $scope.portlet).load($scope.portlet.url, function(){
-            $scope.$emit('portletComplete');
-        });
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiPortletContainer', function () {
-        return {
-            restrict: 'E',
-            replace: true,
-            controller: 'uiPortletContainerController',
-            templateUrl: 'tpl.portal.portlet.container'
-        };
-    });
-
-
-
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
     .directive('uiFormDate', function (UIDateControl) {
         return {
             restrict: 'E',
@@ -4759,10 +2997,10 @@ angular.module('admin.component')
 \n                <div class=\"form-group\">\
 \n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
 \n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change()\" ng-model=\"model\" readonly=\"true\"/>\
+\n                       <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change({val: model})\" ng-model=\"model\" readonly=\"true\"/>\
 \n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
 \n                   </div>\
-\n               </div>'\
+\n               </div>\
 \n            ")
         };
     });
@@ -4840,7 +3078,7 @@ angular.module('admin.component')
 \n                <div class=\"form-group\">\
 \n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
 \n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <input type=\"{{type || 'text'}}\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change()\" ng-model=\"model\"/>\
+\n                       <input type=\"{{type || 'text'}}\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change({val: model})\" ng-model=\"model\"/>\
 \n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
 \n                   </div>\
 \n               </div>'\
@@ -4901,18 +3139,38 @@ angular.module('admin.component')
 //      a-value -- 地址值
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormRegion', function (uiRegionService, componentHelper, defaultCol) {
+    .directive('uiFormRegion', function (UIRegionControl) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiRegionService,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.region', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@',
+                type: '@',
+                mode: '@'
+            },
+            link: function(s, e, a)  {
+                new UIRegionControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                        <input type=\"hidden\" name=\"{{name}}\" ng-value={{value}}/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
+\n                        <input ng-if=\"!mode || mode == 's' || mode == 'c'\" type=\"text\" class=\"input-small form-control input-inline\" name=\"city\"/>\
+\n                        <input ng-if=\"!mode || mode == 's'\" type=\"text\" class=\"input-small form-control input-inline\" name=\"area\"/>\
+\n                        <input ng-if=\"!mode\" type=\"text\" class=\"input-medium form-control input-inline\" name=\"address\" ng-value={{aValue}}/>\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------
@@ -4947,7 +3205,7 @@ angular.module('admin.component')
 \n                <div class=\"form-group\">\
 \n                    <label class=\"col-md-{{lcol}} control-label\">{{label}}</label>\
 \n                    <div class=\"col-md-{{rcol}}\">\
-\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" title=\"{{placeholder}}\" ng-transclude></select>\
+\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" title=\"{{placeholder || '请选择'}}\" ng-transclude></select>\
 \n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
 \n                    </div>\
 \n                </div>\
@@ -4958,36 +3216,37 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  针对select的封装
+//
 //
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormRemoteSelect', function (uiMultiSelectFactory, componentHelper, defaultCol) {
+    .directive('uiFormTag', function (UITagControl) {
         return {
             restrict: 'E',
-            replace: false,
-            transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                var select = uiMultiSelectFactory(scope, element, $.extend({multi: true}, attrs));
-                componentHelper.tiggerComplete(scope, attrs.ref || '$formRemoteSelect', select);
-
-                //
-                scope.$on('uiform.reset', function () {
-                    select.reset();
-                });
-
-                //
-                element.removeAttr('name').removeAttr('readonly').removeAttr('model');
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                name: '@',
+                model: '=',
+                placeholder: '@',
+                change: '&',
+                help: '@'
             },
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.input', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
+            link: function (scope, element, attrs) {
+                new UITagControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <input type=\"text\" class=\"form-control\" name=\"{{name}}\"/>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
         };
     });
 
@@ -4999,18 +3258,41 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormSpinner', function (uiSpinnerFactory, componentHelper, defaultCol) {
+    .directive('uiFormSpinner', function (UISpinnerControl) {
         return {
             restrict: 'E',
             replace: true,
-            link: uiSpinnerFactory,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.spinner', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function(s, e, a)  {
+                new UISpinnerControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <div class=\"input-group\" style=\"width:150px;\">\
+\n                           <div class=\"spinner-buttons input-group-btn\">\
+\n                               <button type=\"button\" class=\"btn spinner-up blue\"><i class=\"fa fa-plus\"></i></button>\
+\n                           </div>\
+\n                           <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" readonly=\"true\"/>\
+\n                           <div class=\"spinner-buttons input-group-btn\">\
+\n                               <button type=\"button\" class=\"btn spinner-down red\"><i class=\"fa fa-minus\"></i></button>\
+\n                           </div>\
+\n                       </div>\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                    </div>\
+\n               </div>\
+\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------
@@ -5021,19 +3303,32 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormSwitch', function (uiSwitchFactory, componentHelper, defaultCol) {
+    .directive('uiFormSwitch', function (UISwitchControl) {
         return {
             restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: uiSwitchFactory,
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.switch', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function(s, e, a)  {
+                new UISwitchControl(s, e, a);
+            },
+            template: ("\
+\n               <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
         };
     });
 
@@ -5064,7 +3359,7 @@ angular.module('admin.component')
 \n                 <div class=\"input-inline search-item\">\
 \n                    <div class=\"input-group\">\
 \n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change()\" readonly=\"true\"/>\
+\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\" readonly=\"true\"/>\
 \n                    </div>\
 \n                </div>\
 \n            ")
@@ -5131,7 +3426,7 @@ angular.module('admin.component')
 \n                 <div class=\"input-inline search-item\">\
 \n                    <div class=\"input-group\">\
 \n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change()\"/>\
+\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\"/>\
 \n                    </div>\
 \n                </div>\
 \n            ")
@@ -5319,13 +3614,12 @@ angular.module('admin.component')
             this.scope = scope;
             this.element = element;
             this.attrs = attrs;
-            this.logger = new Logger('uiStateButton');
             this.message = new Message('uiStateButton');
         }if(super$0!==null)SP$0(UIStateButton,super$0);UIStateButton.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIStateButton,"configurable":true,"writable":true}});DP$0(UIStateButton,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
         proto$0.init = function() {var this$0 = this;
             if (!this.scope.clickHandler) {
-                this.message.error('必须设置ng-click属性');
+                this.message.error('必须设置on-click属性');
             }
             this.element.click(function()  {
                 this$0.disable(true);
@@ -5362,13 +3656,15 @@ angular.module('admin.component')
                 transclude: true,
                 scope: {
                     target: '@target',
-                    clickHandler: '&ngClick'
+                    clickFnName: '@onClick'
                 },
                 link: function (scope, element, attrs) {
                     var button = new UIStateButton(scope, element, attrs);
                     button.init();
                 },
-                template: 'tpl.button.state'
+                template: ("\
+\n                    <button type=\"button\" class=\"btn\" ng-transclude ng-click=\"clickHandler()\"></button>\
+\n                ")
             };
         });
 })();
@@ -5381,24 +3677,23 @@ angular.module('admin.component')
 (function () {
 
     angular.module('admin.component')
-        .directive('uiBreadcrumb', function (util) {
+        .directive('uiBreadcrumb', function (Util, Ajax) {
 
             var UIBreadcrumb = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIBreadcrumb, super$0);var proto$0={};
                 function UIBreadcrumb(scope) {
                     this.scope = scope;
                     this.message = new Message('uiBreadcrumb');
-                    this.ajax = new Ajax();
                 }if(super$0!==null)SP$0(UIBreadcrumb,super$0);UIBreadcrumb.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIBreadcrumb,"configurable":true,"writable":true}});DP$0(UIBreadcrumb,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
                 proto$0.init = function() {var this$0 = this;
                     if (this.scope.datas) {
-                        this.handler(util.toJSON(this.scope.datas));
+                        this.handler(Util.toJSON(this.scope.datas));
                     }
                     else if (this.scope.url) {
-                        this.ajax.post(this.scope.url).then(function(datas)  {return this$0.handler(datas)});
+                        Ajax.post(this.scope.url).then(function(datas)  {return this$0.handler(datas)});
                     }
                     else {
-                        this.message.error("至少设置data或者url来配置面包屑");
+                        this.message.error("至少设置datas或者url来配置面包屑");
                     }
                 };
 
@@ -5512,1983 +3807,6 @@ angular.module('admin.component')
             };
         });
 })();
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('uiMenuFactory', function (msg, ajax, Event) {
-        var m = new msg('Menu'),
-            Menu = function (scope, element, attrs) {
-                Event.call(this);
-                this.element = element;
-                this.attrs = attrs;
-                this.scope = scope;
-                this.activeItem = null;
-                this.init();
-            };
-        Menu.prototype = {
-
-            /**
-             *
-             */
-            init: function () {
-                this.scope.activeItem = null;
-                this.scope.menuItems = [];
-                this.scope.onClickHandler = this.onClickHandler.bind(this);
-                if (this.attrs.url) {
-                    this.setUrl(this.attrs.url);
-                }
-            },
-
-            /**
-             *
-             * @param url
-             */
-            setUrl: function (url) {
-                ajax.get(url).then(function(data){
-                    this.setData(data);
-                }.bind(this));
-            },
-
-            /**
-             *
-             */
-            setData: function (menuItems) {
-                this.scope.menuItems = menuItems;
-            },
-
-            /**
-             *
-             * @param menuItem
-             */
-            onClickHandler: function(menuItem){
-                if(this.scope.activeItem){
-                    this.scope.activeItem.active = false;
-                }
-                this.scope.activeItem = menuItem;
-                this.scope.activeItem.active = true;
-            }
-        };
-        return function (s, e, a, c, t) {
-            return new Menu(s, e, a, c, t);
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiMenu', function () {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: function (scope, element) {
-                element.find(' li a').click(function (evt) {
-                    var $a = $(evt.target);
-                    $a.parent().parent().find('li').removeClass('active');
-                    $a.parent().parent().find('.arrow').removeClass('open');
-
-                    $a.parent().addClass('active');
-                    $a.find('.arrow').addClass('open');
-                });
-
-                //
-                var $a = element.find('a[href="' + window.location.hash + '"]');
-                $a = $a.length > 0 ? $a : element.find('a[href="' + window.location.hash.replace(/\/[^\/]+$/, '') + '"]');
-                $a.parents('li').each(function(i, li){
-                    var $li = $(li);
-                    $li.addClass('active');
-                    $li.find(' > a .arrow').addClass('open');
-                });
-            },
-            templateUrl: 'tpl.menu'
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  创建Table的委托对象, 目前使用datatable作为第三方库, 方法和其他差不多
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .factory('uiTableEditableFactory', function (msg) {
-        var m = new msg('TableEditable'),
-            TableEditable = function () {
-                this.editUrl = this.attrs.editUrl || '';
-                this.editUrl = this.editUrl + (this.editUrl.indexOf('?') == -1 ? '?' : '&') + 'idName=' + this.attrs.idName;
-                this.editFormName = this.attrs.formName;
-                this.editRuleMap = {};
-                if (this.editFormName) {
-                    $.getJSON('/validator?cm=' + this.editFormName, function (rules) {
-                        this.editRuleMap = rules;
-                    }.bind(this));
-                }
-                else if (this.editUrl) {
-                    //m.error('开始编辑模式, 但是未提供form-name校验数据的地址');
-                }
-
-                this.toggleEdit = function (isEdit) {
-                    this.scope.$broadcast('uitable.editabled', isEdit);
-                };
-                this.getRuleByName = function (name) {
-                    return this.editRuleMap[name] || {};
-                };
-            };
-
-        /**
-         *
-         */
-        return TableEditable;
-    })
-;
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  创建Table的委托对象, 目前使用datatable作为第三方库, 方法和其他差不多
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .factory('uiTableFactory', function (uiTableDelegate, uiTableEditableFactory, util, logger, ajax, msg, Event, $compile) {
-        var m = new msg('table'),
-            Table = function (scope, element, attrs) {
-                Event.call(this);
-                this.columns = [];
-                this.nopageMode = attrs.nopage !== undefined;
-                this.idName = attrs.idName;
-                this.pageResult = {};
-                this.selectValues = [];
-                this.selectItems = [];
-                this.instance = null;
-                this.element = element;
-                this.scope = scope;
-                this.attrs = attrs;
-                this.searchParams = null;
-                this.pageSelectNum = [];
-                uiTableEditableFactory.call(this);
-            };
-
-        Table.prototype = {
-
-            /**
-             * 初始化
-             */
-            initTable: function () {
-                this.instance = uiTableDelegate(this, this.element, this.attrs, this.columns);
-                this.element.on('click', 'tr', function (evt) {
-                    //if(evt.target.nodeName == 'TR' || evt.target.nodeName == 'TD'){
-                    //    var $tr = $(this);
-                    //    $tr.find('td:eq(0) input[type="checkbox"]').click();
-                    //    $tr.toggleClass('selected');
-                    //}
-                });
-            },
-
-            /**
-             *
-             */
-            initEvnet: function () {
-            },
-
-            /**
-             * 新增列
-             * @param column
-             */
-            setColumn: function (column, index){
-                index = parseInt(index);
-                if(index && !isNaN(index)){
-                    this.columns.splice(index, 0, column);
-                }
-                else{
-                    index = this.columns.length;
-                    this.columns.push(column);
-                }
-                if (this.instance) {
-                    var setting = this.instance.fnSettings(),
-                        headers = setting.aoHeader[0],
-                        th = this.element.find('th').eq(index)[0],
-                        columns = setting.aoColumns;
-                    column.fnGetData = column.mDataProp;
-                    column = $.extend({}, columns[columns.length - 1], column);
-                    headers.splice(index, 0, {cell: th, unique: true});
-                    columns.splice(index, 0, column);
-                }
-                $.each(this.columns, function(i, c){
-                    c.mIndex = i;
-                });
-            },
-
-            /**
-             *
-             * @param head
-             * @param name
-             */
-            addColumn: function (head, name, index) {
-                var def = '<ui-table-column head="' + head + '" name="' + name + '" data-index="' + index + '"></ui-table-column>';
-                this.addCustomColumn(def, index);
-            },
-
-            /**
-             *
-             * @param head
-             * @param name
-             * @param render
-             */
-            addCustomColumn: function (def, index) {
-                var $tr = this.element.find('tr:eq(0)'),
-                    $th = index == undefined ? $tr.find('th:last-child') : $tr.find('th:eq(' + index + ')'),
-                    $def = $(def);
-                $def.insertAfter($th);
-                $compile($def)(this.scope);
-            },
-
-            /**
-             *
-             */
-            removeColumnAtIndex: function (index) {
-                this.element.find('tr:eq(0) th:eq(' + index + ')').remove();
-                var setting = this.instance.fnSettings();
-                setting.aoHeader[0].splice(index, 1);
-                setting.aoColumns.splice(index, 1);
-                this.columns.splice(index, 1);
-            },
-
-            /**
-             * 获取rowData
-             * @param rowIndex
-             * @returns {*}
-             */
-            getDataAtIndex: function (rowIndex) {
-                return this.pageResult.aaData ? this.pageResult.aaData[rowIndex] : null;
-            },
-
-            /**
-             * 获取rowData的id
-             * @param rowIndex
-             * @returns {*}
-             */
-            getIdByIndex: function (rowIndex) {
-                var d = this.getDataAtIndex(rowIndex);
-                return this.getIdByData(d);
-            },
-
-            /**
-             *
-             */
-            getIdByData: function (d) {
-                return d ? d[this.idName] : null;
-            },
-
-            /**
-             * 是否包含该item
-             */
-            containItem: function (rowData) {
-                var id = rowData[this.idName];
-                for (var i = 0; i < this.selectValues.length; i++) {
-                    if (this.selectValues[i] === id) {
-                        return true;
-                    }
-                }
-                return false;
-            },
-
-            /**
-             *
-             * @param columnIndex
-             * @returns {Array}
-             */
-            getDomsByColumnIndex: function (columnIndex) {
-                var doms = [];
-                this.element.find('tr:gt(0)').each(function (index, tr) {
-                    doms.push($('td', tr).eq(columnIndex));
-                });
-                return doms;
-            },
-
-            /**
-             * 获取rowData的主键
-             * @param rowIndex
-             * @returns {*}
-             */
-            getIdByIndex: function (rowIndex) {
-                var rowData = this.getDataAtIndex(rowIndex),
-                    pk = rowData ? rowData[this.idName] : null;
-                return pk;
-            },
-
-            /**
-             * 预处理数据
-             * @param result
-             */
-            beforeDataHandler: function (result) {
-                this.pageResult = result;
-                if (this.nopageMode) {
-                    this.selectItems = [];
-                }
-                this.pageSelectNum = [];
-                this.$emit('uitable.dataSuccess', result);
-            },
-
-            /**
-             * 预处理完以后
-             * @param result
-             */
-            afterDataHandler: function (result) {
-                if ($.fn.uniform) {
-                    this.element.find('input[type=checkbox]').uniform();
-                }
-
-                var sn = 0,
-                    trs = this.element.find('tr:gt(0)');
-                $.each(this.pageSelectNum, function (i, isSelect) {
-                    if (isSelect) {
-                        sn++;
-                        //$(trs[i]).addClass('selected');
-                    }
-                });
-
-                this.scope.$broadcast('uitable.selectAllChecked', this.pageResult.aaData && sn == this.pageResult.aaData.length && sn != 0);
-                this.$emit('uitable.renderSuccess', result);
-            },
-
-            /**
-             * 数据获取报错
-             * @param json
-             */
-            errorDataHandler: function (json) {
-                this.$emit('uitable.dataFail', json);
-            },
-
-            /**
-             * 刷新
-             * @param params
-             * @param url
-             */
-            refresh: function (params, url) {
-                this.searchParams = params || this.searchParams;
-                this.url = url || this.url;
-                this.instance.fnPageChange(this.getCurrentPage() - 1);
-                this.$emit('uitable.refreshData');
-            },
-
-            /**
-             * 跳转
-             * @param index
-             */
-            jumpTo: function (index) {
-                if (/^\d+$/.test(index)) {
-                    index = parseInt(index) - 1;
-                }
-                else if (index == undefined) {
-                    index = this.getCurrentPage() - 1;
-                }
-                this.instance.fnPageChange(index != undefined ? Math.abs(index) : "first");
-                this.$emit('uitable.refreshData');
-            },
-
-            /**
-             * 获取当前页
-             * @returns {null}
-             */
-            getCurrentPage: function () {
-                var setting = this.instance.fnSettings();
-                return Math.ceil(setting._iDisplayStart / setting._iDisplayLength) + 1;
-            },
-
-            /**
-             * 查询, 设置条件, 返回第一页, 当查询的时候要去除所有选中的项目
-             * @param params
-             * @param url
-             */
-            search: function (params, url) {
-                this.$emit('uitable.beforeSearch');
-                this.selectItems = [];
-                this.selectValues = [];
-                this.searchParams = params || this.searchParams;
-                this.url = url || this.url;
-                this.jumpTo(1);
-            },
-
-            /**
-             *
-             */
-            items: function (items, idName) {
-                idName = idName || this.idName;
-                var self = this;
-                this.selectItems = items;
-                this.selectValues = $.map(this.selectItems, function (selectItem) {
-                    var pk = selectItem[idName],
-                        $cDom = self.element.find('[pk="' + pk + '"]').attr('checked', true);
-                    return pk;
-                });
-            },
-
-            /**
-             * 清空所有选中的行
-             * @param isAll true是所有选中的包括跨页, false是当前页面所有选中的
-             */
-            cleanSelect: function (isAll) {
-                if (isAll) {
-                    this.selectItems = [];
-                    this.selectValues = [];
-                }
-                else {
-                    this.selectAllHandler(false);
-                }
-            },
-
-            /**
-             * 全选
-             * @param isChecked
-             * @param idName
-             */
-            selectAllHandler: function (isChecked, idName) {
-                idName = idName || this.idName;
-                var pageDatas = this.pageResult.aaData || [],
-                    call = function () {
-                        if (isChecked) {
-                            //this.element.find('tr:gt(0)').addClass('selected');
-                            this.selectItems = this.selectItems.concat($.grep(pageDatas, function (data) {
-                                return !this.containItem(data);
-                            }.bind(this)));
-                        }
-                        else {
-                            //this.element.find('tr:gt(0)').removeClass('selected');
-                            this.selectItems = $.grep(this.selectItems, function (item) {
-                                for (var i = 0; i < pageDatas.length; i++) {
-                                    if (pageDatas[i][this.idName] == item[this.idName]) {
-                                        return false;
-                                    }
-                                }
-                                return true;
-                            }.bind(this));
-                        }
-                        this.selectValues = $.map(this.selectItems, function (selectItem) {
-                            return selectItem[idName];
-                        });
-                        this.scope.$broadcast('uitable.selectAll', isChecked);
-                    }.bind(this);
-                if (!this.scope.$$phase) {
-                    this.scope.$apply(call);
-                }
-                else {
-                    call();
-                }
-            },
-
-            /**
-             * 单选
-             * @param isChecked
-             * @param idName
-             * @param rowData
-             */
-            selectOneHandler: function (isChecked, idName, rowData) {
-                idName = idName || this.idName;
-                this.scope.$apply(function () {
-                    if (isChecked) {
-                        this.selectItems.push(rowData);
-                        this.selectValues.push(rowData[idName]);
-                    }
-                    else {
-                        for (var i = 0, item; item = this.selectItems[i]; i++) {
-                            if (item[idName] == rowData[idName]) {
-                                this.selectItems.splice(i, 1);
-                                this.selectValues.splice(i, 1);
-                                break;
-                            }
-                        }
-                    }
-                    this.scope.$broadcast('uitable.selectAllChecked', this.selectItems.length == this.pageResult.aaData.length && this.selectItems.length != 0);
-                }.bind(this));
-            },
-
-            /**
-             * 清空状态
-             */
-            cleanState: function () {
-                if (this.attrs.stateKey) {
-                    ajax.post('/dataTable/stateClean', {sStateKey: this.attrs.stateKey}).then(function () {
-                        m.success("表格缓存信息更新成功！");
-                        setTimeout('window.location.href = window.location.href;', 1000);
-                    });
-                } else {
-                    m.error("该表格没有设置缓存！");
-                }
-            }
-        };
-
-        /**
-         *
-         */
-        return function (scope, element, attrs) {
-            return new Table(scope, element, attrs);
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTable', function (uiTableFactory, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-
-            compile: function () {
-                var uiTable = null;
-                return {
-                    pre: function (scope, element, attrs) {
-                        var ref = attrs.ref || '$table';
-                        uiTable = uiTableFactory(scope, element, attrs);
-                        scope[ref] = uiTable;
-                        componentHelper.tiggerComplete(scope, ref, uiTable);
-                    },
-                    post: function () {
-                        uiTable.initTable();
-                    }
-                };
-            },
-            templateUrl: 'tpl.table'
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .provider('uiTableDelegate', function () {
-
-        return {
-            $get: function (util, ajax, logger) {
-                return function (table, element, attrs, columns) {
-                    var sStateKey = attrs.stateKey,  //属性state-key  需要唯一设计，每张表都要设置没有默认值，建议url以"_"分割，不要过长
-                        sQuerySortStr = "", //查询出的排序字符串字段
-                        instance = $(element.find('table')).dataTable({
-                            "bDestroy": true,
-                            "sDom": "<'table-scrollable't><'row'<'col-md-3 col-sm-12'li>r<'col-md-7 col-sm-12'p>>", // defaukt datatable without  horizobtal scroll
-                            "bPaginate": attrs.nopage === undefined,
-                            "bLengthChange": true,
-                            "bFilter": false,
-                            "bSort": true,
-                            "bInfo": attrs.nopage === undefined,
-                            "bAutoWidth": false,
-                            "bStateSave": true,//保存条件等状态在cookie里
-                            "aoColumns": columns,
-                            "aaSorting": util.toJSON(attrs.sort || '[]'),
-                            'fnInitComplete': function () {
-                                if (attrs.nopage != undefined) {
-                                    return;
-                                }
-                                try {
-                                    var $div = this.parent().parent().find('div.row'),
-                                        $form = $([
-                                            '<div class="col-md-2">',
-                                            '<div class="input-group">',
-                                            '<input type="text" class="form-control" placeholder="跳转页数">',
-                                            '<span class="input-group-btn">',
-                                            '<a href="javascript:;" class="btn green" style="font-size: 12px;">Go</a>',
-                                            '</span>',
-                                            '</div>',
-                                            '</div>'
-                                        ].join('')),
-                                        handler = function () {
-                                            var val = $input.val();
-                                            if (/\d+/.test(val)) {
-                                                table.jumpTo(val);
-                                            }
-                                            else {
-                                                $input.val('');
-                                            }
-                                        },
-                                        $btn = $form.find('a'),
-                                        $input = $form.find('input');
-                                    //
-                                    $div.append($form);
-
-                                    //
-                                    $btn.click(handler);
-                                    $(document).keydown(function (evt) {
-                                        if (evt.keyCode == 13) {
-                                            handler();
-                                        }
-                                        evt.stopImmediatePropagation();
-                                    });
-                                }
-                                catch (e) {
-                                    logger.error(e);
-                                }
-                            },
-                            "fnServerData": function (sSource, aoData, fnCallback) {
-                                if ((!attrs.url && !table.url) || attrs.manual != undefined) {
-                                    delete attrs.manual;
-                                    fnCallback({aaData: [], iTotalRecords: 0, iTotalDisplayRecords: 0});
-                                    return;
-                                }
-
-                                //请求参数
-                                var url = table.url || attrs.url;
-
-                                //
-                                if (table.searchParams) {
-                                    var s = [];
-                                    if ($.isArray(table.searchParams)) {
-                                        s = table.searchParams;
-                                    }
-                                    else {
-                                        $.each(table.searchParams, function (k, v) {
-                                            s.push({name: k, value: v});
-                                        });
-                                    }
-                                    aoData = aoData.concat(s);
-                                }
-
-                                //
-                                ajax.post(url, aoData)
-                                    .then(function (result) {
-                                        if ($.isArray(result)) {
-                                            result = {
-                                                aaData: result,
-                                                iTotalDisplayRecords: result.length,
-                                                iTotalRecords: result.length
-                                            };
-                                        }
-                                        else if(attrs.nameData && attrs.nameTotal){
-                                            result = {
-                                                aaData: result[attrs.nameData],
-                                                iTotalDisplayRecords: result[attrs.nameTotal],
-                                                iTotalRecords: result[attrs.nameTotal]
-                                            };
-                                        }
-                                        table.beforeDataHandler(result);
-                                        fnCallback(result);
-                                        table.afterDataHandler(result);
-                                    }, function (json) {
-                                        table.errorDataHandler(json);
-                                    })
-                                    .finally(function (json) {
-                                        table.$emit('uitable.requestComplete');
-                                    });
-                            },
-                            "fnStateLoadParams": function (oSettings, oData) {
-                            },
-                            "fnStateLoad": function (oSettings, oData) {
-                                var r = undefined;
-                                if (typeof (sStateKey) != 'undefined' && sStateKey.length > 0) {
-                                    $.ajax({
-                                        url: '/dataTable/stateLoad',
-                                        data: {sStateKey: sStateKey},
-                                        type: 'POST',
-                                        dataType: 'json',
-                                        cache: false,
-                                        async: false,
-                                        timeout: 1000,
-                                        success: function (json) {
-                                            if (json.result == 'ok' && json.data != null && json.data != '') {
-                                                r = json.data;
-                                                sQuerySortStr = r.aaSorting.toString() + r.abVisCols.toString() + r.iLength;
-                                            }
-                                        }
-                                    });
-                                }
-                                return r;
-                            },
-                            "fnStateSaveParams": function (oSettings, oData) {
-                                if (typeof (sStateKey) != 'undefined' && sStateKey.length > 0) {
-                                    oData.sStateKey = sStateKey;
-                                    oData.oSearch = "";
-                                    oData.aoSearchCols = "";
-                                    oData.iStart = 0;
-                                }
-                            },
-                            "fnStateSave": function (oSettings, oData) {
-                                if (typeof (sStateKey) != 'undefined' && sStateKey.length > 0) {
-                                    var sNowSortStr = oData.aaSorting.toString() + oData.abVisCols.toString() + oData.iLength;
-                                    if (sQuerySortStr != sNowSortStr) {
-                                        ajax.post('/dataTable/stateSave', {data: JSON.stringify(oData)}).then(function () {
-                                            sQuerySortStr = sNowSortStr;
-                                        });
-                                    }
-                                }
-                            },
-                            "oLanguage": {
-                                "sProcessing": '<img src="http://7xi8np.com1.z0.glb.clouddn.com/assets/img/loading-spinner-grey.gif"/><span>&nbsp;&nbsp;正在查询.. .</span>',
-                                "sLengthMenu": "每页显示 _MENU_ 条",
-                                "sZeroRecords": "请选择条件后，点击搜索按钮开始搜索",
-                                "sInfo": "<label>当前第 _START_ - _END_ 条　共计 _TOTAL_ 条</label>",
-                                "sInfoEmpty": "没有符合条件的记录",
-                                "sInfoFiltered": "(从 _MAX_ 条记录中过滤)",
-                                "sSearch": "查询",
-                                "oPaginate": {
-                                    "sFirst": "首页",
-                                    "sPrevious": "上一页",
-                                    "sNext": "下一页",
-                                    "sLast": "尾页"
-                                }
-                            },
-                            "sPaginationType": "bootstrap_full_number",
-                            "aLengthMenu": [
-                                [10, 20, 30, 60],
-                                [10, 20, 30, 60]
-                            ],
-                            "bProcessing": true,
-                            "bServerSide": true
-                        });
-                    return instance;
-                };
-            }
-        };
-    });
-//------------------------------------------------------
-//
-//
-// 依赖 qm.table.js
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('uiTableToolBarFactory', function (msg, ajax, $injector) {
-        var m = new msg('TableToolBar'),
-            TableToolBar = function ($scope, tableId, $element, $attrs) {
-                this.scope = $scope;
-                this.element = $element;
-                this.tableId = tableId;
-                this.attrs = $attrs;
-                this.blank = ',' + ($attrs.blank || '') + ',';
-                this.isEdit = false;
-                this.editText = '开启';
-            };
-        TableToolBar.prototype = {
-            isShow: function (index, columnConfig) {
-                return this.blank.indexOf(',' + index + ',') == -1 && !columnConfig.bChecked;
-            },
-            toggleColumn: function (evt, column) {
-                column.bVisible = !column.bVisible;
-                if (this.scope[this.tableId]) {
-                    this.scope[this.tableId].instance.fnSetColumnVis(column.mIndex, column.bVisible, false);
-                }
-                evt.stopPropagation();
-            },
-            toggleEdit: function () {
-                this.isEdit = !this.isEdit;
-                this.editText = this.isEdit ? '关闭' : '开启';
-                this.scope[this.tableId].toggleEdit(this.isEdit);
-            },
-            getHideBeforeIndex: function (index) {
-                var css = this.instance.fnSettings().aoColumns;
-                var num = 0;
-                for (var i = 0; i < index; i++) {
-                    if (css[i].bVisible)
-                        num++;
-                }
-                return num;
-            },
-            doAddItem: function () {
-                if (this.scope.addItem) {
-                    this.scope.addItem();
-                }
-                else {
-                    if (this.attrs.add) {
-                        $injector.get('$state').go(this.attrs.add);
-                    }
-                    else {
-                        m.error('点击添加数据按钮，但是没有设置地址, 请在add="地址"');
-                    }
-                }
-            },
-            doDelItem: function (values) {
-                if (this.scope.delItem) {
-                    this.scope.delItem(values);
-                }
-                else {
-                    if (this.attrs.del) {
-                        if (values.length > 1) {
-                            ajax.remove(this.attrs.del, {ids: values.join(',')}).then(function () {
-                                this.scope[this.tableId].refresh();
-                            }.bind(this));
-                        }
-                        else {
-                            ajax.remove(this.attrs.del + '/' + values[0]).then(function () {
-                                this.scope[this.tableId].refresh();
-                            }.bind(this));
-                        }
-                    }
-                    else {
-                        m.error('点击删除数据按钮，但是没有设置地址, 请在del="地址"');
-                    }
-                }
-            }
-        };
-        return function ($scope, tableId, $element, $attrs) {
-            return new TableToolBar($scope, tableId, $element, $attrs);
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiToolBarTable', function (uiTableToolBarFactory, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: function (scope, element, attrs) {
-                //
-                element.find('[data-hover="dropdown"]').dropdownHover();
-
-                //
-                var tableRef = componentHelper.getComponentRef(element.parent().find('.ui-table'), '$table'),
-                    ref = attrs.ref || '$tableToolBar',
-                    toolbar = uiTableToolBarFactory(scope, tableRef, element, attrs);
-                scope[ref] = toolbar;
-                componentHelper.tiggerComplete(scope, ref, toolbar);
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.toolbar.table', {
-                    editable: attrs.editable != undefined,
-                    add: attrs.add != undefined,
-                    del: attrs.del != undefined,
-                    table: componentHelper.getComponentRef(element.parent().find('ui-table'), '$table'),
-                    ref: componentHelper.getComponentRef(element, '$tableToolBar'),
-                    tip: attrs.tip || '数据',
-                    deltip: attrs.deltip || '删除'
-                });
-            }
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('tooltip', function () {
-        return {
-            restrict: 'A',
-            replace: false,
-            link: function (scope, element, attrs) {
-                var content = attrs.tooltip,
-                    title = attrs.title,
-                    placement = attrs.placement || (title ? 'right' : 'top');
-
-                //如果有标题有内容, 那么使用popup over
-                if (title) {
-                    element.popover({
-                        title: title,
-                        content: content,
-                        placement: placement,
-                        trigger: 'hover'
-                    });
-                }
-                //否则使用tooltip
-                else {
-                    element.tooltip({
-                        title: content,
-                        placement: placement
-                    });
-                }
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .factory('uiTreeFactory', function (ajax, uiTreeConfig, uiRegionHelper, logger, util, msg, Event) {
-        var m = new msg('Tree'),
-            Tree = function (scope, element, attrs) {
-                Event.call(this);
-                this.scope = scope;
-                this.element = element;
-                this.attrs = attrs;
-                this.instance = null;
-                this.selectItems = [];
-                this.selectValues = [];
-                this.treeNodeBtns = [];
-                this.searchModel = attrs.searchModel;
-                this.searchMode = attrs.searchMode;
-                this.checkedValues = (attrs.setCheck || '').split(',');
-                this.init();
-            };
-
-        //
-        Tree.prototype = {
-
-            /**
-             *
-             */
-            init: function () {
-                if (this.attrs.region != undefined) { //是否是树形区域
-                    uiRegionHelper.getDataList(this.attrs.region || 's').then(function (r) {
-                        this.setData(r);
-                    }.bind(this));
-                }
-                else if (this.attrs.url) {
-                    ajax.post(this.attrs.url).then(function (r) {
-                        this.setData(r);
-                    }.bind(this));
-                }
-                else {
-                    //說明是手動拉
-                }
-
-                //
-                if (this.attrs.onAdd != undefined) {
-                    this.addTreeNodeBtn('新增', 'add', this.onTreeNodeAddClickHandler.bind(this));
-                }
-                if (this.attrs.onEdit != undefined) {
-                    this.addTreeNodeBtn('编辑', 'edit', this.onTreeNodeEditClickHandler.bind(this));
-                }
-                if (this.attrs.onDel != undefined) {
-                    this.addTreeNodeBtn('删除', 'remove', this.onTreeNodeDelClickHandler.bind(this));
-                }
-
-                //
-                if (this.searchModel) {
-                    var self = this;
-                    this.scope.$watch(this.searchModel, function (nv) {
-                        if (nv != undefined) {
-                            self.filter(nv);
-                        }
-                    });
-                }
-            },
-
-            /**
-             *
-             */
-            refresh: function (params, url) {
-                url = url || this.attrs.url;
-                if (url) {
-                    return ajax.post(url, params || {}).then(function (r) {
-                        this.setData(r);
-                    }.bind(this));
-                }
-                else {
-                    m.error('未设置url, 无法请求');
-                }
-            },
-
-            /**
-             *
-             */
-            filter: function (filterText) {
-                if (!this.dataList) //没数据, 玩个毛~
-                    return;
-                var searchList = this.dataList;
-                if (filterText) {
-                    filterText = filterText.toLowerCase();
-                    var self = this;
-                    searchList = [];
-                    $.each(this.dataList, function (dataIndex, data) {
-                        if (data.name.toLowerCase().indexOf(filterText) != -1) {
-                            searchList = searchList.concat(self.getHierarchyDataById(data.id));
-                        }
-                    });
-                    var r = [],
-                        m = {};
-                    $.each(searchList, function (index, data) {
-                        if (!m[data.id]) {
-                            r.push(data);
-                        }
-                        m[data.id] = data;
-                    });
-                    searchList = r;
-                }
-                this.setData(searchList, null, true);
-                this.expandAll(true);
-            },
-
-            /**
-             *
-             * @param label
-             * @param className
-             * @param handler
-             */
-            addTreeNodeBtn: function (label, className, handler) {
-                this.addTreeNodeBtnAtIndex(this.treeNodeBtns.length, label, className, handler);
-            },
-
-            /**
-             *
-             * @param label
-             * @param className
-             * @param handler
-             */
-            addTreeNodeBtnAtIndex: function (index, label, className, handler) {
-                this.treeNodeBtns.splice(index, 0, {
-                    label: label,
-                    className: className,
-                    handler: handler
-                });
-            },
-
-            /**
-             *
-             */
-            onTreeNodeAddClickHandler: function (treeNode) {
-                var handlerName = this.attrs.onAdd;
-                if (handlerName && this.scope[handlerName]) {
-                    this.scope[handlerName](treeNode);
-                }
-                else {
-                    m.error('设置了on-add, 但是未发现处理函数');
-                }
-            },
-
-            /**
-             *
-             */
-            onTreeNodeDelClickHandler: function (treeNode) {
-                var handlerName = this.attrs.onDel;
-                if (handlerName && this.scope[handlerName]) {
-                    this.scope[handlerName](treeNode);
-                }
-                else {
-                    m.error('设置了on-del, 但是未发现处理函数');
-                }
-            },
-
-            /**
-             *
-             */
-            onTreeNodeEditClickHandler: function (treeNode) {
-                var handlerName = this.attrs.onEdit;
-                if (handlerName && this.scope[handlerName]) {
-                    this.scope[handlerName](treeNode);
-                }
-                else {
-                    m.error('设置了on-edit, 但是未发现处理函数');
-                }
-            },
-
-            /**
-             *
-             */
-            setData: function (resData, pid, isFilter) {
-                //
-                resData = resData.menuTreeList || resData || [];
-                if (!!!isFilter) {
-                    this.dataList = resData;
-                    this.dataMap = {};
-                    $.each(resData, function (nn, data) {
-                        this.dataMap[data.id] = data;
-                    }.bind(this));
-                }
-                if (this.attrs.root != undefined) {
-                    var rootLabel = this.attrs.root || '根目录',
-                        rootId = this.attrs.rootId || '0';
-                    resData.push({"id": rootId, "open": "true", "pid": null, "name": rootLabel, "type": "1"});
-                }
-
-                //
-                this.$emit('dataSuccess', resData);
-
-                //
-                this.instance = $.fn.zTree.init(this.element, uiTreeConfig(this), resData);
-                this.expand(pid);
-                if (this.checkedValues) {
-                    this.checked(this.checkedValues);
-                }
-                var r = $.grep(resData, function (data) {
-                    return data.checked + '' == 'true';
-                });
-                this.item(this.selectItems.concat(r));
-            },
-
-            /**
-             * 获取层级关系
-             */
-            getHierarchyById: function (id) {
-                var r = [],
-                    node = this.getById(id);
-                if (node) {
-                    r.push(node);
-                    while (node = node.getParentNode()) {
-                        r.unshift(node);
-                    }
-                }
-                return r;
-            },
-
-            /**
-             *
-             * @param id
-             */
-            getHierarchyDataById: function (id) {
-                var r = [],
-                    node = this.getDataById(id);
-                if (node) {
-                    r.push(node);
-                    while (node = this.getDataById(node.pid)) {
-                        r.unshift(node);
-                    }
-                }
-                return r;
-            },
-
-            /**
-             *
-             * @param id
-             * @returns {*}
-             */
-            getById: function (id) {
-                return this.instance.getNodeByParam('id', id);
-            },
-
-            /**
-             *
-             */
-            getDataById: function (id) {
-                return this.dataMap[id];
-            },
-
-            /**
-             * 展开
-             * @param pid
-             */
-            expand: function (level) {
-                level = level || this.attrs.expand;
-                if (level == 'all') {
-                    this.expandAll(true);
-                    return;
-                }
-                if (level == undefined) {
-                    return;
-                }
-                var instance = this.instance,
-                    root = instance.getNodes()[0],
-                    expandInternal = function (n, l) {
-                        if (n && n.children && l-- > 1) {
-                            for (var i = 0; i < n.children.length; i++) {
-                                instance.expandNode(n.children[i], true, false, false); //打开下级
-                                expandInternal(n.children[i], l);
-                            }
-                        }
-                    };
-
-                if (level == 1) { //只打开自己
-                    instance.expandNode(root, true, false, false);
-                }
-                else {
-                    expandInternal(root, level);
-                }
-            },
-
-            /**
-             *
-             */
-            expandAll: function (isExpand) {
-                this.instance.expandAll(isExpand);
-            },
-
-            /**
-             *
-             * @param id
-             */
-            expandById: function (id) {
-                var findNodes = this.getById(id);
-                if (findNodes) {
-                    this.instance.expandNode(findNodes, true, false, false);
-                }
-                else {
-                    m.error('未找到id为[' + id + ']的节点, 无法展开');
-                }
-            },
-
-            /**
-             *
-             * @param cs
-             */
-            checked: function (cs, isClean) {
-                if (isClean) {
-                    this.selectItems = [];
-                    this.selectValues = [];
-                }
-                var r = [];
-                for (var i = 0, c; i < cs.length; i++) {
-                    c = cs[i];
-                    if (c) {
-                        var node = this.instance.getNodeByParam("id", c, null);
-                        if (node) {
-                            this.instance.checkNode(node, true, true);
-                            r.push(node);
-                        }
-                    }
-                }
-                this.item(r);
-            },
-
-            /**
-             *
-             */
-            item: function (item) {
-                if (item) {
-                    this.selectItems = item;
-                    this.selectValues = $.map(this.selectItems, function (item) {
-                        return item.id;
-                    });
-                }
-                else {
-                    return this.selectItems;
-                }
-            },
-
-            /**
-             *
-             */
-            val: function () {
-                //NOT SUPPORTED
-            },
-
-            /**
-             *  清空选中
-             */
-            cleanChecked: function () {
-                var self = this;
-                $.each(this.selectItems, function (i, selectItem) {
-                    var node = self.instance.getNodeByParam("id", selectItem.id, null);
-                    self.instance.checkNode(node, false, true);
-                });
-            },
-
-            /**
-             * 设置选中的数据
-             * @param data
-             */
-            setSelectData: function (data) {
-                this.selectItems = data;
-                this.selectValues = $.map(this.selectItems, function (item) {
-                    return item.id;
-                });
-            }
-        };
-        return function (scope, element, attrs) {
-            return new Tree(scope, element, attrs);
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTree', function (uiTreeFactory, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: function (scope, element, attrs) {
-                var uiTree = uiTreeFactory(scope, element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$tree', uiTree);
-            },
-            template: function (element, attrs) {
-                attrs.treeId = new Date().getTime();
-                return '<ul id="tree' + attrs.treeId + '" class="ztree" style="width:100%; overflow:auto;"></ul>';
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .provider('uiTreeConfig', function () {
-
-        var defaultConfig = {
-            check: {enable: true},
-            edit: {enable: false},
-            data: {
-                key: {name: "name", childs: "childs", title: "name"},
-                simpleData: {enable: true, idKey: "id", pIdKey: "pid", rootPId: "0"}
-            },
-            view: {addHoverDom: null, removeHoverDom: null},
-            callback: {beforeClick: null, onClick: null, onCheck: null}
-        };
-
-        var defaultBtnBuilder = function (treeNodeBtnClass, treeNode) {
-            var $span = $("#" + treeNode.tId + "_span");
-            var $spanBtn = $("<span class='button'></span>").addClass(treeNodeBtnClass.className).attr('title', treeNodeBtnClass.label).click(function (evt) {
-                treeNodeBtnClass.handler(treeNode);
-                evt.stopPropagation();
-            });
-            $span.append($spanBtn);
-            return {
-                show: function () {
-                    $spanBtn.show();
-                },
-                hide: function () {
-                    $spanBtn.hide();
-                }
-            };
-        };
-
-
-        var Config = function (tree) {
-            $.extend(this, defaultConfig);
-            this.tree = tree;
-
-            //
-            this.check.enable = tree.attrs.check != 'false';
-            this.edit.enable = tree.attrs.edit == 'true';
-
-            //
-            this.callback = {
-                beforeClick: this.call.bind(this, 'onBeforeClick'),
-                onClick: this.call.bind(this, 'onClick'),
-                beforeCheck: this.call.bind(this, 'onBeforeCheck'),
-                onCheck: this.onCheck.bind(this)
-            };
-
-            this.view = {
-                addHoverDom: this.onMouseEnterHandler.bind(this),
-                removeHoverDom: this.onMouseLeaveHandler.bind(this)
-            };
-
-            this.treeNodeBtnMap = {};
-        };
-        Config.prototype = {
-
-            /**
-             *
-             * @param treeId
-             * @param treeNode
-             */
-            onMouseEnterHandler: function (treeId, treeNode) {
-                this.treeNodeBtnMap[treeNode.id] = this.treeNodeBtnMap[treeNode.id] || {};
-                var treeNodeBtnInstances = this.treeNodeBtnMap[treeNode.id],  //所有这个treenode实例
-                    treeNodeBtnClasses = this.tree.treeNodeBtns;  //这个tree正对treenode可以创建的扩展按钮
-                $.each(treeNodeBtnClasses, function (index, treeNodeBtnClass) { //遍历, 如果创建过了就显示，没创建过就创建
-                    var treeNodeBtnInstance = treeNodeBtnInstances[treeNodeBtnClass.label];
-                    if (!treeNodeBtnInstance) {
-                        treeNodeBtnInstance = defaultBtnBuilder(treeNodeBtnClass, treeNode);
-                        treeNodeBtnInstances[treeNodeBtnClass.label] = treeNodeBtnInstance;
-                    }
-                    treeNodeBtnInstance.show();
-                });
-            },
-
-            /**
-             *
-             * @param treeId
-             * @param treeNode
-             */
-            onMouseLeaveHandler: function (treeId, treeNode) {
-                $.each(this.treeNodeBtnMap[treeNode.id] || {}, function (index, treeNodeBtnInstance) {
-                    treeNodeBtnInstance.hide();
-                });
-            },
-
-            onCheck: function (evt, id, nodeData) {
-                var selectDatas = this.tree.instance.getCheckedNodes(true);
-                this.tree.setSelectData(selectDatas);
-                this.call('onCheck', ['', evt, id, nodeData]);
-            },
-
-            call: function (attrName) {
-                var args = arguments,
-                    bc = this.tree.attrs[attrName],
-                    scope = this.tree.scope;
-                if (bc) {
-
-                    args = Array.prototype.slice.call(args, 1);
-                    var r = scope[bc].apply(scope, args);
-                    try{ scope.$apply(); } catch(e){ }
-                    return r;
-                }
-                else {
-                    return true;
-                }
-            }
-        };
-
-
-        return {
-
-            /**
-             * 提供给设置配置
-             * @param config
-             */
-            setConfig: function (config) {
-                defaultConfig = $.extend(defaultConfig, config);
-            },
-
-            $get: function () {
-                return function (tree) {
-                    return new Config(tree);
-                };
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTreeRegion', function (uiTreeFactory, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: function (scope, element, attrs) {
-                attrs.region = attrs.mode || 's';
-                var uiTree = uiTreeFactory(scope, element, attrs);
-                componentHelper.tiggerComplete(scope, attrs.ref || '$treeRegion', uiTree);
-            },
-            template: function (element, attrs) {
-                attrs.treeId = new Date().getTime();
-                return '<ul id="tree' + attrs.treeId + '" class="ztree" style="width:100%; overflow:auto;"></ul>';
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-(function ($) {
-    angular.module('admin.template', []);
-})(jQuery);
-
-(function ($) {
-    angular.module('admin.template')
-        .run(function(componentHelper){
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.button.state', '<button type="button" class="btn" ng-transclude></button>');
-
-        });
-})(jQuery);
-(function ($) {
-    angular.module('admin.template')
-        .run(function(componentHelper){
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.chart.line', [
-                '<div class="" type="line">',
-                    '<div></div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.chart.column', [
-                '<div class="" type="column">',
-                    '<div></div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.chart.pie', [
-                '<div class="" type="pie">',
-                    '<div></div>',
-                '</div>'
-            ].join(''));
-        });
-})(jQuery);
-
-(function ($) {
-    angular.module('admin.template')
-        .run(function(componentHelper){
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.form', [
-                '<form action="#" class="form-horizontal">',
-                    '<div class="form-body">',
-                    '</div>',
-                '</form>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.form.input', [
-                '<div class="form-group">',
-                    '<label class="col-md-{{{leftCol}}} control-label">{{{label}}}</label>',
-                    '<div class="col-md-{{rightCol}}">',
-                        '<input {{#if type}}type="{{type}}"{{else}}type="text"{{/if}} class="form-control" name="{{name}}" placeholder="{{placeholder}}"  {{#if value}}value="{{value}}"{{/if}} {{#if readonly}}readonly="{{readonly}}"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}}/>',
-                        '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.form.input.daterange', [
-                '<div class="form-group">',
-                    '<label class="col-md-{{leftCol}} control-label">{{{label}}}</label>',
-                    '<div class="col-md-{{rightCol}}">',
-                        '<div class="input-date-range input-inline">',
-                            '<div class="input-group">',
-                                '<input type="text" class="form-control" name="{{fromName}}" {{#if fromModel}}ng-model="{{fromModel}}"{{/if}} {{#if fromValue}}value="{{fromValue}}"{{/if}} readonly>',
-                                '<span class="input-group-addon">至</span>',
-                                '<input type="text" class="form-control" name="{{toName}}" {{#if toModel}}ng-model="{{toModel}}"{{/if}} {{#if toValue}}value="{{toValue}}"{{/if}} readonly>',
-                            '</div>',
-                        '</div>',
-                        '{{#if help}}<span class="help-block">{{{help}}}</span>{{/if}}',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.form.select', [
-                '<div class="form-group" {{#if isMulti}}is-multi="true"{{/if}}>',
-                    '<label class="col-md-{{leftCol}} control-label">{{{label}}}</label>',
-                    '<div class="col-md-{{rightCol}}">',
-                        '<select class="form-control" {{#if buttonClass}}data-style="{{buttonClass}}"{{/if}} name="{{name}}" placeholder="{{placeholder}}" {{#if disabled}}disabled="disabled"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}} ng-transclude></select>',
-                        '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.form.item', [
-                '<div class="form-group">',
-                    '<label class="col-md-{{leftCol}} control-label">{{{label}}}</label>',
-                    '<div class="col-md-{{rightCol}}">',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.form.region', [
-                '<div class="form-group">',
-                     '<label class="col-md-{{leftCol}} control-label">{{{label}}}</label>',
-                     '<div class="col-md-{{rightCol}}">',
-                        '<input type="hidden" {{#if model}}ng-value="{{model}}"{{/if}} {{#if sName}}name="{{sName}}"{{/if}}  {{#if value}}value="{{value}}"{{/if}}/>',
-                        '<input type="text" class="input-small form-control input-inline" name="province"/>',
-                        '<input type="text" class="input-small form-control input-inline" name="city"/>',
-                        '<input type="text" class="input-small form-control input-inline" name="area"/>',
-                        '<input type="text" class="input-xsmall form-control input-inline" {{#if aName}}name="{{aName}}"{{/if}}/>',
-                        '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.form.textarea', [
-                '<div class="form-group">',
-                    '<label class="control-label col-md-{{leftCol}}">{{{label}}}</label>',
-                    '<div class="col-md-{{rightCol}}">',
-                        '<textarea {{#if rows}}rows="{{rows}}"{{/if}} {{#if style}}style="{{style}}"{{/if}} {{#if cols}}cols="{{cols}}"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#if name}}name="{{name}}"{{/if}} class="form-control"></textarea>',
-                        '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.form.switch', [
-                '<div class="form-group">',
-                    '<label class="control-label col-md-{{leftCol}}">{{{label}}}</label>',
-                    '<div class="col-md-{{rightCol}}">',
-                         '<input type="checkbox"  {{#if disabled}}disabled="{{disabled}}"{{/if}} {{#if value}}value="{{value}}"{{/if}} {{#if name}}name="{{name}}"{{/if}} {{#if onText}}data-on-text="{{onText}}"{{/if}}  {{#if offText}}data-off-text="{{offText}}"{{/if}}/>',
-                         '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.form.spinner', [
-                '<div class="form-group">',
-                    '<label class="control-label col-md-{{leftCol}}">{{{label}}}</label>',
-                    '<div class="col-md-{{rightCol}}">',
-                        '<div class="input-group" style="width:150px;">',
-                            '<div class="spinner-buttons input-group-btn">',
-                                '<button type="button" class="btn spinner-up blue"><i class="fa fa-plus"></i></button>',
-                            '</div>',
-                            '<input type="text" class="spinner-input form-control" {{#if name}}name="{{name}}"{{/if}} {{#if value}}value="{{value}}"{{/if}} readonly>',
-                            '<div class="spinner-buttons input-group-btn">',
-                                '<button type="button" class="btn spinner-down red"><i class="fa fa-minus"></i></button>',
-                            '</div>',
-                        '</div>',
-                        '{{#if help}}<span class="help-block">{{help}}</span>{{/if}}',
-                    '</div>',
-                '</div>'
-            ].join(''));
-        });
-})(jQuery);
-(function ($) {
-    angular.module('admin.template')
-        .run(function(componentHelper){
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.menu', [
-                '<div class="page-sidebar-wrapper">',
-                    '<div class="page-sidebar navbar-collapse collapse">',
-                        '<ul class="page-sidebar-menu" ng-transclude></ul>',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-        });
-})(jQuery);
-(function ($) {
-    angular.module('admin.template')
-        .run(function(componentHelper){
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.portal',[
-                '<div class="row ui-sortable">',
-                    '<div class="column sortable col-md-{{eachColumn}}" ng-repeat="column in columns">',
-                        '<ui-portlet-container ng-repeat="portlet in column"></ui-portlet-container>',
-                        '<div class="portlet-container portlet-sortable-empty"></div>',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.portal.portlet.container',[
-                '<div class="portlet-container">',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.portal.portlet',[
-                '<div class="portlet">',
-                    '<div class="portlet-title tabbable-line">',
-                        '<div class="caption"><span class="caption-subject {{captionClass}}">{{title}}</span></div>',
-                    '</div>',
-                    '<div class="portlet-body">',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.portal.portlet.action',[
-                '<div class="actions portlet-tool-bar" ng-transclude>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.portal.portlet.action.pagination',[
-                '<ul class="pagination pagination-circle portlet-tool-bar">',
-                    '<li ng-class="{\'disabled\': isFirst}" ><a href="javascript:;" ng-click="loadFirst()"><i class="fa fa-angle-left"></i></a></li>',
-                    '<li ng-repeat="page in pageList" ng-class="{\'active\': page.current}" ng-click="load(page.index)"><a href="javascript:;" ng-bind="page.index"></a></li>',
-                    '<li ng-class="{\'disabled\': isLast}" ><a href="javascript:;" ng-click="loadLast()"><i class="fa fa-angle-right"></i></a></li>',
-                '</ul>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.portal.portlet.action.search',[
-                '<div class="inputs portlet-tool-bar">',
-                    '<div class="portlet-input input-inline input-small">',
-                        '<div class="input-icon right">',
-                            '<i class="icon-magnifier"></i>',
-                            '<input type="text" {{#if model}}ng-model="{{model}}"{{/if}} class="form-control input-circle" placeholder="查询"/>',
-                        '</div>',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.portal.portlet.action.tab',[
-                '<ul class="nav nav-tabs portlet-tool-bar" ng-transclude>',
-                '</ul>'
-            ].join(''));
-        });
-})(jQuery);
-(function ($) {
-    angular.module('admin.template')
-        .run(function(componentHelper){
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.searchform', [
-                '<form novalidate action="" class="ui-search-form form-inline">',
-                    '<div class="row">',
-                        '<div class="col-md-{{leftCol}}" ng-transclude></div>',
-                        '<div class="text-right col-md-{{rightCol}}">',
-                            '<a title="回车键也可触发搜索" class="btn blue-chambray btn-sm" ng-click="{{ref}}.search()" style="width: 30px"><i class="fa fa-search"></i></button>',
-                            '<a title="重置搜索选项" class="btn default btn-sm" ng-click="{{ref}}.reset()" style="width: 30px"><i class="fa fa-undo font-blue-chambray"></i></a>',
-                        '</div>',
-                    '</div>',
-                '</form>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.searchform.input', [
-                '<div class="input-inline search-item">',
-                    '<div class="input-group">',
-                        '{{#if label}}',
-                            '<div class="input-group-addon">{{label}}:</div>',
-                        '{{/if}}',
-                        '<input class="form-control" name="{{name}}" placeholder="{{placeholder}}" {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}}/>',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.searchform.userselect.input', [
-                '<div class="input-inline search-item">',
-                    '<div class="input-group input-small">',
-                        '{{#if label}}',
-                            '<div class="input-group-addon">{{label}}:</div>',
-                        '{{/if}}',
-                        '<input class="form-control" name="{{name}}" placeholder="{{placeholder}}" {{#if model}}ng-model="{{model}}"{{/if}} {{#each other}}{{key}}="{{val}}"{{/each}}/>',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.searchform.daterange', [
-                '<div class="input-inline search-item input-mlarge">',
-                    '<div class="input-group">',
-                        '<input type="text" readonly class="form-control" name="{{fromName}}" {{#if fromModel}}ng-model="{{fromModel}}"{{/if}}/>',
-                        '<span class="input-group-addon">{{label}}</span>',
-                        '<input type="text" readonly class="form-control" name="{{toName}}" {{#if toModel}}ng-model="{{toModel}}"{{/if}}/>',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.searchform.input.select', [
-                '<div class="input-inline search-item">',
-                    '<div class="input-group">',
-                        '<select class="input-xsmall form-control " {{#if buttonClass}}data-style="{{buttonClass}}"{{/if}} {{#if model}}ng-model="{{model}}"{{/if}} {{#if selectName}}name="{{selectName}}"{{/if}} ng-transclude></select>',
-                        '<input style="left:-1px;" class="form-control input-small pull-right" {{#if inputName}}name="{{inputName}}"{{/if}} placeholder="{{placeholder}}" ng-keydown="onChangeHandler($event)"/>',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.searchform.region', [
-                '<div class="input-inline search-item">',
-                    '<div class="input-group">',
-                        '{{#if label}}<div class="input-group-addon">{{{label}}}:</div>{{/if}}',
-                        '<input type="hidden" {{#if model}}ng-value="{{model}}"{{/if}} {{#if name}}name="{{name}}"{{/if}}  value="{{value}}"/>',
-                        '<input type="text" class="input-small form-control" name="province" />',
-                        '<input type="text" class="input-small form-control" name="city" />',
-                        '<input type="text" class="input-small form-control" name="area" />',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.searchform.select', [
-                '{{#if label}}',
-                    '<div class="input-inline input-medium search-item" {{#if isMulti}}is-multi="true"{{/if}}>',
-                        '<div class="input-group">',
-                            '<div class="input-group-addon">{{label}}:</div>',
-                            '<select class="form-control" {{#if buttonClass}}data-style="{{buttonClass}}"{{/if}} name="{{name}}" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
-                        '</div>',
-                    '</div>',
-                '{{else}}',
-                    '<div class="input-small search-item input-inline" {{#if isMulti}}is-multi="true"{{/if}}>',
-                        '<select name="{{name}}" {{#if buttonClass}}data-style="{{buttonClass}}"{{/if}} class="form-control" {{#if model}}ng-model="{{model}}"{{/if}} ng-transclude {{#each other}}{{key}}="{{val}}"{{/each}}></select>',
-                    '</div>',
-                '{{/if}}'
-            ].join(''));
-        });
-})(jQuery);
-(function ($) {
-    angular.module('admin.template')
-        .run(function(componentHelper){
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.tab', [
-                '<div class="tabbable-custom{{#if close}} tabbable-close{{/if}}">',
-                    '<ul class="nav nav-tabs" ng-transclude>',
-                    '</ul>',
-                    '<div class="tab-content" style="min-height: 100px;">',
-                    '</div>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.tab.item', [
-                '<li>',
-                    '<a href="javascript:;" ng-click="$tabItem.onClickHandler()" ><span>{{{head}}}</span><i class="fa fa-times" ng-click="$tabItem.onRemoveHandler($event)"></i></a>',
-                '</li>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.tab.list.item', [
-                '<li class="dropdown">',
-                    '<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{head}} <i class="fa fa-angle-down"></i></a>',
-                    '<ul class="dropdown-menu" role="menu" ng-transclude>',
-                    '</ul>',
-                '</li>'
-            ].join(''));
-
-        });
-})(jQuery);
-(function ($) {
-    angular.module('admin.template')
-        .run(function(componentHelper){
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.table', [
-                '<div class="ui-table">',
-                    '<table class="table table-striped table-bordered table-hover">',
-                        '<thead>',
-                            '<tr role="row" class="heading" ng-transclude>',
-                            '</tr>',
-                        '</thead>',
-                        '<tbody></tbody>',
-                    '</table>',
-                '</div>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.table.column', [
-                '<th>',
-                    '{{head}}',
-                '</th>'
-            ].join(''));
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.table.column.checked', [
-                '<th>',
-                    '<input type="checkbox" ng-click="onSelectAllHandler($event)"/>',
-                '</th>'
-            ].join(''));
-        });
-})(jQuery);
-(function ($) {
-    angular.module('admin.template')
-        .run(function (componentHelper) {
-
-            /**
-             *
-             */
-            componentHelper.setTemplate('tpl.toolbar.table', [
-                '<div class="ui-toolbar table-toolbar">',
-
-                    '<div class="btn-group pull-left">',
-                        '{{#if editable}}',
-                            '<button type="button" class="btn btn-sm btn-info" ng-click="{{ref}}.toggleEdit()"><i class="fa fa-edit"></i> <span ng-bind="{{ref}}.editText"></span>快速编辑</button>&nbsp;&nbsp;',
-                        '{{/if}}',
-                        '{{#if add}}',
-                            '<button type="button" class="btn btn-sm btn-primary" ng-click="{{ref}}.doAddItem()"><i class="fa fa-plus-circle"></i> 新增{{tip}}</button>&nbsp;&nbsp;',
-                        '{{/if}}',
-                        '{{#if del}}',
-                            '<button type="button" ng-class="{\'btn-danger\': {{table}}.selectValues.length > 0}" class="btn btn-sm" ng-disabled="{{table}}.selectValues.length==0" ng-click="{{ref}}.doDelItem({{table}}.selectValues)"><i class="fa fa-times-circle"></i> {{deltip}}{{tip}}</button>&nbsp;&nbsp;',
-                        '{{/if}}',
-                    '</div>',
-
-                    '<div class="btn-group pull-left" ng-transclude></div>',
-
-                    '<span ng-show="{{table}}.selectValues.length != 0" class="table-toolbar-tip fadeInRight">您已选择 <strong ng-bind="{{table}}.selectValues.length"></strong> 个{{tip}}，支持翻页选择多个{{tip}}。</span>',
-
-                    //uitable column show or hide select area
-                    '<div class="btn-group pull-right">',
-                        '<a class="btn default btn-sm" href="#" data-hover="dropdown"><i class="fa fa-table"></i></a>',
-                        '<div class="dropdown-menu dropdown-checkboxes pull-right">',
-                            '<label ng-repeat="column in {{table}}.columns" ng-if="{{ref}}.isShow($index, column)" style="cursor:pointer" >',
-                                '<div class="checker">',
-                                    '<span ng-class="{checked: column.bVisible}">',
-                                        '<input type="checkbox" ng-click="{{ref}}.toggleColumn($event, column)">',
-                                    '</span>',
-                                '</div>',
-                                '<span ng-bind="column.mTitle"/>',
-                            '</label>',
-                            '<label class="divider"></label>',
-                            '<label style="text-align: center;"><a href="javascript:;" ng-click="{{table}}.cleanState()" class="btn btn-sm green easy-pie-chart-reload"><i class="fa fa-repeat"></i> 恢复默认</a></label>',
-                        ' </div>',
-                    '</div>',
-                    '<div style="clear:both"></div>',
-                '</div>'
-            ].join(''));
-        });
-})(jQuery);
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -7497,7 +3815,7 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 (function () {
-    angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'admin.template'])
+    angular.module('admin', ['admin.service', 'admin.filter', 'admin.component'])
         .config(function(AjaxProvider, MessageProvider)  {
 
             //
@@ -7509,11 +3827,6 @@ angular.module('admin.component')
             //
             // 通知位置
             //
-            MessageProvider.setPostion('bottom', 'right');
+            MessageProvider.setPosition('bottom', 'right');
         });
 })();
-
-//
-if($.fn.modal){
-    $.fn.modal.Constructor.prototype.enforceFocus = function() {};
-}

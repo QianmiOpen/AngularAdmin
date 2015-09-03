@@ -205,5 +205,5 @@
 
 
     angular.module('admin.service')
-        .factory('Shortcut', Shortcut);
+        .factory('ShortcutFactory', Shortcut);
 })();

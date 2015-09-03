@@ -5,7 +5,7 @@
 
     class ValueService {
 
-        constructor($parse) {
+        constrcutor($parse) {
             this.$parse = $parse;
         }
 

@@ -58,6 +58,19 @@
     * dataKeyName, 键的名称
     * dateValueName, 值的名称
     * render, scope里面的方法, 用于美化option
+* ```<ui-form-spinner label="计数器:" model="item.formSpinner" help="醉了6" min="0" max="100" step="5" change="spinnerChangeHandler(val)"></ui-form-spinner>```
+    * min, 最小值
+    * max, 最大值
+    * step, 步数
+    * change 改变以后的回调
+* ```<ui-form-switch label="开关:" model="item.formSwitch" help="醉了6" on-text="男" off-text="女" change="switchChangeHandler(val)"></ui-form-switch>```
+    * on-text, 左边的文字, 默认是开
+    * off-text, 右边的文字, 默认是关
+    * on-value, 左边的文件, 默认是1
+    * off-value, 右边的文字, 默认是0
+* ```<ui-form-tag label="开关:" model="item.formTag" url="/test/remote/select" editable="true" change="tagChangeHandler(val, item, vals, items)"></ui-form-tag>```
+    * url, 远程加载的数据地址
+    * editable, 是否可以按回车自动新增一个, 默认是true
 
 ## 查询
 
