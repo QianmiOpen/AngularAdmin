@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Demo</title>
+    <link rel="stylesheet" href="../output/css/all.css"/>
+    <style type="text/css">
+        .imageSS {
+            border-radius: 40px;
+            width: 80px;
+            height: 80px;;
+        }
+    </style>
+</head>
+<body style="background-color: #fff !important;padding: 10px;" ng-app="admin">
+<ui-container style="display: none" controller="CC">
+    <ui-table>
+        <ui-table-date-column head="日期列" name="date" format="xxxxxx"></ui-table-date-column>
+        <ui-table-image-column head="图片列" image-css="imageSS" name="image" placeholder="xxxxxx"></ui-table-image-column>
+        <ui-table-column head="简单列" name="simple"></ui-table-column>
+        <ui-table-column head="自定义列" name="advance">
+            {{data.simple}}
+        </ui-table-column>
+        <ui-table-progress-column head="进度条列" name="progress"></ui-table-progress-column>
+        <ui-table-state-column head="状态列" name="state" default="0">
+            <span state="0">吃</span>
+            <span state="1">喝</span>
+            <span state="2">玩</span>
+        </ui-table-state-column>
+        <ui-table-operation-column head="操作列"></ui-table-operation-column>
+    </ui-table>
+</ui-container>
+</body>
+<script src="../output/js/lib.js"></script>
+<script src="../output/js/all.js"></script>
+<script src="../output/assets/js/jquery.mockjax.js"></script>
+<script>
+    var remoteSelects = [];
+    for (var i = 0; i < 50; i++) {
+        remoteSelects.push({
+            id: (new Date().getTime() + '').substr(7) + i + 1,
+            name: (new Date().getTime() + '').substr(7) + i
+        });
+    }
+    $.mockjax({
+        url: '/test/remote/select',
+        response: function () {
+            this.responseText = {
+                data: remoteSelects,
+                type: 1
+            }
+        }
+    });
+
+
+    function CC($scope, Message, $timeout) {
+    }
+</script>
+</html>
