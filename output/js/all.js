@@ -1134,6 +1134,92 @@ angular.module('admin.component')
             return UIDateRangeControl;
         });
 })();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+
+    angular.module('admin.component')
+        .provider('UIEditorControl', function()  {
+            var configUrl, allUrl,
+                result = {
+                    setUrl: function(_configUrl, _allUrl) {
+                        configUrl = _configUrl;
+                        allUrl = _allUrl;
+                    },
+
+                    $get: function() {
+                        var UIEditorControl = (function(super$0){var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIEditorControl, super$0);var proto$0={};
+
+                            function UIEditorControl(s, e, a) {
+                                this.className = 'Editor';
+                                this.$scriptElement = e.find('script');
+                                super$0.call(this, s, e, a);
+                            }if(super$0!==null)SP$0(UIEditorControl,super$0);UIEditorControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIEditorControl,"configurable":true,"writable":true}});DP$0(UIEditorControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                            proto$0.init = function() {
+                                super$0.prototype.init.call(this);
+                                this.editorId = 'uiFromEditor' + new Date().getTime();
+                                this.$scriptElement.attr('id', this.editorId);
+                            };
+
+                            proto$0.render = function() {var this$0 = this;
+                                super$0.prototype.render.call(this);
+                                if (window.UE) {
+                                    this._initEditor();
+                                }
+                                else {
+                                    $.getScript(configUrl, function()  {
+                                        $.getScript(allUrl, function()  {
+                                            this$0._initEditor();
+                                        });
+                                    });
+                                }
+                            };
+
+                            proto$0.reset = function() {
+                                this.editor.setContent('');
+                            };
+
+                            proto$0.val = function(val) {
+                                if (val !== undefined) {
+                                    this.editor.setContent(val);
+                                    return this;
+                                }
+                                else {
+                                    return this.editor.getContent();
+                                }
+                            };
+
+                            proto$0.getEditor = function() {
+                                return this.editor;
+                            };
+
+                            proto$0._initEditor = function() {var this$0 = this;
+                                this.editor = UE.getEditor(this.editorId, {
+                                    autoHeightEnabled: true
+                                });
+                                this.editor.addListener('contentChange', function()  {
+                                    this$0._change();
+                                });
+                            };
+
+                            proto$0._change = function() {
+                                var content = this.val();
+                                this.scope.model = content;
+                                this.scope.change({val: content});
+                            };
+                        MIXIN$0(UIEditorControl.prototype,proto$0);proto$0=void 0;return UIEditorControl;})(UIFormControl);
+                        return UIEditorControl;
+                    }
+                };
+            return result;
+        });
+})();
 //------------------------------------------------------
 //
 //
@@ -1485,13 +1571,13 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiRegionHelper', function ($q, logger, msg) {
-        var m = new msg('UiRegionHelper'),
+    .factory('uiRegionHelper', function ($q, Message) {
+        var m = new Message('UiRegionHelper'),
             requestQueue = [],
 
             isInitDataMaping = false,
             isInitDataMap = false,
-            dataMapUrl = 'http://pic.ofcard.com/themes/common/region/China_Region_Last.js',
+            dataMapUrl = 'http://localhost:63342/AngularAdmin/output/assets/js/China_Region_Last.js',
             dataMap,
 
             isInitDataList = false,
@@ -1504,7 +1590,6 @@ angular.module('admin.component')
             rootId = '086',
             getSubDataList = function (pid, placeholder, $el, isRequire) {
                 if (isRequire && pid === undefined) {
-                    logger.error(placeholder + '的pid为空');
                     return;
                 }
                 else {
@@ -1542,7 +1627,6 @@ angular.module('admin.component')
                             isInitDataMap = true;
                         }, function () {
                             isInitDataMaping = false; //设置状态，重新
-                            logger.error('....区域数据读取不到了。。');
                             d.reject({});
                         });
                     }
@@ -1764,32 +1848,6 @@ angular.module('admin.component')
                             cityId && $cel && $cel.select2('val', cityId);
                             streetId && $sel && $sel.select2('val', streetId);
                         }, 500);
-
-                        /*
-                         var c = target.pid != rootId ? allTreeData[target.pid] : null;
-                         var p = c && c.pid != rootId ? allTreeData[c.pid] : null;
-
-                         var provinceId = undefined, cityId = undefined, streetId = undefined;
-                         if (c && p){    //sid是区域
-                         provinceId = p.id;cityId = c.id;streetId = sid;
-                         }
-                         else if(c){ //sid是市
-                         provinceId = c.id;cityId = sid;streetId = 0;
-                         }
-                         else{  //sid是省
-                         provinceId = sid;cityId = 0;streetId = 0;
-                         }
-                         self.getProvince($pel);
-                         self.getCity(provinceId, $cel);
-                         self.getStreet(cityId, $sel);
-                         setTimeout(function () {
-                         provinceId && $pel && $pel.select2('val', provinceId);
-                         cityId && $cel && $cel.select2('val', cityId);
-                         streetId && $sel && $sel.select2('val', streetId);
-                         });
-                         d.resolve([target, c, p]);
-                         */
-
                     }
                     else {
                         m.error('当前地址数据有误, 请重新编辑保存');
@@ -1815,7 +1873,7 @@ angular.module('admin.component')
             var UIRegionControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIRegionControl, super$0);var proto$0={};
                 function UIRegionControl(s, e, a) {
                     this.className = 'Region';
-                    this.$inputDom = e.find('input:hidden');
+                    this.$inputDom = e.find('input:eq(0)');
                     this.$pDom = e.find('[name="province"]');
                     this.$cDom = e.find('[name="city"]');
                     this.$sDom = e.find('[name="area"]');
@@ -1826,6 +1884,68 @@ angular.module('admin.component')
 
                 proto$0.init = function() {
                     super$0.prototype.init.call(this);
+                    switch (this.attrs.mode) {
+                        case 'p':
+                            this.$cDom.hide();
+                            this.$sDom.hide();
+                            this.$aDom.hide();
+                            break;
+                        case 'c':
+                            this.$sDom.hide();
+                            this.$aDom.hide();
+                            break;
+                        case 's':
+                            this.$aDom.hide();
+                            break;
+                    }
+                };
+
+                proto$0.initEvents = function() {var this$0 = this;
+                    super$0.prototype.initEvents.call(this);
+                    this.$pDom.change(function(evt)  {
+                        if (evt.val) {
+                            uiRegionHelper.getCity(evt.val).then(function(data)  {
+                                this$0.$cDom.select2(this$0.toCityData(data));
+                                this$0.$sDom.select2(this$0.toStreetData());
+                            });
+                            this$0.$pDom.val(evt.added[this$0.valueType]);
+                            this$0.$inputDom.val(evt.val);
+                            this$0._change('p');
+                        }
+                        else {
+                            this$0.reset();
+                        }
+                    });
+
+                    //
+                    this.$cDom.change(function(evt)  {
+                        if (evt.val) {
+                            uiRegionHelper.getStreet(evt.val).then(function(data)  {
+                                this$0.$sDom.select2(this$0.toStreetData(data));
+                            });
+                            this$0.$cDom.val(evt.added[this$0.valueType]);
+                            this$0.$inputDom.val(evt.val);
+                            this$0._change('c');
+                        }
+                        else {
+                            this$0.$sDom.select2(this$0.toStreetData());
+                            this$0.$cDom.val('');
+                            this$0.$inputDom.val('');
+                        }
+                    });
+
+                    //
+                    this.$sDom.change(function(evt)  {
+                        if (evt.val) {
+                            this$0.$sDom.val(evt.added[this$0.valueType]);
+                            this$0.$inputDom.val(evt.val);
+                            this$0._change('s');
+                        }
+                        else {
+                            this$0.$sDom.val('');
+                            this$0.$inputDom.val('');
+                        }
+                    });
                 };
 
                 proto$0.render = function() {var this$0 = this;
@@ -1840,7 +1960,11 @@ angular.module('admin.component')
                                 if (p) {
                                     this$0.$pDom.select2('val', p.id);
                                     this$0.$pDom.val(p[self.valueType]);
-                                    return [c, s, uiRegionHelper.getCity(p.id)]
+                                    return [c, s, uiRegionHelper.getCity(p.id)];
+                                }
+                                else {
+                                    this$0.$cDom.select2(this$0.toCityData([]));
+                                    this$0.$sDom.select2(this$0.toStreetData([]));
                                 }
                                 throw new Error();
                             })
@@ -1851,6 +1975,9 @@ angular.module('admin.component')
                                     this$0.$cDom.val(c[self.valueType]);
                                     return [s, uiRegionHelper.getStreet(c.id)];
                                 }
+                                else {
+                                    this$0.$sDom.select2(this$0.toStreetData([]));
+                                }
                                 throw new Error();
                             })
                             .then(function(s, data)  {
@@ -1860,12 +1987,43 @@ angular.module('admin.component')
                                     self.$sDom.val(s[self.valueType]);
                                 }
                             });
+                        this.$inputDom.val(this.codeValue);
                     }
                     else { //没有则直接加载省
                         uiRegionHelper.getProvince().then(function(data)  {
                             this$0.$pDom.select2(this$0.toProvinceData(data));
+                            this$0.$cDom.select2(this$0.toCityData([]));
+                            this$0.$sDom.select2(this$0.toStreetData([]));
                         });
                     }
+                };
+
+                proto$0.toProvinceData = function(data) {
+                    return {data: data || [], allowClear: true, placeholder: '请选择省'};
+                };
+
+                proto$0.toCityData = function(data) {
+                    return {data: data || [], allowClear: true, placeholder: '请选择市'};
+                };
+
+                proto$0.toStreetData = function(data) {
+                    return {data: data || [], allowClear: true, placeholder: '请选择区'};
+                };
+
+                proto$0.reset = function() {
+                    this.$inputDom.val('');
+                    this.$pDom.val('').select2('val', '');
+                    this.$cDom.val('').select2(this.toCityData());
+                    this.$sDom.val('').select2(this.toStreetData());
+                };
+
+                proto$0._change = function(mode) {
+                    this.scope.model = this.$inputDom.val();
+                    var val = this.scope.mode,
+                        p = this.$pDom.val(),
+                        c = this.$cDom.val(),
+                        s = this.$sDom.val();
+                    this.scope.change({mode: mode, val: val, p: p, c: c, s: s});
                 };
             MIXIN$0(UIRegionControl.prototype,proto$0);proto$0=void 0;return UIRegionControl;})(UIFormControl);
 
@@ -2416,7 +2574,7 @@ angular.module('admin.component')
                         this$0.selectValues.push(evt.val);
                         this$0.selectItems.push(evt.object);
                         this$0.scope.model = this$0.selectValues;
-                        this$0.scope.change({val: evt.val, item: evt.object, vals: this$0.selectValues, items: this$0.selectItems});
+                        this$0.scope.change({isAdd: true, val: evt.val, item: evt.object, vals: this$0.selectValues, items: this$0.selectItems});
                         return true;
                     });
 
@@ -2429,7 +2587,7 @@ angular.module('admin.component')
                             return item != evt.choice;
                         });
                         this$0.scope.model = this$0.selectValues;
-                        this$0.scope.change({val: evt.val, item: evt.object, vals: this$0.selectValues, items: this$0.selectItems});
+                        this$0.scope.change({isAdd: false, val: evt.val, item: evt.object, vals: this$0.selectValues, items: this$0.selectItems});
                     });
                 };
 
@@ -2619,352 +2777,155 @@ angular.module('admin.component')
             return UIRemoteSelectControl;
         });
 })();
-angular.module('admin.component')
-    .factory('uiMultiSelectFactory', function ($q, ajax, logger, msg, util, Event, ValueService) {
-        var m = new msg('MultiSelect'),
-            MultiSelect = function (scope, element, attrs) {
-                Event.call(this);
-                this.scope = scope;
-                this.element = element;
-                this.inputElement = element.find('input');
-                this.attrs = attrs;
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
 
-                //
-                this.isInit = true;
+    angular.module('admin.component')
+        .provider('UIUploadControl', function()  {
+            var domain, tokenUrl, maxSize,
+                result = {
+                    setDomain: function(_domain) {
+                        domain = _domain
+                    },
 
-                //
-                this.selectValues = [];  //选中的值
-                this.selectItems = [];   //选中的数据
-                this.datas = undefined;
+                    setTokenUrl: function(_tokenUrl) {
+                        tokenUrl = _tokenUrl;
+                    },
 
-                //
-                var self = this,
-                    selectOption = {
-                        openOnEnter: false,
-                        formatNoMatches: function () {
-                            return '没有符合的数据';
-                        },
-                        formatInputTooShort: function (t, m) {
-                            return '输入' + m + '个字符后开始查询';
-                        },
-                        formatSelectionTooBig: function (m) {
-                            return '最大可以选中' + m + '个数据';
-                        },
-                        formatSearching: function () {
-                            return '正在加载数据...';
-                        },
-                        formatAjaxError: function () {
-                            return '加载数据失败';
-                        }
-                    };
+                    setMaxSize: function(_maxSize) {
+                        maxSize = _maxSize;
+                    },
 
-                if (attrs.multi !== undefined) {  //开启多选, select元素不能开启
-                    selectOption.multiple = true;
-                }
-                if (attrs.url !== undefined) { //开启远程查询
-                    if (attrs.multi !== undefined) {
-                        selectOption.createSearchChoice = $.proxy(self.createSearchChoice, self);
-                    }
-                    selectOption.query = $.proxy(self.filterData, self);
-                    selectOption.initSelection = $.proxy(self.initSelection, self);
-                    selectOption.id = $.proxy(self.formatId, self);
-                    selectOption.formatSelection = $.proxy(self.formatResult, self);
-                    selectOption.formatResult = $.proxy(self.formatResult, self);
-                }
-                if (attrs.minmum) { //输入几个字符以后才能搜索
-                    selectOption.minimumInputLength = attrs.minmum;
-                }
-                if (attrs.maxSize) { //最大选中几个
-                    selectOption.maximumSelectionSize = attrs.maxSize;
-                }
+                    $get: function() {
+                        var UIUploadControl = (function(super$0){var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIUploadControl, super$0);var proto$0={};
 
-                selectOption.closeOnSelect = false;
+                            function UIUploadControl(s, e, a) {
+                                this.className = 'Upload';
+                                super$0.call(this, s, e, a);
+                            }if(super$0!==null)SP$0(UIUploadControl,super$0);UIUploadControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIUploadControl,"configurable":true,"writable":true}});DP$0(UIUploadControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
+                            proto$0.init = function() {
+                                super$0.prototype.init.call(this);
+                                this.$updateButton = this.element.find('button:eq(0)');
+                                this.$removeButton = this.element.find('button:eq(1)');
+                                this.$container = this.element.find('.ui-form-upload');
+                                this.uploadButtonId = 'uiFormUploadButton' + new Date().getTime();
+                                this.uploadContrainerId = 'uiFormUploadContainer' + new Date().getTime();
+                                this.$updateButton.attr('id', this.uploadButtonId);
+                                this.$container.attr('id', this.$container);
+                            };
 
-                //构造对象
-                this.inputElement.select2(selectOption);
-
-                //初始化值
-                this.initValue();
-                this.initEvents();
-            };
-
-        //
-        MultiSelect.prototype = {
-
-            /**
-             * 初始化值
-             */
-            initValue: function () {
-                var ngModel = this.attrs.model,
-                    self = this;
-                //
-                if (this.attrs.multi !== undefined && this.attrs.setCheck) {
-                    this.loadData().then(function () {
-                        self.selectItems = [];
-                        self.selectValues = [];
-                        $.each(self.datas, function (i, data) {
-                            if ((',' + self.attrs.setCheck + ',').indexOf(',' + data.id + ',') != -1) {
-                                self.selectItems.push(data);
-                                self.selectValues.push(data.id);
-                            }
-                        });
-                        self.isFocusInit = true;
-                        self.val(self.selectValues);
-                    });
-                }
-
-                //
-                if (!ngModel) {
-                    return;
-                }
-                var v = ValueService.get(this.scope, ngModel);
-                if (v) {
-                    this.element.select2('val', v);
-                }
-                else {
-                    var _this = this;
-                    var r = this.scope.$watch(ngModel, function (n) {
-                        if (n) {
-                            _this.element.select2('val', n);
-                            r();
-                        }
-                    });
-                }
-            },
-
-            initEvents: function () {
-                var self = this;
-                this.element.on('select2-selecting', function (evt) {
-                    if (evt.object.isNew && this.attrs.editable == 'false') {
-                        return false;
-                    }
-
-                    if (this.attrs.multi !== undefined) {
-                        this.selectValues.push(evt.val);
-                        this.selectItems.push(evt.object);
-                    }
-                    else {
-                        this.selectValues = [evt.val];
-                        this.selectItems = [evt.object];
-                    }
-                    this.$emit('uiSelect.doSelect', this.selectValues, this.selectItems);
-                    if (this.attrs.model) {
-                        ValueService.set(this.scope, this.attrs.model, this.attrs.multi !== undefined ? this.selectValues : this.selectValues[0]);
-                    }
-                    return true;
-                }.bind(this));
-                this.element.on('select2-removing', function (evt) {
-                    this.selectValues = $.grep(this.selectValues, function (value) {
-                        return value != evt.val;
-                    });
-                    this.selectItems = $.grep(this.selectItems, function (item) {
-                        return item != evt.choice;
-                    });
-                    this.$emit('uiSelect.doRemove', this.selectValues, this.selectItems);
-                }.bind(this));
-
-                //
-                this.element.on('change', function (evt) {
-                    if (evt.added) {
-                        this.$emit('uiSelect.doAdd', evt.added, self.attrs.tag);
-                    }
-                    if (evt.removed) {
-                        this.$emit('uiSelect.doDel', evt.removed, self.attrs.tag);
-                    }
-                }.bind(this));
-            },
-
-            /**
-             *
-             * @param term
-             * @param data
-             */
-            createSearchChoice: function (term, data) {
-                if ($(data).filter(function () {
-                        return this.name.indexOf(term) === 0;
-                    }).length === 0) {
-                    return data.length <= 10 ? {id: term, name: term, isNew: true} : null; //最多10个
-                }
-            },
-
-
-            /**
-             * 加载远程数据
-             * @param o
-             */
-            useParams: function (o) {
-                return $.extend(this.params, o || {}); //TODO: 额外查询参数
-            },
-
-            /**
-             *  TODO: 目前没考虑错误的处理
-             */
-            loadData: function () {
-                var self = this,
-                    d = $q.defer();
-                if (self.datas) {
-                    d.resolve(self.datas);
-                }
-                else {
-                    ajax.post(this.attrs.url, this.useParams).then(function (r) {
-                        self.datas = r ? r.aaData || r : [];
-                        $.each(self.datas, function (i, dd) { //遍历所有属性, 放入一个特殊变量, 用于后期查询使用
-                            var s = [];
-                            for (var k in dd) {
-                                s.push(k + '=' + (dd[k] || '').toString().toLowerCase());
-                            }
-                            dd.__string = s.join(',');
-                        });
-                        d.resolve(self.datas);
-                    });
-                }
-                return d.promise;
-            },
-
-            /**
-             * 过滤
-             * @param o
-             */
-            filterData: function (o) {
-                var self = this,
-                    sfs = (this.attrs.search || '').toLowerCase().split(','),
-                    keyword = o.term.toLowerCase();
-                this.loadData().then(function (rs) {
-                    var os = [];
-                    $.each(rs, function (i, r) {
-                        var isC = false;
-                        if (o.init) { //初始化, 那么只会根据
-                            isC = self.attrs.multi ? o.term.indexOf(self.formatId(r)) != -1 : self.formatId(r) == o.term;
-                        }
-                        else { //根据属性过滤
-                            if (sfs.length === 0 || sfs[0] === '') {
-                                isC = r.__string.indexOf(keyword) != -1;
-                            }
-                            else {   //针对特定属性
-                                $.each(sfs, function (ii, sf) {
-                                    isC = (r[sf] || '').toString().toLowerCase().indexOf(keyword) != -1;
+                            proto$0.render = function() {
+                                super$0.prototype.render.call(this);
+                                Qiniu.uploader({
+                                    runtimes: 'html5,flash,html4',    //上传模式,依次退化
+                                    browse_button: this.uploadButtonId,       //上传选择的点选按钮，**必需**
+                                    uptoken_url: tokenUrl,
+                                    domain: domain,
+                                    unique_names: true,
+                                    container: this.uploadContrainerId,           //上传区域DOM ID，默认是browser_button的父元素，
+                                    max_file_size: maxSize,           //最大文件体积限制
+                                    flash_swf_url: '/assets/js/plupload/js/Moxie.swf',  //引入flash,相对路径
+                                    max_retries: 3,                   //上传失败最大重试次数
+                                    dragdrop: true,                   //开启可拖曳上传
+                                    drop_element: this.uploadContrainerId,        //拖曳上传区域元素的ID，拖曳文件或文件夹后可触发上传
+                                    chunk_size: '1mb',                //分块上传时，每片的体积
+                                    auto_start: true,                 //选择文件后自动上传，若关闭需要自己绑定事件触发上传
+                                    init: {
+                                        'FilesAdded': function (up, files) {
+                                            plupload.each(files, function (file) {
+                                                // 文件添加进队列后,处理相关的事情
+                                            });
+                                        },
+                                        'BeforeUpload': function (up, file) {
+                                            var a = 1;
+                                            // 每个文件上传前,处理相关的事情
+                                        },
+                                        'UploadProgress': function (up, file) {
+                                            var a = 1;
+                                            // 每个文件上传时,处理相关的事情
+                                        },
+                                        'FileUploaded': function (up, file, info) {
+                                            info = JSON.parse(info);
+                                            info.name = file.name;
+                                            info.url = domain + '/' + info.key;
+                                            cb && cb(info);
+                                            // 每个文件上传成功后,处理相关的事情
+                                            // 其中 info 是文件上传成功后，服务端返回的json，形式如
+                                            // {
+                                            //    "hash": "Fh8xVqod2MQ1mocfI4S4KpRL6D98",
+                                            //    "key": "gogopher.jpg"
+                                            //  }
+                                            // 参考http://developer.qiniu.com/docs/v6/api/overview/up/response/simple-response.html
+                                            // var domain = up.getOption('domain');
+                                            // var res = parseJSON(info);
+                                            // var sourceLink = domain + res.key; 获取上传成功后的文件的Url
+                                        },
+                                        'Error': function (up, err, errTip) {
+                                            var a = 1;
+                                            //上传出错时,处理相关的事情
+                                        },
+                                        'UploadComplete': function () {
+                                            var a = 1;
+                                            //队列文件处理完毕后,处理相关的事情
+                                        },
+                                        'Key': function (up, file) {
+                                            // 若想在前端对每个文件的key进行个性化处理，可以配置该函数
+                                            // 该配置必须要在 unique_names: false , save_key: false 时才生效
+                                            var key = "";
+                                            // do something with key here
+                                            return key
+                                        }
+                                    }
                                 });
-                            }
-                        }
-                        if (isC) {
-                            os.push(r);
-                        }
-                    });
-
-                    o.callback({results: os});
-                });
-            },
-
-            /**
-             * 反向查找选中的items
-             * @param element
-             * @param callback
-             */
-            initSelection: function (element, callback) {
-                var self = this,
-                    handler = function (data) {
-                        if (self.attrs.multi !== undefined) {
-                            callback(data.results);
-                        }
-                        else {
-                            callback(data.results[0]);
-                        }
-                    };
-                if (self.isFocusInit) {
-                    self.isFocusInit = false;
-                    self.isInit = false;
-                    handler({results: self.selectItems});
-                }
-                else if (element.val() !== undefined) {
-                    self.isInit = false;
-                    this.filterData({
-                        term: element.val(),
-                        init: true,
-                        callback: handler
-                    });
-                }
-                else if (self.isInit) {
-                    self.isInit = false;
-                    handler({results: []});
-                }
-            },
-
-            /**
-             * 选中的值
-             * @param o
-             */
-            formatId: function (o) {
-                return o[this.attrs.valueName || 'id'];
-            },
-
-            /**
-             * 如何显示数据
-             * @param item
-             */
-            formatResult: function (item, container, query) {
-                return item[this.attrs.labelName || 'name'];
-            },
-
-            /**
-             * 清空数据
-             */
-            reset: function () {
-                this.selectItems = [];
-                this.selectValues = [];
-                this.inputElement.select2('val', '');
-            },
-
-            /**
-             *
-             * @param v
-             */
-            val: function (vals) {
-                if (vals) {
-                    this.inputElement.select2('val', vals);
-                    if (this.attrs.multi) {
-                        this.selectValues = vals;
+                            };
+                        MIXIN$0(UIUploadControl.prototype,proto$0);proto$0=void 0;return UIUploadControl;})(UIFormControl);
+                        return UIUploadControl;
                     }
-                    else {
-                        this.selectValues = [vals];
-                    }
-                    var values = ',' + this.selectValues.join(',') + ',',
-                        self = this;
-                    this.loadData().then(function (datas) {
-                        self.selectItems = $.grep(datas, function (data) {
-                            return values.indexOf(',' + self.formatId(data) + ',') != -1;
-                        });
-                    });
-                }
-                else {
-                    if (this.attrs.multi) {
-                        return this.selectValues;
-                    }
-                    else {
-                        return this.selectValues[0];
-                    }
-                }
+                };
+            return result;
+        });
+})();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormEditor', function (UIEditorControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
             },
-
-            item: function () {
-                if (this.attrs.multi) {
-                    return this.selectItems;
-                }
-                else {
-                    return this.selectItems[0];
-                }
+            link: function (scope, element, attrs) {
+                new UIEditorControl(scope, element, attrs);
             },
-
-            /**
-             *
-             */
-            render: function () {
-                this.element.change();
-            }
-        };
-
-        return function (scope, element, attrs) {
-            return new MultiSelect(scope, element, attrs);
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <script name=\"{{name}}\" type=\"text/plain\"></script>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------
@@ -3161,12 +3122,12 @@ angular.module('admin.component')
             template: ("\
 \n                <div class=\"form-group\">\
 \n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                        <input type=\"hidden\" name=\"{{name}}\" ng-value={{value}}/>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-region\">\
+\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
 \n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
-\n                        <input ng-if=\"!mode || mode == 's' || mode == 'c'\" type=\"text\" class=\"input-small form-control input-inline\" name=\"city\"/>\
-\n                        <input ng-if=\"!mode || mode == 's'\" type=\"text\" class=\"input-small form-control input-inline\" name=\"area\"/>\
-\n                        <input ng-if=\"!mode\" type=\"text\" class=\"input-medium form-control input-inline\" name=\"address\" ng-value={{aValue}}/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"city\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"area\"/>\
+\n                        <input type=\"text\" class=\"input-medium form-control input-inline\" name=\"address\" ng-value=\"{{aValue}}\" placeholder=\"请输入详细地址\" />\
 \n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
 \n                   </div>\
 \n               </div>'\
@@ -3332,6 +3293,54 @@ angular.module('admin.component')
         };
     });
 
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormUpload', function (UIInputControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function (scope, element, attrs) {
+                new UIInputControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-upload\">\
+\n                       <div>\
+\n                           <img class=\"{{css}}\"/>\
+\n                       </div>\
+\n                       <div class=\"btn-group\">\
+\n                           <button type=\"button\" class=\"btn blue start\">\
+\n                               <i class=\"fa fa-upload\"></i>\
+\n                               <span>选择文件</span>\
+\n                           </button>\
+\n                           <button type=\"button\" class=\"btn red start\">\
+\n                               <i class=\"fa fa-upload\"></i>\
+\n                               <span>删除文件</span>\
+\n                           </button>\
+\n                       </div>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
+        };
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -3816,7 +3825,8 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 (function () {
     angular.module('admin', ['admin.service', 'admin.filter', 'admin.component'])
-        .config(function(AjaxProvider, MessageProvider)  {
+        .config(function(AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider)  {
+            var baseJsUrl = 'http://localhost:63342/AngularAdmin/output/assets/js/';
 
             //
             // ajax 默认返回处理
@@ -3828,5 +3838,17 @@ angular.module('admin.component')
             // 通知位置
             //
             MessageProvider.setPosition('bottom', 'right');
+
+            //
+            // 百度编辑器的库地址
+            //
+            UIEditorControlProvider.setUrl((("" + baseJsUrl) + "/ueditor/ueditor.config.js"), (("" + baseJsUrl) + "/ueditor/ueditor.all.js"));
+
+            //
+            // 上传空间的配置
+            //
+            UIUploadControlProvider.setDomain('七牛域名');
+            UIUploadControlProvider.setTokenUrl('七牛每次上传会调用这个URL, 返回算好的token, 然后才能上传');
+            UIUploadControlProvider.setMaxSize('1mb');
         });
 })();

@@ -6,13 +6,13 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiRegionHelper', function ($q, logger, msg) {
-        var m = new msg('UiRegionHelper'),
+    .factory('uiRegionHelper', function ($q, Message) {
+        var m = new Message('UiRegionHelper'),
             requestQueue = [],
 
             isInitDataMaping = false,
             isInitDataMap = false,
-            dataMapUrl = 'http://pic.ofcard.com/themes/common/region/China_Region_Last.js',
+            dataMapUrl = 'http://localhost:63342/AngularAdmin/output/assets/js/China_Region_Last.js',
             dataMap,
 
             isInitDataList = false,
@@ -25,7 +25,6 @@ angular.module('admin.component')
             rootId = '086',
             getSubDataList = function (pid, placeholder, $el, isRequire) {
                 if (isRequire && pid === undefined) {
-                    logger.error(placeholder + '的pid为空');
                     return;
                 }
                 else {
@@ -63,7 +62,6 @@ angular.module('admin.component')
                             isInitDataMap = true;
                         }, function () {
                             isInitDataMaping = false; //设置状态，重新
-                            logger.error('....区域数据读取不到了。。');
                             d.reject({});
                         });
                     }
@@ -285,32 +283,6 @@ angular.module('admin.component')
                             cityId && $cel && $cel.select2('val', cityId);
                             streetId && $sel && $sel.select2('val', streetId);
                         }, 500);
-
-                        /*
-                         var c = target.pid != rootId ? allTreeData[target.pid] : null;
-                         var p = c && c.pid != rootId ? allTreeData[c.pid] : null;
-
-                         var provinceId = undefined, cityId = undefined, streetId = undefined;
-                         if (c && p){    //sid是区域
-                         provinceId = p.id;cityId = c.id;streetId = sid;
-                         }
-                         else if(c){ //sid是市
-                         provinceId = c.id;cityId = sid;streetId = 0;
-                         }
-                         else{  //sid是省
-                         provinceId = sid;cityId = 0;streetId = 0;
-                         }
-                         self.getProvince($pel);
-                         self.getCity(provinceId, $cel);
-                         self.getStreet(cityId, $sel);
-                         setTimeout(function () {
-                         provinceId && $pel && $pel.select2('val', provinceId);
-                         cityId && $cel && $cel.select2('val', cityId);
-                         streetId && $sel && $sel.select2('val', streetId);
-                         });
-                         d.resolve([target, c, p]);
-                         */
-
                     }
                     else {
                         m.error('当前地址数据有误, 请重新编辑保存');
