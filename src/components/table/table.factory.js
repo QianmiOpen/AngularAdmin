@@ -66,9 +66,16 @@
                             this.searchParams = null;
                             this.pageSelectNum = [];
                             this.triggerComplete(this.scope, this.attrs.ref || '$table', this);
+                            this.scope.$on('uitable.column.complete', (evt, column) => {
+                                this.addColumn(column);
+                            });
                         }
 
                         build() {
+                        }
+
+                        addColumn(column) {
+                            this.columns.push(column);
                         }
                     }
 

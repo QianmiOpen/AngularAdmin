@@ -50,6 +50,7 @@ angular.module('admin.component')
                         return w;
                     }
                 };
+                this.scope.$emit('uitable.column.complete', this);
             }
 
             initEvents() {

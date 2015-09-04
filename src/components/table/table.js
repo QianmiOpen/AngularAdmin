@@ -15,9 +15,9 @@ angular.module('admin.component')
                 return {
                     pre: function (scope, element, attrs) {
                         uiTable = new UITableControl(scope, element, attrs);
+                        uiTable.init();
                     },
                     post: function () {
-                        uiTable.init();
                         uiTable.build();
                     }
                 };
