@@ -118,6 +118,25 @@
 
 ## 表格
 
+```javascript
+<ui-table url="/test/remote/select" nopage="false" manual="false" change="callback(isSelect, selectItem, selectValue, selectItems, selectValues)" data-success="callback(result)" data-fail="callback(result)">
+    <ui-table-check-column name="id"></ui-table-check-column>
+    <ui-table-date-column head="日期列" name="date" format="yyyy-MM-dd"></ui-table-date-column>
+    <ui-table-image-column head="图片列" image-css="imageSS" name="image" placeholder="xxxxxx"></ui-table-image-column>
+    <ui-table-column head="简单列" name="simple"></ui-table-column>
+    <ui-table-column head="自定义列" name="advance">
+        {{data.simple}}
+    </ui-table-column>
+    <ui-table-progress-column head="进度条列" name="progress"></ui-table-progress-column>
+    <ui-table-state-column head="状态列" name="state" default="0">
+        <span state="0">吃</span>
+        <span state="1">喝</span>
+        <span state="2">玩</span>
+    </ui-table-state-column>
+    <ui-table-operation-column head="操作列"></ui-table-operation-column>
+</ui-table>
+```
+
 ## 树
 
 ## 弹出框
