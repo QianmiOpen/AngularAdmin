@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------------------------------
 (function () {
     angular.module('admin', ['admin.service', 'admin.filter', 'admin.component'])
-        .config((AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider) => {
+        .config((AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider) => {
             let baseJsUrl = 'http://localhost:63342/AngularAdmin/output/assets/js/';
 
             //
@@ -32,5 +32,12 @@
             UIUploadControlProvider.setDomain('七牛域名');
             UIUploadControlProvider.setTokenUrl('七牛每次上传会调用这个URL, 返回算好的token, 然后才能上传');
             UIUploadControlProvider.setMaxSize('1mb');
+
+            //
+            // 表格配置项
+            //
+            UITableControlProvider.setRequestMethod('post');
+            UITableControlProvider.setResultName('aaData', 'iTotalRecords');
+            UITableControlProvider.setConfig({});
         });
 })();
