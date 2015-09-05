@@ -14,8 +14,9 @@
 </head>
 <body style="background-color: #fff !important;padding: 10px;" ng-app="admin">
 <ui-container style="display: none" controller="CC">
-    <ui-table>
-        <ui-table-date-column head="日期列" name="date" format="xxxxxx"></ui-table-date-column>
+    <ui-table url="/test/remote/select">
+        <ui-table-check-column name="id"></ui-table-check-column>
+        <ui-table-date-column head="日期列" name="date" format="yyyy-MM-dd"></ui-table-date-column>
         <ui-table-image-column head="图片列" image-css="imageSS" name="image" placeholder="xxxxxx"></ui-table-image-column>
         <ui-table-column head="简单列" name="simple"></ui-table-column>
         <ui-table-column head="自定义列" name="advance">
@@ -36,10 +37,14 @@
 <script src="../output/assets/js/jquery.mockjax.js"></script>
 <script>
     var remoteSelects = [];
-    for (var i = 0; i < 50; i++) {
+    for (var i = 0; i < 10; i++) {
         remoteSelects.push({
-            id: (new Date().getTime() + '').substr(7) + i + 1,
-            name: (new Date().getTime() + '').substr(7) + i
+            id: i + '',
+            date: new Date(new Date().getTime() + i * 1000),
+            image: 'https://www.baidu.com/img/bdlogo.png',
+            simple: i + 10,
+            progress: i * 2,
+            state: i % 3
         });
     }
     $.mockjax({

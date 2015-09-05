@@ -6,66 +6,59 @@
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiTableCheckColumn', function (uiTableColumnService, componentHelper, msg) {
-        var m = new msg('tableCheckColumn');
+    .directive('uiTableCheckColumn', function (UITableColumnControl) {
+        class UITableCheckColumnControl extends UITableColumnControl {
+            constructor(s, e, a) {
+                this.className = 'CheckColumn';
+                super(s, e, a);
+            }
+
+            init() {
+                super.init();
+                this.$table = this.element.parents('table');
+                this.$tableBody = this.$table.find('tbody');
+            }
+
+            initEvents() {
+                super.initEvents();
+                this.scope.$emit('uitable.column.idname', this.attrs.name);
+                this.scope.selectAllHandler = (evt) => {
+                    this._selectAllHandler(evt);
+                };
+            }
+
+            render(rowData) {
+                var val = this.getValue(rowData);
+                return $(`<input type="checkbox" value="${val}"/>`).data('rowData', rowData).click((evt) => {
+                    this._selectOneHandler(evt);
+                });
+            }
+
+            _selectAllHandler(evt) {
+                let isCheck = evt.target.checked;
+                this.$tableBody.find('input[type=checkbox]').prop('checked', isCheck).uniform();
+                this.scope.$emit('uitable.column.selectall', isCheck);
+            }
+
+            _selectOneHandler(evt) {
+                let $target = $(evt.target);
+                this.scope.$emit('uitable.column.selectone', {isCheck: evt.target.checked, rowData: $target.data('rowData'), value: $target.val()});
+            }
+        }
+
         return {
             restrict: 'E',
             replace: true,
-            controller: function ($scope, $element, $attrs) {
-                $attrs.checked = true;
-                var $dom = $element.find('input'),
-                    ref = componentHelper.getComponentRef($element.parents('table').parent(), '$table'),
-                    name = $attrs.name;
-
-                //
-                $dom.click(function (evt) {
-                    var isChecked = evt.target.checked;
-                    $scope[ref].selectAllHandler(isChecked, name);
-                    evt.stopPropagation();
-                });
-                $scope.$on('uitable.selectAllChecked', function (evt, isAll) {
-                    $dom[0].checked = isAll;
-                    $.fn.uniform && $dom.uniform();
-                });
-
-                //
-                var render = function (rowData) {
-
-                    //判断之前是否被选过
-                    var isContainValue = $scope[ref].containItem(rowData);
-                    if (isContainValue) {
-                        $scope[ref].pageSelectNum.push(true);
-                    }
-                    else{
-                        $scope[ref].pageSelectNum.push(false);
-                    }
-
-                    //
-                    $scope.$on('uitable.selectAll', function (evt, isAll) {
-                        $dom[0].checked = isAll;
-                        $.fn.uniform && $dom.uniform();
-                    });
-
-                    //
-                    var $dom = $('<input type="checkbox" pk="' + rowData[name] + '"/>').val(rowData[name]).click(function (evt) {
-                        $scope[ref].selectOneHandler(evt.target.checked, $attrs.name, rowData);
-                        evt.stopPropagation();
-                    });
-
-                    //
-                    $dom[0].checked = isContainValue;
-                    return $dom;
-                };
-
-                //
-                if ($scope[ref] && $scope[ref].addColumn) {
-                    $scope[ref].setColumn(uiTableColumnService(ref, $scope, $attrs, render), $attrs.index);
-                    $scope[ref].idName = name;
-                }
-                else {
-                    m.error('uiTableCheckColumn必须放在uiTable里面');
-                }
+            scope: {
+                head: '@'
             },
-            templateUrl: 'tpl.table.column.checked'
+            controller: function ($scope, $element, $attrs) {
+                return new UITableCheckColumnControl($scope, $element, $attrs);
+            },
+            template: `
+                <th>
+                    <input type="checkbox" ng-click="selectAllHandler($event)"/>
+                </th>
+            `
         };
     });

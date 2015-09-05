@@ -10,7 +10,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            tranclude: true,
+            transclude: true,
             scope: {
                 head: '@'
             },

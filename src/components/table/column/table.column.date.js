@@ -10,18 +10,18 @@ angular.module('admin.component')
         class UITableDateColumnControl extends UITableColumnControl {
             constructor(s, e, a) {
                 this.className = 'DateColumn';
-                this.format = a.format || 'yyyy-MM-dd HH:mm:ss';
                 super(s, e, a);
             }
 
             init() {
                 super.init();
+                this.format = this.attrs.format || 'yyyy-MM-dd HH:mm:ss';
             }
 
             render(rowData) {
                 var val = this.getValue(rowData);
                 if (val) {
-                    val = Util.dateFormatStr(val, format);
+                    val = Util.dateFormatStr(val, this.format);
                 }
                 return $('<div/>').html(val);
             }

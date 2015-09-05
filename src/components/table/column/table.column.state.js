@@ -8,9 +8,9 @@
 angular.module('admin.component')
     .directive('uiTableStateColumn', function (UITableColumnControl) {
         class UITableStateColumnControl extends UITableColumnControl {
-            constructor(s, e, a) {
+            constructor(s, e, a, t) {
                 this.className = 'StateColumn';
-                super(s, e, a);
+                super(s, e, a, t);
             }
 
             init() {
@@ -41,12 +41,12 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            tranclude: true,
+            transclude: true,
             scope: {
                 head: '@'
             },
-            controller: function ($scope, $element, $attrs) {
-                return new UITableStateColumnControl($scope, $element, $attrs);
+            controller: function ($scope, $element, $attrs, $transclude) {
+                return new UITableStateColumnControl($scope, $element, $attrs, $transclude);
             },
             template: `
                 <th>

@@ -77,13 +77,16 @@ angular.module('admin.component')
             }
 
             getValue(rowData) {
-                let name = this.sName;
+                let name = this.sName, v;
                 if (name && name.indexOf(".") != -1) {
                     let ns = name.split('.'), n;
-                    let v = rowData;
+                    v = rowData;
                     while ((n = ns.shift()) && v) {
                         v = v[n];
                     }
+                }
+                else if (name) {
+                    v = rowData[name];
                 }
                 return v;
             }
