@@ -27,7 +27,7 @@
     window.UEDITOR_CONFIG = {
 
         //为编辑器实例添加一个路径，这个不能被注释
-        UEDITOR_HOME_URL: 'http://localhost:63342/AngularAdmin/output/assets/js/ueditor/'
+        UEDITOR_HOME_URL: 'http://7xllk7.com1.z0.glb.clouddn.com/assets/js/ueditor/'
 
         // 服务器统一请求接口路径
         //, serverUrl: URL + "jsp/controller.jsp"
