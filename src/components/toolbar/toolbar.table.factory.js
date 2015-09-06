@@ -16,6 +16,7 @@ angular.module('admin.component')
                 this.attrs = attrs;
                 this.transclude = transclude;
                 this.table = null;
+                this.isEdit = false;
                 this.message = new Message('UITableToolBar');
             }
 
@@ -23,8 +24,8 @@ angular.module('admin.component')
                 this.transclude(this.scope, (dom) => {
                     this.element.find('.btn-group:eq(0)').append(dom);
                 });
-                this.scope.isShow = (index, column) => this._isShow(index, column);
-                this.scope.toggleColumn = (evt, column) => this._toggleColumn(evt, column);
+                this.scope.component = this;
+                this.scope.editText = '开启';
                 this.triggerComplete(this.scope, this.attrs.ref || '$tableToolbar', this);
             }
 
@@ -34,14 +35,26 @@ angular.module('admin.component')
                 });
             }
 
-            _isShow(index, column) {
+            toggleEdit() {
+                this.isEdit = !this.isEdit;
+                this.scope.editText = this.isEdit ? '关闭' : '开启';
+                this.scope.$parent.$broadcast('uitable.column.edit', this.isEdit);
+            }
+
+            doAddItem() {
+            }
+
+            doDelItems() {
+            }
+
+            isShow(index, column) {
                 if (column.className == 'CheckColumn' || column.className == 'OperationColumn') {
                     return false;
                 }
                 return true;
             }
 
-            _toggleColumn(evt, column) {
+            toggleColumn(evt, column) {
                 column.bVisible = !column.bVisible;
                 this.scope.$parent.$broadcast('uitable.column.visable', column);
             }

@@ -3330,6 +3330,59 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
+//  参数
+//      p -- 省, 开关, 默认开, 可不填
+//      c -- 市, 开关, 默认开, 可不填
+//      s -- 区, 开关, 默认开, 可不填
+//      a -- 地址, 开关, 默认关
+//
+//      s-name -- 区域的name
+//      a-name -- 详细地址的name
+//
+//
+//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
+//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
+//      s-value -- 区域默认值
+//      a-value -- 地址值
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormRegion', function (UIRegionControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@',
+                type: '@',
+                mode: '@'
+            },
+            link: function(s, e, a)  {
+                new UIRegionControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-region\">\
+\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"city\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"area\"/>\
+\n                        <input type=\"text\" class=\"input-medium form-control input-inline\" name=\"address\" ng-value=\"{{aValue}}\" placeholder=\"请输入详细地址\" />\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
 //  针对input的封装
 //
 //
@@ -3483,59 +3536,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  参数
-//      p -- 省, 开关, 默认开, 可不填
-//      c -- 市, 开关, 默认开, 可不填
-//      s -- 区, 开关, 默认开, 可不填
-//      a -- 地址, 开关, 默认关
-//
-//      s-name -- 区域的name
-//      a-name -- 详细地址的name
-//
-//
-//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
-//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
-//      s-value -- 区域默认值
-//      a-value -- 地址值
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormRegion', function (UIRegionControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@',
-                type: '@',
-                mode: '@'
-            },
-            link: function(s, e, a)  {
-                new UIRegionControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-region\">\
-\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"city\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"area\"/>\
-\n                        <input type=\"text\" class=\"input-medium form-control input-inline\" name=\"address\" ng-value=\"{{aValue}}\" placeholder=\"请输入详细地址\" />\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>'\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
 //  针对select的封装
 //
 //
@@ -3658,43 +3658,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSwitch', function (UISwitchControl) {
-        return {
-            restrict: 'E',
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                placeholder: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function(s, e, a)  {
-                new UISwitchControl(s, e, a);
-            },
-            template: ("\
-\n               <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>\
-\n            ")
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
 //  针对input的封装
 //
 //
@@ -3740,6 +3703,43 @@ angular.module('admin.component')
 \n            ")
         };
     });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSwitch', function (UISwitchControl) {
+        return {
+            restrict: 'E',
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function(s, e, a)  {
+                new UISwitchControl(s, e, a);
+            },
+            template: ("\
+\n               <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4569,6 +4569,7 @@ angular.module('admin.component')
                 this.attrs = attrs;
                 this.transclude = transclude;
                 this.table = null;
+                this.isEdit = false;
                 this.message = new Message('UITableToolBar');
             }if(super$0!==null)SP$0(UITableToolBarControl,super$0);UITableToolBarControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableToolBarControl,"configurable":true,"writable":true}});DP$0(UITableToolBarControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
@@ -4576,8 +4577,8 @@ angular.module('admin.component')
                 this.transclude(this.scope, function(dom)  {
                     this$0.element.find('.btn-group:eq(0)').append(dom);
                 });
-                this.scope.isShow = function(index, column)  {return this$0._isShow(index, column)};
-                this.scope.toggleColumn = function(evt, column)  {return this$0._toggleColumn(evt, column)};
+                this.scope.component = this;
+                this.scope.editText = '开启';
                 this.triggerComplete(this.scope, this.attrs.ref || '$tableToolbar', this);
             };
 
@@ -4587,14 +4588,26 @@ angular.module('admin.component')
                 });
             };
 
-            proto$0._isShow = function(index, column) {
+            proto$0.toggleEdit = function() {
+                this.isEdit = !this.isEdit;
+                this.scope.editText = this.isEdit ? '关闭' : '开启';
+                this.scope.$parent.$broadcast('uitable.column.edit', this.isEdit);
+            };
+
+            proto$0.doAddItem = function() {
+            };
+
+            proto$0.doDelItems = function() {
+            };
+
+            proto$0.isShow = function(index, column) {
                 if (column.className == 'CheckColumn' || column.className == 'OperationColumn') {
                     return false;
                 }
                 return true;
             };
 
-            proto$0._toggleColumn = function(evt, column) {
+            proto$0.toggleColumn = function(evt, column) {
                 column.bVisible = !column.bVisible;
                 this.scope.$parent.$broadcast('uitable.column.visable', column);
             };
@@ -4704,9 +4717,9 @@ angular.module('admin.component')
             template: ("\
 \n                <div class=\"ui-toolbar table-toolbar\">\
 \n                    <div class=\"btn-group pull-left\">\
-\n                        <button ng-if=\"editable\" type=\"button\" class=\"btn btn-sm btn-info\" ng-click=\"toggleEdit()\"><i class=\"fa fa-edit\"></i> <span ng-bind=\"editText\"></span>快速编辑</button>&nbsp;&nbsp;\
-\n                        <button ng-if=\"add\" type=\"button\" class=\"btn btn-sm btn-primary\" ng-click=\"doAddItem()\"><i class=\"fa fa-plus-circle\"></i> 新增{{tip}}</button>&nbsp;&nbsp;\
-\n                        <button ng-if=\"del\" type=\"button\" ng-class=\"{'btn-danger': table.selectItems.selectValues.length > 0}\" class=\"btn btn-sm\" ng-disabled=\"table.selectItems.length==0\" ng-click=\"doDelItem()\"><i class=\"fa fa-times-circle\"></i> 删除{{tip}}</button>&nbsp;&nbsp;\
+\n                        <button ng-if=\"editable\" type=\"button\" class=\"btn btn-sm btn-info\" ng-click=\"component.toggleEdit()\"><i class=\"fa fa-edit\"></i> <span ng-bind=\"editText\"></span>快速编辑</button>&nbsp;&nbsp;\
+\n                        <button ng-if=\"add\" type=\"button\" class=\"btn btn-sm btn-primary\" ng-click=\"component.doAddItem()\"><i class=\"fa fa-plus-circle\"></i> 新增{{tip}}</button>&nbsp;&nbsp;\
+\n                        <button ng-if=\"del\" type=\"button\" ng-class=\"{'btn-danger': table.selectItems.selectValues.length > 0}\" class=\"btn btn-sm\" ng-disabled=\"table.selectItems.length==0\" ng-click=\"component.doDelItem()\"><i class=\"fa fa-times-circle\"></i> 删除{{tip}}</button>&nbsp;&nbsp;\
 \n                    </div>\
 \n\
 \n                    <span ng-show=\"table.selectItems.length > 0\" class=\"table-toolbar-tip fadeInRight\">您已选择 <strong ng-bind=\"selectItems.length\"></strong> 个{{tip}}，支持翻页选择多个{{tip}}。</span>\
@@ -4714,10 +4727,10 @@ angular.module('admin.component')
 \n                    <div class=\"btn-group pull-right\">\
 \n                        <a class=\"btn default btn-sm\" href=\"#\" data-hover=\"dropdown\"><i class=\"fa fa-table\"></i></a>\
 \n                        <div class=\"dropdown-menu dropdown-checkboxes pull-right\">\
-\n                            <label ng-repeat=\"column in table.aoColumns\" ng-if=\"isShow($index, column)\" style=\"cursor:pointer\" >\
+\n                            <label ng-repeat=\"column in table.aoColumns\" ng-if=\"component.isShow($index, column)\" style=\"cursor:pointer\" >\
 \n                                <div class=\"checker\">\
 \n                                    <span ng-class=\"{checked: column.bVisible}\">\
-\n                                        <input type=\"checkbox\" ng-click=\"toggleColumn($event, column)\">\
+\n                                        <input type=\"checkbox\" ng-click=\"component.toggleColumn($event, column)\">\
 \n                                    </span>\
 \n                                </div>\
 \n                                <span ng-bind=\"column.mTitle\"/>\
