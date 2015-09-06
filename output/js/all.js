@@ -817,6 +817,41 @@ angular.module('admin.component')
         return this.optional(element) || reg.test(value);
     }, "密码由8-16位字母、数字和特殊字符组成，且至少有一个大写字母或者特殊字符！");
 })(jQuery);
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchForm', function (uiSearchFormFactory, componentHelper) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: function (scope, element, attrs) {
+                var ref = componentHelper.getComponentRef(element.parent().find('.ui-table'), '$table');
+
+                //
+                var searchForm = new uiSearchFormFactory(scope, element, attrs, ref),
+                    thisRef = attrs.ref || '$searchForm';
+                scope[thisRef] = searchForm;
+                componentHelper.tiggerComplete(scope, thisRef, searchForm);
+            },
+            template: function (element, attrs) {
+                var col = attrs.column || "11:1",
+                    ref = attrs.ref || '$searchForm';
+                var cc = col.split(':');
+                return componentHelper.getTemplate('tpl.searchform', {
+                    leftCol: cc[0],
+                    rightCol: cc[1],
+                    ref: ref
+                });
+            }
+        };
+    });
+
 /**
  * 表单控件
  */
@@ -3264,41 +3299,6 @@ angular.module('admin.component')
         };
     })
 ;
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchForm', function (uiSearchFormFactory, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: function (scope, element, attrs) {
-                var ref = componentHelper.getComponentRef(element.parent().find('.ui-table'), '$table');
-
-                //
-                var searchForm = new uiSearchFormFactory(scope, element, attrs, ref),
-                    thisRef = attrs.ref || '$searchForm';
-                scope[thisRef] = searchForm;
-                componentHelper.tiggerComplete(scope, thisRef, searchForm);
-            },
-            template: function (element, attrs) {
-                var col = attrs.column || "11:1",
-                    ref = attrs.ref || '$searchForm';
-                var cc = col.split(':');
-                return componentHelper.getTemplate('tpl.searchform', {
-                    leftCol: cc[0],
-                    rightCol: cc[1],
-                    ref: ref
-                });
-            }
-        };
-    });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -3544,6 +3544,51 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSpinner', function (UISpinnerControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function(s, e, a)  {
+                new UISpinnerControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <div class=\"input-group\" style=\"width:150px;\">\
+\n                           <div class=\"spinner-buttons input-group-btn\">\
+\n                               <button type=\"button\" class=\"btn spinner-up blue\"><i class=\"fa fa-plus\"></i></button>\
+\n                           </div>\
+\n                           <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" readonly=\"true\"/>\
+\n                           <div class=\"spinner-buttons input-group-btn\">\
+\n                               <button type=\"button\" class=\"btn spinner-down red\"><i class=\"fa fa-minus\"></i></button>\
+\n                           </div>\
+\n                       </div>\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                    </div>\
+\n               </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
 //  针对select的封装
 //
 //
@@ -3618,51 +3663,6 @@ angular.module('admin.component')
         };
     });
 
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSpinner', function (UISpinnerControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                placeholder: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function(s, e, a)  {
-                new UISpinnerControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <div class=\"input-group\" style=\"width:150px;\">\
-\n                           <div class=\"spinner-buttons input-group-btn\">\
-\n                               <button type=\"button\" class=\"btn spinner-up blue\"><i class=\"fa fa-plus\"></i></button>\
-\n                           </div>\
-\n                           <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" readonly=\"true\"/>\
-\n                           <div class=\"spinner-buttons input-group-btn\">\
-\n                               <button type=\"button\" class=\"btn spinner-down red\"><i class=\"fa fa-minus\"></i></button>\
-\n                           </div>\
-\n                       </div>\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                    </div>\
-\n               </div>\
-\n            ")
-        };
-    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4721,6 +4721,42 @@ angular.module('admin.component')
         };
     });
 
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('tooltip', function () {
+        return {
+            restrict: 'A',
+            replace: false,
+            link: function (scope, element, attrs) {
+                var content = attrs.tooltip,
+                    title = attrs.title,
+                    placement = attrs.placement || (title ? 'right' : 'top');
+
+                //如果有标题有内容, 那么使用popup over
+                if (title) {
+                    element.popover({
+                        title: title,
+                        content: content,
+                        placement: placement,
+                        trigger: 'hover'
+                    });
+                }
+                //否则使用tooltip
+                else {
+                    element.tooltip({
+                        title: content,
+                        placement: placement
+                    });
+                }
+            }
+        };
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
