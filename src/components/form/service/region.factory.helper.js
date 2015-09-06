@@ -12,7 +12,7 @@ angular.module('admin.component')
 
             isInitDataMaping = false,
             isInitDataMap = false,
-            dataMapUrl = `${AdminCDN}/js/China_Region_Last.js`,
+            dataMapUrl = `${AdminCDN}/assets/js/China_Region_Last.js`,
             dataMap,
 
             isInitDataList = false,

@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------------------------------
 (function () {
     angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'ui.router'])
-        .constant('AdminCDN', 'http://localhost:63342/AngularAdminSrc/output/assets')
+        .constant('AdminCDN', 'http://7xllk7.com1.z0.glb.clouddn.com')
         .config((AdminCDN, AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider, UITreeControlProvider) => {
 
             //
@@ -24,7 +24,7 @@
             //
             // 百度编辑器的库地址
             //
-            UIEditorControlProvider.setUrl(`${AdminCDN}/js/ueditor/ueditor.config.js`, `${AdminCDN}/js/ueditor/ueditor.all.js`);
+            UIEditorControlProvider.setUrl(`${AdminCDN}/assets/js/ueditor/ueditor.config.js`, `${AdminCDN}/assets/js/ueditor/ueditor.all.js`);
 
             //
             // 上传空间的配置

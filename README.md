@@ -8,6 +8,15 @@
     * template   custom control template
     * admin.js   entry file
 
+## 已上传到七牛
+
+```javascript
+<link rel="stylesheet" href="http://7xllk7.com1.z0.glb.clouddn.com/css/all.css"/>
+<script src="http://7xllk7.com1.z0.glb.clouddn.com/js/lib.js"></script>
+<script src="http://7xllk7.com1.z0.glb.clouddn.com/js/all.js"></script>
+即可完美体验
+```
+
 ## 配置项
 
 ```javascript

@@ -1540,7 +1540,7 @@ angular.module('admin.component')
 
             isInitDataMaping = false,
             isInitDataMap = false,
-            dataMapUrl = (("" + AdminCDN) + "/js/China_Region_Last.js"),
+            dataMapUrl = (("" + AdminCDN) + "/assets/js/China_Region_Last.js"),
             dataMap,
 
             isInitDataList = false,
@@ -5043,7 +5043,7 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 (function () {
     angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'ui.router'])
-        .constant('AdminCDN', 'http://localhost:63342/AngularAdminSrc/output/assets')
+        .constant('AdminCDN', 'http://7xllk7.com1.z0.glb.clouddn.com')
         .config(function(AdminCDN, AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider, UITreeControlProvider)  {
 
             //
@@ -5060,7 +5060,7 @@ angular.module('admin.component')
             //
             // 百度编辑器的库地址
             //
-            UIEditorControlProvider.setUrl((("" + AdminCDN) + "/js/ueditor/ueditor.config.js"), (("" + AdminCDN) + "/js/ueditor/ueditor.all.js"));
+            UIEditorControlProvider.setUrl((("" + AdminCDN) + "/assets/js/ueditor/ueditor.config.js"), (("" + AdminCDN) + "/assets/js/ueditor/ueditor.all.js"));
 
             //
             // 上传空间的配置
