@@ -150,10 +150,10 @@
 <ui-tree url="/test/remote/select"
              on-data-success="dataSuccessHandler(result)"
              on-data-fail="dataFailHandler(result)"
-             before-check="beforeCheckHandler(treeNode)"
-             check="checkHandler(treeNode)"
-             before-click="beforeClickHandler(treeNode)"
-             click="clickHandler(treeNode)"></ui-tree>
+             on-before-check="beforeCheckHandler(treeNode)"
+             on-check="checkHandler(treeNode)"
+             on-before-click="beforeClickHandler(treeNode)"
+             on-click="clickHandler(treeNode)"></ui-tree>
 ```
 
 ## 弹出框
