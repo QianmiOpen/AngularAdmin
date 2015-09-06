@@ -3330,59 +3330,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  参数
-//      p -- 省, 开关, 默认开, 可不填
-//      c -- 市, 开关, 默认开, 可不填
-//      s -- 区, 开关, 默认开, 可不填
-//      a -- 地址, 开关, 默认关
-//
-//      s-name -- 区域的name
-//      a-name -- 详细地址的name
-//
-//
-//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
-//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
-//      s-value -- 区域默认值
-//      a-value -- 地址值
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormRegion', function (UIRegionControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@',
-                type: '@',
-                mode: '@'
-            },
-            link: function(s, e, a)  {
-                new UIRegionControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-region\">\
-\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"city\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"area\"/>\
-\n                        <input type=\"text\" class=\"input-medium form-control input-inline\" name=\"address\" ng-value=\"{{aValue}}\" placeholder=\"请输入详细地址\" />\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>'\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
 //  针对input的封装
 //
 //
@@ -3536,6 +3483,59 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
+//  参数
+//      p -- 省, 开关, 默认开, 可不填
+//      c -- 市, 开关, 默认开, 可不填
+//      s -- 区, 开关, 默认开, 可不填
+//      a -- 地址, 开关, 默认关
+//
+//      s-name -- 区域的name
+//      a-name -- 详细地址的name
+//
+//
+//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
+//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
+//      s-value -- 区域默认值
+//      a-value -- 地址值
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormRegion', function (UIRegionControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@',
+                type: '@',
+                mode: '@'
+            },
+            link: function(s, e, a)  {
+                new UIRegionControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-region\">\
+\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"city\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"area\"/>\
+\n                        <input type=\"text\" class=\"input-medium form-control input-inline\" name=\"address\" ng-value=\"{{aValue}}\" placeholder=\"请输入详细地址\" />\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
 //  针对select的封装
 //
 //
@@ -3658,6 +3658,43 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSwitch', function (UISwitchControl) {
+        return {
+            restrict: 'E',
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function(s, e, a)  {
+                new UISwitchControl(s, e, a);
+            },
+            template: ("\
+\n               <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
 //  针对input的封装
 //
 //
@@ -3703,43 +3740,6 @@ angular.module('admin.component')
 \n            ")
         };
     });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSwitch', function (UISwitchControl) {
-        return {
-            restrict: 'E',
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                placeholder: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function(s, e, a)  {
-                new UISwitchControl(s, e, a);
-            },
-            template: ("\
-\n               <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>\
-\n            ")
-        };
-    });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4560,7 +4560,7 @@ angular.module('admin.component')
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .factory('UITableToolBarControl', function () {
+    .factory('UITableToolBarControl', function ($state) {
         var UITableToolBarControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableToolBarControl, super$0);var proto$0={};
             function UITableToolBarControl(scope, element, attrs, transclude) {
                 super$0.call(this);
@@ -4595,6 +4595,20 @@ angular.module('admin.component')
             };
 
             proto$0.doAddItem = function() {
+                if (this.scope[this.attrs.add]) {
+                    this.scope[this.attrs.add]();
+                }
+                else if (this.attrs.add && this.attrs.add.indexOf('/') != -1) {
+                    if (this.attrs.addDialog) {
+                        //TODO: 弹出框
+                    }
+                    else {
+                        $state.go(this.attrs.add);
+                    }
+                }
+                else {
+                    this.message.error('点击添加数据按钮，但是没有设置地址, 请在add="地址"');
+                }
             };
 
             proto$0.doDelItems = function() {
@@ -4614,7 +4628,8 @@ angular.module('admin.component')
         MIXIN$0(UITableToolBarControl.prototype,proto$0);proto$0=void 0;return UITableToolBarControl;})(ComponentEvent);
         return UITableToolBarControl;
     })
-    .factory('uiTableToolBarFactory', function (msg, ajax, $injector) {
+    .
+    factory('uiTableToolBarFactory', function (msg, ajax, $injector) {
         var m = new msg('TableToolBar'),
             TableToolBar = function ($scope, tableId, $element, $attrs) {
                 this.scope = $scope;
@@ -4751,7 +4766,7 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 (function () {
-    angular.module('admin', ['admin.service', 'admin.filter', 'admin.component'])
+    angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'ui.router'])
         .config(function(AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider)  {
             var baseJsUrl = 'http://localhost:63342/AngularAdmin/output/assets/js/';
 

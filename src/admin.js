@@ -6,7 +6,7 @@
 //
 //-----------------------------------------------------------------------------------------------
 (function () {
-    angular.module('admin', ['admin.service', 'admin.filter', 'admin.component'])
+    angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'ui.router'])
         .config((AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider) => {
             let baseJsUrl = 'http://localhost:63342/AngularAdmin/output/assets/js/';
 

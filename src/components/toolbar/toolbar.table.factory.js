@@ -7,7 +7,7 @@
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .factory('UITableToolBarControl', function () {
+    .factory('UITableToolBarControl', function ($state) {
         class UITableToolBarControl extends ComponentEvent {
             constructor(scope, element, attrs, transclude) {
                 super();
@@ -42,6 +42,20 @@ angular.module('admin.component')
             }
 
             doAddItem() {
+                if (this.scope[this.attrs.add]) {
+                    this.scope[this.attrs.add]();
+                }
+                else if (this.attrs.add && this.attrs.add.indexOf('/') != -1) {
+                    if (this.attrs.addDialog) {
+                        //TODO: 弹出框
+                    }
+                    else {
+                        $state.go(this.attrs.add);
+                    }
+                }
+                else {
+                    this.message.error('点击添加数据按钮，但是没有设置地址, 请在add="地址"');
+                }
             }
 
             doDelItems() {
@@ -61,7 +75,8 @@ angular.module('admin.component')
         }
         return UITableToolBarControl;
     })
-    .factory('uiTableToolBarFactory', function (msg, ajax, $injector) {
+    .
+    factory('uiTableToolBarFactory', function (msg, ajax, $injector) {
         var m = new msg('TableToolBar'),
             TableToolBar = function ($scope, tableId, $element, $attrs) {
                 this.scope = $scope;
