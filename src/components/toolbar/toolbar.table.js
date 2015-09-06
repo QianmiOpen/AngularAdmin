@@ -18,9 +18,7 @@ angular.module('admin.component')
                 tip: '@'
             },
             controller: ($scope, $element, $attrs, $transclude) => {
-                var uiTableToolbar = new UITableToolBarControl($scope, $element, $attrs, $transclude);
-                uiTableToolbar.init();
-                uiTableToolbar.initEvents();
+                new UITableToolBarControl($scope, $element, $attrs, $transclude);
             },
             template: `
                 <div class="ui-toolbar table-toolbar">

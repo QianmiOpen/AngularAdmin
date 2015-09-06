@@ -75,7 +75,7 @@
                     pageNumberName = _pageNumberName;
                 },
 
-                $get: function (Ajax, Message, Util) {
+                $get: function (Ajax, Message, Util, AdminCDN) {
                     class UITableControl extends ComponentEvent {
                         constructor(scope, element, attrs) {
                             super();
@@ -149,8 +149,13 @@
                         }
 
                         build() {
-                            this.instance = this.element.find('table').dataTable($.extend({}, defaultConfig, this));
-                            this.scope.$emit('uitable.complete', this);
+                            if ($.fn.dataTable) {
+                                this._build();
+                            }
+                            else {
+                                Ajax.getScript(`${AdminCDN}/js/jquery.dataTables.min.js`)
+                                    .then(() => this._build());
+                            }
                         }
 
                         jumpTo(page) {
@@ -186,6 +191,11 @@
 
                         selectAll(isSelected) {
                             this.scope.$broadcast('uitable.column.selectall', isSelected);
+                        }
+
+                        _build() {
+                            this.instance = this.element.find('table').dataTable($.extend({}, defaultConfig, this));
+                            this.scope.$emit('uitable.complete', this);
                         }
 
                         _fetchData(sSource, aoData, fnCallback) {

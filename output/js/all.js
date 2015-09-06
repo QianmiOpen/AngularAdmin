@@ -124,6 +124,14 @@ angular.module('admin.service')
                         remove: function(url, data, options) {var this$0 = this;
                             return util.confirm((("您确认删除该" + (options.label || '数据')) + "吗?"))
                                 .then(function()  {return this$0.message(url, data, '删除数据成功', '删除数据失败')});
+                        },
+
+                        getScript: function(url) {
+                            return $.ajax({
+                                url: url,
+                                dataType: "script",
+                                cache: true
+                            });
                         }
                     };
                 }
@@ -1526,13 +1534,13 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiRegionHelper', function ($q, Message) {
+    .factory('uiRegionHelper', function ($q, Message, AdminCDN) {
         var m = new Message('UiRegionHelper'),
             requestQueue = [],
 
             isInitDataMaping = false,
             isInitDataMap = false,
-            dataMapUrl = 'http://localhost:63342/AngularAdmin/output/assets/js/China_Region_Last.js',
+            dataMapUrl = (("" + AdminCDN) + "/China_Region_Last.js"),
             dataMap,
 
             isInitDataList = false,
@@ -4053,14 +4061,14 @@ angular.module('admin.component')
                 transclude: true,
                 scope: {
                     target: '@target',
-                    clickFnName: '@onClick'
+                    clickHandler: '@click'
                 },
                 link: function (scope, element, attrs) {
                     var button = new UIStateButton(scope, element, attrs);
                     button.init();
                 },
                 template: ("\
-\n                    <button type=\"button\" class=\"btn\" ng-transclude ng-click=\"clickHandler()\"></button>\
+\n                    <button type=\"button\" class=\"btn\" ng-transclude></button>\
 \n                ")
             };
         });
@@ -4287,7 +4295,7 @@ angular.module('admin.component')
                     pageNumberName = _pageNumberName;
                 },
 
-                $get: function (Ajax, Message, Util) {
+                $get: function (Ajax, Message, Util, AdminCDN) {
                     var UITableControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableControl, super$0);var proto$0={};
                         function UITableControl(scope, element, attrs) {
                             super$0.call(this);
@@ -4360,9 +4368,14 @@ angular.module('admin.component')
                             });
                         };
 
-                        proto$0.build = function() {
-                            this.instance = this.element.find('table').dataTable($.extend({}, defaultConfig, this));
-                            this.scope.$emit('uitable.complete', this);
+                        proto$0.build = function() {var this$0 = this;
+                            if ($.fn.dataTable) {
+                                this._build();
+                            }
+                            else {
+                                Ajax.getScript((("" + AdminCDN) + "/js/jquery.dataTables.min.js"))
+                                    .then(function()  {return this$0._build()});
+                            }
                         };
 
                         proto$0.jumpTo = function(page) {
@@ -4398,6 +4411,11 @@ angular.module('admin.component')
 
                         proto$0.selectAll = function(isSelected) {
                             this.scope.$broadcast('uitable.column.selectall', isSelected);
+                        };
+
+                        proto$0._build = function() {
+                            this.instance = this.element.find('table').dataTable($.extend({}, defaultConfig, this));
+                            this.scope.$emit('uitable.complete', this);
                         };
 
                         proto$0._fetchData = function(sSource, aoData, fnCallback) {var this$0 = this;
@@ -4520,8 +4538,8 @@ angular.module('admin.component')
             scope: {
                 change: '&',  //选中的数据变动了
                 jumpTo: '&', //点击跳转或者刷新
-                dataSuccess: '&', //数据获取成功
-                dateFail: '&', //数据获取失败
+                onDataSuccess: '&', //数据获取成功
+                onDateFail: '&', //数据获取失败
                 initParams: '=' //查询参数
             },
             compile: function () {
@@ -4571,6 +4589,8 @@ angular.module('admin.component')
                 this.table = null;
                 this.isEdit = false;
                 this.message = new Message('UITableToolBar');
+                this.init();
+                this.initEvents();
             }if(super$0!==null)SP$0(UITableToolBarControl,super$0);UITableToolBarControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableToolBarControl,"configurable":true,"writable":true}});DP$0(UITableToolBarControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
             proto$0.init = function() {var this$0 = this;
@@ -4612,6 +4632,28 @@ angular.module('admin.component')
             };
 
             proto$0.doDelItems = function() {
+                var table = this.scope.table,
+                    selectValues = table.selectValues;
+                if (this.scope[this.attrs.del]) {
+                    this.scope[this.attrs.del](selectValues);
+                }
+                else {
+                    if (this.attrs.del) {
+                        if (selectValues.length > 1) {
+                            ajax.remove(this.attrs.del, {ids: selectValues.join(',')}).then(function()  {
+                                table.refresh();
+                            });
+                        }
+                        else {
+                            ajax.remove(this.attrs.del + '/' + selectValues[0]).then(function()  {
+                                table.refresh();
+                            });
+                        }
+                    }
+                    else {
+                        this.message.error('点击删除数据按钮，但是没有设置地址, 请在del="地址"');
+                    }
+                }
             };
 
             proto$0.isShow = function(index, column) {
@@ -4627,83 +4669,6 @@ angular.module('admin.component')
             };
         MIXIN$0(UITableToolBarControl.prototype,proto$0);proto$0=void 0;return UITableToolBarControl;})(ComponentEvent);
         return UITableToolBarControl;
-    })
-    .
-    factory('uiTableToolBarFactory', function (msg, ajax, $injector) {
-        var m = new msg('TableToolBar'),
-            TableToolBar = function ($scope, tableId, $element, $attrs) {
-                this.scope = $scope;
-                this.element = $element;
-                this.tableId = tableId;
-                this.attrs = $attrs;
-                this.blank = ',' + ($attrs.blank || '') + ',';
-                this.isEdit = false;
-                this.editText = '开启';
-            };
-        TableToolBar.prototype = {
-            isShow: function (index, columnConfig) {
-                return this.blank.indexOf(',' + index + ',') == -1 && !columnConfig.bChecked;
-            },
-            toggleColumn: function (evt, column) {
-                column.bVisible = !column.bVisible;
-                if (this.scope[this.tableId]) {
-                    this.scope[this.tableId].instance.fnSetColumnVis(column.mIndex, column.bVisible, false);
-                }
-                evt.stopPropagation();
-            },
-            toggleEdit: function () {
-                this.isEdit = !this.isEdit;
-                this.editText = this.isEdit ? '关闭' : '开启';
-                this.scope[this.tableId].toggleEdit(this.isEdit);
-            },
-            getHideBeforeIndex: function (index) {
-                var css = this.instance.fnSettings().aoColumns;
-                var num = 0;
-                for (var i = 0; i < index; i++) {
-                    if (css[i].bVisible)
-                        num++;
-                }
-                return num;
-            },
-            doAddItem: function () {
-                if (this.scope.addItem) {
-                    this.scope.addItem();
-                }
-                else {
-                    if (this.attrs.add) {
-                        $injector.get('$state').go(this.attrs.add);
-                    }
-                    else {
-                        m.error('点击添加数据按钮，但是没有设置地址, 请在add="地址"');
-                    }
-                }
-            },
-            doDelItem: function (values) {
-                if (this.scope.delItem) {
-                    this.scope.delItem(values);
-                }
-                else {
-                    if (this.attrs.del) {
-                        if (values.length > 1) {
-                            ajax.remove(this.attrs.del, {ids: values.join(',')}).then(function () {
-                                this.scope[this.tableId].refresh();
-                            }.bind(this));
-                        }
-                        else {
-                            ajax.remove(this.attrs.del + '/' + values[0]).then(function () {
-                                this.scope[this.tableId].refresh();
-                            }.bind(this));
-                        }
-                    }
-                    else {
-                        m.error('点击删除数据按钮，但是没有设置地址, 请在del="地址"');
-                    }
-                }
-            }
-        };
-        return function ($scope, tableId, $element, $attrs) {
-            return new TableToolBar($scope, tableId, $element, $attrs);
-        };
     });
 //------------------------------------------------------
 //
@@ -4725,9 +4690,7 @@ angular.module('admin.component')
                 tip: '@'
             },
             controller: function($scope, $element, $attrs, $transclude)  {
-                var uiTableToolbar = new UITableToolBarControl($scope, $element, $attrs, $transclude);
-                uiTableToolbar.init();
-                uiTableToolbar.initEvents();
+                new UITableToolBarControl($scope, $element, $attrs, $transclude);
             },
             template: ("\
 \n                <div class=\"ui-toolbar table-toolbar\">\
@@ -4766,9 +4729,173 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 (function () {
+
+    var requestMethod = 'post',
+        idName = 'id',
+        pidName = 'pid',
+        labelName = 'name',
+        defaultConfig = {
+            check: {enable: true},
+            edit: {enable: false},
+            data: {
+                key: {name: "name", childs: "childs", title: "name"},
+                simpleData: {enable: true, idKey: "id", pIdKey: "pid", rootPId: "0"}
+            },
+            view: {addHoverDom: null, removeHoverDom: null},
+            callback: {beforeClick: null, onClick: null, onCheck: null}
+        };
+
+    angular.module('admin.component')
+        .provider('UITreeControl', function () {
+            var result = {
+
+                setDataName: function(_idName, _labelName, _pidName) {
+                    defaultConfig.data.simpleData.idKey = idName = _idName;
+                    defaultConfig.data.simpleData.pIdKey = pidName = _pidName;
+                    defaultConfig.data.key.name = labelName = _labelName;
+                },
+
+                setRequestMethod: function(_requestMethod) {
+                    requestMethod = _requestMethod;
+                },
+
+                $get: function(AdminCDN, Ajax) {
+                    var UITreeControl = (function(super$0){var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITreeControl, super$0);var proto$0={};
+                        function UITreeControl(scope, element, attrs, transclude) {
+                            super$0.call(this);
+                            this.element = element;
+                            this.scope = scope;
+                            this.attrs = attrs;
+                            this.transclude = transclude;
+                            this.message = new Message('UITree');
+                            this.init();
+                            this.initEvents();
+                        }if(super$0!==null)SP$0(UITreeControl,super$0);UITreeControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITreeControl,"configurable":true,"writable":true}});DP$0(UITreeControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                        proto$0.init = function() {
+                            this.treeId = 'uiTree' + new Date().getTime();
+                            this.callback = {
+                                beforeClick: function()  {
+                                },
+                                onClick: function()  {
+                                },
+                                beforeCheck: function()  {
+                                },
+                                onCheck: function()  {
+                                }
+                            };
+                            this.view = {
+                                addHoverDom: function()  {
+                                },
+                                removeHoverDom: function()  {
+                                }
+                            };
+                            this.triggerComplete(this.scope, this.attrs.ref || '$tree', this);
+                        };
+
+                        proto$0.initEvents = function() {
+
+                        };
+
+                        proto$0.build = function() {var this$0 = this;
+                            if ($.fn.ztree) {
+                                this.load();
+                            }
+                            else {
+                                Ajax.getScript((("" + AdminCDN) + "/js/zTree_v3/js/jquery.ztree.all-3.5.min.js"))
+                                    .then(function()  {return this$0.load()});
+                            }
+                        };
+
+                        proto$0.load = function(params, url) {var this$0 = this;
+                            url = url || this.attrs.url;
+                            if (url) {
+                                return Ajax[requestMethod](url, params || {})
+                                    .then(function(r)  {
+                                        this$0.scope.onDataSuccess({result: r});
+                                        this$0.setData(r);
+                                    })
+                                    .catch(function(r)  {
+                                        this$0.scope.onDataFail({result: r});
+                                        this$0.setData(r);
+                                    });
+                            }
+                            else {
+                                this.message.error('未设置url, 无法请求');
+                            }
+                        };
+
+                        proto$0.setData = function(resData) {
+                            resData = resData || [];
+                            if (this.attrs.root !== undefined) {
+                                var rootData = {open: true, type: 1};
+                                rootData[idName] = this.attrs.rootId || '0';
+                                rootData[labelName] = this.attrs.root || '根';
+                                resData.push(rootData);
+                            }
+                            this.instance = $.fn.zTree.init(this.element, $.extend({}, defaultConfig, this), resData);
+                        };
+
+                        proto$0._filter = function(filterText) {
+                        };
+                    MIXIN$0(UITreeControl.prototype,proto$0);proto$0=void 0;return UITreeControl;})(ComponentEvent);
+                    return UITreeControl;
+                }
+            };
+            return result;
+        });
+})();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiTree', function (UITreeControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                beforeClick: '&',
+                click: '&',
+                beforeCheck: '&',
+                check: '&',
+                checked: '=',
+                filter: '=',
+                onDataSuccess: '&',
+                onDataFail: '&'
+            },
+            compile: function () {
+                var uiTree = null;
+                return {
+                    pre: function (s, e, a, c, t) {
+                        uiTree = new UITreeControl(s, e, a, t);
+                        uiTree.init();
+                        uiTree.initEvents();
+                    },
+                    post: function () {
+                        uiTree.build();
+                    }
+                };
+            },
+            template: ("\
+\n                <ul class=\"ztree ui-tree\"></ul>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
     angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'ui.router'])
-        .config(function(AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider)  {
-            var baseJsUrl = 'http://localhost:63342/AngularAdmin/output/assets/js/';
+        .constant('AdminCDN', 'http://localhost:63342/AngularAdminSrc/output/assets')
+        .config(function(AdminCDN, AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider, UITreeControlProvider)  {
 
             //
             // ajax 默认返回处理
@@ -4784,7 +4911,7 @@ angular.module('admin.component')
             //
             // 百度编辑器的库地址
             //
-            UIEditorControlProvider.setUrl((("" + baseJsUrl) + "/ueditor/ueditor.config.js"), (("" + baseJsUrl) + "/ueditor/ueditor.all.js"));
+            UIEditorControlProvider.setUrl((("" + AdminCDN) + "/js/ueditor/ueditor.config.js"), (("" + AdminCDN) + "/js/ueditor/ueditor.all.js"));
 
             //
             // 上传空间的配置
@@ -4800,5 +4927,11 @@ angular.module('admin.component')
             UITableControlProvider.setResultName('aaData', 'iTotalRecords');
             UITableControlProvider.setPageName('pageSize', 'pageNo');
             UITableControlProvider.setConfig({});
+
+            //
+            // 树配置项
+            //
+            UITreeControlProvider.setDataName('id', 'name', 'pid');
+            UITreeControlProvider.setRequestMethod('post');
         });
 })();

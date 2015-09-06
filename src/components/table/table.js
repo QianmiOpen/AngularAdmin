@@ -13,8 +13,8 @@ angular.module('admin.component')
             scope: {
                 change: '&',  //选中的数据变动了
                 jumpTo: '&', //点击跳转或者刷新
-                dataSuccess: '&', //数据获取成功
-                dateFail: '&', //数据获取失败
+                onDataSuccess: '&', //数据获取成功
+                onDateFail: '&', //数据获取失败
                 initParams: '=' //查询参数
             },
             compile: function () {

@@ -7,8 +7,8 @@
 //-----------------------------------------------------------------------------------------------
 (function () {
     angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'ui.router'])
-        .config((AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider) => {
-            let baseJsUrl = 'http://localhost:63342/AngularAdmin/output/assets/js/';
+        .constant('AdminCDN', 'http://localhost:63342/AngularAdminSrc/output/assets')
+        .config((AdminCDN, AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider, UITreeControlProvider) => {
 
             //
             // ajax 默认返回处理
@@ -24,7 +24,7 @@
             //
             // 百度编辑器的库地址
             //
-            UIEditorControlProvider.setUrl(`${baseJsUrl}/ueditor/ueditor.config.js`, `${baseJsUrl}/ueditor/ueditor.all.js`);
+            UIEditorControlProvider.setUrl(`${AdminCDN}/js/ueditor/ueditor.config.js`, `${AdminCDN}/js/ueditor/ueditor.all.js`);
 
             //
             // 上传空间的配置
@@ -40,5 +40,11 @@
             UITableControlProvider.setResultName('aaData', 'iTotalRecords');
             UITableControlProvider.setPageName('pageSize', 'pageNo');
             UITableControlProvider.setConfig({});
+
+            //
+            // 树配置项
+            //
+            UITreeControlProvider.setDataName('id', 'name', 'pid');
+            UITreeControlProvider.setRequestMethod('post');
         });
 })();

@@ -6,13 +6,13 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiRegionHelper', function ($q, Message) {
+    .factory('uiRegionHelper', function ($q, Message, AdminCDN) {
         var m = new Message('UiRegionHelper'),
             requestQueue = [],
 
             isInitDataMaping = false,
             isInitDataMap = false,
-            dataMapUrl = 'http://localhost:63342/AngularAdmin/output/assets/js/China_Region_Last.js',
+            dataMapUrl = `${AdminCDN}/China_Region_Last.js`,
             dataMap,
 
             isInitDataList = false,

@@ -54,14 +54,14 @@
                 transclude: true,
                 scope: {
                     target: '@target',
-                    clickFnName: '@onClick'
+                    clickHandler: '@click'
                 },
                 link: function (scope, element, attrs) {
                     let button = new UIStateButton(scope, element, attrs);
                     button.init();
                 },
                 template: `
-                    <button type="button" class="btn" ng-transclude ng-click="clickHandler()"></button>
+                    <button type="button" class="btn" ng-transclude></button>
                 `
             };
         });

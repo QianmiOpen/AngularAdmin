@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Demo</title>
+    <link rel="stylesheet" href="../output/css/all.css"/>
+</head>
+<body style="background-color: #fff !important;padding: 10px;" ng-app="admin">
+<ui-container style="display: none" controller="CC">
+    <ui-tree url="/test/remote/select"
+             on-data-success="dataSuccessHandler(result)"
+             on-data-fail="dataFailHandler(result)"
+             before-check="beforeCheckHandler(treeNode)"
+             check="checkHandler(treeNode)"
+             before-click="beforeClickHandler(treeNode)"
+             click="clickHandler(treeNode)"></ui-tree>
+</ui-container>
+</body>
+<script src="../output/js/lib.js"></script>
+<script src="../output/js/all.js"></script>
+<script src="../output/assets/js/jquery.mockjax.js"></script>
+<script>
+    var remoteSelects = [];
+    for (var i = 0; i < 10; i++) {
+        remoteSelects.push({
+            id: i + '',
+            name: new Date(new Date().getTime() + i * 1000)
+        });
+    }
+    $.mockjax({
+        url: '/test/remote/select',
+        response: function () {
+            this.responseText = {
+                data: remoteSelects,
+                type: 1
+            }
+        }
+    });
+
+
+    function CC($scope, Message, $timeout) {
+        $scope.dataSuccessHandler = function () {
+            Message.success('数据加载成功了');
+        }
+    }
+</script>
+</html>

@@ -30,3 +30,5 @@
 .ui-form-region .select2-container{width: 120px !important;}
 
 .ui-form-upload div {margin-bottom: 4px}
+
+.ui-tree {width:100%; overflow:auto;}

@@ -42,7 +42,14 @@
     //
     UITableControlProvider.setRequestMethod('post');
     UITableControlProvider.setResultName('aaData', 'iTotalRecords');
+    UITableControlProvider.setPageName('pageSize', 'pageNo');
     UITableControlProvider.setConfig({});
+
+    //
+    // 树配置项
+    //
+    UITreeControlProvider.setDataName('id', 'name', 'pid');
+    UITreeControlProvider.setRequestMethod('post');
 });
 ```
 
@@ -138,6 +145,16 @@
 ```
 
 ## 树
+
+```javascript
+<ui-tree url="/test/remote/select"
+             on-data-success="dataSuccessHandler(result)"
+             on-data-fail="dataFailHandler(result)"
+             before-check="beforeCheckHandler(treeNode)"
+             check="checkHandler(treeNode)"
+             before-click="beforeClickHandler(treeNode)"
+             click="clickHandler(treeNode)"></ui-tree>
+```
 
 ## 弹出框
 
