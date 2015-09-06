@@ -20,6 +20,7 @@ angular.module('admin.component')
             template: `
                 <th>
                     {{head}}
+                    <div style="display:none" ng-transclude></div>
                 </th>'
             `
         };

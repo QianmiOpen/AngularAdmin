@@ -49,7 +49,9 @@
         `,
         dataName = 'aaData',
         totalName = 'iTotalRecords',
-        requestMethod = 'post';
+        requestMethod = 'post',
+        pageSizeName = 'pageSize',
+        pageNumberName = 'pageNo';
 
     angular.module('admin.component')
         .provider('UITableControl', function () {
@@ -66,6 +68,11 @@
 
                 setRequestMethod(_requestMethod) {
                     requestMethod = _requestMethod;
+                },
+
+                setPageName(_pageSizeName, _pageNumberName) {
+                    pageSizeName = _pageNumberName;
+                    pageNumberName = _pageNumberName;
                 },
 
                 $get: function (Ajax, Message, Util) {
@@ -88,7 +95,9 @@
                                 this._buildJumpDom();
                             };
                             this.fnServerData = (sSource, aoData, fnCallback) => {
-                                this._fetchData(sSource, aoData, fnCallback);
+                                setTimeout(() => {
+                                    this._fetchData(sSource, aoData, fnCallback);
+                                }, 100)
                             };
 
                             //
@@ -98,7 +107,7 @@
                             this.selectValues = [];
                             this.selectItems = [];
                             this.instance = null;
-                            this.searchParams = null;
+                            this.searchParams = [];
                             this.pageSelectNum = [];
                             this.triggerComplete(this.scope, this.attrs.ref || '$table', this);
                         }
@@ -154,26 +163,10 @@
                             }
                             else {
                                 var url = this.url || this.attrs.url;
-                                $.each(this.searchParams || {}, (name, value) => {
-                                    aoData.push({name, value});
-                                });
+                                this._buildPageParam(aoData);
                                 Ajax[requestMethod](url, aoData)
                                     .then((data) => {
-                                        let result = {};
-                                        if ($.isArray(data)) {
-                                            result = {
-                                                aaData: data,
-                                                iTotalDisplayRecords: data.length,
-                                                iTotalRecords: data.length
-                                            };
-                                        }
-                                        else {
-                                            result = {
-                                                aaData: data[dataName],
-                                                iTotalDisplayRecords: result[totalName],
-                                                iTotalRecords: result[totalName]
-                                            };
-                                        }
+                                        let result = this._buildPageResult(data);
                                         this._beforeDataHandler(result);
                                         fnCallback(result);
                                         this._afterDataHandler(result);
@@ -202,6 +195,45 @@
 
                         _errorDataHandler(result) {
                             this.scope.dateFail({result: result});
+                        }
+
+                        _buildPageResult(data) {
+                            let result = {};
+                            if ($.isArray(data)) {
+                                result = {
+                                    aaData: data,
+                                    iTotalDisplayRecords: data.length,
+                                    iTotalRecords: data.length
+                                };
+                            }
+                            else {
+                                result = {
+                                    aaData: data[dataName],
+                                    iTotalDisplayRecords: result[totalName],
+                                    iTotalRecords: result[totalName]
+                                };
+                            }
+                            return result;
+                        }
+
+                        _buildPageParam(searchParams) {
+                            $.each(this.scope.initParams || {}, (name, value) => {
+                                searchParams.push({name, value});
+                            });
+                            $.each(this.searchParams || {}, (name, value) => {
+                                searchParams.push({name, value});
+                            });
+                            let start, size;
+                            $.each(searchParams || {}, (name, value) => {
+                                if (name == 'iDisplayStart') {
+                                    start = value;
+                                }
+                                else if (name == 'iDisplayLength') {
+                                    size = value;
+                                }
+                            });
+                            searchParams.push({name: pageNumberName, value: start / size});
+                            searchParams.push({name: pageSizeName, value: size});
                         }
 
                         _buildJumpDom() {

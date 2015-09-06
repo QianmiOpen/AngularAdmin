@@ -38,6 +38,7 @@
             //
             UITableControlProvider.setRequestMethod('post');
             UITableControlProvider.setResultName('aaData', 'iTotalRecords');
+            UITableControlProvider.setPageName('pageSize', 'pageNo');
             UITableControlProvider.setConfig({});
         });
 })();

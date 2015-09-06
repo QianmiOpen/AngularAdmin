@@ -11,7 +11,7 @@ angular.module('admin.component')
             return val || defaultV || '-';
         };
     })
-    .factory('UITableColumnControl', function (Message) {
+    .factory('UITableColumnControl', function (Message, $compile) {
         class UITableColumnControl extends ComponentEvent {
             constructor($scope, $element, $attrs, $transclude) {
                 super();
@@ -58,12 +58,7 @@ angular.module('admin.component')
 
             render(rowData) {
                 if (this.hasTransclude) {
-                    var $doms = null;
-                    this.transclude(this.scope.$new(), function (c, s) {
-                        s.data = rowData;
-                        $doms = c;
-                    });
-                    return $doms;
+                    return this.getTransclude(rowData);
                 }
                 else {
                     var customRenderName = 'render' + name.charAt(0).toUpperCase() + name.substr(1);
@@ -89,6 +84,13 @@ angular.module('admin.component')
                     v = rowData[name];
                 }
                 return v;
+            }
+
+            getTransclude(rowData){
+                let s = this.scope.$new();
+                s.data = rowData;
+                let $dom = $compile(this.element.find('div').html())(s);
+                return $dom;
             }
 
             wrapperDisplay(r) {

@@ -14,7 +14,8 @@ angular.module('admin.component')
                 change: '&',  //选中的数据变动了
                 jumpTo: '&', //点击跳转或者刷新
                 dataSuccess: '&', //数据获取成功
-                dateFail: '&' //数据获取失败
+                dateFail: '&', //数据获取失败
+                initParams: '=' //查询参数
             },
             compile: function () {
                 var uiTable = null;

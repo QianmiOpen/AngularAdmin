@@ -3027,6 +3027,7 @@ angular.module('admin.component')
             template: ("\
 \n                <th>\
 \n                    {{head}}\
+\n                    <div style=\"display:none\" ng-transclude></div>\
 \n                </th>'\
 \n            ")
         };
@@ -3137,7 +3138,7 @@ angular.module('admin.component')
             return val || defaultV || '-';
         };
     })
-    .factory('UITableColumnControl', function (Message) {
+    .factory('UITableColumnControl', function (Message, $compile) {
         var UITableColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableColumnControl, super$0);var proto$0={};
             function UITableColumnControl($scope, $element, $attrs, $transclude) {
                 super$0.call(this);
@@ -3184,12 +3185,7 @@ angular.module('admin.component')
 
             proto$0.render = function(rowData) {
                 if (this.hasTransclude) {
-                    var $doms = null;
-                    this.transclude(this.scope.$new(), function (c, s) {
-                        s.data = rowData;
-                        $doms = c;
-                    });
-                    return $doms;
+                    return this.getTransclude(rowData);
                 }
                 else {
                     var customRenderName = 'render' + name.charAt(0).toUpperCase() + name.substr(1);
@@ -3215,6 +3211,13 @@ angular.module('admin.component')
                     v = rowData[name];
                 }
                 return v;
+            };
+
+            proto$0.getTransclude = function(rowData){
+                var s = this.scope.$new();
+                s.data = rowData;
+                var $dom = $compile(this.element.find('div').html())(s);
+                return $dom;
             };
 
             proto$0.wrapperDisplay = function(r) {
@@ -3533,51 +3536,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSpinner', function (UISpinnerControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                placeholder: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function(s, e, a)  {
-                new UISpinnerControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <div class=\"input-group\" style=\"width:150px;\">\
-\n                           <div class=\"spinner-buttons input-group-btn\">\
-\n                               <button type=\"button\" class=\"btn spinner-up blue\"><i class=\"fa fa-plus\"></i></button>\
-\n                           </div>\
-\n                           <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" readonly=\"true\"/>\
-\n                           <div class=\"spinner-buttons input-group-btn\">\
-\n                               <button type=\"button\" class=\"btn spinner-down red\"><i class=\"fa fa-minus\"></i></button>\
-\n                           </div>\
-\n                       </div>\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                    </div>\
-\n               </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
 //  针对select的封装
 //
 //
@@ -3652,6 +3610,51 @@ angular.module('admin.component')
         };
     });
 
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSpinner', function (UISpinnerControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function(s, e, a)  {
+                new UISpinnerControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <div class=\"input-group\" style=\"width:150px;\">\
+\n                           <div class=\"spinner-buttons input-group-btn\">\
+\n                               <button type=\"button\" class=\"btn spinner-up blue\"><i class=\"fa fa-plus\"></i></button>\
+\n                           </div>\
+\n                           <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" readonly=\"true\"/>\
+\n                           <div class=\"spinner-buttons input-group-btn\">\
+\n                               <button type=\"button\" class=\"btn spinner-down red\"><i class=\"fa fa-minus\"></i></button>\
+\n                           </div>\
+\n                       </div>\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                    </div>\
+\n               </div>\
+\n            ")
+        };
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4252,7 +4255,9 @@ angular.module('admin.component')
 \n        "),
         dataName = 'aaData',
         totalName = 'iTotalRecords',
-        requestMethod = 'post';
+        requestMethod = 'post',
+        pageSizeName = 'pageSize',
+        pageNumberName = 'pageNo';
 
     angular.module('admin.component')
         .provider('UITableControl', function () {
@@ -4269,6 +4274,11 @@ angular.module('admin.component')
 
                 setRequestMethod: function(_requestMethod) {
                     requestMethod = _requestMethod;
+                },
+
+                setPageName: function(_pageSizeName, _pageNumberName) {
+                    pageSizeName = _pageNumberName;
+                    pageNumberName = _pageNumberName;
                 },
 
                 $get: function (Ajax, Message, Util) {
@@ -4291,7 +4301,9 @@ angular.module('admin.component')
                                 this$0._buildJumpDom();
                             };
                             this.fnServerData = function(sSource, aoData, fnCallback)  {
-                                this$0._fetchData(sSource, aoData, fnCallback);
+                                setTimeout(function()  {
+                                    this$0._fetchData(sSource, aoData, fnCallback);
+                                }, 100)
                             };
 
                             //
@@ -4301,7 +4313,7 @@ angular.module('admin.component')
                             this.selectValues = [];
                             this.selectItems = [];
                             this.instance = null;
-                            this.searchParams = null;
+                            this.searchParams = [];
                             this.pageSelectNum = [];
                             this.triggerComplete(this.scope, this.attrs.ref || '$table', this);
                         };
@@ -4357,6 +4369,9 @@ angular.module('admin.component')
                             }
                             else {
                                 var url = this.url || this.attrs.url;
+                                $.each(this.scope.initParams || {}, function(name, value)  {
+                                    aoData.push({name: name, value: value});
+                                });
                                 $.each(this.searchParams || {}, function(name, value)  {
                                     aoData.push({name: name, value: value});
                                 });
@@ -4448,7 +4463,8 @@ angular.module('admin.component')
                 change: '&',  //选中的数据变动了
                 jumpTo: '&', //点击跳转或者刷新
                 dataSuccess: '&', //数据获取成功
-                dateFail: '&' //数据获取失败
+                dateFail: '&', //数据获取失败
+                initParams: '=' //查询参数
             },
             compile: function () {
                 var uiTable = null;
@@ -4517,6 +4533,7 @@ angular.module('admin.component')
             //
             UITableControlProvider.setRequestMethod('post');
             UITableControlProvider.setResultName('aaData', 'iTotalRecords');
+            UITableControlProvider.setPageName('pageSize', 'pageNo');
             UITableControlProvider.setConfig({});
         });
 })();

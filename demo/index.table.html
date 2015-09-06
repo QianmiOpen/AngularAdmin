@@ -14,13 +14,14 @@
 </head>
 <body style="background-color: #fff !important;padding: 10px;" ng-app="admin">
 <ui-container style="display: none" controller="CC">
-    <ui-table url="/test/remote/select">
+    <ui-table url="/test/remote/select" init-params="{a:1,b:2}">
         <ui-table-check-column name="id"></ui-table-check-column>
         <ui-table-date-column head="日期列" name="date" format="yyyy-MM-dd"></ui-table-date-column>
         <ui-table-image-column head="图片列" image-css="imageSS" name="image" placeholder="xxxxxx"></ui-table-image-column>
         <ui-table-column head="简单列" name="simple"></ui-table-column>
         <ui-table-column head="自定义列" name="advance">
-            {{data.simple}}
+            <image ng-src="{{data.image}}"/>
+            <a ng-href="{{data.id}}" ng-bind="data.id"></a>
         </ui-table-column>
         <ui-table-progress-column head="进度条列" name="progress"></ui-table-progress-column>
         <ui-table-state-column head="状态列" name="state" default="0">
@@ -59,6 +60,9 @@
 
 
     function CC($scope, Message, $timeout) {
+        var a = 1, b = 2, c = 3;
+        $scope.tableOne = {};
+        $scope.tableOne.ssss = {a:a, b:b, c:c};
     }
 </script>
 </html>
