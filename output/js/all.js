@@ -817,485 +817,6 @@ angular.module('admin.component')
         return this.optional(element) || reg.test(value);
     }, "密码由8-16位字母、数字和特殊字符组成，且至少有一个大写字母或者特殊字符！");
 })(jQuery);
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchForm', function (uiSearchFormFactory, componentHelper) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: function (scope, element, attrs) {
-                var ref = componentHelper.getComponentRef(element.parent().find('.ui-table'), '$table');
-
-                //
-                var searchForm = new uiSearchFormFactory(scope, element, attrs, ref),
-                    thisRef = attrs.ref || '$searchForm';
-                scope[thisRef] = searchForm;
-                componentHelper.tiggerComplete(scope, thisRef, searchForm);
-            },
-            template: function (element, attrs) {
-                var col = attrs.column || "11:1",
-                    ref = attrs.ref || '$searchForm';
-                var cc = col.split(':');
-                return componentHelper.getTemplate('tpl.searchform', {
-                    leftCol: cc[0],
-                    rightCol: cc[1],
-                    ref: ref
-                });
-            }
-        };
-    });
-
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTableCheckColumn', function (UITableColumnControl) {
-        var UITableCheckColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableCheckColumnControl, super$0);var proto$0={};
-            function UITableCheckColumnControl(s, e, a) {
-                this.className = 'CheckColumn';
-                super$0.call(this, s, e, a);
-            }if(super$0!==null)SP$0(UITableCheckColumnControl,super$0);UITableCheckColumnControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableCheckColumnControl,"configurable":true,"writable":true}});DP$0(UITableCheckColumnControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                super$0.prototype.init.call(this);
-                this.$table = this.element.parents('table');
-                this.$tableBody = this.$table.find('tbody');
-            };
-
-            proto$0.initEvents = function() {var this$0 = this;
-                super$0.prototype.initEvents.call(this);
-                this.scope.$emit('uitable.column.idname', this.attrs.name);
-                this.scope.selectAllHandler = function(evt)  {
-                    this$0._selectAllHandler(evt);
-                };
-            };
-
-            proto$0.render = function(rowData) {var this$0 = this;
-                var val = this.getValue(rowData);
-                return $((("<input type=\"checkbox\" value=\"" + val) + "\"/>")).data('rowData', rowData).click(function(evt)  {
-                    this$0._selectOneHandler(evt);
-                });
-            };
-
-            proto$0._selectAllHandler = function(evt) {
-                var isCheck = evt.target.checked;
-                this.$tableBody.find('input[type=checkbox]').prop('checked', isCheck).uniform();
-                this.scope.$emit('uitable.column.selectall', isCheck);
-            };
-
-            proto$0._selectOneHandler = function(evt) {
-                var $target = $(evt.target);
-                this.scope.$emit('uitable.column.selectone', {isCheck: evt.target.checked, rowData: $target.data('rowData'), value: $target.val()});
-            };
-        MIXIN$0(UITableCheckColumnControl.prototype,proto$0);proto$0=void 0;return UITableCheckColumnControl;})(UITableColumnControl);
-
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                head: '@'
-            },
-            controller: function ($scope, $element, $attrs) {
-                return new UITableCheckColumnControl($scope, $element, $attrs);
-            },
-            template: ("\
-\n                <th>\
-\n                    <input type=\"checkbox\" ng-click=\"selectAllHandler($event)\"/>\
-\n                </th>\
-\n            ")
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTableDateColumn', function (UITableColumnControl, Util) {
-        var UITableDateColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableDateColumnControl, super$0);var proto$0={};
-            function UITableDateColumnControl(s, e, a) {
-                this.className = 'DateColumn';
-                super$0.call(this, s, e, a);
-            }if(super$0!==null)SP$0(UITableDateColumnControl,super$0);UITableDateColumnControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableDateColumnControl,"configurable":true,"writable":true}});DP$0(UITableDateColumnControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                super$0.prototype.init.call(this);
-                this.format = this.attrs.format || 'yyyy-MM-dd HH:mm:ss';
-            };
-
-            proto$0.render = function(rowData) {
-                var val = this.getValue(rowData);
-                if (val) {
-                    val = Util.dateFormatStr(val, this.format);
-                }
-                return $('<div/>').html(val);
-            };
-        MIXIN$0(UITableDateColumnControl.prototype,proto$0);proto$0=void 0;return UITableDateColumnControl;})(UITableColumnControl);
-
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                head: '@'
-            },
-            controller: function ($scope, $element, $attrs) {
-                return new UITableDateColumnControl($scope, $element, $attrs);
-            },
-            template: ("\
-\n                <th>\
-\n                    {{head}}\
-\n                </th>'\
-\n            ")
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTableImageColumn', function (UITableColumnControl) {
-        var UITableImageColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableImageColumnControl, super$0);var proto$0={};
-            function UITableImageColumnControl(s, e, a) {
-                super$0.call(this, s, e, a);
-            }if(super$0!==null)SP$0(UITableImageColumnControl,super$0);UITableImageColumnControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableImageColumnControl,"configurable":true,"writable":true}});DP$0(UITableImageColumnControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                super$0.prototype.init.call(this);
-            };
-
-            proto$0.render = function(rowData) {
-                var val = this.getValue(rowData),
-                    placeholder = this.attrs.placeholder,  //默认图片
-                    qiniu = this.attrs.qiniu; //七牛后缀
-                if (val === undefined) {
-                    val = placeholder;
-                }
-                if (val !== undefined && qiniu) {
-                    val = val + qiniu;
-                }
-                return $('<img/>').attr('src', val).addClass(this.scope.imageCss);
-            };
-        MIXIN$0(UITableImageColumnControl.prototype,proto$0);proto$0=void 0;return UITableImageColumnControl;})(UITableColumnControl);
-
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                head: '@',
-                imageCss: '@'
-            },
-            controller: function ($scope, $element, $attrs) {
-                return new UITableImageColumnControl($scope, $element, $attrs);
-            },
-            template: ("\
-\n                <th>\
-\n                    {{head}}\
-\n                </th>'\
-\n            ")
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTableColumn', function (UITableColumnControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                head: '@'
-            },
-            controller: function ($scope, $element, $attrs, $transclude) {
-                return new UITableColumnControl($scope, $element, $attrs, $transclude);
-            },
-            template: ("\
-\n                <th>\
-\n                    {{head}}\
-\n                    <div style=\"display:none\" ng-transclude></div>\
-\n                </th>'\
-\n            ")
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTableOperationColumn', function (UITableColumnControl) {
-        var UITableOperationColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableOperationColumnControl, super$0);var proto$0={};
-            function UITableOperationColumnControl(s, e, a) {
-                this.className = 'OperationColumn';
-                super$0.call(this, s, e, a);
-            }if(super$0!==null)SP$0(UITableOperationColumnControl,super$0);UITableOperationColumnControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableOperationColumnControl,"configurable":true,"writable":true}});DP$0(UITableOperationColumnControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                super$0.prototype.init.call(this);
-            };
-        MIXIN$0(UITableOperationColumnControl.prototype,proto$0);proto$0=void 0;return UITableOperationColumnControl;})(UITableColumnControl);
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                head: '@'
-            },
-            controller: function ($scope, $element, $attrs, $transclude) {
-                return new UITableOperationColumnControl($scope, $element, $attrs, $transclude);
-            },
-            template: ("\
-\n                <th>\
-\n                    {{head}}\
-\n                </th>'\
-\n            ")
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTableProgressColumn', function (UITableColumnControl) {
-        var UITableProgressColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableProgressColumnControl, super$0);var proto$0={};
-            function UITableProgressColumnControl(s, e, a) {
-                this.className = 'ProgressColumn';
-                super$0.call(this, s, e, a);
-            }if(super$0!==null)SP$0(UITableProgressColumnControl,super$0);UITableProgressColumnControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableProgressColumnControl,"configurable":true,"writable":true}});DP$0(UITableProgressColumnControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                super$0.prototype.init.call(this);
-            };
-
-            proto$0.render = function(rowData) {
-                var val = this.getValue(rowData), level,
-                    dom = this._getDom();
-                val = val !== undefined ? val : 0;
-                if (val <= 25)
-                    level = 'progress-bar-danger';
-                else if (val <= 50)
-                    level = 'progress-bar-danger';
-                else if (val <= 75)
-                    level = 'progress-bar-info';
-                dom.attr('title', val + '%').find('div').addClass(level).animate({width: val + '%'}).end();
-                return dom;
-            };
-
-            proto$0._getDom = function() {
-                return $(("\
-\n                    <div style=\"border: 1px solid #57b5e3;\" class=\"progress progress-striped active\" role=\"progressbar\"style=\"margin-bottom:0px;\">\
-\n                        <div class=\"progress-bar\"></div>\
-\n                    </div>\
-\n                "));
-            };
-        MIXIN$0(UITableProgressColumnControl.prototype,proto$0);proto$0=void 0;return UITableProgressColumnControl;})(UITableColumnControl);
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                head: '@'
-            },
-            controller: function ($scope, $element, $attrs) {
-                return new UITableProgressColumnControl($scope, $element, $attrs);
-            },
-            template: ("\
-\n                <th>\
-\n                    {{head}}\
-\n                </th>'\
-\n            ")
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .filter('emptyFilter', function () {
-        return function (val, defaultV) {
-            return val || defaultV || '-';
-        };
-    })
-    .factory('UITableColumnControl', function (Message, $compile) {
-        var UITableColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableColumnControl, super$0);var proto$0={};
-            function UITableColumnControl($scope, $element, $attrs, $transclude) {
-                super$0.call(this);
-                this.scope = $scope;
-                this.element = $element;
-                this.attrs = $attrs;
-                this.transclude = $transclude;
-                this.hasTransclude = $transclude && $transclude().length > 0;
-                this.className = this.className || 'Column';
-                this.init();
-                this.initEvents();
-            }if(super$0!==null)SP$0(UITableColumnControl,super$0);UITableColumnControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableColumnControl,"configurable":true,"writable":true}});DP$0(UITableColumnControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {var this$0 = this;
-                this.message = new Message('UITable' + this.className);
-                this.sName = this.attrs.name || '';
-                this.mTitle = this.attrs.head;
-                this.bEditable = this.attrs.editable;
-                this.bChecked = this.attrs.checked;
-                this.mEditUrl = this.attrs.editUrl;
-                this.mAttrs = this.attrs;
-                this.sClass = this.attrs.css || '';
-                this.sWidth = this.attrs.width || 'smart';
-                this.bVisible = this.attrs.novisible === undefined;
-                this.bSortable = this.attrs.sort !== undefined;
-                this.mDataProp = function(rowData, type)  {
-                    if (type != 'display') {
-                        return '';
-                    }
-                    if (arguments.length == 3) {  //datatable会调用两次，第一个获取数据，第二次用获取的数据，渲染数据....
-                        return arguments[2];
-                    }
-                    else {
-                        var r = this$0.render(rowData, type);
-                        var w = this$0.wrapperDisplay(r);
-                        return w;
-                    }
-                };
-                this.scope.$emit('uitable.column.complete', this);
-            };
-
-            proto$0.initEvents = function() {
-            };
-
-            proto$0.render = function(rowData) {
-                if (this.hasTransclude) {
-                    return this.getTransclude(rowData);
-                }
-                else {
-                    var customRenderName = 'render' + name.charAt(0).toUpperCase() + name.substr(1);
-                    if (this.scope[customRenderName]) {
-                        return this.scope[customRenderName](rowData);
-                    }
-                    else {
-                        return this.getValue(rowData);
-                    }
-                }
-            };
-
-            proto$0.getValue = function(rowData) {
-                var name = this.sName, v;
-                if (name && name.indexOf(".") != -1) {
-                    var ns = name.split('.'), n;
-                    v = rowData;
-                    while ((n = ns.shift()) && v) {
-                        v = v[n];
-                    }
-                }
-                else if (name) {
-                    v = rowData[name];
-                }
-                return v;
-            };
-
-            proto$0.getTransclude = function(rowData){
-                var s = this.scope.$new();
-                s.data = rowData;
-                var $dom = $compile(this.element.find('div').html())(s);
-                return $dom;
-            };
-
-            proto$0.wrapperDisplay = function(r) {
-                r = r !== undefined ? r : '-'; //针对0或者false值
-                if (r !== undefined && angular.isString(r)) {
-                    r = $.trim(r);
-                    r = r.length ? r : '-';
-                    r = '<div>' + r + '</div>';
-                }
-                return r;
-            };
-        MIXIN$0(UITableColumnControl.prototype,proto$0);proto$0=void 0;return UITableColumnControl;})(ComponentEvent);
-
-        return UITableColumnControl;
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTableStateColumn', function (UITableColumnControl) {
-        var UITableStateColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableStateColumnControl, super$0);var proto$0={};
-            function UITableStateColumnControl(s, e, a, t) {
-                this.className = 'StateColumn';
-                super$0.call(this, s, e, a, t);
-            }if(super$0!==null)SP$0(UITableStateColumnControl,super$0);UITableStateColumnControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableStateColumnControl,"configurable":true,"writable":true}});DP$0(UITableStateColumnControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                super$0.prototype.init.call(this);
-            };
-
-            proto$0.render = function(rowData) {
-                var val = this.getValue(rowData),
-                    defaultValue = this.attrs.default,
-                    $dom, $s = this.scope.$new();
-                $s.data = rowData;
-                this.transclude($s, function (clone) {
-                    $dom = clone.filter('[state="' + val + '"]');
-                    if ($dom.length === 0) { //用默认值
-                        $dom = clone.filter('[state="' + defaultValue + '"]');
-                    }
-                    if ($dom.length === 0) { //还没有...
-                        clone.forEach(function(dom)  {
-                            if (dom.innerHTML && dom.innerHTML.indexOf(defaultValue) != -1) {
-                                $dom = $(dom);
-                            }
-                        });
-                    }
-                });
-                return $dom;
-            };
-        MIXIN$0(UITableStateColumnControl.prototype,proto$0);proto$0=void 0;return UITableStateColumnControl;})(UITableColumnControl);
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                head: '@'
-            },
-            controller: function ($scope, $element, $attrs, $transclude) {
-                return new UITableStateColumnControl($scope, $element, $attrs, $transclude);
-            },
-            template: ("\
-\n                <th>\
-\n                    {{head}}\
-\n                </th>'\
-\n            ")
-        };
-    })
-;
 /**
  * 表单控件
  */
@@ -3299,6 +2820,485 @@ angular.module('admin.component')
             return result;
         });
 })();
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiTableCheckColumn', function (UITableColumnControl) {
+        var UITableCheckColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableCheckColumnControl, super$0);var proto$0={};
+            function UITableCheckColumnControl(s, e, a) {
+                this.className = 'CheckColumn';
+                super$0.call(this, s, e, a);
+            }if(super$0!==null)SP$0(UITableCheckColumnControl,super$0);UITableCheckColumnControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableCheckColumnControl,"configurable":true,"writable":true}});DP$0(UITableCheckColumnControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                super$0.prototype.init.call(this);
+                this.$table = this.element.parents('table');
+                this.$tableBody = this.$table.find('tbody');
+            };
+
+            proto$0.initEvents = function() {var this$0 = this;
+                super$0.prototype.initEvents.call(this);
+                this.scope.$emit('uitable.column.idname', this.attrs.name);
+                this.scope.selectAllHandler = function(evt)  {
+                    this$0._selectAllHandler(evt);
+                };
+            };
+
+            proto$0.render = function(rowData) {var this$0 = this;
+                var val = this.getValue(rowData);
+                return $((("<input type=\"checkbox\" value=\"" + val) + "\"/>")).data('rowData', rowData).click(function(evt)  {
+                    this$0._selectOneHandler(evt);
+                });
+            };
+
+            proto$0._selectAllHandler = function(evt) {
+                var isCheck = evt.target.checked;
+                this.$tableBody.find('input[type=checkbox]').prop('checked', isCheck).uniform();
+                this.scope.$emit('uitable.column.selectall', isCheck);
+            };
+
+            proto$0._selectOneHandler = function(evt) {
+                var $target = $(evt.target);
+                this.scope.$emit('uitable.column.selectone', {isCheck: evt.target.checked, rowData: $target.data('rowData'), value: $target.val()});
+            };
+        MIXIN$0(UITableCheckColumnControl.prototype,proto$0);proto$0=void 0;return UITableCheckColumnControl;})(UITableColumnControl);
+
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                head: '@'
+            },
+            controller: function ($scope, $element, $attrs) {
+                return new UITableCheckColumnControl($scope, $element, $attrs);
+            },
+            template: ("\
+\n                <th>\
+\n                    <input type=\"checkbox\" ng-click=\"selectAllHandler($event)\"/>\
+\n                </th>\
+\n            ")
+        };
+    });
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiTableDateColumn', function (UITableColumnControl, Util) {
+        var UITableDateColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableDateColumnControl, super$0);var proto$0={};
+            function UITableDateColumnControl(s, e, a) {
+                this.className = 'DateColumn';
+                super$0.call(this, s, e, a);
+            }if(super$0!==null)SP$0(UITableDateColumnControl,super$0);UITableDateColumnControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableDateColumnControl,"configurable":true,"writable":true}});DP$0(UITableDateColumnControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                super$0.prototype.init.call(this);
+                this.format = this.attrs.format || 'yyyy-MM-dd HH:mm:ss';
+            };
+
+            proto$0.render = function(rowData) {
+                var val = this.getValue(rowData);
+                if (val) {
+                    val = Util.dateFormatStr(val, this.format);
+                }
+                return $('<div/>').html(val);
+            };
+        MIXIN$0(UITableDateColumnControl.prototype,proto$0);proto$0=void 0;return UITableDateColumnControl;})(UITableColumnControl);
+
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                head: '@'
+            },
+            controller: function ($scope, $element, $attrs) {
+                return new UITableDateColumnControl($scope, $element, $attrs);
+            },
+            template: ("\
+\n                <th>\
+\n                    {{head}}\
+\n                </th>'\
+\n            ")
+        };
+    });
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiTableImageColumn', function (UITableColumnControl) {
+        var UITableImageColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableImageColumnControl, super$0);var proto$0={};
+            function UITableImageColumnControl(s, e, a) {
+                super$0.call(this, s, e, a);
+            }if(super$0!==null)SP$0(UITableImageColumnControl,super$0);UITableImageColumnControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableImageColumnControl,"configurable":true,"writable":true}});DP$0(UITableImageColumnControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                super$0.prototype.init.call(this);
+            };
+
+            proto$0.render = function(rowData) {
+                var val = this.getValue(rowData),
+                    placeholder = this.attrs.placeholder,  //默认图片
+                    qiniu = this.attrs.qiniu; //七牛后缀
+                if (val === undefined) {
+                    val = placeholder;
+                }
+                if (val !== undefined && qiniu) {
+                    val = val + qiniu;
+                }
+                return $('<img/>').attr('src', val).addClass(this.scope.imageCss);
+            };
+        MIXIN$0(UITableImageColumnControl.prototype,proto$0);proto$0=void 0;return UITableImageColumnControl;})(UITableColumnControl);
+
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                head: '@',
+                imageCss: '@'
+            },
+            controller: function ($scope, $element, $attrs) {
+                return new UITableImageColumnControl($scope, $element, $attrs);
+            },
+            template: ("\
+\n                <th>\
+\n                    {{head}}\
+\n                </th>'\
+\n            ")
+        };
+    });
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiTableColumn', function (UITableColumnControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                head: '@'
+            },
+            controller: function ($scope, $element, $attrs, $transclude) {
+                return new UITableColumnControl($scope, $element, $attrs, $transclude);
+            },
+            template: ("\
+\n                <th>\
+\n                    {{head}}\
+\n                    <div style=\"display:none\" ng-transclude></div>\
+\n                </th>'\
+\n            ")
+        };
+    });
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiTableOperationColumn', function (UITableColumnControl) {
+        var UITableOperationColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableOperationColumnControl, super$0);var proto$0={};
+            function UITableOperationColumnControl(s, e, a) {
+                this.className = 'OperationColumn';
+                super$0.call(this, s, e, a);
+            }if(super$0!==null)SP$0(UITableOperationColumnControl,super$0);UITableOperationColumnControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableOperationColumnControl,"configurable":true,"writable":true}});DP$0(UITableOperationColumnControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                super$0.prototype.init.call(this);
+            };
+        MIXIN$0(UITableOperationColumnControl.prototype,proto$0);proto$0=void 0;return UITableOperationColumnControl;})(UITableColumnControl);
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                head: '@'
+            },
+            controller: function ($scope, $element, $attrs, $transclude) {
+                return new UITableOperationColumnControl($scope, $element, $attrs, $transclude);
+            },
+            template: ("\
+\n                <th>\
+\n                    {{head}}\
+\n                </th>'\
+\n            ")
+        };
+    });
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiTableProgressColumn', function (UITableColumnControl) {
+        var UITableProgressColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableProgressColumnControl, super$0);var proto$0={};
+            function UITableProgressColumnControl(s, e, a) {
+                this.className = 'ProgressColumn';
+                super$0.call(this, s, e, a);
+            }if(super$0!==null)SP$0(UITableProgressColumnControl,super$0);UITableProgressColumnControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableProgressColumnControl,"configurable":true,"writable":true}});DP$0(UITableProgressColumnControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                super$0.prototype.init.call(this);
+            };
+
+            proto$0.render = function(rowData) {
+                var val = this.getValue(rowData), level,
+                    dom = this._getDom();
+                val = val !== undefined ? val : 0;
+                if (val <= 25)
+                    level = 'progress-bar-danger';
+                else if (val <= 50)
+                    level = 'progress-bar-danger';
+                else if (val <= 75)
+                    level = 'progress-bar-info';
+                dom.attr('title', val + '%').find('div').addClass(level).animate({width: val + '%'}).end();
+                return dom;
+            };
+
+            proto$0._getDom = function() {
+                return $(("\
+\n                    <div style=\"border: 1px solid #57b5e3;\" class=\"progress progress-striped active\" role=\"progressbar\"style=\"margin-bottom:0px;\">\
+\n                        <div class=\"progress-bar\"></div>\
+\n                    </div>\
+\n                "));
+            };
+        MIXIN$0(UITableProgressColumnControl.prototype,proto$0);proto$0=void 0;return UITableProgressColumnControl;})(UITableColumnControl);
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                head: '@'
+            },
+            controller: function ($scope, $element, $attrs) {
+                return new UITableProgressColumnControl($scope, $element, $attrs);
+            },
+            template: ("\
+\n                <th>\
+\n                    {{head}}\
+\n                </th>'\
+\n            ")
+        };
+    });
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .filter('emptyFilter', function () {
+        return function (val, defaultV) {
+            return val || defaultV || '-';
+        };
+    })
+    .factory('UITableColumnControl', function (Message, $compile) {
+        var UITableColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableColumnControl, super$0);var proto$0={};
+            function UITableColumnControl($scope, $element, $attrs, $transclude) {
+                super$0.call(this);
+                this.scope = $scope;
+                this.element = $element;
+                this.attrs = $attrs;
+                this.transclude = $transclude;
+                this.hasTransclude = $transclude && $transclude().length > 0;
+                this.className = this.className || 'Column';
+                this.init();
+                this.initEvents();
+            }if(super$0!==null)SP$0(UITableColumnControl,super$0);UITableColumnControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableColumnControl,"configurable":true,"writable":true}});DP$0(UITableColumnControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {var this$0 = this;
+                this.message = new Message('UITable' + this.className);
+                this.sName = this.attrs.name || '';
+                this.mTitle = this.attrs.head;
+                this.bEditable = this.attrs.editable;
+                this.bChecked = this.attrs.checked;
+                this.mEditUrl = this.attrs.editUrl;
+                this.mAttrs = this.attrs;
+                this.sClass = this.attrs.css || '';
+                this.sWidth = this.attrs.width || 'smart';
+                this.bVisible = this.attrs.novisible === undefined;
+                this.bSortable = this.attrs.sort !== undefined;
+                this.mDataProp = function(rowData, type)  {
+                    if (type != 'display') {
+                        return '';
+                    }
+                    if (arguments.length == 3) {  //datatable会调用两次，第一个获取数据，第二次用获取的数据，渲染数据....
+                        return arguments[2];
+                    }
+                    else {
+                        var r = this$0.render(rowData, type);
+                        var w = this$0.wrapperDisplay(r);
+                        return w;
+                    }
+                };
+                this.scope.$emit('uitable.column.complete', this);
+            };
+
+            proto$0.initEvents = function() {
+            };
+
+            proto$0.render = function(rowData) {
+                if (this.hasTransclude) {
+                    return this.getTransclude(rowData);
+                }
+                else {
+                    var customRenderName = 'render' + name.charAt(0).toUpperCase() + name.substr(1);
+                    if (this.scope[customRenderName]) {
+                        return this.scope[customRenderName](rowData);
+                    }
+                    else {
+                        return this.getValue(rowData);
+                    }
+                }
+            };
+
+            proto$0.getValue = function(rowData) {
+                var name = this.sName, v;
+                if (name && name.indexOf(".") != -1) {
+                    var ns = name.split('.'), n;
+                    v = rowData;
+                    while ((n = ns.shift()) && v) {
+                        v = v[n];
+                    }
+                }
+                else if (name) {
+                    v = rowData[name];
+                }
+                return v;
+            };
+
+            proto$0.getTransclude = function(rowData){
+                var s = this.scope.$new();
+                s.data = rowData;
+                var $dom = $compile(this.element.find('div').html())(s);
+                return $dom;
+            };
+
+            proto$0.wrapperDisplay = function(r) {
+                r = r !== undefined ? r : '-'; //针对0或者false值
+                if (r !== undefined && angular.isString(r)) {
+                    r = $.trim(r);
+                    r = r.length ? r : '-';
+                    r = '<div>' + r + '</div>';
+                }
+                return r;
+            };
+        MIXIN$0(UITableColumnControl.prototype,proto$0);proto$0=void 0;return UITableColumnControl;})(ComponentEvent);
+
+        return UITableColumnControl;
+    });
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiTableStateColumn', function (UITableColumnControl) {
+        var UITableStateColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableStateColumnControl, super$0);var proto$0={};
+            function UITableStateColumnControl(s, e, a, t) {
+                this.className = 'StateColumn';
+                super$0.call(this, s, e, a, t);
+            }if(super$0!==null)SP$0(UITableStateColumnControl,super$0);UITableStateColumnControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableStateColumnControl,"configurable":true,"writable":true}});DP$0(UITableStateColumnControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                super$0.prototype.init.call(this);
+            };
+
+            proto$0.render = function(rowData) {
+                var val = this.getValue(rowData),
+                    defaultValue = this.attrs.default,
+                    $dom, $s = this.scope.$new();
+                $s.data = rowData;
+                this.transclude($s, function (clone) {
+                    $dom = clone.filter('[state="' + val + '"]');
+                    if ($dom.length === 0) { //用默认值
+                        $dom = clone.filter('[state="' + defaultValue + '"]');
+                    }
+                    if ($dom.length === 0) { //还没有...
+                        clone.forEach(function(dom)  {
+                            if (dom.innerHTML && dom.innerHTML.indexOf(defaultValue) != -1) {
+                                $dom = $(dom);
+                            }
+                        });
+                    }
+                });
+                return $dom;
+            };
+        MIXIN$0(UITableStateColumnControl.prototype,proto$0);proto$0=void 0;return UITableStateColumnControl;})(UITableColumnControl);
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                head: '@'
+            },
+            controller: function ($scope, $element, $attrs, $transclude) {
+                return new UITableStateColumnControl($scope, $element, $attrs, $transclude);
+            },
+            template: ("\
+\n                <th>\
+\n                    {{head}}\
+\n                </th>'\
+\n            ")
+        };
+    })
+;
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchForm', function (uiSearchFormFactory, componentHelper) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: function (scope, element, attrs) {
+                var ref = componentHelper.getComponentRef(element.parent().find('.ui-table'), '$table');
+
+                //
+                var searchForm = new uiSearchFormFactory(scope, element, attrs, ref),
+                    thisRef = attrs.ref || '$searchForm';
+                scope[thisRef] = searchForm;
+                componentHelper.tiggerComplete(scope, thisRef, searchForm);
+            },
+            template: function (element, attrs) {
+                var col = attrs.column || "11:1",
+                    ref = attrs.ref || '$searchForm';
+                var cc = col.split(':');
+                return componentHelper.getTemplate('tpl.searchform', {
+                    leftCol: cc[0],
+                    rightCol: cc[1],
+                    ref: ref
+                });
+            }
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4740,9 +4740,7 @@ angular.module('admin.component')
             data: {
                 key: {name: "name", childs: "childs", title: "name"},
                 simpleData: {enable: true, idKey: "id", pIdKey: "pid", rootPId: "0"}
-            },
-            view: {addHoverDom: null, removeHoverDom: null},
-            callback: {beforeClick: null, onClick: null, onCheck: null}
+            }
         };
 
     angular.module('admin.component')
@@ -4759,36 +4757,32 @@ angular.module('admin.component')
                     requestMethod = _requestMethod;
                 },
 
-                $get: function(AdminCDN, Ajax) {
+                $get: function(AdminCDN, Ajax, $compile) {
                     var UITreeControl = (function(super$0){var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITreeControl, super$0);var proto$0={};
                         function UITreeControl(scope, element, attrs, transclude) {
                             super$0.call(this);
                             this.element = element;
+                            this.treeElement = element.find('ul');
                             this.scope = scope;
                             this.attrs = attrs;
+                            this.treeNodeBtnMap = {};
                             this.transclude = transclude;
                             this.message = new Message('UITree');
                             this.init();
                             this.initEvents();
                         }if(super$0!==null)SP$0(UITreeControl,super$0);UITreeControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITreeControl,"configurable":true,"writable":true}});DP$0(UITreeControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
-                        proto$0.init = function() {
-                            this.element.attr('id', 'uiTree' + new Date().getTime());
+                        proto$0.init = function() {var this$0 = this;
+                            this.treeElement.attr('id', 'uiTree' + new Date().getTime());
                             this.callback = {
-                                beforeClick: function()  {
-                                },
-                                onClick: function()  {
-                                },
-                                beforeCheck: function()  {
-                                },
-                                onCheck: function()  {
-                                }
+                                beforeClick: function(treeId, treeNode, treeNodeId)  {return this$0.scope.onBeforeClick({treeNode: treeNode})},
+                                onClick: function(evt, treeId, treeNode, treeNodeId)  {return this$0.scope.onClick({treeNode: treeNode})},
+                                beforeCheck: function(treeId, treeNode)  {return this$0.scope.onBeforeCheck({treeNode: treeNode})},
+                                onCheck: function(evt, treeId, treeNode)  {return this$0.scope.onCheck({treeNode: treeNode})}
                             };
                             this.view = {
-                                addHoverDom: function()  {
-                                },
-                                removeHoverDom: function()  {
-                                }
+                                addHoverDom: function(treeId, treeNode)  {return this$0._onMouseEnterTreeNode(treeNode)},
+                                removeHoverDom: function(treeId, treeNode)  {return this$0._onMouseOverTreeNode(treeNode)}
                             };
                             this.triggerComplete(this.scope, this.attrs.ref || '$tree', this);
                         };
@@ -4797,6 +4791,9 @@ angular.module('admin.component')
                             this.scope.$watch('filter', function(val)  {
                                 this$0._filter(val);
                             });
+                            this.scope.onAddHandler = function(evt)  {return this$0._onAddHandler($(evt.target).parent().data('treeNode'))};
+                            this.scope.onEditHandler = function(evt)  {return this$0._onEditHandler($(evt.target).parent().data('treeNode'))};
+                            this.scope.onRemoveHandler = function(evt)  {return this$0._onRemoveHandler($(evt.target).parent().data('treeNode'))};
                         };
 
                         proto$0.build = function() {var this$0 = this;
@@ -4835,10 +4832,45 @@ angular.module('admin.component')
                                 rootData[labelName] = this.attrs.root || '根';
                                 resData.push(rootData);
                             }
-                            this.instance = $.fn.zTree.init(this.element, $.extend({}, defaultConfig, this), resData);
+                            this.instance = $.fn.zTree.init(this.treeElement, $.extend({}, defaultConfig, this), resData);
                         };
 
                         proto$0._filter = function(filterText) {
+                        };
+
+                        proto$0._onMouseEnterTreeNode = function(treeNode) {var this$0 = this;
+                            if (this.treeNodeBtnMap[treeNode.id]) {
+                                this.treeNodeBtnMap[treeNode.id].show();
+                            }
+                            else {
+                                var scope = this.scope.$new(),
+                                    $dom = this.element.find('>span').clone(true);
+                                scope.treeNode = treeNode;
+                                this.transclude(scope, function($dom2)  {
+                                    $dom.data('treeNode', treeNode);
+                                    $dom.append($dom2).show();
+                                    $("#" + treeNode.tId + "_span").append($dom);
+                                    this$0.treeNodeBtnMap[treeNode.id] = $dom;
+                                });
+                            }
+                        };
+
+                        proto$0._onMouseOverTreeNode = function(treeNode) {
+                            if (this.treeNodeBtnMap[treeNode.id]) {
+                                this.treeNodeBtnMap[treeNode.id].hide();
+                            }
+                        };
+
+                        proto$0._onAddHandler = function(treeNode) {
+                            this.message.success('点击了新增');
+                        };
+
+                        proto$0._onEditHandler = function(treeNode) {
+                            this.message.success('点击了新增');
+                        };
+
+                        proto$0._onRemoveHandler = function(treeNode) {
+                            this.message.success('点击了删除');
                         };
                     MIXIN$0(UITreeControl.prototype,proto$0);proto$0=void 0;return UITreeControl;})(ComponentEvent);
                     return UITreeControl;
@@ -4859,6 +4891,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
+            transclude: true,
             scope: {
                 onBeforeClick: '&',
                 onClick: '&',
@@ -4867,7 +4900,11 @@ angular.module('admin.component')
                 onDataFail: '&',
                 onCheck: '&',
 
-                Checked: '=',
+                onAdd: '@',
+                onEdit: '@',
+                onRemove: '&',
+
+                checked: '=',
                 filter: '='
             },
             compile: function () {
@@ -4884,7 +4921,14 @@ angular.module('admin.component')
                 };
             },
             template: ("\
-\n                <ul class=\"ztree ui-tree\"></ul>\
+\n                <div>\
+\n                    <ul class=\"ztree ui-tree\"></ul>\
+\n                    <span style=\"display:none\">\
+\n                        <span ng-if=\"onAdd\" class=\"button add\" ng-click=\"onAddHandler($event)\"></span>\
+\n                        <span ng-if=\"onEdit\" class=\"button edit\" ng-click=\"onEditHandler($event)\"></span>\
+\n                        <span ng-if=\"onRemove\" class=\"button remove\" ng-click=\"onRemoveHandler($event)\"></span>\
+\n                    </span>\
+\n                </div>\
 \n            ")
         };
     });
@@ -4913,6 +4957,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
+            transclude: true,
             scope: {
                 onBeforeClick: '&',
                 onClick: '&',
@@ -4921,7 +4966,11 @@ angular.module('admin.component')
                 onDataFail: '&',
                 onCheck: '&',
 
-                Checked: '=',
+                onAdd: '@',
+                onEdit: '@',
+                onRemove: '&',
+
+                checked: '=',
                 filter: '='
             },
             compile: function () {
@@ -4938,7 +4987,14 @@ angular.module('admin.component')
                 };
             },
             template: ("\
-\n                <ul class=\"ztree ui-tree\"></ul>\
+\n                <div>\
+\n                    <ul class=\"ztree ui-tree\"></ul>\
+\n                    <div style=\"display:none\">\
+\n                        <span ng-if=\"onAdd\" class=\"button add\" ng-click=\"onAddHandler(treeNode)\"></span>\
+\n                        <span ng-if=\"onEdit\" class=\"button edit\" ng-click=\"onEditHandler(treeNode)\"></span>\
+\n                        <span ng-if=\"onRemove\" class=\"button remove\" ng-click=\"onRemoveHandler(treeNode)\"></span>\
+\n                    </div>\
+\n                </div>\
 \n            ")
         };
     });

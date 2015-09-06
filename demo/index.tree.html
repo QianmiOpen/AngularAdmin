@@ -10,6 +10,9 @@
     <div class="row">
         <div class="col-md-6">
             <ui-tree url="/test/remote/select"
+                     on-add="//www.baidu.com"
+                     on-del="/test/remote/select"
+                     on-edit="//www.baidu.com"
                      on-data-success="dataSuccessHandler(result)"
                      on-data-fail="dataFailHandler(result)"
                      on-before-check="beforeCheckHandler(treeNode)"
@@ -48,6 +51,10 @@
     function CC($scope, Message, $timeout) {
         $scope.dataSuccessHandler = function () {
             Message.success('数据加载成功了');
+        }
+        $scope.beforeCheckHandler = function(node){
+            Message.success(`${node.id}被选中了`);
+            return false;
         }
     }
 </script>

@@ -10,6 +10,7 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
+            transclude: true,
             scope: {
                 onBeforeClick: '&',
                 onClick: '&',
@@ -18,7 +19,11 @@ angular.module('admin.component')
                 onDataFail: '&',
                 onCheck: '&',
 
-                Checked: '=',
+                onAdd: '@',
+                onEdit: '@',
+                onRemove: '&',
+
+                checked: '=',
                 filter: '='
             },
             compile: function () {
@@ -35,7 +40,14 @@ angular.module('admin.component')
                 };
             },
             template: `
-                <ul class="ztree ui-tree"></ul>
+                <div>
+                    <ul class="ztree ui-tree"></ul>
+                    <span style="display:none">
+                        <span ng-if="onAdd" class="button add" ng-click="onAddHandler($event)"></span>
+                        <span ng-if="onEdit" class="button edit" ng-click="onEditHandler($event)"></span>
+                        <span ng-if="onRemove" class="button remove" ng-click="onRemoveHandler($event)"></span>
+                    </span>
+                </div>
             `
         };
     });
