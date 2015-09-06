@@ -128,7 +128,6 @@
                                     this.selectItems = [];
                                     this.selectValues = [];
                                 }
-                                console.log(this.selectItems, this.selectValues);
                             });
                             this.scope.$on('uitable.column.selectone', (evt, obj) => {
                                 if (obj.isCheck) {
@@ -142,7 +141,6 @@
                                         this.selectValues.splice(ii, 1);
                                     }
                                 }
-                                console.log(this.selectItems, this.selectValues);
                             });
                         }
 
@@ -151,9 +149,38 @@
                         }
 
                         jumpTo(page) {
+                            if (/^\d+$/.test(page)) {
+                                page = parseInt(page) - 1;
+                            }
+                            else if (page == undefined) {
+                                page = this.getCurrentPage() - 1;
+                            }
+                            this.instance.fnPageChange(page != undefined ? Math.abs(page) : "first");
+                            return this;
                         }
 
-                        refresh() {
+                        refresh(params, url) {
+                            this.searchParams = params || this.searchParams;
+                            this.url = url || this.url;
+                            this.instance.fnPageChange(this.getCurrentPage() - 1);
+                            return this;
+                        }
+
+                        search(params, url) {
+                            this.selectItems = [];
+                            this.selectValues = [];
+                            this.searchParams = params || this.searchParams;
+                            this.url = url || this.url;
+                            this.jumpTo(1);
+                        }
+
+                        getCurrentPage() {
+                            var setting = this.instance.fnSettings();
+                            return Math.ceil(setting._iDisplayStart / setting._iDisplayLength) + 1;
+                        }
+
+                        selectAll(isSelected){
+                            this.scope.$broadcast('uitable.column.selectall', isSelected);
                         }
 
                         _fetchData(sSource, aoData, fnCallback) {
