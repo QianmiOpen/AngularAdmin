@@ -14,6 +14,11 @@
 </head>
 <body style="background-color: #fff !important;padding: 10px;" ng-app="admin">
 <ui-container style="display: none" controller="CC">
+
+    <ui-tool-bar-table editable="true" add="true" del="true" tip="数据">
+        <button type="button" class="btn btn-sm btn-primary"><i class="fa fa-plus-circle"></i> 额外按钮</button>&nbsp;&nbsp;
+    </ui-tool-bar-table>
+
     <ui-table url="/test/remote/select" init-params="tableOne.ssss">
         <ui-table-check-column name="id"></ui-table-check-column>
         <ui-table-date-column head="日期列" name="date" format="yyyy-MM-dd hh:mm:ss"></ui-table-date-column>

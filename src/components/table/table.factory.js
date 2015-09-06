@@ -97,7 +97,7 @@
                             this.fnServerData = (sSource, aoData, fnCallback) => {
                                 setTimeout(() => {
                                     this._fetchData(sSource, aoData, fnCallback);
-                                }, 100)
+                                }, 100);
                             };
 
                             //
@@ -142,20 +142,25 @@
                                     }
                                 }
                             });
+                            this.scope.$on('uitable.column.visable', (evt, column) => {
+                                let i = _.indexOf(this.aoColumns, column);
+                                this.instance.fnSetColumnVis(i, column.bVisible, false);
+                            });
                         }
 
                         build() {
                             this.instance = this.element.find('table').dataTable($.extend({}, defaultConfig, this));
+                            this.scope.$emit('uitable.complete', this);
                         }
 
                         jumpTo(page) {
                             if (/^\d+$/.test(page)) {
                                 page = parseInt(page) - 1;
                             }
-                            else if (page == undefined) {
+                            else if (page === undefined) {
                                 page = this.getCurrentPage() - 1;
                             }
-                            this.instance.fnPageChange(page != undefined ? Math.abs(page) : "first");
+                            this.instance.fnPageChange(page !== undefined ? Math.abs(page) : "first");
                             return this;
                         }
 
@@ -179,12 +184,12 @@
                             return Math.ceil(setting._iDisplayStart / setting._iDisplayLength) + 1;
                         }
 
-                        selectAll(isSelected){
+                        selectAll(isSelected) {
                             this.scope.$broadcast('uitable.column.selectall', isSelected);
                         }
 
                         _fetchData(sSource, aoData, fnCallback) {
-                            if ((!this.attrs.url && !this.url) || this.attrs.manual != undefined) {
+                            if ((!this.attrs.url && !this.url) || this.attrs.manual !== undefined) {
                                 delete this.attrs.manual;
                                 fnCallback({aaData: [], iTotalRecords: 0, iTotalDisplayRecords: 0});
                             }

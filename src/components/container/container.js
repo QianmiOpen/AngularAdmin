@@ -24,6 +24,10 @@
                         .append(this.content);
 
                     this.lazyInit();
+                    return this;
+                }
+
+                initEvents(){
                 }
 
                 lazyInit() {
@@ -69,7 +73,9 @@
                     controller: '@'
                 },
                 link: function (scope, element, attrs, ctrl, tranclude) {
-                    new UIContainer(scope, element, tranclude).init();
+                    new UIContainer(scope, element, tranclude)
+                        .init()
+                        .initEvents();
                 },
                 template: `
                     <div></div>

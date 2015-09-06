@@ -4151,6 +4151,10 @@ angular.module('admin.component')
                         .append(this.content);
 
                     this.lazyInit();
+                    return this;
+                };
+
+                proto$0.initEvents = function(){
                 };
 
                 proto$0.lazyInit = function() {var this$0 = this;
@@ -4196,7 +4200,9 @@ angular.module('admin.component')
                     controller: '@'
                 },
                 link: function (scope, element, attrs, ctrl, tranclude) {
-                    new UIContainer(scope, element, tranclude).init();
+                    new UIContainer(scope, element, tranclude)
+                        .init()
+                        .initEvents();
                 },
                 template: ("\
 \n                    <div></div>\
@@ -4303,7 +4309,7 @@ angular.module('admin.component')
                             this.fnServerData = function(sSource, aoData, fnCallback)  {
                                 setTimeout(function()  {
                                     this$0._fetchData(sSource, aoData, fnCallback);
-                                }, 100)
+                                }, 100);
                             };
 
                             //
@@ -4334,7 +4340,6 @@ angular.module('admin.component')
                                     this$0.selectItems = [];
                                     this$0.selectValues = [];
                                 }
-                                console.log(this$0.selectItems, this$0.selectValues);
                             });
                             this.scope.$on('uitable.column.selectone', function(evt, obj)  {
                                 if (obj.isCheck) {
@@ -4348,50 +4353,64 @@ angular.module('admin.component')
                                         this$0.selectValues.splice(ii, 1);
                                     }
                                 }
-                                console.log(this$0.selectItems, this$0.selectValues);
+                            });
+                            this.scope.$on('uitable.column.visable', function(evt, column)  {
+                                var i = _.indexOf(this$0.aoColumns, column);
+                                this$0.instance.fnSetColumnVis(i, column.bVisible, false);
                             });
                         };
 
                         proto$0.build = function() {
                             this.instance = this.element.find('table').dataTable($.extend({}, defaultConfig, this));
+                            this.scope.$emit('uitable.complete', this);
                         };
 
                         proto$0.jumpTo = function(page) {
+                            if (/^\d+$/.test(page)) {
+                                page = parseInt(page) - 1;
+                            }
+                            else if (page === undefined) {
+                                page = this.getCurrentPage() - 1;
+                            }
+                            this.instance.fnPageChange(page !== undefined ? Math.abs(page) : "first");
+                            return this;
                         };
 
-                        proto$0.refresh = function() {
+                        proto$0.refresh = function(params, url) {
+                            this.searchParams = params || this.searchParams;
+                            this.url = url || this.url;
+                            this.instance.fnPageChange(this.getCurrentPage() - 1);
+                            return this;
+                        };
+
+                        proto$0.search = function(params, url) {
+                            this.selectItems = [];
+                            this.selectValues = [];
+                            this.searchParams = params || this.searchParams;
+                            this.url = url || this.url;
+                            this.jumpTo(1);
+                        };
+
+                        proto$0.getCurrentPage = function() {
+                            var setting = this.instance.fnSettings();
+                            return Math.ceil(setting._iDisplayStart / setting._iDisplayLength) + 1;
+                        };
+
+                        proto$0.selectAll = function(isSelected) {
+                            this.scope.$broadcast('uitable.column.selectall', isSelected);
                         };
 
                         proto$0._fetchData = function(sSource, aoData, fnCallback) {var this$0 = this;
-                            if ((!this.attrs.url && !this.url) || this.attrs.manual != undefined) {
+                            if ((!this.attrs.url && !this.url) || this.attrs.manual !== undefined) {
                                 delete this.attrs.manual;
                                 fnCallback({aaData: [], iTotalRecords: 0, iTotalDisplayRecords: 0});
                             }
                             else {
                                 var url = this.url || this.attrs.url;
-                                $.each(this.scope.initParams || {}, function(name, value)  {
-                                    aoData.push({name: name, value: value});
-                                });
-                                $.each(this.searchParams || {}, function(name, value)  {
-                                    aoData.push({name: name, value: value});
-                                });
+                                this._buildPageParam(aoData);
                                 Ajax[requestMethod](url, aoData)
                                     .then(function(data)  {
-                                        var result = {};
-                                        if ($.isArray(data)) {
-                                            result = {
-                                                aaData: data,
-                                                iTotalDisplayRecords: data.length,
-                                                iTotalRecords: data.length
-                                            };
-                                        }
-                                        else {
-                                            result = {
-                                                aaData: data[dataName],
-                                                iTotalDisplayRecords: result[totalName],
-                                                iTotalRecords: result[totalName]
-                                            };
-                                        }
+                                        var result = this$0._buildPageResult(data);
                                         this$0._beforeDataHandler(result);
                                         fnCallback(result);
                                         this$0._afterDataHandler(result);
@@ -4420,6 +4439,45 @@ angular.module('admin.component')
 
                         proto$0._errorDataHandler = function(result) {
                             this.scope.dateFail({result: result});
+                        };
+
+                        proto$0._buildPageResult = function(data) {
+                            var result = {};
+                            if ($.isArray(data)) {
+                                result = {
+                                    aaData: data,
+                                    iTotalDisplayRecords: data.length,
+                                    iTotalRecords: data.length
+                                };
+                            }
+                            else {
+                                result = {
+                                    aaData: data[dataName],
+                                    iTotalDisplayRecords: result[totalName],
+                                    iTotalRecords: result[totalName]
+                                };
+                            }
+                            return result;
+                        };
+
+                        proto$0._buildPageParam = function(searchParams) {
+                            $.each(this.scope.initParams || {}, function(name, value)  {
+                                searchParams.push({name: name, value: value});
+                            });
+                            $.each(this.searchParams || {}, function(name, value)  {
+                                searchParams.push({name: name, value: value});
+                            });
+                            var start, size;
+                            $.each(searchParams || {}, function(name, value)  {
+                                if (name == 'iDisplayStart') {
+                                    start = value;
+                                }
+                                else if (name == 'iDisplayLength') {
+                                    size = value;
+                                }
+                            });
+                            searchParams.push({name: pageNumberName, value: start / size});
+                            searchParams.push({name: pageSizeName, value: size});
                         };
 
                         proto$0._buildJumpDom = function() {var this$0 = this;
@@ -4489,6 +4547,185 @@ angular.module('admin.component')
 \n                        <tbody></tbody>\
 \n                    </table>\
 \n                </div>'\
+\n            ")
+        };
+    });
+
+//------------------------------------------------------
+//
+//
+// 依赖 qm.table.js
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .factory('UITableToolBarControl', function () {
+        var UITableToolBarControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableToolBarControl, super$0);var proto$0={};
+            function UITableToolBarControl(scope, element, attrs, transclude) {
+                super$0.call(this);
+                this.element = element;
+                this.scope = scope;
+                this.attrs = attrs;
+                this.transclude = transclude;
+                this.table = null;
+                this.message = new Message('UITableToolBar');
+            }if(super$0!==null)SP$0(UITableToolBarControl,super$0);UITableToolBarControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableToolBarControl,"configurable":true,"writable":true}});DP$0(UITableToolBarControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {var this$0 = this;
+                this.transclude(this.scope, function(dom)  {
+                    this$0.element.find('.btn-group:eq(0)').append(dom);
+                });
+                this.scope.isShow = function(index, column)  {return this$0._isShow(index, column)};
+                this.scope.toggleColumn = function(evt, column)  {return this$0._toggleColumn(evt, column)};
+                this.triggerComplete(this.scope, this.attrs.ref || '$tableToolbar', this);
+            };
+
+            proto$0.initEvents = function() {var this$0 = this;
+                this.scope.$parent.$on('uitable.complete', function(evt, uiTable)  {
+                    this$0.scope.table = uiTable;
+                });
+            };
+
+            proto$0._isShow = function(index, column) {
+                if (column.className == 'CheckColumn' || column.className == 'OperationColumn') {
+                    return false;
+                }
+                return true;
+            };
+
+            proto$0._toggleColumn = function(evt, column) {
+                column.bVisible = !column.bVisible;
+                this.scope.$parent.$broadcast('uitable.column.visable', column);
+            };
+        MIXIN$0(UITableToolBarControl.prototype,proto$0);proto$0=void 0;return UITableToolBarControl;})(ComponentEvent);
+        return UITableToolBarControl;
+    })
+    .factory('uiTableToolBarFactory', function (msg, ajax, $injector) {
+        var m = new msg('TableToolBar'),
+            TableToolBar = function ($scope, tableId, $element, $attrs) {
+                this.scope = $scope;
+                this.element = $element;
+                this.tableId = tableId;
+                this.attrs = $attrs;
+                this.blank = ',' + ($attrs.blank || '') + ',';
+                this.isEdit = false;
+                this.editText = '开启';
+            };
+        TableToolBar.prototype = {
+            isShow: function (index, columnConfig) {
+                return this.blank.indexOf(',' + index + ',') == -1 && !columnConfig.bChecked;
+            },
+            toggleColumn: function (evt, column) {
+                column.bVisible = !column.bVisible;
+                if (this.scope[this.tableId]) {
+                    this.scope[this.tableId].instance.fnSetColumnVis(column.mIndex, column.bVisible, false);
+                }
+                evt.stopPropagation();
+            },
+            toggleEdit: function () {
+                this.isEdit = !this.isEdit;
+                this.editText = this.isEdit ? '关闭' : '开启';
+                this.scope[this.tableId].toggleEdit(this.isEdit);
+            },
+            getHideBeforeIndex: function (index) {
+                var css = this.instance.fnSettings().aoColumns;
+                var num = 0;
+                for (var i = 0; i < index; i++) {
+                    if (css[i].bVisible)
+                        num++;
+                }
+                return num;
+            },
+            doAddItem: function () {
+                if (this.scope.addItem) {
+                    this.scope.addItem();
+                }
+                else {
+                    if (this.attrs.add) {
+                        $injector.get('$state').go(this.attrs.add);
+                    }
+                    else {
+                        m.error('点击添加数据按钮，但是没有设置地址, 请在add="地址"');
+                    }
+                }
+            },
+            doDelItem: function (values) {
+                if (this.scope.delItem) {
+                    this.scope.delItem(values);
+                }
+                else {
+                    if (this.attrs.del) {
+                        if (values.length > 1) {
+                            ajax.remove(this.attrs.del, {ids: values.join(',')}).then(function () {
+                                this.scope[this.tableId].refresh();
+                            }.bind(this));
+                        }
+                        else {
+                            ajax.remove(this.attrs.del + '/' + values[0]).then(function () {
+                                this.scope[this.tableId].refresh();
+                            }.bind(this));
+                        }
+                    }
+                    else {
+                        m.error('点击删除数据按钮，但是没有设置地址, 请在del="地址"');
+                    }
+                }
+            }
+        };
+        return function ($scope, tableId, $element, $attrs) {
+            return new TableToolBar($scope, tableId, $element, $attrs);
+        };
+    });
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiToolBarTable', function (UITableToolBarControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                editable: '@',
+                add: '@',
+                del: '@',
+                tip: '@'
+            },
+            controller: function($scope, $element, $attrs, $transclude)  {
+                var uiTableToolbar = new UITableToolBarControl($scope, $element, $attrs, $transclude);
+                uiTableToolbar.init();
+                uiTableToolbar.initEvents();
+            },
+            template: ("\
+\n                <div class=\"ui-toolbar table-toolbar\">\
+\n                    <div class=\"btn-group pull-left\">\
+\n                        <button ng-if=\"editable\" type=\"button\" class=\"btn btn-sm btn-info\" ng-click=\"toggleEdit()\"><i class=\"fa fa-edit\"></i> <span ng-bind=\"editText\"></span>快速编辑</button>&nbsp;&nbsp;\
+\n                        <button ng-if=\"add\" type=\"button\" class=\"btn btn-sm btn-primary\" ng-click=\"doAddItem()\"><i class=\"fa fa-plus-circle\"></i> 新增{{tip}}</button>&nbsp;&nbsp;\
+\n                        <button ng-if=\"del\" type=\"button\" ng-class=\"{'btn-danger': table.selectItems.selectValues.length > 0}\" class=\"btn btn-sm\" ng-disabled=\"table.selectItems.length==0\" ng-click=\"doDelItem()\"><i class=\"fa fa-times-circle\"></i> 删除{{tip}}</button>&nbsp;&nbsp;\
+\n                    </div>\
+\n\
+\n                    <span ng-show=\"table.selectItems.length > 0\" class=\"table-toolbar-tip fadeInRight\">您已选择 <strong ng-bind=\"selectItems.length\"></strong> 个{{tip}}，支持翻页选择多个{{tip}}。</span>\
+\n\
+\n                    <div class=\"btn-group pull-right\">\
+\n                        <a class=\"btn default btn-sm\" href=\"#\" data-hover=\"dropdown\"><i class=\"fa fa-table\"></i></a>\
+\n                        <div class=\"dropdown-menu dropdown-checkboxes pull-right\">\
+\n                            <label ng-repeat=\"column in table.aoColumns\" ng-if=\"isShow($index, column)\" style=\"cursor:pointer\" >\
+\n                                <div class=\"checker\">\
+\n                                    <span ng-class=\"{checked: column.bVisible}\">\
+\n                                        <input type=\"checkbox\" ng-click=\"toggleColumn($event, column)\">\
+\n                                    </span>\
+\n                                </div>\
+\n                                <span ng-bind=\"column.mTitle\"/>\
+\n                            </label>\
+\n                         </div>\
+\n                    </div>\
+\n                    <div style=\"clear:both\"></div>\
+\n                </div>\
 \n            ")
         };
     });
