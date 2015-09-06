@@ -147,6 +147,7 @@
 ## 树
 
 ```javascript
+//通用树
 <ui-tree url="/test/remote/select"
              on-data-success="dataSuccessHandler(result)"
              on-data-fail="dataFailHandler(result)"
@@ -154,6 +155,9 @@
              on-check="checkHandler(treeNode)"
              on-before-click="beforeClickHandler(treeNode)"
              on-click="clickHandler(treeNode)"></ui-tree>
+
+//区域树
+<ui-region-tree mode="s"></ui-region-tree>
 ```
 
 ## 弹出框

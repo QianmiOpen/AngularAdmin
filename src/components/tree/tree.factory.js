@@ -50,7 +50,7 @@
                         }
 
                         init() {
-                            this.treeId = 'uiTree' + new Date().getTime();
+                            this.element.attr('id', 'uiTree' + new Date().getTime());
                             this.callback = {
                                 beforeClick: () => {
                                 },
@@ -71,7 +71,9 @@
                         }
 
                         initEvents() {
-
+                            this.scope.$watch('filter', (val) => {
+                                this._filter(val);
+                            });
                         }
 
                         build() {

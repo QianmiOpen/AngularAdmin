@@ -7,13 +7,20 @@
 </head>
 <body style="background-color: #fff !important;padding: 10px;" ng-app="admin">
 <ui-container style="display: none" controller="CC">
-    <ui-tree url="/test/remote/select"
-             on-data-success="dataSuccessHandler(result)"
-             on-data-fail="dataFailHandler(result)"
-             on-before-check="beforeCheckHandler(treeNode)"
-             on-check="checkHandler(treeNode)"
-             on-before-click="beforeClickHandler(treeNode)"
-             on-click="clickHandler(treeNode)"></ui-tree>
+    <div class="row">
+        <div class="col-md-6">
+            <ui-tree url="/test/remote/select"
+                     on-data-success="dataSuccessHandler(result)"
+                     on-data-fail="dataFailHandler(result)"
+                     on-before-check="beforeCheckHandler(treeNode)"
+                     on-check="checkHandler(treeNode)"
+                     on-before-click="beforeClickHandler(treeNode)"
+                     on-click="clickHandler(treeNode)"></ui-tree>
+        </div>
+        <div class="col-md-6">
+            <ui-region-tree mode="s"></ui-region-tree>
+        </div>
+    </div>
 </ui-container>
 </body>
 <script src="../output/js/lib.js"></script>
