@@ -59,6 +59,28 @@ angular.module('admin.component')
             }
 
             doDelItems() {
+                let table = this.scope.table,
+                    selectValues = table.selectValues;
+                if (this.scope[this.attrs.del]) {
+                    this.scope[this.attrs.del](selectValues);
+                }
+                else {
+                    if (this.attrs.del) {
+                        if (selectValues.length > 1) {
+                            ajax.remove(this.attrs.del, {ids: selectValues.join(',')}).then(() => {
+                                table.refresh();
+                            });
+                        }
+                        else {
+                            ajax.remove(this.attrs.del + '/' + selectValues[0]).then(() => {
+                                table.refresh();
+                            });
+                        }
+                    }
+                    else {
+                        this.message.error('点击删除数据按钮，但是没有设置地址, 请在del="地址"');
+                    }
+                }
             }
 
             isShow(index, column) {
