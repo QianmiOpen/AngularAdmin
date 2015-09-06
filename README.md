@@ -11,8 +11,8 @@
 ## 配置项
 
 ```javascript
-.config((AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider) => {
-    let baseJsUrl = 'http://localhost:63342/AngularAdmin/output/assets/js/';
+.constant('AdminCDN', 'http://localhost:63342/AngularAdminSrc/output/assets')
+.config((AdminCDN, AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider, UITreeControlProvider) => {
 
     //
     // ajax 默认返回处理
@@ -28,7 +28,7 @@
     //
     // 百度编辑器的库地址
     //
-    UIEditorControlProvider.setUrl(`${baseJsUrl}/ueditor/ueditor.config.js`, `${baseJsUrl}/ueditor/ueditor.all.js`);
+    UIEditorControlProvider.setUrl(`${AdminCDN}/ueditor/ueditor.config.js`, `${AdminCDN}/ueditor/ueditor.all.js`);
 
     //
     // 上传空间的配置

@@ -4858,14 +4858,15 @@ angular.module('admin.component')
             restrict: 'E',
             replace: true,
             scope: {
-                beforeClick: '&',
-                click: '&',
-                beforeCheck: '&',
-                check: '&',
-                checked: '=',
-                filter: '=',
+                onBeforeClick: '&',
+                onClick: '&',
+                onBeforeCheck: '&',
                 onDataSuccess: '&',
-                onDataFail: '&'
+                onDataFail: '&',
+                onCheck: '&',
+
+                Checked: '=',
+                filter: '='
             },
             compile: function () {
                 var uiTree = null;
