@@ -96,7 +96,10 @@
                                         this.setData(r);
                                     });
                             }
-                            else {
+                            else if (this.dataList) {
+                                this.setData(this.dataList);
+                            }
+                            else if (!this.attrs.manual) {
                                 this.message.error('未设置url, 无法请求');
                             }
                         }
@@ -109,7 +112,10 @@
                                 rootData[labelName] = this.attrs.root || '根';
                                 resData.push(rootData);
                             }
-                            this.instance = $.fn.zTree.init(this.treeElement, $.extend({}, defaultConfig, this), resData);
+                            if ($.fn.zTree) {
+                                this.instance = $.fn.zTree.init(this.treeElement, $.extend({}, defaultConfig, this), resData);
+                            }
+                            this.dataList = resData;
                         }
 
                         _filter(filterText) {
