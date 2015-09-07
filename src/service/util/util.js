@@ -29,6 +29,17 @@ angular.module('admin.service')
             },
 
             /**
+             *
+             * @param data
+             * @param isError
+             */
+            toPromise(data, isError) {
+                let defer = $q.defer();
+                defer[isError ? 'reject' : 'resolve'](data);
+                return defer.promise;
+            },
+
+            /**
              * 给元素加特效, 需要animate.css的支持
              * @param $el
              * @param animateCssName
@@ -138,9 +149,11 @@ angular.module('admin.service')
                     $inputs.push($input);
                     $form.append($input);
                 });
-                var validator = $form.validate({rules: jsonRules, debug: true, submitHandler: function () {
-                        return false;
-                    }}),
+                var validator = $form.validate({
+                        rules: jsonRules, debug: true, submitHandler: function () {
+                            return false;
+                        }
+                    }),
                     errName = null,
                     errMsg = null;
                 $.each($inputs, function (i, $input) {  //逐一验证, 只要发现错误, 直接跳出
@@ -159,7 +172,7 @@ angular.module('admin.service')
              * @param rules
              * @returns {*}
              */
-            checkValueUseRules: function(name, value, rules){
+            checkValueUseRules: function (name, value, rules) {
                 var jsonData = {},
                     jsonRules = {};
                 jsonData[name] = value;

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Demo</title>
+    <link rel="stylesheet" href="../output/css/all.css"/>
+</head>
+<body style="background-color: #fff !important;" ng-app="admin">
+<ui-container style="display: none" controller="CC">
+
+    <div class="row">
+        <div class="col-md-12">
+            <a class="btn btn-primary" ng-click="addNew()">新增</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <ui-tab close="true" default="0">
+                <ui-tab-item head="我是静态">
+                    11
+                </ui-tab-item>
+                <ui-tab-item head="我是静态2">
+                    22
+                </ui-tab-item>
+                <ui-tab-item head="我是静态3">
+                    33
+                </ui-tab-item>
+            </ui-tab>
+        </div>
+    </div>
+
+
+</ui-container>
+</body>
+<script src="../output/js/lib.js"></script>
+<script src="../output/js/all.js"></script>
+<script>
+    function CC($scope) {
+        $scope.addNew = function(){
+            $scope.$tab.addTab('测试啊', '123123123123123123', true);
+        };
+    }
+</script>
