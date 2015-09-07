@@ -5609,8 +5609,6 @@ angular.module('admin.component')
                 return {
                     pre: function (s, e, a, c, t) {
                         uiTree = new UITreeControl(s, e, a, t);
-                        uiTree.init();
-                        uiTree.initEvents();
                     },
                     post: function () {
                         uiTree.build();
