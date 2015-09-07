@@ -20,7 +20,7 @@ angular.module('admin.component')
                     <div class="portlet-input input-inline input-small">
                         <div class="input-icon right">
                             <i class="icon-magnifier"></i>
-                            <input type="text" ng-model="{{model}}"} class="form-control input-circle" placeholder="{{placeholder}}"/>
+                            <input type="text" ng-model="model" class="form-control input-circle" placeholder="{{placeholder}}"/>
                         </div>
                     </div>
                 </div>

@@ -11,7 +11,7 @@ angular.module('admin.component')
             restrict: 'E',
             replace: true,
             transclude: true,
-            templateUrl: `
+            template: `
                 <div class="actions portlet-tool-bar" ng-transclude>
                 </div>
             `

@@ -6,7 +6,7 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiPortlet', function (componentHelper) {
+    .directive('uiPortlet', function (UIPortletControl) {
         return {
             restrict: 'E',
             replace: true,
@@ -17,23 +17,8 @@ angular.module('admin.component')
                 icon: '@',
                 url: '@'
             },
-            controller: function ($scope, $element, $attrs, $transclude) {
-                var $content = $transclude($scope),
-                    $toolbar = $content.filter('.portlet-tool-bar');
-                if ($toolbar.length == 0) {
-                    $.each($content, function (i, c) {
-                        if (c.nodeName.indexOf('UI-PORTLET-ACTION') != -1) {
-                            $toolbar = $(c);
-                            return false;
-                        }
-                    });
-                }
-                $element.find('.portlet-body').append($content);
-                if ($toolbar.length != 0) {
-                    $toolbar.insertAfter($element.find('.caption'));
-                }
-
-                componentHelper.tiggerComplete($scope, $attrs.ref || '$portlet', $scope);
+            link: function (scope, elemt, attrs, contrllor, transclude) {
+                new UIPortletControl(scope, elemt, attrs, transclude);
             },
             template: `
                 <div class="portlet">
@@ -41,7 +26,7 @@ angular.module('admin.component')
                         <i ng-if="icon" class="{{icon}}"></i>
                         <div class="caption"><span class="caption-subject {{captionClass}}">{{title}}</span></div>
                     </div>
-                    <div class="portlet-body" ng-transclude>
+                    <div class="portlet-body">
                     </div>
                 </div>
             `

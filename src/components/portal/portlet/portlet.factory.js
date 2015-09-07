@@ -6,7 +6,7 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .controller('UIPortletControl', function (Ajax, $compile) {
+    .factory('UIPortletControl', function (Ajax, $compile) {
 
         class UIPortletControl extends ComponentEvent {
             constructor(scope, element, attrs, transclude) {
@@ -23,7 +23,7 @@ angular.module('admin.component')
 
             init() {
                 this.bodyElement = this.element.find('.portlet-body');
-                this.headElement = this.element.find('portlet-title');
+                this.headElement = this.element.find('.portlet-title');
                 this.triggerComplete(this.scope, this.attrs.ref || '$portlet', this);
             }
 
