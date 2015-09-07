@@ -153,7 +153,7 @@
                                 this._build();
                             }
                             else {
-                                Ajax.getScript(`${AdminCDN}/js/jquery.dataTables.min.js`)
+                                Ajax.getScript(`${AdminCDN}/assets/js/jquery.dataTables.min.js`)
                                     .then(() => this._build());
                             }
                         }
