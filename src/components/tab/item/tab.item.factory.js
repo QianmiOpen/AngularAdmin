@@ -21,7 +21,6 @@ angular.module('admin.component')
 
             init() {
                 this.scope.component = this;
-                this.bodyElement = this.element.parents('.ui-tab').find('.tab-content');
             }
 
             initEvents() {
@@ -43,6 +42,16 @@ angular.module('admin.component')
             removeHandler(evt) {
                 this.scope.$parent.$broadcast('uitab.item.remove', this.element.index());
                 evt.stopPropagation();
+            }
+
+            getContainer() {
+                if (!this.bodyElement) {
+                    this.bodyElement = this.element.parents('.ui-tab').find('.tab-content');
+                    if (this.bodyElement.length === 0) {
+                        this.bodyElement = this.element.parents('.portlet').find('.portlet-body');
+                    }
+                }
+                return this.bodyElement;
             }
 
             getContent() {
@@ -71,7 +80,7 @@ angular.module('admin.component')
                 else {
                     this.getContent()
                         .then(() => {
-                            this.bodyElement.append(this.content);
+                            this.getContainer().append(this.content);
                             this.content.show();
                         });
                 }

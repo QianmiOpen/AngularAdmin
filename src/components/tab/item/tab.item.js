@@ -8,7 +8,7 @@ angular.module('admin.component')
                 head: '@',
                 url: '@'
             },
-            controller: ($scope, $element, $attrs, $transclude) => {
+            link: ($scope, $element, $attrs, controller, $transclude) => {
                 new UITabItemControl($scope, $element, $attrs, $transclude);
             },
             template: `
