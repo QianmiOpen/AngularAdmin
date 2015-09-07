@@ -78,7 +78,7 @@
                                 this.load();
                             }
                             else {
-                                Ajax.getScript(`${AdminCDN}/js/zTree_v3/js/jquery.ztree.all-3.5.min.js`)
+                                Ajax.getScript(`${AdminCDN}/assets/js/zTree_v3/js/jquery.ztree.all-3.5.min.js`)
                                     .then(() => this.load());
                             }
                         }
