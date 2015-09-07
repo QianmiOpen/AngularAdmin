@@ -30,13 +30,13 @@
         <div class="col-md-6">
             <ui-portlet class="light" title="Tkk">
                 <ui-portlet-action-search></ui-portlet-action-search>
-                123123123
+                <button class="btn btn-primary" ng-click="showAA()">点我啊</button>
             </ui-portlet>
 
             <ui-portlet class="light" title="Tkk">
                 <ui-portlet-action-tab default="0">
                     <ui-tab-item head="1111">
-                        111111111
+                        <button class="btn btn-primary" ng-click="showAA()">点我啊</button>
                     </ui-tab-item>
                     <ui-tab-item head="2222">
                         222222222
@@ -85,31 +85,10 @@
         }
     });
 
-    var i = 0;
-    var a = 0;
-    $.mockjax({
-        url: '/test',
-        response: function () {
-            var aa = [],
-                    m = 5;
-            for (; i < m; i++) {
-                aa.push({
-                    a: i,
-                    b: Math.random(),
-                    c: Math.random(),
-                    d: Math.random(),
-                    e: '2014-11-1' + i + ' 11:11:11'
-                })
-            }
-            this.responseText = {
-                data: {
-                    aaData: aa,
-                    iTotalDisplayRecords: 1000,
-                    iTotalRecords: 1000
-                },
-                result: 1
-            }
+    function CC($scope){
+        $scope.showAA = function(){
+            alert(111);
         }
-    });
+    }
 </script>
 </html>

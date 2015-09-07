@@ -3017,7 +3017,7 @@ angular.module('admin.component')
             };
 
             proto$0.render = function() {
-                var $content = this.transclude(this.scope),
+                var $content = this.transclude(this.scope.$parent),
                     $toolbar = $content.filter('.portlet-tool-bar');
                 if ($toolbar.length === 0) {
                     $.each($content, function(i, c)  {
@@ -3073,8 +3073,10 @@ angular.module('admin.component')
             template: ("\
 \n                <div class=\"portlet\">\
 \n                    <div class=\"portlet-title tabbable-line\">\
-\n                        <i ng-if=\"icon\" class=\"{{icon}}\"></i>\
-\n                        <div class=\"caption\"><span class=\"caption-subject {{captionClass}}\">{{title}}</span></div>\
+\n                        <div class=\"caption\">\
+\n                            <i ng-if=\"icon\" class=\"{{icon}}\"></i>\
+\n                            <span class=\"caption-subject {{captionClass}}\">{{title}}</span>\
+\n                        </div>\
 \n                    </div>\
 \n                    <div class=\"portlet-body\">\
 \n                    </div>\
@@ -3149,8 +3151,7 @@ angular.module('admin.component')
                 else if (this.scope.url) {
                     return Ajax.get(this.scope.url)
                         .then(function(html)  {
-                            this$0.content = $compile(html)(this$0.scope);
-                            return this$0.content;
+                            return html;
                         });
                 }
                 else {
@@ -3168,6 +3169,7 @@ angular.module('admin.component')
                 else {
                     this.getContent()
                         .then(function()  {
+                            this$0.content = $compile(this$0.content)(this$0.scope.$parent);
                             this$0.getContainer().append(this$0.content);
                             this$0.content.show();
                         });
@@ -5387,6 +5389,42 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('tooltip', function () {
+        return {
+            restrict: 'A',
+            replace: false,
+            link: function (scope, element, attrs) {
+                var content = attrs.tooltip,
+                    title = attrs.title,
+                    placement = attrs.placement || (title ? 'right' : 'top');
+
+                //如果有标题有内容, 那么使用popup over
+                if (title) {
+                    element.popover({
+                        title: title,
+                        content: content,
+                        placement: placement,
+                        trigger: 'hover'
+                    });
+                }
+                //否则使用tooltip
+                else {
+                    element.tooltip({
+                        title: content,
+                        placement: placement
+                    });
+                }
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
 (function () {
 
     var requestMethod = 'post',
@@ -5655,42 +5693,6 @@ angular.module('admin.component')
 \n                    </div>\
 \n                </div>\
 \n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('tooltip', function () {
-        return {
-            restrict: 'A',
-            replace: false,
-            link: function (scope, element, attrs) {
-                var content = attrs.tooltip,
-                    title = attrs.title,
-                    placement = attrs.placement || (title ? 'right' : 'top');
-
-                //如果有标题有内容, 那么使用popup over
-                if (title) {
-                    element.popover({
-                        title: title,
-                        content: content,
-                        placement: placement,
-                        trigger: 'hover'
-                    });
-                }
-                //否则使用tooltip
-                else {
-                    element.tooltip({
-                        title: content,
-                        placement: placement
-                    });
-                }
-            }
         };
     });
 //-----------------------------------------------------------------------------------------------

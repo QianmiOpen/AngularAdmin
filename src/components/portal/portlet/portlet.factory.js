@@ -31,7 +31,7 @@ angular.module('admin.component')
             }
 
             render() {
-                let $content = this.transclude(this.scope),
+                let $content = this.transclude(this.scope.$parent),
                     $toolbar = $content.filter('.portlet-tool-bar');
                 if ($toolbar.length === 0) {
                     $.each($content, (i, c) => {

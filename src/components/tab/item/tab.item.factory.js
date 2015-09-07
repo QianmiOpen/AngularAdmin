@@ -61,8 +61,7 @@ angular.module('admin.component')
                 else if (this.scope.url) {
                     return Ajax.get(this.scope.url)
                         .then((html) => {
-                            this.content = $compile(html)(this.scope);
-                            return this.content;
+                            return html;
                         });
                 }
                 else {
@@ -80,6 +79,7 @@ angular.module('admin.component')
                 else {
                     this.getContent()
                         .then(() => {
+                            this.content = $compile(this.content)(this.scope.$parent);
                             this.getContainer().append(this.content);
                             this.content.show();
                         });

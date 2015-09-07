@@ -18,7 +18,7 @@
         <div class="col-md-12">
             <ui-tab close="true" default="0">
                 <ui-tab-item head="我是静态">
-                    11
+                    <button class="btn btn-primary" ng-click="showAA()">点我啊</button>
                 </ui-tab-item>
                 <ui-tab-item head="我是静态2">
                     22
@@ -40,5 +40,8 @@
         $scope.addNew = function(){
             $scope.$tab.addTab('测试啊', '123123123123123123', true);
         };
+        $scope.showAA = function(){
+            alert(111);
+        }
     }
 </script>
