@@ -56,20 +56,24 @@ angular.module('admin.component')
 
             getContent() {
                 if (this.content) {
-                    return Util.toPromise(this.content);
+                    return Util.toPromise(this.wrapperContent(html));
                 }
                 else if (this.scope.url) {
                     return Ajax.get(this.scope.url)
                         .then((html) => {
-                            return html;
+                            return this.wrapperContent(html);
                         });
                 }
                 else {
-                    this.transclude(this.scope, (dom) => {
+                    this.transclude(this.scope.$parent.$parent, (dom) => {
                         this.content = dom;
                     });
                     return Util.toPromise(this.content);
                 }
+            }
+
+            wrapperContent(html) {
+                return $compile(html)(this.scope.$parent.$parent);
             }
 
             _show() {
@@ -79,7 +83,6 @@ angular.module('admin.component')
                 else {
                     this.getContent()
                         .then(() => {
-                            this.content = $compile(this.content)(this.scope.$parent.$parent); //让作用域和tab的上层一致
                             this.getContainer().append(this.content);
                             this.content.show();
                         });
