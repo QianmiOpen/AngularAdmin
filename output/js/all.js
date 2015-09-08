@@ -4715,7 +4715,7 @@ angular.module('admin.component')
                 },
 
                 setPageName: function(_pageSizeName, _pageNumberName) {
-                    pageSizeName = _pageNumberName;
+                    pageSizeName = _pageSizeName;
                     pageNumberName = _pageNumberName;
                 },
 
@@ -4909,7 +4909,7 @@ angular.module('admin.component')
                             $.each(this.searchParams || {}, function(name, value)  {
                                 searchParams.push({name: name, value: value});
                             });
-                            var start, size;
+                            var start = 0, size = 0;
                             $.each(searchParams || {}, function(name, value)  {
                                 if (name == 'iDisplayStart') {
                                     start = value;
