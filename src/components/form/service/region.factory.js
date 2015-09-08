@@ -8,7 +8,7 @@
 (function () {
     angular.module('admin.component')
         .factory('UIRegionControl', (uiRegionHelper) => {
-            class UIRegionControl extends UIFormControl {
+            class UIRegionControl extends UIFormItemControl {
                 constructor(s, e, a) {
                     this.className = 'Region';
                     this.$inputDom = e.find('input:eq(0)');

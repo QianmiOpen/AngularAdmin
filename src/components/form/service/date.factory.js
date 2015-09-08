@@ -8,7 +8,7 @@
 (function () {
     angular.module('admin.component')
         .factory('UIDateControl', () => {
-            class UIDateControl extends UIFormControl {
+            class UIDateControl extends UIFormItemControl {
                 constructor(s, e, a) {
                     this.className = 'Date';
                     this.formEl = e.find('input');

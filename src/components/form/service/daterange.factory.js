@@ -44,7 +44,7 @@
 
     angular.module('admin.component')
         .factory('UIDateRangeControl', () => {
-            class UIDateRangeControl extends UIFormControl {
+            class UIDateRangeControl extends UIFormItemControl {
                 constructor(s, e, a) {
                     this.className = 'DateRange';
                     this.startDateElement = e.find('.input-group').find('input:first');

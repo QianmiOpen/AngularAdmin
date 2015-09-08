@@ -27,7 +27,7 @@ angular.module('admin.component')
                 <div class="input-inline search-item">
                     <div class="input-group">
                         <div ng-if="label" class="input-group-addon">{{label}}</div>
-                        <select class="form-control show-tick" data-live-search="true" data-style="{{buttonClass}}" name="{{name}}" title="{{placeholder}}" ng-transclude></select>
+                        <select class="form-control show-tick" data-live-search="true" data-style="{{buttonClass}}" name="{{name}}" ng-transclude></select>
                     </div>
                 </div>
             `

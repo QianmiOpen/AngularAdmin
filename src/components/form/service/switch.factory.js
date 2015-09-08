@@ -8,7 +8,7 @@
 (function () {
     angular.module('admin.component')
         .factory('UISwitchControl', () => {
-            class UISwitchControl extends UIFormControl {
+            class UISwitchControl extends UIFormItemControl {
                 constructor(s, e, a) {
                     this.className = 'Switch';
                     this.formEl = e.find('input');

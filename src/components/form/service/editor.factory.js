@@ -17,7 +17,7 @@
                     },
 
                     $get() {
-                        class UIEditorControl extends UIFormControl {
+                        class UIEditorControl extends UIFormItemControl {
 
                             constructor(s, e, a) {
                                 this.className = 'Editor';

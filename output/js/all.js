@@ -869,13 +869,15 @@ angular.module('admin.component')
                     },
                     post: function () {
                         form.layout();
-                        setTimeout(function () {
-                            form.initValidation();
-                        }, 300);
                     }
                 };
             },
-            templateUrl: 'tpl.form'
+            template: ("\
+\n                <form action=\"#\" class=\"form-horizontal\">\
+\n                    <div class=\"form-body\">\
+\n                    </div>\
+\n                </form>\
+\n            ")
         };
     });
 
@@ -984,8 +986,8 @@ angular.module('admin.component')
 /**
  * 表单控件
  */
-var UIFormControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIFormControl, super$0);var proto$0={};
-    function UIFormControl(scope, element, attrs) {
+var UIFormItemControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIFormItemControl, super$0);var proto$0={};
+    function UIFormItemControl(scope, element, attrs) {
         this.scope = scope;
         this.element = element;
         this.attrs = attrs;
@@ -996,7 +998,7 @@ var UIFormControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o
         this.initEvents();
         this.cleanElement();
         this.render();
-    }if(super$0!==null)SP$0(UIFormControl,super$0);UIFormControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIFormControl,"configurable":true,"writable":true}});DP$0(UIFormControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+    }if(super$0!==null)SP$0(UIFormItemControl,super$0);UIFormItemControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIFormItemControl,"configurable":true,"writable":true}});DP$0(UIFormItemControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
     proto$0.init = function() {
         this.message = new Message('UI' + (this.formPrefix + this.className));
@@ -1054,7 +1056,7 @@ var UIFormControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o
             this.formEl.val('');
         }
     };
-MIXIN$0(UIFormControl.prototype,proto$0);proto$0=void 0;return UIFormControl;})(ComponentEvent);
+MIXIN$0(UIFormItemControl.prototype,proto$0);proto$0=void 0;return UIFormItemControl;})(ComponentEvent);
 
 
 angular.module('admin.component')
@@ -1101,7 +1103,7 @@ angular.module('admin.component')
                         useSeconds: this.timeMode
                     });
                 };
-            MIXIN$0(UIDateControl.prototype,proto$0);proto$0=void 0;return UIDateControl;})(UIFormControl);
+            MIXIN$0(UIDateControl.prototype,proto$0);proto$0=void 0;return UIDateControl;})(UIFormItemControl);
 
             return UIDateControl;
         });
@@ -1221,7 +1223,7 @@ angular.module('admin.component')
                         return this;
                     }
                 };
-            MIXIN$0(UIDateRangeControl.prototype,proto$0);proto$0=void 0;return UIDateRangeControl;})(UIFormControl);
+            MIXIN$0(UIDateRangeControl.prototype,proto$0);proto$0=void 0;return UIDateRangeControl;})(UIFormItemControl);
 
             return UIDateRangeControl;
         });
@@ -1305,7 +1307,7 @@ angular.module('admin.component')
                                 this.scope.model = content;
                                 this.scope.change({val: content});
                             };
-                        MIXIN$0(UIEditorControl.prototype,proto$0);proto$0=void 0;return UIEditorControl;})(UIFormControl);
+                        MIXIN$0(UIEditorControl.prototype,proto$0);proto$0=void 0;return UIEditorControl;})(UIFormItemControl);
                         return UIEditorControl;
                     }
                 };
@@ -1347,7 +1349,6 @@ angular.module('admin.component')
 
                 function UIFormControl(s, e, a, formItems) {
                     this.className = 'form';
-                    this.action = this.attrs.action.replace(/#/g, '');
                     this.formItems = formItems;
                     this.formControlMap = {};
                     super$0.call(this, s, e, a);
@@ -1355,6 +1356,7 @@ angular.module('admin.component')
 
                 proto$0.init = function() {var this$0 = this;
                     super$0.prototype.init.call(this);
+                    this.action = this.attrs.action.replace(/#/g, '');
                     this.scope.$on('componentComplete', function(evt, o)  {
                         this$0.formControlMap[o.name] = o.component;
                     });
@@ -1376,260 +1378,11 @@ angular.module('admin.component')
                     this.element.valid();
                 };
 
-            MIXIN$0(UIFormControl.prototype,proto$0);proto$0=void 0;return UIFormControl;})(UIFormControl);
-            return UIFormControl;
-        })
-        .constant('uiFormValidateConfig', {
-            errorElement: 'span',
-            errorClass: 'help-block',
-            focusInvalid: false,
-            ignore: '',
-            rules: {},
-            highlight: function (element) {
-                $(element).closest('.form-group').addClass('has-error');
-            },
-            unhighlight: function (element) {
-                $(element).closest('.form-group').removeClass('has-error');
-            },
-            success: function (label, element) {
-                label.closest('.form-group').removeClass('has-error');
-            },
-            errorPlacement: function (error, element, message) {
-                $(error).appendTo($(element).parent());
-            }
-        })
-        .factory('uiFormFactory', function (msg, ajax, uiFormValidateConfig, uiFormControl) {
-            var m = new msg('Form'),
-                Form = function (scope, element, attrs, formItems) {
-                    this.column = attrs.column;
-                    this.formItems = formItems;
-                    this.formControlMap = {};
-                    this.action = attrs.action.replace(/#/g, '');
-                    this.formName = attrs.formName;
-                    uiFormControl.apply(this, arguments);
+                proto$0.layout = function(){
+                    this.element.find('.form-body').append(this.formItems);
                 };
-            Form.prototype = $.extend(new uiFormControl(), {
-
-                /**
-                 *
-                 * @private
-                 */
-                _init: function () {
-                    this.scope.$on('componentComplete', function (evt, o) {
-                        if (o && o.name) {
-                            this.formControlMap[o.name] = o;
-                        }
-                    }.bind(this));
-                },
-
-                /**
-                 *
-                 */
-                changeValidateRule: function (ruleName, ruleConfig) {
-                    var validator = this.element.data().validator;
-                    if (validator) {
-                        var oldConfig = validator.settings.rules[ruleName];
-                        validator.settings.rules[ruleName] = $.extend(oldConfig, ruleConfig);
-                    }
-                },
-
-                /**
-                 *
-                 */
-                startValidate: function () {
-                    this.element.valid();
-                },
-
-                /**
-                 *
-                 */
-                addFormItem: function (formItem) {
-                    this.formItems.push(formItem);
-                    this.layout();
-                },
-
-                /**
-                 *
-                 */
-                formItemVal: function (formItemName, value) {
-                    var $el = this.element.find('[name="' + formItemName + '"]');
-                    if (value) {
-                        $el.val(value);
-                    }
-                    else {
-                        return $el.val();
-                    }
-                },
-
-                /**
-                 * 根据column进行布局
-                 */
-                layout: function (column) {
-                    column = parseInt(column !== undefined ? column : this.column);
-                    if (column > 1) {
-                        var eachColumn = 12 / column,
-                            $body = this.element.find(' > div'),
-                            doms = []; //没列占多少
-                        $body.html();
-                        var i, dom;
-                        for (i = 0; i < this.formItems.length; i++) { //过滤一下
-                            dom = this.formItems[i];
-                            if (dom.innerHTML !== undefined) {
-                                if (dom.type == 'hidden') {
-                                    $body.append(dom);
-                                }
-                                else {
-                                    doms.push(dom);
-                                }
-                            }
-                        }
-                        var otherHandler = function (i, dom) {
-                            $body.append(dom);
-                        };
-                        for (i = 0; i < doms.length; i = i + column) {
-                            var $rowDom = $('<div/>').addClass('row'),
-                                tempI = i,
-                                tempColumn = i,
-                                other = [];
-                            while (tempColumn < tempI + column && doms[tempColumn]) {
-                                dom = doms[tempColumn];
-                                if (dom.className.indexOf('row') != -1) {
-                                    other.push(dom);
-                                    i++; //多用了一个
-                                    tempI++;
-                                }
-                                else {
-                                    var $cellDom = $('<div/>').addClass('col-md-' + eachColumn);
-                                    $cellDom.append(doms[tempColumn]);
-                                    $rowDom.append($cellDom);
-                                }
-                                tempColumn++;
-                            }
-                            $body.append($rowDom);
-                            $.each(other, otherHandler);
-                        }
-                    }
-                    else {
-                        this.element.find(' > div').append(this.formItems);
-                    }
-                },
-
-                /**
-                 *
-                 */
-                initValidation: function () {
-                    if (this.action) {  //推荐用心的
-                        $.getJSON('/validator?action=' + this.action, function (rules) {
-                            this.setRules(rules);
-                        }.bind(this));
-                    }
-                    else if (this.formName) { //这是老的, 不要这样啊啊
-                        $.getJSON('/validator?cm=' + this.formName, function (rules) {
-                            this.setRules(rules);
-                        }.bind(this));
-                    }
-                    else if (this.attrs.validateUrl) {
-                        $.getJSON(this.attrs.validateUrl, function (rules) {
-                            this.setRules(rules);
-                        }.bind(this));
-                    }
-                    else {
-                        this.element.submit(this._submit.bind(this));
-                    }
-                },
-
-                /**
-                 *
-                 * @param rules
-                 */
-                setRules: function (rules) {
-                    var messages = {};
-                    this.$emit('uiform.rules', rules, messages);
-                    this.element.validate($.extend({}, uiFormValidateConfig, {
-                        rules: rules,
-                        messages: messages,
-                        submitHandler: this._submit.bind(this)
-                    }));
-                },
-
-                /**
-                 *
-                 * @returns {*}
-                 */
-                formData: function (isJson) {
-                    var r = this.element.serializeArray();
-                    if (isJson === true) {
-                        var o = {};
-                        $.each(r, function (i, item) {
-                            var n = item.name,
-                                v = item.value;
-                            if (o[n]) {
-                                if ($.isArray(o[n])) {
-                                    o[n].push(v);
-                                }
-                                else {
-                                    o[n] = [o[n], v];
-                                }
-                            }
-                            else {
-                                o[n] = v;
-                            }
-                        });
-                        r = o;
-                    }
-                    return r;
-                },
-
-                /**
-                 * 加载数据绑定到表单
-                 * @param url
-                 */
-                loadData: function (url) {
-                    var self = this;
-                    return ajax.post(url).then(function (formData) {
-                        self.setData(formData);
-                    });
-                },
-
-                /**
-                 * 给表单设置数据集
-                 * @param data
-                 */
-                setData: function (data) {
-                    for (var k in data) {
-                        var formControl = this.formControlMap[k];
-                        if (formControl) {
-                            formControl.val(data[k]);
-                        }
-                    }
-                },
-
-                /**
-                 *
-                 */
-                submit: function (fn) {
-                    this.$on('uiForm.doSubmit', fn);
-                },
-                _submit: function (other) {
-                    if (this.action) {
-                        ajax.post(this.action, this.formData(other)).then(function () {
-                            this.$emit('uiForm.completeSubmit', this);
-                        }.bind(this));
-                    }
-                    else {
-                        this.$emit('uiForm.doSubmit', this.formData({}));
-                    }
-                    return false;
-                },
-
-                /**
-                 *
-                 */
-                reset: function () {
-                    this.scope.$broadcast('uiform.reset');
-                }
-            });
-            return Form;
+            MIXIN$0(UIFormControl.prototype,proto$0);proto$0=void 0;return UIFormControl;})(UIFormItemControl);
+            return UIFormControl;
         });
 })
 (jQuery);
@@ -1651,7 +1404,7 @@ angular.module('admin.component')
                     this.formEl = e.find('input');
                     super$0.call(this, s, e, a);
                 }if(super$0!==null)SP$0(UIInputControl,super$0);UIInputControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIInputControl,"configurable":true,"writable":true}});DP$0(UIInputControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-            ;return UIInputControl;})(UIFormControl);
+            ;return UIInputControl;})(UIFormItemControl);
             return UIInputControl;
         });
 })();
@@ -2117,7 +1870,7 @@ angular.module('admin.component')
                         s = this.$sDom.val();
                     this.scope.change({mode: mode, val: val, p: p, c: c, s: s});
                 };
-            MIXIN$0(UIRegionControl.prototype,proto$0);proto$0=void 0;return UIRegionControl;})(UIFormControl);
+            MIXIN$0(UIRegionControl.prototype,proto$0);proto$0=void 0;return UIRegionControl;})(UIFormItemControl);
 
             return UIRegionControl;
         });
@@ -2367,7 +2120,7 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 (function () {
     angular.module('admin.component')
-        .factory('UISelectControl',function(Ajax)  {
+        .factory('UISelectControl', function(Ajax)  {
 
             //
             var UISelectControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UISelectControl, super$0);var proto$0={};
@@ -2416,15 +2169,16 @@ angular.module('admin.component')
                 };
 
                 proto$0.render = function() {
-                    if (this.init) {
+                    if (this.isInit) {
                         this.formEl.selectpicker('refresh');
                     }
                     else {
                         this.formEl.selectpicker({
                             iconBase: 'fa',
-                            tickIcon: 'fa-check'
+                            tickIcon: 'fa-check',
+                            title: this.attrs.placeholder || '请选择'
                         });
-                        this.init = true;
+                        this.isInit = true;
                     }
                 };
 
@@ -2488,7 +2242,7 @@ angular.module('admin.component')
                     var $option = $('<optgroup/>').attr('label', name);
                     return $option;
                 };
-            MIXIN$0(UISelectControl.prototype,proto$0);proto$0=void 0;return UISelectControl;})(UIFormControl);
+            MIXIN$0(UISelectControl.prototype,proto$0);proto$0=void 0;return UISelectControl;})(UIFormItemControl);
 
             //
             return UISelectControl;
@@ -2549,7 +2303,7 @@ angular.module('admin.component')
                     }
                     return value;
                 };
-            MIXIN$0(UISpinnerControl.prototype,proto$0);proto$0=void 0;return UISpinnerControl;})(UIFormControl);
+            MIXIN$0(UISpinnerControl.prototype,proto$0);proto$0=void 0;return UISpinnerControl;})(UIFormItemControl);
             return UISpinnerControl;
         });
 })();
@@ -2629,7 +2383,7 @@ angular.module('admin.component')
                     this.scope.model = v;
                     this.scope.change({val: v});
                 };
-            MIXIN$0(UISwitchControl.prototype,proto$0);proto$0=void 0;return UISwitchControl;})(UIFormControl);
+            MIXIN$0(UISwitchControl.prototype,proto$0);proto$0=void 0;return UISwitchControl;})(UIFormItemControl);
             return UISwitchControl;
         });
 })();
@@ -2865,7 +2619,7 @@ angular.module('admin.component')
                         return this.selectItems[0];
                     }
                 };
-            MIXIN$0(UIRemoteSelectControl.prototype,proto$0);proto$0=void 0;return UIRemoteSelectControl;})(UIFormControl);
+            MIXIN$0(UIRemoteSelectControl.prototype,proto$0);proto$0=void 0;return UIRemoteSelectControl;})(UIFormItemControl);
             return UIRemoteSelectControl;
         });
 })();
@@ -2977,7 +2731,7 @@ angular.module('admin.component')
                                     }
                                 });
                             };
-                        MIXIN$0(UIUploadControl.prototype,proto$0);proto$0=void 0;return UIUploadControl;})(UIFormControl);
+                        MIXIN$0(UIUploadControl.prototype,proto$0);proto$0=void 0;return UIUploadControl;})(UIFormItemControl);
                         return UIUploadControl;
                     }
                 };
@@ -3092,6 +2846,137 @@ angular.module('admin.component')
 
 
 
+
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .factory('UITabItemControl', function (Ajax, Util, $compile) {
+        var UITabItemControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabItemControl, super$0);var proto$0={};
+            function UITabItemControl(scope, element, attrs, transclude) {
+                super$0.call(this);
+                this.element = element;
+                this.scope = scope;
+                this.attrs = attrs;
+                this.transclude = transclude;
+                this.message = new Message('UITabItem');
+                this.init();
+                this.initEvents();
+            }if(super$0!==null)SP$0(UITabItemControl,super$0);UITabItemControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabItemControl,"configurable":true,"writable":true}});DP$0(UITabItemControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                this.scope.component = this;
+            };
+
+            proto$0.initEvents = function() {var this$0 = this;
+                this.scope.$on('uitab.item.remove', function(evt, index)  {
+                    if (index == this$0.element.index()) {
+                        this$0._remove();
+                    }
+                });
+                this.scope.$on('uitab.item.show', function(evt, index)  {
+                    this$0[index == this$0.element.index() ? '_show' : '_hide']();
+                });
+            };
+
+            proto$0.clickHandler = function(evt) {
+                this.scope.$parent.$broadcast('uitab.item.show', this.element.index());
+                evt.stopPropagation();
+            };
+
+            proto$0.removeHandler = function(evt) {
+                this.scope.$parent.$broadcast('uitab.item.remove', this.element.index());
+                evt.stopPropagation();
+            };
+
+            proto$0.getContainer = function() {
+                if (!this.bodyElement) {
+                    this.bodyElement = this.element.parents('.ui-tab').find('.tab-content');
+                    if (this.bodyElement.length === 0) {
+                        this.bodyElement = this.element.parents('.portlet').find('.portlet-body');
+                    }
+                }
+                return this.bodyElement;
+            };
+
+            proto$0.getContent = function() {var this$0 = this;
+                if (this.content) {
+                    return Util.toPromise(this.content);
+                }
+                else if (this.scope.url) {
+                    return Ajax.get(this.scope.url)
+                        .then(function(html)  {
+                            return html;
+                        });
+                }
+                else {
+                    this.transclude(this.scope, function(dom)  {
+                        this$0.content = dom;
+                    });
+                    return Util.toPromise(this.content);
+                }
+            };
+
+            proto$0._show = function() {var this$0 = this;
+                if (this.content) {
+                    this.content.show();
+                }
+                else {
+                    this.getContent()
+                        .then(function()  {
+                            this$0.content = $compile(this$0.content)(this$0.scope.$parent);
+                            this$0.getContainer().append(this$0.content);
+                            this$0.content.show();
+                        });
+                }
+                this.scope.active = true;
+            };
+
+            proto$0._hide = function() {
+                if (this.content) {
+                    this.content.hide();
+                }
+                this.scope.active = false;
+            };
+
+            proto$0._remove = function() {var this$0 = this;
+                setTimeout(function() {
+                    this$0.element.remove();
+                    this$0.content && this$0.content.remove();
+                    this$0.scope.$destroy();
+                }, 100);
+            };
+        MIXIN$0(UITabItemControl.prototype,proto$0);proto$0=void 0;return UITabItemControl;})(ComponentEvent);
+
+        return UITabItemControl;
+    });
+angular.module('admin.component')
+    .directive('uiTabItem', function (UITabItemControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                head: '@',
+                url: '@'
+            },
+            link: function($scope, $element, $attrs, controller, $transclude)  {
+                new UITabItemControl($scope, $element, $attrs, $transclude);
+            },
+            template: ("\
+\n                <li ng-class=\"{'active': active}\">\
+\n                    <a href=\"javascript:;\" ng-click=\"component.clickHandler($event)\">\
+\n                        <span>{{head}}</span>\
+\n                        <i class=\"fa fa-times\" ng-click=\"component.removeHandler($event)\"></i>\
+\n                    </a>\
+\n                </li>\
+\n            ")
+        };
+    });
 
 //------------------------------------------------------
 //
@@ -3537,137 +3422,6 @@ angular.module('admin.component')
         };
     })
 ;
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('UITabItemControl', function (Ajax, Util, $compile) {
-        var UITabItemControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabItemControl, super$0);var proto$0={};
-            function UITabItemControl(scope, element, attrs, transclude) {
-                super$0.call(this);
-                this.element = element;
-                this.scope = scope;
-                this.attrs = attrs;
-                this.transclude = transclude;
-                this.message = new Message('UITabItem');
-                this.init();
-                this.initEvents();
-            }if(super$0!==null)SP$0(UITabItemControl,super$0);UITabItemControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabItemControl,"configurable":true,"writable":true}});DP$0(UITabItemControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                this.scope.component = this;
-            };
-
-            proto$0.initEvents = function() {var this$0 = this;
-                this.scope.$on('uitab.item.remove', function(evt, index)  {
-                    if (index == this$0.element.index()) {
-                        this$0._remove();
-                    }
-                });
-                this.scope.$on('uitab.item.show', function(evt, index)  {
-                    this$0[index == this$0.element.index() ? '_show' : '_hide']();
-                });
-            };
-
-            proto$0.clickHandler = function(evt) {
-                this.scope.$parent.$broadcast('uitab.item.show', this.element.index());
-                evt.stopPropagation();
-            };
-
-            proto$0.removeHandler = function(evt) {
-                this.scope.$parent.$broadcast('uitab.item.remove', this.element.index());
-                evt.stopPropagation();
-            };
-
-            proto$0.getContainer = function() {
-                if (!this.bodyElement) {
-                    this.bodyElement = this.element.parents('.ui-tab').find('.tab-content');
-                    if (this.bodyElement.length === 0) {
-                        this.bodyElement = this.element.parents('.portlet').find('.portlet-body');
-                    }
-                }
-                return this.bodyElement;
-            };
-
-            proto$0.getContent = function() {var this$0 = this;
-                if (this.content) {
-                    return Util.toPromise(this.content);
-                }
-                else if (this.scope.url) {
-                    return Ajax.get(this.scope.url)
-                        .then(function(html)  {
-                            return html;
-                        });
-                }
-                else {
-                    this.transclude(this.scope, function(dom)  {
-                        this$0.content = dom;
-                    });
-                    return Util.toPromise(this.content);
-                }
-            };
-
-            proto$0._show = function() {var this$0 = this;
-                if (this.content) {
-                    this.content.show();
-                }
-                else {
-                    this.getContent()
-                        .then(function()  {
-                            this$0.content = $compile(this$0.content)(this$0.scope.$parent);
-                            this$0.getContainer().append(this$0.content);
-                            this$0.content.show();
-                        });
-                }
-                this.scope.active = true;
-            };
-
-            proto$0._hide = function() {
-                if (this.content) {
-                    this.content.hide();
-                }
-                this.scope.active = false;
-            };
-
-            proto$0._remove = function() {var this$0 = this;
-                setTimeout(function() {
-                    this$0.element.remove();
-                    this$0.content && this$0.content.remove();
-                    this$0.scope.$destroy();
-                }, 100);
-            };
-        MIXIN$0(UITabItemControl.prototype,proto$0);proto$0=void 0;return UITabItemControl;})(ComponentEvent);
-
-        return UITabItemControl;
-    });
-angular.module('admin.component')
-    .directive('uiTabItem', function (UITabItemControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                head: '@',
-                url: '@'
-            },
-            link: function($scope, $element, $attrs, controller, $transclude)  {
-                new UITabItemControl($scope, $element, $attrs, $transclude);
-            },
-            template: ("\
-\n                <li ng-class=\"{'active': active}\">\
-\n                    <a href=\"javascript:;\" ng-click=\"component.clickHandler($event)\">\
-\n                        <span>{{head}}</span>\
-\n                        <i class=\"fa fa-times\" ng-click=\"component.removeHandler($event)\"></i>\
-\n                    </a>\
-\n                </li>\
-\n            ")
-        };
-    });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -3942,7 +3696,7 @@ angular.module('admin.component')
 \n                <div class=\"form-group\">\
 \n                    <label class=\"col-md-{{lcol}} control-label\">{{label}}</label>\
 \n                    <div class=\"col-md-{{rcol}}\">\
-\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" title=\"{{placeholder || '请选择'}}\" ng-transclude></select>\
+\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" ng-transclude></select>\
 \n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
 \n                    </div>\
 \n                </div>\
@@ -4335,7 +4089,7 @@ angular.module('admin.component')
 \n                <div class=\"input-inline search-item\">\
 \n                    <div class=\"input-group\">\
 \n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" title=\"{{placeholder}}\" ng-transclude></select>\
+\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" ng-transclude></select>\
 \n                    </div>\
 \n                </div>\
 \n            ")
@@ -4539,6 +4293,74 @@ angular.module('admin.component')
 //
 //
 //
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+
+    var UIStateButton = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIStateButton, super$0);var proto$0={};
+        function UIStateButton(scope, element, attrs) {
+            this.scope = scope;
+            this.element = element;
+            this.attrs = attrs;
+            this.message = new Message('uiStateButton');
+        }if(super$0!==null)SP$0(UIStateButton,super$0);UIStateButton.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIStateButton,"configurable":true,"writable":true}});DP$0(UIStateButton,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+        proto$0.init = function() {var this$0 = this;
+            if (!this.scope.clickHandler) {
+                this.message.error('必须设置on-click属性');
+            }
+            this.element.click(function()  {
+                this$0.disable(true);
+                var result = this$0.scope.clickHandler();
+                this$0.wait(result);
+            });
+        };
+
+        proto$0.wait = function(result) {var this$0 = this;
+            if (result && result.finally) {
+                result.finally(function()  {return this$0.disable(false)});
+            }
+            else {
+                this.disable(false);
+            }
+        };
+
+        proto$0.disable = function(isD) {
+            //
+            if (this.scope.target) {
+                Metronic[(("" + (isD ? '' : 'un')) + "blockUI")](this.scope.target);
+            }
+
+            //
+            this.element.prop('disabled', isD);
+        };
+    MIXIN$0(UIStateButton.prototype,proto$0);proto$0=void 0;return UIStateButton;})(Event);
+
+    angular.module('admin.component')
+        .directive('uiStateButton', function () {
+            return {
+                restrict: 'E',
+                replace: true,
+                transclude: true,
+                scope: {
+                    target: '@target',
+                    clickHandler: '@click'
+                },
+                link: function (scope, element, attrs) {
+                    var button = new UIStateButton(scope, element, attrs);
+                    button.init();
+                },
+                template: ("\
+\n                    <button type=\"button\" class=\"btn\" ng-transclude></button>\
+\n                ")
+            };
+        });
+})();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
 //-----------------------------------------------------------------------------------------------
 (function () {
 
@@ -4686,74 +4508,6 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
-(function () {
-
-    var UIStateButton = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIStateButton, super$0);var proto$0={};
-        function UIStateButton(scope, element, attrs) {
-            this.scope = scope;
-            this.element = element;
-            this.attrs = attrs;
-            this.message = new Message('uiStateButton');
-        }if(super$0!==null)SP$0(UIStateButton,super$0);UIStateButton.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIStateButton,"configurable":true,"writable":true}});DP$0(UIStateButton,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-        proto$0.init = function() {var this$0 = this;
-            if (!this.scope.clickHandler) {
-                this.message.error('必须设置on-click属性');
-            }
-            this.element.click(function()  {
-                this$0.disable(true);
-                var result = this$0.scope.clickHandler();
-                this$0.wait(result);
-            });
-        };
-
-        proto$0.wait = function(result) {var this$0 = this;
-            if (result && result.finally) {
-                result.finally(function()  {return this$0.disable(false)});
-            }
-            else {
-                this.disable(false);
-            }
-        };
-
-        proto$0.disable = function(isD) {
-            //
-            if (this.scope.target) {
-                Metronic[(("" + (isD ? '' : 'un')) + "blockUI")](this.scope.target);
-            }
-
-            //
-            this.element.prop('disabled', isD);
-        };
-    MIXIN$0(UIStateButton.prototype,proto$0);proto$0=void 0;return UIStateButton;})(Event);
-
-    angular.module('admin.component')
-        .directive('uiStateButton', function () {
-            return {
-                restrict: 'E',
-                replace: true,
-                transclude: true,
-                scope: {
-                    target: '@target',
-                    clickHandler: '@click'
-                },
-                link: function (scope, element, attrs) {
-                    var button = new UIStateButton(scope, element, attrs);
-                    button.init();
-                },
-                template: ("\
-\n                    <button type=\"button\" class=\"btn\" ng-transclude></button>\
-\n                ")
-            };
-        });
-})();
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
     .controller('UIPortalControl', function () {
 
@@ -4807,6 +4561,83 @@ angular.module('admin.component')
 \n            ")
         };
     });
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .factory('UITabControl', function () {
+        var UITabControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabControl, super$0);var proto$0={};
+            function UITabControl(scope, element, attrs, transclude) {
+                super$0.call(this);
+                this.element = element;
+                this.scope = scope;
+                this.attrs = attrs;
+                this.transclude = transclude;
+                this.message = new Message('UITab');
+                this.init();
+                this.initEvents();
+            }if(super$0!==null)SP$0(UITabControl,super$0);UITabControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabControl,"configurable":true,"writable":true}});DP$0(UITabControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                this.scope.component = this;
+                this.triggerComplete(this.scope, this.attrs.ref || '$tab', this);
+            };
+
+            proto$0.initEvents = function() {
+            };
+
+            proto$0.build = function() {
+                this.showAtIndex(this.scope.default);
+            };
+
+            proto$0.showAtIndex = function(index) {
+                index && this.scope.$broadcast('uitab.item.show', index);
+            };
+
+            proto$0.removeAtIndex = function(index) {
+                index && this.scope.$broadcast('uitab.item.remove', index);
+            };
+        MIXIN$0(UITabControl.prototype,proto$0);proto$0=void 0;return UITabControl;})(ComponentEvent);
+
+        return UITabControl;
+    });
+angular.module('admin.component')
+    .directive('uiTab', function (UITabControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                close: '@',
+                default: '@',
+                url: '@'
+            },
+            compile: function () {
+                var tab = null;
+                return {
+                    pre: function (scope, element, attrs, controller, transclude) {
+                        tab = new UITabControl(scope, element, attrs, transclude);
+                    },
+                    post: function () {
+                        tab.build();
+                    }
+                };
+            },
+            template: ("\
+\n                <div class=\"ui-tab tabbable-custom\" ng-class=\"{'tabbable-close': close}\">\
+\n                    <ul class=\"nav nav-tabs\" ng-transclude>\
+\n                    </ul>\
+\n                    <div class=\"tab-content\" style=\"min-height: 100px;\">\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5161,83 +4992,6 @@ angular.module('admin.component')
 //------------------------------------------------------
 //
 //
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('UITabControl', function () {
-        var UITabControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabControl, super$0);var proto$0={};
-            function UITabControl(scope, element, attrs, transclude) {
-                super$0.call(this);
-                this.element = element;
-                this.scope = scope;
-                this.attrs = attrs;
-                this.transclude = transclude;
-                this.message = new Message('UITab');
-                this.init();
-                this.initEvents();
-            }if(super$0!==null)SP$0(UITabControl,super$0);UITabControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabControl,"configurable":true,"writable":true}});DP$0(UITabControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                this.scope.component = this;
-                this.triggerComplete(this.scope, this.attrs.ref || '$tab', this);
-            };
-
-            proto$0.initEvents = function() {
-            };
-
-            proto$0.build = function() {
-                this.showAtIndex(this.scope.default);
-            };
-
-            proto$0.showAtIndex = function(index) {
-                index && this.scope.$broadcast('uitab.item.show', index);
-            };
-
-            proto$0.removeAtIndex = function(index) {
-                index && this.scope.$broadcast('uitab.item.remove', index);
-            };
-        MIXIN$0(UITabControl.prototype,proto$0);proto$0=void 0;return UITabControl;})(ComponentEvent);
-
-        return UITabControl;
-    });
-angular.module('admin.component')
-    .directive('uiTab', function (UITabControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                close: '@',
-                default: '@',
-                url: '@'
-            },
-            compile: function () {
-                var tab = null;
-                return {
-                    pre: function (scope, element, attrs, controller, transclude) {
-                        tab = new UITabControl(scope, element, attrs, transclude);
-                    },
-                    post: function () {
-                        tab.build();
-                    }
-                };
-            },
-            template: ("\
-\n                <div class=\"ui-tab tabbable-custom\" ng-class=\"{'tabbable-close': close}\">\
-\n                    <ul class=\"nav nav-tabs\" ng-transclude>\
-\n                    </ul>\
-\n                    <div class=\"tab-content\" style=\"min-height: 100px;\">\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-
-//------------------------------------------------------
-//
-//
 // 依赖 qm.table.js
 //
 //
@@ -5538,17 +5292,11 @@ angular.module('admin.component')
 
                         proto$0.setData = function(resData, isFilter) {
                             resData = resData || [];
-                            if (this.attrs.root !== undefined) {
-                                var rootData = {open: true, type: 1};
-                                rootData[idName] = this.attrs.rootId || '0';
-                                rootData[labelName] = this.attrs.root || '根';
-                                resData.push(rootData);
-                            }
                             if ($.fn.zTree) {
                                 this.instance = $.fn.zTree.init(this.treeElement, $.extend({}, defaultConfig, this), resData);
                                 this.expand();
                             }
-                            if(!isFilter){
+                            if (!isFilter) {
                                 this.dataList = resData;
                                 this.setDataMap(resData);
                             }
@@ -5589,6 +5337,19 @@ angular.module('admin.component')
                             return this.dataMap[data[pidName]];
                         };
 
+                        proto$0.appendData = function(id, name, pid) {
+                            var data = id;
+                            if (id !== undefined && name) {
+                                data = {};
+                                data[idName] = id;
+                                data[pidName] = pid;
+                                data[labelName] = name;
+                            }
+                            this.dataList = this.dataList || [];
+                            this.dataList.push(data);
+                            this.setData(this.dataList);
+                        };
+
                         proto$0._filter = function(filterText) {var this$0 = this;
                             if (!this.dataList)
                                 return;
@@ -5606,7 +5367,7 @@ angular.module('admin.component')
                                         m[item[idName]] = 1;
                                         return true;
                                     }
-                                    else{
+                                    else {
                                         return false;
                                     }
                                 });

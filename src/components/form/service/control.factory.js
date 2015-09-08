@@ -1,7 +1,7 @@
 /**
  * 表单控件
  */
-class UIFormControl extends ComponentEvent {
+class UIFormItemControl extends ComponentEvent {
     constructor(scope, element, attrs) {
         this.scope = scope;
         this.element = element;

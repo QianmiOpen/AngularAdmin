@@ -8,7 +8,7 @@
 (function () {
     angular.module('admin.component')
         .factory('UITagControl', ($q, Util, Ajax) => {
-            class UIRemoteSelectControl extends UIFormControl {
+            class UIRemoteSelectControl extends UIFormItemControl {
                 constructor(s, e, a) {
                     this.className = 'RemoteSelect';
                     this.selectValues = [];

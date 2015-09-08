@@ -7,10 +7,10 @@
 //-----------------------------------------------------------------------------------------------
 (function () {
     angular.module('admin.component')
-        .factory('UISelectControl',(Ajax) => {
+        .factory('UISelectControl', (Ajax) => {
 
             //
-            class UISelectControl extends UIFormControl {
+            class UISelectControl extends UIFormItemControl {
 
                 constructor(s, e, a) {
                     this.className = 'Select';
@@ -56,15 +56,16 @@
                 }
 
                 render() {
-                    if (this.init) {
+                    if (this.isInit) {
                         this.formEl.selectpicker('refresh');
                     }
                     else {
                         this.formEl.selectpicker({
                             iconBase: 'fa',
-                            tickIcon: 'fa-check'
+                            tickIcon: 'fa-check',
+                            title: this.attrs.placeholder || '请选择'
                         });
-                        this.init = true;
+                        this.isInit = true;
                     }
                 }
 

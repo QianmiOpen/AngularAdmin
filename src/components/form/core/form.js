@@ -21,13 +21,15 @@ angular.module('admin.component')
                     },
                     post: function () {
                         form.layout();
-                        setTimeout(function () {
-                            form.initValidation();
-                        }, 300);
                     }
                 };
             },
-            templateUrl: 'tpl.form'
+            template: `
+                <form action="#" class="form-horizontal">
+                    <div class="form-body">
+                    </div>
+                </form>
+            `
         };
     });
 

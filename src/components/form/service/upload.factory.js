@@ -24,7 +24,7 @@
                     },
 
                     $get() {
-                        class UIUploadControl extends UIFormControl {
+                        class UIUploadControl extends UIFormItemControl {
 
                             constructor(s, e, a) {
                                 this.className = 'Upload';

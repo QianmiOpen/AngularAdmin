@@ -113,12 +113,6 @@
 
                         setData(resData, isFilter) {
                             resData = resData || [];
-                            if (this.attrs.root !== undefined) {
-                                let rootData = {open: true, type: 1};
-                                rootData[idName] = this.attrs.rootId || '0';
-                                rootData[labelName] = this.attrs.root || '根';
-                                resData.push(rootData);
-                            }
                             if ($.fn.zTree) {
                                 this.instance = $.fn.zTree.init(this.treeElement, $.extend({}, defaultConfig, this), resData);
                                 this.expand();
@@ -164,11 +158,15 @@
                             return this.dataMap[data[pidName]];
                         }
 
-                        appendData(id, name) {
+                        appendData(id, name, pid) {
                             let data = id;
-                            if (_.isString(id)) {
-                                data = {id, name};
+                            if (id !== undefined && name) {
+                                data = {};
+                                data[idName] = id;
+                                data[pidName] = pid;
+                                data[labelName] = name;
                             }
+                            this.dataList = this.dataList || [];
                             this.dataList.push(data);
                             this.setData(this.dataList);
                         }

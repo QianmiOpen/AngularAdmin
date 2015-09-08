@@ -8,7 +8,7 @@
 (function () {
     angular.module('admin.component')
         .factory('UISpinnerControl', () => {
-            class UISpinnerControl extends UIFormControl {
+            class UISpinnerControl extends UIFormItemControl {
                 constructor(s, e, a) {
                     this.className = 'Spinner';
                     this.formEl = e.find('input');

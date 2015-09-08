@@ -9,7 +9,7 @@
 
     angular.module('admin.component')
         .factory('UIInputControl', () => {
-            class UIInputControl extends UIFormControl {
+            class UIInputControl extends UIFormItemControl {
 
                 constructor(s, e, a) {
                     this.className = 'Input';
