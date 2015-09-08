@@ -15,20 +15,19 @@
                     this.scope = scope;
                     this.element = element;
                     this.attrs = attrs;
-                    this.scope.$on('componentComplete', this.initHandler.bind(this));
-                    this.content = $transclude(scope);
+                    this.transclude = $transclude;
+                    this.init();
                 }
 
                 init() {
+                    this.completeName = this.attrs.complete;
+                    this.scope.$on('componentComplete', this.initHandler.bind(this));
+                    this.content = this.transclude(scope);
                     this.element
                         .show()
                         .append(this.content);
 
                     this.lazyInit();
-                    return this;
-                }
-
-                initEvents(){
                 }
 
                 lazyInit() {
@@ -49,7 +48,11 @@
                         else if (ctrl) {
                             $controller(ctrl, {$scope: this.scope});
                         }
-                        this.scope.$emit('uicontainer.ready'); // 触发
+
+                        //
+                        if (this.scope[this.completeName]) {
+                            this.scope[this.completeName]();
+                        }
                     });
                 }
 
@@ -71,9 +74,7 @@
                 replace: true,
                 transclude: true,
                 link: function (scope, element, attrs, ctrl, tranclude) {
-                    new UIContainer(scope, element, attrs, tranclude)
-                        .init()
-                        .initEvents();
+                    new UIContainer(scope, element, attrs, tranclude);
                 },
                 template: `
                     <div></div>
