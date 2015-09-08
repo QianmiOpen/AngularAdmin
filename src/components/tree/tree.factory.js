@@ -43,6 +43,7 @@
                             this.scope = scope;
                             this.attrs = attrs;
                             this.treeNodeBtnMap = {};
+                            this.dataMap = {};
                             this.transclude = transclude;
                             this.message = new Message('UITree');
                             this.init();
@@ -67,7 +68,12 @@
 
                         initEvents() {
                             this.scope.$watch('filter', (val) => {
-                                this._filter(val);
+                                if ($.fn.zTree) {
+                                    clearTimeout(this.timeout);
+                                    this.timeout = setTimeout(() => {
+                                        this._filter(val);
+                                    }, 100);
+                                }
                             });
                             this.scope.onAddHandler = (evt) => this._onAddHandler($(evt.target).parent().data('treeNode'));
                             this.scope.onEditHandler = (evt) => this._onEditHandler($(evt.target).parent().data('treeNode'));
@@ -105,7 +111,7 @@
                             }
                         }
 
-                        setData(resData) {
+                        setData(resData, isFilter) {
                             resData = resData || [];
                             if (this.attrs.root !== undefined) {
                                 let rootData = {open: true, type: 1};
@@ -117,23 +123,71 @@
                                 this.instance = $.fn.zTree.init(this.treeElement, $.extend({}, defaultConfig, this), resData);
                                 this.expand();
                             }
-                            this.dataList = resData;
+                            if(!isFilter){
+                                this.dataList = resData;
+                                this.setDataMap(resData);
+                            }
                         }
 
-                        expand(arg){
+                        setDataMap(resData) {
+                            this.dataMap = {};
+                            for (var item of resData) {
+                                this.dataMap[item[idName]] = item;
+                            }
+                        }
+
+                        expand(arg) {
                             arg = arg || this.attrs.expand;
                             if (arg == 'all') {
                                 this.expandAll(true);
                             }
-                            else if(arg){
+                            else if (arg) {
                             }
                         }
 
-                        expandAll(isExpand){
+                        expandAll(isExpand) {
                             this.instance.expandAll(isExpand);
                         }
 
+                        getHierarchyData(data) {
+                            var r = [];
+                            if (data) {
+                                r.push(data);
+                                while (data = this.getParentData(data)) {
+                                    r.unshift(data);
+                                }
+                            }
+                            return r;
+                        }
+
+                        getParentData(data) {
+                            return this.dataMap[data[pidName]];
+                        }
+
                         _filter(filterText) {
+                            if (!this.dataList)
+                                return;
+                            let searchList = this.dataList, m = {};
+                            if (filterText) {
+                                filterText = filterText.toLowerCase();
+                                searchList = [];
+                                $.each(this.dataList, (dataIndex, data) => {
+                                    if (data[labelName] && data[labelName].toLowerCase().indexOf(filterText) != -1) {
+                                        searchList = searchList.concat(this.getHierarchyData(data));
+                                    }
+                                });
+                                searchList = searchList.filter((item) => {
+                                    if (!m[item[idName]]) {
+                                        m[item[idName]] = 1;
+                                        return true;
+                                    }
+                                    else{
+                                        return false;
+                                    }
+                                });
+                            }
+                            this.setData(searchList, true);
+                            this.expandAll(true);
                         }
 
                         _onMouseEnterTreeNode(treeNode) {

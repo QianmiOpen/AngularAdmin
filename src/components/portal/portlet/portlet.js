@@ -13,6 +13,7 @@ angular.module('admin.component')
             transclude: true,
             scope: {
                 captionClass: '@',
+                bodyClass: '@',
                 title: '@',
                 icon: '@',
                 url: '@'
@@ -28,7 +29,7 @@ angular.module('admin.component')
                             <span class="caption-subject {{captionClass}}">{{title}}</span>
                         </div>
                     </div>
-                    <div class="portlet-body">
+                    <div class="portlet-body {{bodyClass}}">
                     </div>
                 </div>
             `

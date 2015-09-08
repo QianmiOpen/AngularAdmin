@@ -3063,6 +3063,7 @@ angular.module('admin.component')
             transclude: true,
             scope: {
                 captionClass: '@',
+                bodyClass: '@',
                 title: '@',
                 icon: '@',
                 url: '@'
@@ -3078,7 +3079,7 @@ angular.module('admin.component')
 \n                            <span class=\"caption-subject {{captionClass}}\">{{title}}</span>\
 \n                        </div>\
 \n                    </div>\
-\n                    <div class=\"portlet-body\">\
+\n                    <div class=\"portlet-body {{bodyClass}}\">\
 \n                    </div>\
 \n                </div>\
 \n            ")
@@ -4030,43 +4031,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSwitch', function (UISwitchControl) {
-        return {
-            restrict: 'E',
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                placeholder: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function(s, e, a)  {
-                new UISwitchControl(s, e, a);
-            },
-            template: ("\
-\n               <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>\
-\n            ")
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
 //  针对input的封装
 //
 //
@@ -4112,6 +4076,43 @@ angular.module('admin.component')
 \n            ")
         };
     });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSwitch', function (UISwitchControl) {
+        return {
+            restrict: 'E',
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function(s, e, a)  {
+                new UISwitchControl(s, e, a);
+            },
+            template: ("\
+\n               <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5463,6 +5464,7 @@ angular.module('admin.component')
                             this.scope = scope;
                             this.attrs = attrs;
                             this.treeNodeBtnMap = {};
+                            this.dataMap = {};
                             this.transclude = transclude;
                             this.message = new Message('UITree');
                             this.init();
@@ -5487,7 +5489,12 @@ angular.module('admin.component')
 
                         proto$0.initEvents = function() {var this$0 = this;
                             this.scope.$watch('filter', function(val)  {
-                                this$0._filter(val);
+                                if ($.fn.zTree) {
+                                    clearTimeout(this$0.timeout);
+                                    this$0.timeout = setTimeout(function()  {
+                                        this$0._filter(val);
+                                    }, 100);
+                                }
                             });
                             this.scope.onAddHandler = function(evt)  {return this$0._onAddHandler($(evt.target).parent().data('treeNode'))};
                             this.scope.onEditHandler = function(evt)  {return this$0._onEditHandler($(evt.target).parent().data('treeNode'))};
@@ -5525,7 +5532,7 @@ angular.module('admin.component')
                             }
                         };
 
-                        proto$0.setData = function(resData) {
+                        proto$0.setData = function(resData, isFilter) {
                             resData = resData || [];
                             if (this.attrs.root !== undefined) {
                                 var rootData = {open: true, type: 1};
@@ -5537,23 +5544,71 @@ angular.module('admin.component')
                                 this.instance = $.fn.zTree.init(this.treeElement, $.extend({}, defaultConfig, this), resData);
                                 this.expand();
                             }
-                            this.dataList = resData;
+                            if(!isFilter){
+                                this.dataList = resData;
+                                this.setDataMap(resData);
+                            }
                         };
 
-                        proto$0.expand = function(arg){
+                        proto$0.setDataMap = function(resData) {var S_ITER$0 = typeof Symbol!=='undefined'&&Symbol&&Symbol.iterator||'@@iterator';var S_MARK$0 = typeof Symbol!=='undefined'&&Symbol&&Symbol["__setObjectSetter__"];function GET_ITER$0(v){if(v){if(Array.isArray(v))return 0;var f;if(S_MARK$0)S_MARK$0(v);if(typeof v==='object'&&typeof (f=v[S_ITER$0])==='function'){if(S_MARK$0)S_MARK$0(void 0);return f.call(v);}if(S_MARK$0)S_MARK$0(void 0);if((v+'')==='[object Generator]')return v;}throw new Error(v+' is not iterable')};var $D$0;var $D$1;var $D$2;
+                            this.dataMap = {};
+                            $D$0 = GET_ITER$0(resData);$D$2 = $D$0 === 0;$D$1 = ($D$2 ? resData.length : void 0);for (var item ;$D$2 ? ($D$0 < $D$1) : !($D$1 = $D$0["next"]())["done"];){item = ($D$2 ? resData[$D$0++] : $D$1["value"]);
+                                this.dataMap[item[idName]] = item;
+                            };$D$0 = $D$1 = $D$2 = void 0;
+                        };
+
+                        proto$0.expand = function(arg) {
                             arg = arg || this.attrs.expand;
                             if (arg == 'all') {
                                 this.expandAll(true);
                             }
-                            else if(arg){
+                            else if (arg) {
                             }
                         };
 
-                        proto$0.expandAll = function(isExpand){
+                        proto$0.expandAll = function(isExpand) {
                             this.instance.expandAll(isExpand);
                         };
 
-                        proto$0._filter = function(filterText) {
+                        proto$0.getHierarchyData = function(data) {
+                            var r = [];
+                            if (data) {
+                                r.push(data);
+                                while (data = this.getParentData(data)) {
+                                    r.unshift(data);
+                                }
+                            }
+                            return r;
+                        };
+
+                        proto$0.getParentData = function(data) {
+                            return this.dataMap[data[pidName]];
+                        };
+
+                        proto$0._filter = function(filterText) {var this$0 = this;
+                            if (!this.dataList)
+                                return;
+                            var searchList = this.dataList, m = {};
+                            if (filterText) {
+                                filterText = filterText.toLowerCase();
+                                searchList = [];
+                                $.each(this.dataList, function(dataIndex, data)  {
+                                    if (data[labelName] && data[labelName].toLowerCase().indexOf(filterText) != -1) {
+                                        searchList = searchList.concat(this$0.getHierarchyData(data));
+                                    }
+                                });
+                                searchList = searchList.filter(function(item)  {
+                                    if (!m[item[idName]]) {
+                                        m[item[idName]] = 1;
+                                        return true;
+                                    }
+                                    else{
+                                        return false;
+                                    }
+                                });
+                            }
+                            this.setData(searchList, true);
+                            this.expandAll(true);
                         };
 
                         proto$0._onMouseEnterTreeNode = function(treeNode) {var this$0 = this;
@@ -5637,8 +5692,8 @@ angular.module('admin.component')
                 };
             },
             template: ("\
-\n                <div>\
-\n                    <ul class=\"ztree ui-tree\"></ul>\
+\n                <div class=\"ui-tree\">\
+\n                    <ul class=\"ztree\"></ul>\
 \n                    <span style=\"display:none\">\
 \n                        <span ng-if=\"onAdd\" class=\"button add\" ng-click=\"onAddHandler($event)\"></span>\
 \n                        <span ng-if=\"onEdit\" class=\"button edit\" ng-click=\"onEditHandler($event)\"></span>\

@@ -31,4 +31,4 @@
 
 .ui-form-upload div {margin-bottom: 4px}
 
-.ui-tree {width:100%; overflow:auto;}
+.ui-tree {width:100%; height: 100%; overflow:auto;}

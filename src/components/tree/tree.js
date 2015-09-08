@@ -38,8 +38,8 @@ angular.module('admin.component')
                 };
             },
             template: `
-                <div>
-                    <ul class="ztree ui-tree"></ul>
+                <div class="ui-tree">
+                    <ul class="ztree"></ul>
                     <span style="display:none">
                         <span ng-if="onAdd" class="button add" ng-click="onAddHandler($event)"></span>
                         <span ng-if="onEdit" class="button edit" ng-click="onEditHandler($event)"></span>
