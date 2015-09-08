@@ -79,7 +79,7 @@ angular.module('admin.component')
                 else {
                     this.getContent()
                         .then(() => {
-                            this.content = $compile(this.content)(this.scope.$parent);
+                            this.content = $compile(this.content)(this.scope.$parent.$parent); //让作用域和tab的上层一致
                             this.getContainer().append(this.content);
                             this.content.show();
                         });
