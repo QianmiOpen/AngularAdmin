@@ -31,7 +31,7 @@ angular.module('admin.component')
             }
 
             build() {
-                this.showAtIndex(this.scope.default || 0);
+                this.showAtIndex(this.scope.default || '0');
             }
 
             showAtIndex(index) {
