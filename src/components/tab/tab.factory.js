@@ -21,6 +21,9 @@ angular.module('admin.component')
 
             init() {
                 this.scope.component = this;
+                this.transclude(this.scope, (dom) => {
+                    this.element.find('ul').append(dom);
+                });
                 this.triggerComplete(this.scope, this.attrs.ref || '$tab', this);
             }
 

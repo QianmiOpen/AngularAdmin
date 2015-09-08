@@ -22,7 +22,7 @@ angular.module('admin.component')
             },
             template: `
                 <div class="ui-tab tabbable-custom" ng-class="{'tabbable-close': close}">
-                    <ul class="nav nav-tabs" ng-transclude>
+                    <ul class="nav nav-tabs">
                     </ul>
                     <div class="tab-content" style="min-height: 100px;">
                     </div>

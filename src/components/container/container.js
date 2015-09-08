@@ -11,9 +11,10 @@
 
             class UIContainer extends Event {
 
-                constructor(scope, element, $transclude) {
+                constructor(scope, element, attrs, $transclude) {
                     this.scope = scope;
                     this.element = element;
+                    this.attrs = attrs;
                     this.scope.$on('componentComplete', this.initHandler.bind(this));
                     this.content = $transclude(scope);
                 }
@@ -31,7 +32,7 @@
                 }
 
                 lazyInit() {
-                    var ctrl = this.scope.controller;
+                    var ctrl = this.attrs.controller;
                     $timeout(() => {
                         // 全局定义
                         if (ctrl && window[ctrl]) {
@@ -69,11 +70,8 @@
                 restrict: 'E',
                 replace: true,
                 transclude: true,
-                scope: {
-                    controller: '@'
-                },
                 link: function (scope, element, attrs, ctrl, tranclude) {
-                    new UIContainer(scope, element, tranclude)
+                    new UIContainer(scope, element, attrs, tranclude)
                         .init()
                         .initEvents();
                 },

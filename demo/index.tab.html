@@ -5,8 +5,8 @@
     <title>Demo</title>
     <link rel="stylesheet" href="../output/css/all.css"/>
 </head>
-<body style="background-color: #fff !important;" ng-app="admin">
-<ui-container style="display: none" controller="CC">
+<body style="background-color: #fff !important;" ng-app="admin" ng-controller="CC">
+<ui-container style="display: none">
 
     <div class="row">
         <div class="col-md-12">
@@ -18,7 +18,9 @@
         <div class="col-md-12">
             <ui-tab close="true" default="0">
                 <ui-tab-item head="我是静态">
-                    <button class="btn btn-primary" ng-click="showAA()">点我啊</button>
+                    <user-input-edit lab-name="昵称" prop="info.nickname" type="input" bind="user"
+                                     canedit="true"></user-input-edit>
+
                 </ui-tab-item>
                 <ui-tab-item head="我是静态2">
                     22
@@ -35,13 +37,62 @@
 </body>
 <script src="../output/js/lib.js"></script>
 <script src="../output/js/all.js"></script>
+<script id="asdasd" type="text/ng-template">
+    <div class="col-md-6">
+        <span class="col-md-4">{{lab}}:</span>
+    <span class="col-md-8">
+    <span ng-show="!edit">
+    {{valStr||'未填写'}}
+    <a ng-click="showEdit()" ng-show="showedit" title="{{tip}}">修改</a>
+    </span>
+    <span ng-show="edit">
+
+    <input type="text" ng-model="eVal" placeholder="未填写" ng-change="doChange(eVal)" ng-if="type=='input'"/>
+
+    <select ng-model="eVal" ng-change="doChange(eVal)" ng-options="k as v for (k,v) in options" ng-if="type=='select'">
+    </select>
+    <a ng-click="saveEdit()">保存</a>
+    <a ng-click="showEdit()">取消</a>
+    </span>
+    </div>
+</script>
 <script>
+    angular.module('admin')
+            .controller('CC', CC)
+            .directive('userInputEdit', function (Ajax) {
+                return {
+                    restrict: 'E',
+                    replace: true,
+                    require: '?ngModel',
+                    scope: {
+                        lab: '@labName',
+                        user: '=bind',
+                        prop: '@prop',
+                        type: '@type',
+                        canedit: '@canedit'
+                    },
+                    templateUrl: 'asdasd',
+                    link: function (scope, element, attrs) {
+                        console.log(scope.user)
+                        console.log(scope.$parent.user);
+                        console.log(scope.$parent.$parent.user);
+                        scope.showEdit = function() {
+                            console.log(scope.options);
+                            scope.edit = !scope.edit;
+                        }
+                        scope.showedit = true;
+                    }
+
+
+                }
+            });
     function CC($scope) {
-        $scope.addNew = function(){
+        $scope.addNew = function () {
             $scope.$tab.addTab('测试啊', '123123123123123123', true);
         };
-        $scope.showAA = function(){
+        $scope.showAA = function () {
             alert(111);
         }
+        $scope.user = {info: {nickname: '阿斯顿阿斯顿'}};
     }
 </script>
