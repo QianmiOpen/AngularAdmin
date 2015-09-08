@@ -266,12 +266,12 @@
                                 searchParams.push({name, value});
                             });
                             let start = 0, size = 0;
-                            $.each(searchParams || {}, (name, value) => {
-                                if (name == 'iDisplayStart') {
-                                    start = value;
+                            $.each(searchParams || [], (index, kv) => {
+                                if (kv.name == 'iDisplayStart') {
+                                    start = kv.value;
                                 }
-                                else if (name == 'iDisplayLength') {
-                                    size = value;
+                                else if (kv.name == 'iDisplayLength') {
+                                    size = kv.value;
                                 }
                             });
                             searchParams.push({name: pageNumberName, value: start / size});
