@@ -71,7 +71,7 @@
                 },
 
                 setPageName(_pageSizeName, _pageNumberName) {
-                    pageSizeName = _pageNumberName;
+                    pageSizeName = _pageSizeName;
                     pageNumberName = _pageNumberName;
                 },
 
@@ -265,7 +265,7 @@
                             $.each(this.searchParams || {}, (name, value) => {
                                 searchParams.push({name, value});
                             });
-                            let start, size;
+                            let start = 0, size = 0;
                             $.each(searchParams || {}, (name, value) => {
                                 if (name == 'iDisplayStart') {
                                     start = value;
