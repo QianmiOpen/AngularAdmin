@@ -123,7 +123,7 @@
                                 this.instance = $.fn.zTree.init(this.treeElement, $.extend({}, defaultConfig, this), resData);
                                 this.expand();
                             }
-                            if(!isFilter){
+                            if (!isFilter) {
                                 this.dataList = resData;
                                 this.setDataMap(resData);
                             }
@@ -164,6 +164,15 @@
                             return this.dataMap[data[pidName]];
                         }
 
+                        appendData(id, name) {
+                            let data = id;
+                            if (_.isString(id)) {
+                                data = {id, name};
+                            }
+                            this.dataList.push(data);
+                            this.setData(this.dataList);
+                        }
+
                         _filter(filterText) {
                             if (!this.dataList)
                                 return;
@@ -181,7 +190,7 @@
                                         m[item[idName]] = 1;
                                         return true;
                                     }
-                                    else{
+                                    else {
                                         return false;
                                     }
                                 });

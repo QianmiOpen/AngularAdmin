@@ -20,14 +20,17 @@
 ## 配置项
 
 ```javascript
-.constant('AdminCDN', 'http://localhost:63342/AngularAdminSrc/output/assets')
-.config((AdminCDN, AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider, UITreeControlProvider) => {
+.config((AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider, UITreeControlProvider) => {
 
     //
     // ajax 默认返回处理
     //
-    AjaxProvider.setSuccessHandler((result) => result.type == 1 ? result.data : null);
-    AjaxProvider.setFailHandler((result) => result.type != 1 ? result.data : null);
+    AjaxProvider.setSuccessHandler(function(result){
+        return result.type == 1 ? result.data : null;
+    });
+    AjaxProvider.setFailHandler(function(result){
+        return result.type != 1 ? result.error : null;
+    });
 
     //
     // 通知位置
@@ -37,7 +40,7 @@
     //
     // 百度编辑器的库地址
     //
-    UIEditorControlProvider.setUrl(`${AdminCDN}/ueditor/ueditor.config.js`, `${AdminCDN}/ueditor/ueditor.all.js`);
+    UIEditorControlProvider.setUrl('你的配置文件');
 
     //
     // 上传空间的配置
