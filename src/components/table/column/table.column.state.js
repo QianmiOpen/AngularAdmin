@@ -28,7 +28,7 @@ angular.module('admin.component')
                         $dom = clone.filter('[state="' + defaultValue + '"]');
                     }
                     if ($dom.length === 0) { //还没有...
-                        clone.forEach((dom) => {
+                        $.each(clone || [], (index, dom) => {
                             if (dom.innerHTML && dom.innerHTML.indexOf(defaultValue) != -1) {
                                 $dom = $(dom);
                             }
