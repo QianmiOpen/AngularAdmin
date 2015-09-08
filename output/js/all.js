@@ -5028,42 +5028,6 @@ angular.module('admin.component')
         };
     });
 
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('tooltip', function () {
-        return {
-            restrict: 'A',
-            replace: false,
-            link: function (scope, element, attrs) {
-                var content = attrs.tooltip,
-                    title = attrs.title,
-                    placement = attrs.placement || (title ? 'right' : 'top');
-
-                //如果有标题有内容, 那么使用popup over
-                if (title) {
-                    element.popover({
-                        title: title,
-                        content: content,
-                        placement: placement,
-                        trigger: 'hover'
-                    });
-                }
-                //否则使用tooltip
-                else {
-                    element.tooltip({
-                        title: content,
-                        placement: placement
-                    });
-                }
-            }
-        };
-    });
 //------------------------------------------------------
 //
 //
@@ -5223,6 +5187,42 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('tooltip', function () {
+        return {
+            restrict: 'A',
+            replace: false,
+            link: function (scope, element, attrs) {
+                var content = attrs.tooltip,
+                    title = attrs.title,
+                    placement = attrs.placement || (title ? 'right' : 'top');
+
+                //如果有标题有内容, 那么使用popup over
+                if (title) {
+                    element.popover({
+                        title: title,
+                        content: content,
+                        placement: placement,
+                        trigger: 'hover'
+                    });
+                }
+                //否则使用tooltip
+                else {
+                    element.tooltip({
+                        title: content,
+                        placement: placement
+                    });
+                }
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
 (function () {
 
     var requestMethod = 'post',
@@ -5303,7 +5303,7 @@ angular.module('admin.component')
                                 this.load();
                             }
                             else {
-                                Ajax.getScript((("" + AdminCDN) + "/assets/js/zTree_v3/js/jquery.ztree.all-3.5.min.js"))
+                                Ajax.getScript((("" + AdminCDN) + "/assets/js/zTree_v3/js/jquery.ztree.all-3.5.js"))
                                     .then(function()  {return this$0.load()});
                             }
                         };
@@ -5377,16 +5377,20 @@ angular.module('admin.component')
                         };
 
                         proto$0.appendData = function(id, name, pid) {
-                            var data = id;
-                            if (id !== undefined && name) {
-                                data = {};
-                                data[idName] = id;
-                                data[pidName] = pid;
-                                data[labelName] = name;
+                            var data = {};
+                            data[idName] = id;
+                            data[labelName] = name;
+                            data[pidName] = pid;
+                            if (pid && this.instance) {
+                                var parent = this.instance.getNodeByParam(idName, pid, null);
+                                this.instance.addNodes(parent, data);
+                            }
+                            else if (this.instance) {
+                                this.instance.addNodes(null, data);
                             }
                             this.dataList = this.dataList || [];
                             this.dataList.push(data);
-                            this.setData(this.dataList);
+                            this.dataMap[id] = data;
                         };
 
                         proto$0._filter = function(filterText) {var this$0 = this;

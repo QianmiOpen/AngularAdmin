@@ -85,7 +85,7 @@
                                 this.load();
                             }
                             else {
-                                Ajax.getScript(`${AdminCDN}/assets/js/zTree_v3/js/jquery.ztree.all-3.5.min.js`)
+                                Ajax.getScript(`${AdminCDN}/assets/js/zTree_v3/js/jquery.ztree.all-3.5.js`)
                                     .then(() => this.load());
                             }
                         }
@@ -159,16 +159,20 @@
                         }
 
                         appendData(id, name, pid) {
-                            let data = id;
-                            if (id !== undefined && name) {
-                                data = {};
-                                data[idName] = id;
-                                data[pidName] = pid;
-                                data[labelName] = name;
+                            let data = {};
+                            data[idName] = id;
+                            data[labelName] = name;
+                            data[pidName] = pid;
+                            if (pid && this.instance) {
+                                let parent = this.instance.getNodeByParam(idName, pid, null);
+                                this.instance.addNodes(parent, data);
+                            }
+                            else if (this.instance) {
+                                this.instance.addNodes(null, data);
                             }
                             this.dataList = this.dataList || [];
                             this.dataList.push(data);
-                            this.setData(this.dataList);
+                            this.dataMap[id] = data;
                         }
 
                         _filter(filterText) {
