@@ -61,6 +61,7 @@
                                 addHoverDom: (treeId, treeNode) => this._onMouseEnterTreeNode(treeNode),
                                 removeHoverDom: (treeId, treeNode) => this._onMouseOverTreeNode(treeNode)
                             };
+                            this.check = {enabled: this.attrs.checked != 'false'};
                             this.triggerComplete(this.scope, this.attrs.ref || '$tree', this);
                         }
 
@@ -114,8 +115,22 @@
                             }
                             if ($.fn.zTree) {
                                 this.instance = $.fn.zTree.init(this.treeElement, $.extend({}, defaultConfig, this), resData);
+                                this.expand();
                             }
                             this.dataList = resData;
+                        }
+
+                        expand(arg){
+                            arg = arg || this.attrs.expand;
+                            if (arg == 'all') {
+                                this.expandAll(true);
+                            }
+                            else if(arg){
+                            }
+                        }
+
+                        expandAll(isExpand){
+                            this.instance.expandAll(isExpand);
                         }
 
                         _filter(filterText) {

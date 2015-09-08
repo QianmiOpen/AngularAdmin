@@ -5481,6 +5481,7 @@ angular.module('admin.component')
                                 addHoverDom: function(treeId, treeNode)  {return this$0._onMouseEnterTreeNode(treeNode)},
                                 removeHoverDom: function(treeId, treeNode)  {return this$0._onMouseOverTreeNode(treeNode)}
                             };
+                            this.check = {enabled: this.attrs.checked != 'false'};
                             this.triggerComplete(this.scope, this.attrs.ref || '$tree', this);
                         };
 
@@ -5534,8 +5535,22 @@ angular.module('admin.component')
                             }
                             if ($.fn.zTree) {
                                 this.instance = $.fn.zTree.init(this.treeElement, $.extend({}, defaultConfig, this), resData);
+                                this.expand();
                             }
                             this.dataList = resData;
+                        };
+
+                        proto$0.expand = function(arg){
+                            arg = arg || this.attrs.expand;
+                            if (arg == 'all') {
+                                this.expandAll(true);
+                            }
+                            else if(arg){
+                            }
+                        };
+
+                        proto$0.expandAll = function(isExpand){
+                            this.instance.expandAll(isExpand);
                         };
 
                         proto$0._filter = function(filterText) {
