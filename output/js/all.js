@@ -3147,7 +3147,34 @@ angular.module('admin.component')
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiTableColumn', function (UITableColumnControl, $rootScope) {
+    .factory('UITableColumnHelper', function(ValueService)  {
+        return function($scope, $element, $attrs, attrName)  {
+            var src = $element.attr((("" + attrName) + "-bak")) || $element.attr(attrName);
+            if (!$element.attr((("" + attrName) + "-bak"))) {
+                $attrs.$set((("" + attrName) + "-bak"), src);
+            }
+            if ($scope.data && src) {
+                $element.prop(attrName.replace('ng-', ''), ValueService.get($scope, src.replace(/{|}/g, '')));
+            }
+        };
+    })
+    .directive('a', function (UITableColumnHelper) {
+        return {
+            restrict: 'E',
+            link: function(scope, element, attrs)  {
+                UITableColumnHelper(scope, element, attrs, 'ng-href');
+            }
+        };
+    })
+    .directive('img', function (UITableColumnHelper) {
+        return {
+            restrict: 'E',
+            link: function($scope, $element, $attrs)  {
+                UITableColumnHelper($scope, $element, $attrs, 'ng-src');
+            }
+        };
+    })
+    .directive('uiTableColumn', function (UITableColumnControl) {
         return {
             restrict: 'E',
             replace: true,
@@ -3167,7 +3194,7 @@ angular.module('admin.component')
 \n                    {{head}}\
 \n                    <script type=\"text/ng-template\" ng-transclude>\
 \n                    </scirpt>\
-\n                </th>'\
+\n                </th>\
 \n            ")
         };
     });
@@ -3285,7 +3312,7 @@ angular.module('admin.component')
                 this.element = $element;
                 this.attrs = $attrs;
                 this.transclude = $transclude;
-                this.hasTransclude = $transclude && $transclude().length > 0;
+                this.hasTransclude = $transclude && $transclude($scope).length > 0;
                 this.className = this.className || 'Column';
                 this.init();
                 this.initEvents();
@@ -5001,6 +5028,42 @@ angular.module('admin.component')
         };
     });
 
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('tooltip', function () {
+        return {
+            restrict: 'A',
+            replace: false,
+            link: function (scope, element, attrs) {
+                var content = attrs.tooltip,
+                    title = attrs.title,
+                    placement = attrs.placement || (title ? 'right' : 'top');
+
+                //如果有标题有内容, 那么使用popup over
+                if (title) {
+                    element.popover({
+                        title: title,
+                        content: content,
+                        placement: placement,
+                        trigger: 'hover'
+                    });
+                }
+                //否则使用tooltip
+                else {
+                    element.tooltip({
+                        title: content,
+                        placement: placement
+                    });
+                }
+            }
+        };
+    });
 //------------------------------------------------------
 //
 //
@@ -5153,42 +5216,6 @@ angular.module('admin.component')
         };
     });
 
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('tooltip', function () {
-        return {
-            restrict: 'A',
-            replace: false,
-            link: function (scope, element, attrs) {
-                var content = attrs.tooltip,
-                    title = attrs.title,
-                    placement = attrs.placement || (title ? 'right' : 'top');
-
-                //如果有标题有内容, 那么使用popup over
-                if (title) {
-                    element.popover({
-                        title: title,
-                        content: content,
-                        placement: placement,
-                        trigger: 'hover'
-                    });
-                }
-                //否则使用tooltip
-                else {
-                    element.tooltip({
-                        title: content,
-                        placement: placement
-                    });
-                }
-            }
-        };
-    });
 //-----------------------------------------------------------------------------------------------
 //
 //

@@ -27,7 +27,8 @@
         <ui-table-column head="自定义列" name="advance">
                 {{data.simple}}
                 <span ng-if="data.simple == 10">我是10</span>
-                <image class="imageSS" src="{{data.image}}"/>
+                <image class="imageSS" ng-src="{{data.image + '?11111111'}}"/>
+                <a ng-href="{{data.image}}">{{data.image}}</a>
                 {{data.id}}
         </ui-table-column>
         <!--<ui-table-progress-column head="进度条列" name="progress"></ui-table-progress-column>-->

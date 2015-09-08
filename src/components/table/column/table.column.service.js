@@ -19,7 +19,7 @@ angular.module('admin.component')
                 this.element = $element;
                 this.attrs = $attrs;
                 this.transclude = $transclude;
-                this.hasTransclude = $transclude && $transclude().length > 0;
+                this.hasTransclude = $transclude && $transclude($scope).length > 0;
                 this.className = this.className || 'Column';
                 this.init();
                 this.initEvents();
