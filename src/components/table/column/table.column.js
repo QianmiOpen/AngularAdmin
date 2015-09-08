@@ -6,7 +6,7 @@
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiTableColumn', function (UITableColumnControl) {
+    .directive('uiTableColumn', function (UITableColumnControl, $rootScope) {
         return {
             restrict: 'E',
             replace: true,
@@ -14,13 +14,18 @@ angular.module('admin.component')
             scope: {
                 head: '@'
             },
-            controller: function ($scope, $element, $attrs, $transclude) {
-                return new UITableColumnControl($scope, $element, $attrs, $transclude);
+            compile: function (tElement, tAttrs, transclude) {
+                return {
+                    pre: function preLink(scope, iElement, iAttrs) {
+                        return new UITableColumnControl(scope, iElement, iAttrs, transclude);
+                    }
+                }
             },
             template: `
                 <th>
                     {{head}}
-                    <div style="display:none" ng-transclude></div>
+                    <script type="text/ng-template" ng-transclude>
+                    </scirpt>
                 </th>'
             `
         };

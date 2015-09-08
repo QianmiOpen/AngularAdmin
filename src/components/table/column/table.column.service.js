@@ -86,10 +86,13 @@ angular.module('admin.component')
                 return v;
             }
 
-            getTransclude(rowData){
+            getTransclude(rowData) {
                 let s = this.scope.$new();
                 s.data = rowData;
-                let $dom = $compile(this.element.find('div').html())(s);
+                let $dom;
+                this.transclude(s, (dom) => {
+                    $dom = dom;
+                });
                 return $dom;
             }
 

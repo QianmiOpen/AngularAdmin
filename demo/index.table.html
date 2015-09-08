@@ -20,20 +20,23 @@
     </ui-tool-bar-table>
 
     <ui-table url="/test/remote/select" init-params="tableOne.ssss">
-        <ui-table-check-column name="id"></ui-table-check-column>
-        <ui-table-date-column head="日期列" name="date" format="yyyy-MM-dd hh:mm:ss"></ui-table-date-column>
-        <ui-table-image-column head="图片列" image-css="imageSS" name="image" placeholder="xxxxxx"></ui-table-image-column>
-        <ui-table-column head="简单列" name="simple"></ui-table-column>
+        <!--<ui-table-check-column name="id"></ui-table-check-column>-->
+        <!--<ui-table-date-column head="日期列" name="date" format="yyyy-MM-dd hh:mm:ss"></ui-table-date-column>-->
+        <!--<ui-table-image-column head="图片列" image-css="imageSS" name="image" placeholder="xxxxxx"></ui-table-image-column>-->
+        <!--<ui-table-column head="简单列" name="simple"></ui-table-column>-->
         <ui-table-column head="自定义列" name="advance">
-            <image class="imageSS" ng-src="{{data.image}}"/>
+                {{data.simple}}
+                <span ng-if="data.simple == 10">我是10</span>
+                <image class="imageSS" src="{{data.image}}"/>
+                {{data.id}}
         </ui-table-column>
-        <ui-table-progress-column head="进度条列" name="progress"></ui-table-progress-column>
-        <ui-table-state-column head="状态列" name="state" default="0">
-            <span state="0">吃</span>
-            <span state="1">喝</span>
-            <span state="2">玩</span>
-        </ui-table-state-column>
-        <ui-table-operation-column head="操作列"></ui-table-operation-column>
+        <!--<ui-table-progress-column head="进度条列" name="progress"></ui-table-progress-column>-->
+        <!--<ui-table-state-column head="状态列" name="state" default="0">-->
+            <!--<span state="0">吃</span>-->
+            <!--<span state="1">喝</span>-->
+            <!--<span state="2">玩</span>-->
+        <!--</ui-table-state-column>-->
+        <!--<ui-table-operation-column head="操作列"></ui-table-operation-column>-->
     </ui-table>
 </ui-container>
 </body>

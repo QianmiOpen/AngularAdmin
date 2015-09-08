@@ -3147,7 +3147,7 @@ angular.module('admin.component')
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiTableColumn', function (UITableColumnControl) {
+    .directive('uiTableColumn', function (UITableColumnControl, $rootScope) {
         return {
             restrict: 'E',
             replace: true,
@@ -3155,13 +3155,18 @@ angular.module('admin.component')
             scope: {
                 head: '@'
             },
-            controller: function ($scope, $element, $attrs, $transclude) {
-                return new UITableColumnControl($scope, $element, $attrs, $transclude);
+            compile: function (tElement, tAttrs, transclude) {
+                return {
+                    pre: function preLink(scope, iElement, iAttrs) {
+                        return new UITableColumnControl(scope, iElement, iAttrs, transclude);
+                    }
+                }
             },
             template: ("\
 \n                <th>\
 \n                    {{head}}\
-\n                    <div style=\"display:none\" ng-transclude></div>\
+\n                    <script type=\"text/ng-template\" ng-transclude>\
+\n                    </scirpt>\
 \n                </th>'\
 \n            ")
         };
@@ -3347,10 +3352,13 @@ angular.module('admin.component')
                 return v;
             };
 
-            proto$0.getTransclude = function(rowData){
+            proto$0.getTransclude = function(rowData) {
                 var s = this.scope.$new();
                 s.data = rowData;
-                var $dom = $compile(this.element.find('div').html())(s);
+                var $dom;
+                this.transclude(s, function(dom)  {
+                    $dom = dom;
+                });
                 return $dom;
             };
 
@@ -4595,7 +4603,7 @@ angular.module('admin.component')
             };
 
             proto$0.build = function() {
-                this.showAtIndex(this.scope.default || 0);
+                this.showAtIndex(this.scope.default || '0');
             };
 
             proto$0.showAtIndex = function(index) {
