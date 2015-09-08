@@ -3044,6 +3044,10 @@ angular.module('admin.component')
                         });
                 }
             };
+
+            proto$0.setTitle = function(title) {
+                this.headElement.find('span').html(title);
+            };
         MIXIN$0(UIPortletControl.prototype,proto$0);proto$0=void 0;return UIPortletControl;})(ComponentEvent);
 
         return UIPortletControl;
@@ -3064,9 +3068,9 @@ angular.module('admin.component')
             scope: {
                 captionClass: '@',
                 bodyClass: '@',
-                title: '@',
                 icon: '@',
-                url: '@'
+                url: '@',
+                title: '@'
             },
             link: function (scope, elemt, attrs, contrllor, transclude) {
                 new UIPortletControl(scope, elemt, attrs, transclude);
@@ -3088,137 +3092,6 @@ angular.module('admin.component')
 
 
 
-
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('UITabItemControl', function (Ajax, Util, $compile) {
-        var UITabItemControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabItemControl, super$0);var proto$0={};
-            function UITabItemControl(scope, element, attrs, transclude) {
-                super$0.call(this);
-                this.element = element;
-                this.scope = scope;
-                this.attrs = attrs;
-                this.transclude = transclude;
-                this.message = new Message('UITabItem');
-                this.init();
-                this.initEvents();
-            }if(super$0!==null)SP$0(UITabItemControl,super$0);UITabItemControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabItemControl,"configurable":true,"writable":true}});DP$0(UITabItemControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                this.scope.component = this;
-            };
-
-            proto$0.initEvents = function() {var this$0 = this;
-                this.scope.$on('uitab.item.remove', function(evt, index)  {
-                    if (index == this$0.element.index()) {
-                        this$0._remove();
-                    }
-                });
-                this.scope.$on('uitab.item.show', function(evt, index)  {
-                    this$0[index == this$0.element.index() ? '_show' : '_hide']();
-                });
-            };
-
-            proto$0.clickHandler = function(evt) {
-                this.scope.$parent.$broadcast('uitab.item.show', this.element.index());
-                evt.stopPropagation();
-            };
-
-            proto$0.removeHandler = function(evt) {
-                this.scope.$parent.$broadcast('uitab.item.remove', this.element.index());
-                evt.stopPropagation();
-            };
-
-            proto$0.getContainer = function() {
-                if (!this.bodyElement) {
-                    this.bodyElement = this.element.parents('.ui-tab').find('.tab-content');
-                    if (this.bodyElement.length === 0) {
-                        this.bodyElement = this.element.parents('.portlet').find('.portlet-body');
-                    }
-                }
-                return this.bodyElement;
-            };
-
-            proto$0.getContent = function() {var this$0 = this;
-                if (this.content) {
-                    return Util.toPromise(this.content);
-                }
-                else if (this.scope.url) {
-                    return Ajax.get(this.scope.url)
-                        .then(function(html)  {
-                            return html;
-                        });
-                }
-                else {
-                    this.transclude(this.scope, function(dom)  {
-                        this$0.content = dom;
-                    });
-                    return Util.toPromise(this.content);
-                }
-            };
-
-            proto$0._show = function() {var this$0 = this;
-                if (this.content) {
-                    this.content.show();
-                }
-                else {
-                    this.getContent()
-                        .then(function()  {
-                            this$0.content = $compile(this$0.content)(this$0.scope.$parent);
-                            this$0.getContainer().append(this$0.content);
-                            this$0.content.show();
-                        });
-                }
-                this.scope.active = true;
-            };
-
-            proto$0._hide = function() {
-                if (this.content) {
-                    this.content.hide();
-                }
-                this.scope.active = false;
-            };
-
-            proto$0._remove = function() {var this$0 = this;
-                setTimeout(function() {
-                    this$0.element.remove();
-                    this$0.content && this$0.content.remove();
-                    this$0.scope.$destroy();
-                }, 100);
-            };
-        MIXIN$0(UITabItemControl.prototype,proto$0);proto$0=void 0;return UITabItemControl;})(ComponentEvent);
-
-        return UITabItemControl;
-    });
-angular.module('admin.component')
-    .directive('uiTabItem', function (UITabItemControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                head: '@',
-                url: '@'
-            },
-            link: function($scope, $element, $attrs, controller, $transclude)  {
-                new UITabItemControl($scope, $element, $attrs, $transclude);
-            },
-            template: ("\
-\n                <li ng-class=\"{'active': active}\">\
-\n                    <a href=\"javascript:;\" ng-click=\"component.clickHandler($event)\">\
-\n                        <span>{{head}}</span>\
-\n                        <i class=\"fa fa-times\" ng-click=\"component.removeHandler($event)\"></i>\
-\n                    </a>\
-\n                </li>\
-\n            ")
-        };
-    });
 
 //------------------------------------------------------
 //
@@ -3664,6 +3537,137 @@ angular.module('admin.component')
         };
     })
 ;
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .factory('UITabItemControl', function (Ajax, Util, $compile) {
+        var UITabItemControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabItemControl, super$0);var proto$0={};
+            function UITabItemControl(scope, element, attrs, transclude) {
+                super$0.call(this);
+                this.element = element;
+                this.scope = scope;
+                this.attrs = attrs;
+                this.transclude = transclude;
+                this.message = new Message('UITabItem');
+                this.init();
+                this.initEvents();
+            }if(super$0!==null)SP$0(UITabItemControl,super$0);UITabItemControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabItemControl,"configurable":true,"writable":true}});DP$0(UITabItemControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                this.scope.component = this;
+            };
+
+            proto$0.initEvents = function() {var this$0 = this;
+                this.scope.$on('uitab.item.remove', function(evt, index)  {
+                    if (index == this$0.element.index()) {
+                        this$0._remove();
+                    }
+                });
+                this.scope.$on('uitab.item.show', function(evt, index)  {
+                    this$0[index == this$0.element.index() ? '_show' : '_hide']();
+                });
+            };
+
+            proto$0.clickHandler = function(evt) {
+                this.scope.$parent.$broadcast('uitab.item.show', this.element.index());
+                evt.stopPropagation();
+            };
+
+            proto$0.removeHandler = function(evt) {
+                this.scope.$parent.$broadcast('uitab.item.remove', this.element.index());
+                evt.stopPropagation();
+            };
+
+            proto$0.getContainer = function() {
+                if (!this.bodyElement) {
+                    this.bodyElement = this.element.parents('.ui-tab').find('.tab-content');
+                    if (this.bodyElement.length === 0) {
+                        this.bodyElement = this.element.parents('.portlet').find('.portlet-body');
+                    }
+                }
+                return this.bodyElement;
+            };
+
+            proto$0.getContent = function() {var this$0 = this;
+                if (this.content) {
+                    return Util.toPromise(this.content);
+                }
+                else if (this.scope.url) {
+                    return Ajax.get(this.scope.url)
+                        .then(function(html)  {
+                            return html;
+                        });
+                }
+                else {
+                    this.transclude(this.scope, function(dom)  {
+                        this$0.content = dom;
+                    });
+                    return Util.toPromise(this.content);
+                }
+            };
+
+            proto$0._show = function() {var this$0 = this;
+                if (this.content) {
+                    this.content.show();
+                }
+                else {
+                    this.getContent()
+                        .then(function()  {
+                            this$0.content = $compile(this$0.content)(this$0.scope.$parent);
+                            this$0.getContainer().append(this$0.content);
+                            this$0.content.show();
+                        });
+                }
+                this.scope.active = true;
+            };
+
+            proto$0._hide = function() {
+                if (this.content) {
+                    this.content.hide();
+                }
+                this.scope.active = false;
+            };
+
+            proto$0._remove = function() {var this$0 = this;
+                setTimeout(function() {
+                    this$0.element.remove();
+                    this$0.content && this$0.content.remove();
+                    this$0.scope.$destroy();
+                }, 100);
+            };
+        MIXIN$0(UITabItemControl.prototype,proto$0);proto$0=void 0;return UITabItemControl;})(ComponentEvent);
+
+        return UITabItemControl;
+    });
+angular.module('admin.component')
+    .directive('uiTabItem', function (UITabItemControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                head: '@',
+                url: '@'
+            },
+            link: function($scope, $element, $attrs, controller, $transclude)  {
+                new UITabItemControl($scope, $element, $attrs, $transclude);
+            },
+            template: ("\
+\n                <li ng-class=\"{'active': active}\">\
+\n                    <a href=\"javascript:;\" ng-click=\"component.clickHandler($event)\">\
+\n                        <span>{{head}}</span>\
+\n                        <i class=\"fa fa-times\" ng-click=\"component.removeHandler($event)\"></i>\
+\n                    </a>\
+\n                </li>\
+\n            ")
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4031,6 +4035,43 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSwitch', function (UISwitchControl) {
+        return {
+            restrict: 'E',
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function(s, e, a)  {
+                new UISwitchControl(s, e, a);
+            },
+            template: ("\
+\n               <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
 //  针对input的封装
 //
 //
@@ -4076,43 +4117,6 @@ angular.module('admin.component')
 \n            ")
         };
     });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSwitch', function (UISwitchControl) {
-        return {
-            restrict: 'E',
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                placeholder: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function(s, e, a)  {
-                new UISwitchControl(s, e, a);
-            },
-            template: ("\
-\n               <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>\
-\n            ")
-        };
-    });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4535,74 +4539,6 @@ angular.module('admin.component')
 //
 //
 //
-//
-//-----------------------------------------------------------------------------------------------
-(function () {
-
-    var UIStateButton = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIStateButton, super$0);var proto$0={};
-        function UIStateButton(scope, element, attrs) {
-            this.scope = scope;
-            this.element = element;
-            this.attrs = attrs;
-            this.message = new Message('uiStateButton');
-        }if(super$0!==null)SP$0(UIStateButton,super$0);UIStateButton.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIStateButton,"configurable":true,"writable":true}});DP$0(UIStateButton,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-        proto$0.init = function() {var this$0 = this;
-            if (!this.scope.clickHandler) {
-                this.message.error('必须设置on-click属性');
-            }
-            this.element.click(function()  {
-                this$0.disable(true);
-                var result = this$0.scope.clickHandler();
-                this$0.wait(result);
-            });
-        };
-
-        proto$0.wait = function(result) {var this$0 = this;
-            if (result && result.finally) {
-                result.finally(function()  {return this$0.disable(false)});
-            }
-            else {
-                this.disable(false);
-            }
-        };
-
-        proto$0.disable = function(isD) {
-            //
-            if (this.scope.target) {
-                Metronic[(("" + (isD ? '' : 'un')) + "blockUI")](this.scope.target);
-            }
-
-            //
-            this.element.prop('disabled', isD);
-        };
-    MIXIN$0(UIStateButton.prototype,proto$0);proto$0=void 0;return UIStateButton;})(Event);
-
-    angular.module('admin.component')
-        .directive('uiStateButton', function () {
-            return {
-                restrict: 'E',
-                replace: true,
-                transclude: true,
-                scope: {
-                    target: '@target',
-                    clickHandler: '@click'
-                },
-                link: function (scope, element, attrs) {
-                    var button = new UIStateButton(scope, element, attrs);
-                    button.init();
-                },
-                template: ("\
-\n                    <button type=\"button\" class=\"btn\" ng-transclude></button>\
-\n                ")
-            };
-        });
-})();
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
 //-----------------------------------------------------------------------------------------------
 (function () {
 
@@ -4750,6 +4686,74 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
+(function () {
+
+    var UIStateButton = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIStateButton, super$0);var proto$0={};
+        function UIStateButton(scope, element, attrs) {
+            this.scope = scope;
+            this.element = element;
+            this.attrs = attrs;
+            this.message = new Message('uiStateButton');
+        }if(super$0!==null)SP$0(UIStateButton,super$0);UIStateButton.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIStateButton,"configurable":true,"writable":true}});DP$0(UIStateButton,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+        proto$0.init = function() {var this$0 = this;
+            if (!this.scope.clickHandler) {
+                this.message.error('必须设置on-click属性');
+            }
+            this.element.click(function()  {
+                this$0.disable(true);
+                var result = this$0.scope.clickHandler();
+                this$0.wait(result);
+            });
+        };
+
+        proto$0.wait = function(result) {var this$0 = this;
+            if (result && result.finally) {
+                result.finally(function()  {return this$0.disable(false)});
+            }
+            else {
+                this.disable(false);
+            }
+        };
+
+        proto$0.disable = function(isD) {
+            //
+            if (this.scope.target) {
+                Metronic[(("" + (isD ? '' : 'un')) + "blockUI")](this.scope.target);
+            }
+
+            //
+            this.element.prop('disabled', isD);
+        };
+    MIXIN$0(UIStateButton.prototype,proto$0);proto$0=void 0;return UIStateButton;})(Event);
+
+    angular.module('admin.component')
+        .directive('uiStateButton', function () {
+            return {
+                restrict: 'E',
+                replace: true,
+                transclude: true,
+                scope: {
+                    target: '@target',
+                    clickHandler: '@click'
+                },
+                link: function (scope, element, attrs) {
+                    var button = new UIStateButton(scope, element, attrs);
+                    button.init();
+                },
+                template: ("\
+\n                    <button type=\"button\" class=\"btn\" ng-transclude></button>\
+\n                ")
+            };
+        });
+})();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
     .controller('UIPortalControl', function () {
 
@@ -4803,83 +4807,6 @@ angular.module('admin.component')
 \n            ")
         };
     });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('UITabControl', function () {
-        var UITabControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabControl, super$0);var proto$0={};
-            function UITabControl(scope, element, attrs, transclude) {
-                super$0.call(this);
-                this.element = element;
-                this.scope = scope;
-                this.attrs = attrs;
-                this.transclude = transclude;
-                this.message = new Message('UITab');
-                this.init();
-                this.initEvents();
-            }if(super$0!==null)SP$0(UITabControl,super$0);UITabControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabControl,"configurable":true,"writable":true}});DP$0(UITabControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                this.scope.component = this;
-                this.triggerComplete(this.scope, this.attrs.ref || '$tab', this);
-            };
-
-            proto$0.initEvents = function() {
-            };
-
-            proto$0.build = function() {
-                this.showAtIndex(this.scope.default);
-            };
-
-            proto$0.showAtIndex = function(index) {
-                index && this.scope.$broadcast('uitab.item.show', index);
-            };
-
-            proto$0.removeAtIndex = function(index) {
-                index && this.scope.$broadcast('uitab.item.remove', index);
-            };
-        MIXIN$0(UITabControl.prototype,proto$0);proto$0=void 0;return UITabControl;})(ComponentEvent);
-
-        return UITabControl;
-    });
-angular.module('admin.component')
-    .directive('uiTab', function (UITabControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                close: '@',
-                default: '@',
-                url: '@'
-            },
-            compile: function () {
-                var tab = null;
-                return {
-                    pre: function (scope, element, attrs, controller, transclude) {
-                        tab = new UITabControl(scope, element, attrs, transclude);
-                    },
-                    post: function () {
-                        tab.build();
-                    }
-                };
-            },
-            template: ("\
-\n                <div class=\"ui-tab tabbable-custom\" ng-class=\"{'tabbable-close': close}\">\
-\n                    <ul class=\"nav nav-tabs\" ng-transclude>\
-\n                    </ul>\
-\n                    <div class=\"tab-content\" style=\"min-height: 100px;\">\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5227,6 +5154,83 @@ angular.module('admin.component')
 \n                        <tbody></tbody>\
 \n                    </table>\
 \n                </div>'\
+\n            ")
+        };
+    });
+
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .factory('UITabControl', function () {
+        var UITabControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabControl, super$0);var proto$0={};
+            function UITabControl(scope, element, attrs, transclude) {
+                super$0.call(this);
+                this.element = element;
+                this.scope = scope;
+                this.attrs = attrs;
+                this.transclude = transclude;
+                this.message = new Message('UITab');
+                this.init();
+                this.initEvents();
+            }if(super$0!==null)SP$0(UITabControl,super$0);UITabControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabControl,"configurable":true,"writable":true}});DP$0(UITabControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                this.scope.component = this;
+                this.triggerComplete(this.scope, this.attrs.ref || '$tab', this);
+            };
+
+            proto$0.initEvents = function() {
+            };
+
+            proto$0.build = function() {
+                this.showAtIndex(this.scope.default);
+            };
+
+            proto$0.showAtIndex = function(index) {
+                index && this.scope.$broadcast('uitab.item.show', index);
+            };
+
+            proto$0.removeAtIndex = function(index) {
+                index && this.scope.$broadcast('uitab.item.remove', index);
+            };
+        MIXIN$0(UITabControl.prototype,proto$0);proto$0=void 0;return UITabControl;})(ComponentEvent);
+
+        return UITabControl;
+    });
+angular.module('admin.component')
+    .directive('uiTab', function (UITabControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                close: '@',
+                default: '@',
+                url: '@'
+            },
+            compile: function () {
+                var tab = null;
+                return {
+                    pre: function (scope, element, attrs, controller, transclude) {
+                        tab = new UITabControl(scope, element, attrs, transclude);
+                    },
+                    post: function () {
+                        tab.build();
+                    }
+                };
+            },
+            template: ("\
+\n                <div class=\"ui-tab tabbable-custom\" ng-class=\"{'tabbable-close': close}\">\
+\n                    <ul class=\"nav nav-tabs\" ng-transclude>\
+\n                    </ul>\
+\n                    <div class=\"tab-content\" style=\"min-height: 100px;\">\
+\n                    </div>\
+\n                </div>\
 \n            ")
         };
     });

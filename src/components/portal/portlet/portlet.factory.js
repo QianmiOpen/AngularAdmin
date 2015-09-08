@@ -58,6 +58,10 @@ angular.module('admin.component')
                         });
                 }
             }
+
+            setTitle(title) {
+                this.headElement.find('span').html(title);
+            }
         }
 
         return UIPortletControl;

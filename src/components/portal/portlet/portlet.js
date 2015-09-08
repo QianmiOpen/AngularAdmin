@@ -14,9 +14,9 @@ angular.module('admin.component')
             scope: {
                 captionClass: '@',
                 bodyClass: '@',
-                title: '@',
                 icon: '@',
-                url: '@'
+                url: '@',
+                title: '@'
             },
             link: function (scope, elemt, attrs, contrllor, transclude) {
                 new UIPortletControl(scope, elemt, attrs, transclude);
