@@ -228,7 +228,7 @@
                                 this.selectItems = [];
                                 this.selectValues = [];
                             }
-                            this.scope.dataSuccess({result: result});
+                            this.scope.onDataSuccess({result: result});
                         }
 
                         _afterDataHandler(result) {
@@ -236,7 +236,7 @@
                         }
 
                         _errorDataHandler(result) {
-                            this.scope.dateFail({result: result});
+                            this.scope.onDateFail({result: result});
                         }
 
                         _buildPageResult(data) {
