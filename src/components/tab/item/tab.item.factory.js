@@ -26,16 +26,29 @@ angular.module('admin.component')
             initEvents() {
                 this.scope.$on('uitab.item.remove', (evt, index) => {
                     if (index == this.element.index()) {
-                        this._remove();
+                        this.remove();
                     }
                 });
-                this.scope.$on('uitab.item.show', (evt, index) => {
-                    this[index == this.element.index() ? '_show' : '_hide']();
+                this.scope.$on('uitab.item.show', (evt, o) => {
+                    let index = o.index,
+                        isLazy = o.lazy;
+                    if (index == this.element.index()) {
+                        this._show();
+                    }
+                    else if (this.content) {
+                        this._hide();
+                    }
+                    else if (!isLazy) {
+                        this.getContent().then(() => {
+                            this.getContainer().append(this.content);
+                            this.content.hide();
+                        });
+                    }
                 });
             }
 
             clickHandler(evt) {
-                this.scope.$parent.$broadcast('uitab.item.show', this.element.index());
+                this.scope.$parent.$broadcast('uitab.item.show', {index: this.element.index()});
                 evt.stopPropagation();
             }
 
@@ -97,7 +110,7 @@ angular.module('admin.component')
                 this.scope.active = false;
             }
 
-            _remove() {
+            remove() {
                 setTimeout(()=> {
                     this.element.remove();
                     this.content && this.content.remove();

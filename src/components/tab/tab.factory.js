@@ -21,6 +21,7 @@ angular.module('admin.component')
 
             init() {
                 this.scope.component = this;
+                this.isLazy = this.scope.lazy != 'false';
                 this.transclude(this.scope, (dom) => {
                     this.element.find('ul').append(dom);
                 });
@@ -35,7 +36,7 @@ angular.module('admin.component')
             }
 
             showAtIndex(index) {
-                index && this.scope.$broadcast('uitab.item.show', index);
+                index && this.scope.$broadcast('uitab.item.show', {index, lazy: this.isLazy});
             }
 
             removeAtIndex(index) {

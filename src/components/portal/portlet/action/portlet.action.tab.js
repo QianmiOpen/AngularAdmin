@@ -12,7 +12,8 @@ angular.module('admin.component')
             replace: true,
             transclude: true,
             scope: {
-                default: '@'
+                default: '@',
+                lazy: '@'
             },
             compile: function () {
                 var tab = null;

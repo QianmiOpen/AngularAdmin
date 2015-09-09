@@ -7,6 +7,7 @@ angular.module('admin.component')
             scope: {
                 close: '@',
                 default: '@',
+                lazy: '@',
                 url: '@'
             },
             compile: function () {
