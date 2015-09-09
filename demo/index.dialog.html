@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Demo</title>
+    <link rel="stylesheet" href="../output/css/all.css"/>
+</head>
+<body style="background-color: #fff !important;padding: 10px;" ng-app="admin">
+<ui-container style="display: none" controller="CC">
+
+    <button class="btn btn-primary" ng-click="$testDialog.show()">打开弹出框</button>
+
+    <button class="btn btn-primary" ng-click="$testDialog.hide()">关闭弹出框</button>
+
+    <ui-dialog ref="$testDialog" url="modal/search/input.date.html" on-show="onSubmit()" on-hide="onCancel()"></ui-dialog>
+</ui-container>
+</body>
+<script src="../output/js/lib.js"></script>
+<script src="../output/js/all.js"></script>
+<script src="../output/assets/js/jquery.mockjax.js"></script>
+<script>
+    var remoteSelects = [];
+    for (var i = 0; i < 10; i++) {
+        remoteSelects.push({
+            id: i + '',
+            date: new Date(new Date().getTime() + i * 1000),
+            image: 'https://www.baidu.com/img/bdlogo.png',
+            simple: i * 3 + 10,
+            progress: (i + 1) * 10,
+            state: i % 3
+        });
+    }
+    $.mockjax({
+        url: '/test/remote/select',
+        response: function () {
+            this.responseText = {
+                data: remoteSelects,
+                type: 1
+            }
+        }
+    });
+
+
+    function CC($scope, UIDialogControl) {
+        $scope.onSubmit = function () {
+        }
+        $scope.onCancel = function () {
+        }
+    }
+</script>
+</html>

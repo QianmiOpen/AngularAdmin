@@ -70,6 +70,16 @@ angular.module('admin.service')
                                 .then(() => this.message(url, data, '删除数据成功', '删除数据失败'));
                         },
 
+                        load(url) {
+                            var $dom = $('<div/>').hide().appendTo(document.body),
+                                defer = $q.defer();
+                            $dom.load(url, (html) => {
+                                $dom.remove();
+                                defer.resolve(html);
+                            });
+                            return defer.promise;
+                        },
+
                         getScript(url) {
                             return $.ajax({
                                 url: url,

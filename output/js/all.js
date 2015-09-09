@@ -35,6 +35,12 @@ var ComponentEvent = (function(super$0){"use strict";var PRS$0 = (function(o,t){
         var ref = element.attr('ref') || defaultRef;
         return scope[ref];
     };
+
+    proto$0.remove = function() {
+        this.element.remove();
+        this.scope.$destroy();
+        this.scope = this.element = this.attrs = this.transclude = null;
+    };
 MIXIN$0(ComponentEvent.prototype,proto$0);proto$0=void 0;return ComponentEvent;})(Event);
 //-----------------------------------------------------------------------------------------------
 //
@@ -124,6 +130,16 @@ angular.module('admin.service')
                         remove: function(url, data, options) {var this$0 = this;
                             return util.confirm((("您确认删除该" + (options.label || '数据')) + "吗?"))
                                 .then(function()  {return this$0.message(url, data, '删除数据成功', '删除数据失败')});
+                        },
+
+                        load: function(url) {
+                            var $dom = $('<div/>').hide().appendTo(document.body),
+                                defer = $q.defer();
+                            $dom.load(url, function(html)  {
+                                $dom.remove();
+                                defer.resolve(html);
+                            });
+                            return defer.promise;
                         },
 
                         getScript: function(url) {
@@ -3187,7 +3203,7 @@ angular.module('admin.component')
                     pre: function preLink(scope, iElement, iAttrs) {
                         return new UITableColumnControl(scope, iElement, iAttrs, transclude);
                     }
-                }
+                };
             },
             template: ("\
 \n                <th>\
@@ -4471,20 +4487,19 @@ angular.module('admin.component')
                     this.scope = scope;
                     this.element = element;
                     this.attrs = attrs;
-                    this.scope.$on('componentComplete', this.initHandler.bind(this));
-                    this.content = $transclude(scope);
+                    this.transclude = $transclude;
+                    this.init();
                 }if(super$0!==null)SP$0(UIContainer,super$0);UIContainer.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIContainer,"configurable":true,"writable":true}});DP$0(UIContainer,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
                 proto$0.init = function() {
+                    this.completeName = this.attrs.complete;
+                    this.scope.$on('componentComplete', this.initHandler.bind(this));
+                    this.content = this.transclude(this.scope);
                     this.element
                         .show()
                         .append(this.content);
 
                     this.lazyInit();
-                    return this;
-                };
-
-                proto$0.initEvents = function(){
                 };
 
                 proto$0.lazyInit = function() {var this$0 = this;
@@ -4505,7 +4520,11 @@ angular.module('admin.component')
                         else if (ctrl) {
                             $controller(ctrl, {$scope: this$0.scope});
                         }
-                        this$0.scope.$emit('uicontainer.ready'); // 触发
+
+                        //
+                        if (this$0.scope[this$0.completeName]) {
+                            this$0.scope[this$0.completeName]();
+                        }
                     });
                 };
 
@@ -4527,9 +4546,7 @@ angular.module('admin.component')
                 replace: true,
                 transclude: true,
                 link: function (scope, element, attrs, ctrl, tranclude) {
-                    new UIContainer(scope, element, attrs, tranclude)
-                        .init()
-                        .initEvents();
+                    new UIContainer(scope, element, attrs, tranclude);
                 },
                 template: ("\
 \n                    <div></div>\
@@ -4537,6 +4554,101 @@ angular.module('admin.component')
             };
         });
 })();
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+(function () {
+    angular.module('admin.component')
+        .factory('UIDialogControl', function (Util, Ajax, $compile, $controller) {
+            var UIDialogControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDialogControl, super$0);var proto$0={};
+                function UIDialogControl(scope, url, urlParam, transclude) {
+                    super$0.call(this);
+                    this.scope = scope;
+                    this.url = url;
+                    this.urlParams = urlParam;
+                    this.transclude = transclude;
+                    this.message = new Message('UIDialogHelper');
+                }if(super$0!==null)SP$0(UIDialogControl,super$0);UIDialogControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDialogControl,"configurable":true,"writable":true}});DP$0(UIDialogControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.show = function() {var this$0 = this;
+                    return this.getContent()
+                        .then(function()  {
+                            this$0.content.modal({
+                                "keyboard": true,
+                                "show": true
+                            });
+                        });
+                };
+
+                proto$0.hide = function() {
+                    if (this.content) {
+                        this.content.modal({
+                            "show": false
+                        });
+                    }
+                };
+
+                proto$0.getContent = function() {var this$0 = this;
+                    if (this.content) {
+                        return Util.toPromise(this.content);
+                    }
+                    else if (this.url) {
+                        return Ajax.load(this.url, this.urlParams || {})
+                            .then(function(html)  {
+                                this$0.content = $compile(html)(this$0.scope);
+                                this$0._addEvents();
+                            });
+                    }
+                    else {
+                        this.content = this.transclude(this.scope);
+                        this._addEvents();
+                        return this.content;
+                    }
+                };
+
+                proto$0.remove = function(){
+                    super$0.prototype.remove.call(this);
+                    this.content.unbind('shown.bs.modal');
+                    this.content.unbind('hidden.bs.modal');
+                };
+
+                proto$0._addEvents = function() {var this$0 = this;
+                    this.content.bind('shown.bs.modal', function()  {
+                        this$0.scope.onShow();
+                    });
+                    this.content.bind('hidden.bs.modal', function()  {
+                        this$0.scope.onHide();
+                    });
+                };
+            MIXIN$0(UIDialogControl.prototype,proto$0);proto$0=void 0;return UIDialogControl;})(ComponentEvent);
+            return UIDialogControl;
+        });
+})();
+angular.module('admin.component')
+    .directive('uiDialog', function (UIDialogControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                url: '@',
+                initParams: '=',
+                onShow: '&',
+                onHide: '&'
+            },
+            link: function (scope, element, attrs, controller, transclude) {
+                var control = new UIDialogControl(scope, scope.url, scope.initParams, transclude);
+                control.triggerComplete(scope, attrs.ref || '$dialog', control);
+            },
+            template: ("\
+\n                <div class=\"ui-dialog\"></div>\
+\n            ")
+        };
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5303,7 +5415,7 @@ angular.module('admin.component')
                                 this.load();
                             }
                             else {
-                                Ajax.getScript((("" + AdminCDN) + "/assets/js/zTree_v3/js/jquery.ztree.all-3.5.js"))
+                                Ajax.getScript((("" + AdminCDN) + "/assets/js/zTree_v3/js/jquery.ztree.all-3.5.min.js"))
                                     .then(function()  {return this$0.load()});
                             }
                         };

@@ -22,7 +22,7 @@
                 init() {
                     this.completeName = this.attrs.complete;
                     this.scope.$on('componentComplete', this.initHandler.bind(this));
-                    this.content = this.transclude(scope);
+                    this.content = this.transclude(this.scope);
                     this.element
                         .show()
                         .append(this.content);

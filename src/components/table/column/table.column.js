@@ -46,7 +46,7 @@ angular.module('admin.component')
                     pre: function preLink(scope, iElement, iAttrs) {
                         return new UITableColumnControl(scope, iElement, iAttrs, transclude);
                     }
-                }
+                };
             },
             template: `
                 <th>

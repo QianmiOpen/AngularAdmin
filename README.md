@@ -20,7 +20,7 @@
 ## 配置项
 
 ```javascript
-.config((AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider, UITreeControlProvider) => {
+.config((AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider, UITreeControlProvider, UIDialogControl) => {
 
     //
     // ajax 默认返回处理
@@ -62,6 +62,7 @@
     //
     UITreeControlProvider.setDataName('id', 'name', 'pid');
     UITreeControlProvider.setRequestMethod('post');
+
 });
 ```
 
@@ -73,6 +74,8 @@
 * ```<ui-breadcrumb  datas="" url="" />```
     * datas, [{name: .., url: ..}] 或者 ['A', 'B', 'C']
     * url, 如果想远程加载设置这个, post请求
+* ```<ui-dialog ref="$testDialog" url="modal/search/input.date.html" on-show="onSubmit()" on-hide="onCancel()"></ui-dialog>```
+    * url 加载的地址
 
 ## 图表
 
