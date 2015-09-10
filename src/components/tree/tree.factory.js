@@ -46,6 +46,7 @@
                             this.dataMap = {};
                             this.transclude = transclude;
                             this.message = new Message('UITree');
+                            this.initAfters = [];
                             this.init();
                             this.initEvents();
                         }
@@ -83,10 +84,14 @@
                         build() {
                             if ($.fn.ztree) {
                                 this.load();
+                                this.scope.onComplete();
                             }
                             else {
                                 Ajax.getScript(`${AdminCDN}/assets/js/zTree_v3/js/jquery.ztree.all-3.5.min.js`)
-                                    .then(() => this.load());
+                                    .then(() => {
+                                        this.load();
+                                        this.scope.onComplete();
+                                    });
                             }
                         }
 
