@@ -2871,6 +2871,153 @@ angular.module('admin.component')
 //
 //------------------------------------------------------
 angular.module('admin.component')
+    .factory('UITabItemControl', function (Ajax, Util, $compile) {
+        var UITabItemControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabItemControl, super$0);var proto$0={};
+            function UITabItemControl(scope, element, attrs, transclude) {
+                super$0.call(this);
+                this.element = element;
+                this.scope = scope;
+                this.attrs = attrs;
+                this.transclude = transclude;
+                this.message = new Message('UITabItem');
+                this.init();
+                this.initEvents();
+            }if(super$0!==null)SP$0(UITabItemControl,super$0);UITabItemControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabItemControl,"configurable":true,"writable":true}});DP$0(UITabItemControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                this.scope.component = this;
+            };
+
+            proto$0.initEvents = function() {var this$0 = this;
+                this.scope.$on('uitab.item.remove', function(evt, index)  {
+                    if (index == this$0.element.index()) {
+                        this$0.remove();
+                    }
+                });
+                this.scope.$on('uitab.item.show', function(evt, o)  {
+                    var index = o.index,
+                        isLazy = o.lazy;
+                    if (index == this$0.element.index()) {
+                        this$0._show();
+                    }
+                    else if (this$0.content) {
+                        this$0._hide();
+                    }
+                    else if (!isLazy) {
+                        this$0.getContent().then(function()  {
+                            this$0.getContainer().append(this$0.content);
+                            this$0.content.hide();
+                        });
+                    }
+                });
+            };
+
+            proto$0.clickHandler = function(evt) {
+                this.scope.$parent.$broadcast('uitab.item.show', {index: this.element.index()});
+                evt.stopPropagation();
+            };
+
+            proto$0.removeHandler = function(evt) {
+                this.scope.$parent.$broadcast('uitab.item.remove', this.element.index());
+                evt.stopPropagation();
+            };
+
+            proto$0.getContainer = function() {
+                if (!this.bodyElement) {
+                    this.bodyElement = this.element.parents('.ui-tab').find('.tab-content');
+                    if (this.bodyElement.length === 0) {
+                        this.bodyElement = this.element.parents('.portlet').find('.portlet-body');
+                    }
+                }
+                return this.bodyElement;
+            };
+
+            proto$0.getContent = function() {var this$0 = this;
+                if (this.content) {
+                    return Util.toPromise(this.wrapperContent(html));
+                }
+                else if (this.scope.url) {
+                    return Ajax.get(this.scope.url)
+                        .then(function(html)  {
+                            return this$0.wrapperContent(html);
+                        });
+                }
+                else {
+                    this.transclude(this.scope.$parent.$parent, function(dom)  {
+                        this$0.content = dom;
+                    });
+                    return Util.toPromise(this.content);
+                }
+            };
+
+            proto$0.wrapperContent = function(html) {
+                return $compile(html)(this.scope.$parent.$parent);
+            };
+
+            proto$0._show = function() {var this$0 = this;
+                if (this.content) {
+                    this.content.show();
+                }
+                else {
+                    this.getContent()
+                        .then(function()  {
+                            this$0.getContainer().append(this$0.content);
+                            this$0.content.show();
+                        });
+                }
+                this.scope.active = true;
+            };
+
+            proto$0._hide = function() {
+                if (this.content) {
+                    this.content.hide();
+                }
+                this.scope.active = false;
+            };
+
+            proto$0.remove = function() {var this$0 = this;
+                setTimeout(function() {
+                    this$0.element.remove();
+                    this$0.content && this$0.content.remove();
+                    this$0.scope.$destroy();
+                }, 100);
+            };
+        MIXIN$0(UITabItemControl.prototype,proto$0);proto$0=void 0;return UITabItemControl;})(ComponentEvent);
+
+        return UITabItemControl;
+    });
+angular.module('admin.component')
+    .directive('uiTabItem', function (UITabItemControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                head: '@',
+                url: '@'
+            },
+            link: function($scope, $element, $attrs, controller, $transclude)  {
+                new UITabItemControl($scope, $element, $attrs, $transclude);
+            },
+            template: ("\
+\n                <li ng-class=\"{'active': active}\">\
+\n                    <a href=\"javascript:;\" ng-click=\"component.clickHandler($event)\">\
+\n                        <span>{{head}}</span>\
+\n                        <i class=\"fa fa-times\" ng-click=\"component.removeHandler($event)\"></i>\
+\n                    </a>\
+\n                </li>\
+\n            ")
+        };
+    });
+
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
     .directive('uiTableCheckColumn', function (UITableColumnControl) {
         var UITableCheckColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableCheckColumnControl, super$0);var proto$0={};
             function UITableCheckColumnControl(s, e, a) {
@@ -3342,153 +3489,6 @@ angular.module('admin.component')
         };
     })
 ;
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('UITabItemControl', function (Ajax, Util, $compile) {
-        var UITabItemControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabItemControl, super$0);var proto$0={};
-            function UITabItemControl(scope, element, attrs, transclude) {
-                super$0.call(this);
-                this.element = element;
-                this.scope = scope;
-                this.attrs = attrs;
-                this.transclude = transclude;
-                this.message = new Message('UITabItem');
-                this.init();
-                this.initEvents();
-            }if(super$0!==null)SP$0(UITabItemControl,super$0);UITabItemControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabItemControl,"configurable":true,"writable":true}});DP$0(UITabItemControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                this.scope.component = this;
-            };
-
-            proto$0.initEvents = function() {var this$0 = this;
-                this.scope.$on('uitab.item.remove', function(evt, index)  {
-                    if (index == this$0.element.index()) {
-                        this$0.remove();
-                    }
-                });
-                this.scope.$on('uitab.item.show', function(evt, o)  {
-                    var index = o.index,
-                        isLazy = o.lazy;
-                    if (index == this$0.element.index()) {
-                        this$0._show();
-                    }
-                    else if (this$0.content) {
-                        this$0._hide();
-                    }
-                    else if (!isLazy) {
-                        this$0.getContent().then(function()  {
-                            this$0.getContainer().append(this$0.content);
-                            this$0.content.hide();
-                        });
-                    }
-                });
-            };
-
-            proto$0.clickHandler = function(evt) {
-                this.scope.$parent.$broadcast('uitab.item.show', {index: this.element.index()});
-                evt.stopPropagation();
-            };
-
-            proto$0.removeHandler = function(evt) {
-                this.scope.$parent.$broadcast('uitab.item.remove', this.element.index());
-                evt.stopPropagation();
-            };
-
-            proto$0.getContainer = function() {
-                if (!this.bodyElement) {
-                    this.bodyElement = this.element.parents('.ui-tab').find('.tab-content');
-                    if (this.bodyElement.length === 0) {
-                        this.bodyElement = this.element.parents('.portlet').find('.portlet-body');
-                    }
-                }
-                return this.bodyElement;
-            };
-
-            proto$0.getContent = function() {var this$0 = this;
-                if (this.content) {
-                    return Util.toPromise(this.wrapperContent(html));
-                }
-                else if (this.scope.url) {
-                    return Ajax.get(this.scope.url)
-                        .then(function(html)  {
-                            return this$0.wrapperContent(html);
-                        });
-                }
-                else {
-                    this.transclude(this.scope.$parent.$parent, function(dom)  {
-                        this$0.content = dom;
-                    });
-                    return Util.toPromise(this.content);
-                }
-            };
-
-            proto$0.wrapperContent = function(html) {
-                return $compile(html)(this.scope.$parent.$parent);
-            };
-
-            proto$0._show = function() {var this$0 = this;
-                if (this.content) {
-                    this.content.show();
-                }
-                else {
-                    this.getContent()
-                        .then(function()  {
-                            this$0.getContainer().append(this$0.content);
-                            this$0.content.show();
-                        });
-                }
-                this.scope.active = true;
-            };
-
-            proto$0._hide = function() {
-                if (this.content) {
-                    this.content.hide();
-                }
-                this.scope.active = false;
-            };
-
-            proto$0.remove = function() {var this$0 = this;
-                setTimeout(function() {
-                    this$0.element.remove();
-                    this$0.content && this$0.content.remove();
-                    this$0.scope.$destroy();
-                }, 100);
-            };
-        MIXIN$0(UITabItemControl.prototype,proto$0);proto$0=void 0;return UITabItemControl;})(ComponentEvent);
-
-        return UITabItemControl;
-    });
-angular.module('admin.component')
-    .directive('uiTabItem', function (UITabItemControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                head: '@',
-                url: '@'
-            },
-            link: function($scope, $element, $attrs, controller, $transclude)  {
-                new UITabItemControl($scope, $element, $attrs, $transclude);
-            },
-            template: ("\
-\n                <li ng-class=\"{'active': active}\">\
-\n                    <a href=\"javascript:;\" ng-click=\"component.clickHandler($event)\">\
-\n                        <span>{{head}}</span>\
-\n                        <i class=\"fa fa-times\" ng-click=\"component.removeHandler($event)\"></i>\
-\n                    </a>\
-\n                </li>\
-\n            ")
-        };
-    });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4723,6 +4723,276 @@ angular.module('admin.component')
 \n            ")
         };
     });
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .factory('UITabControl', function () {
+        var UITabControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabControl, super$0);var proto$0={};
+            function UITabControl(scope, element, attrs, transclude) {
+                super$0.call(this);
+                this.element = element;
+                this.scope = scope;
+                this.attrs = attrs;
+                this.transclude = transclude;
+                this.message = new Message('UITab');
+                this.init();
+                this.initEvents();
+            }if(super$0!==null)SP$0(UITabControl,super$0);UITabControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabControl,"configurable":true,"writable":true}});DP$0(UITabControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {var this$0 = this;
+                this.scope.component = this;
+                this.isLazy = this.scope.lazy != 'false';
+                this.transclude(this.scope, function(dom)  {
+                    this$0.element.find('ul').append(dom);
+                });
+                this.triggerComplete(this.scope, this.attrs.ref || '$tab', this);
+            };
+
+            proto$0.initEvents = function() {
+            };
+
+            proto$0.build = function() {
+                this.showAtIndex(this.scope.default || '0');
+            };
+
+            proto$0.showAtIndex = function(index) {
+                index && this.scope.$broadcast('uitab.item.show', {index: index, lazy: this.isLazy});
+            };
+
+            proto$0.removeAtIndex = function(index) {
+                index && this.scope.$broadcast('uitab.item.remove', index);
+            };
+        MIXIN$0(UITabControl.prototype,proto$0);proto$0=void 0;return UITabControl;})(ComponentEvent);
+
+        return UITabControl;
+    });
+angular.module('admin.component')
+    .directive('uiTab', function (UITabControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                close: '@',
+                default: '@',
+                lazy: '@',
+                url: '@'
+            },
+            compile: function () {
+                var tab = null;
+                return {
+                    pre: function (scope, element, attrs, controller, transclude) {
+                        tab = new UITabControl(scope, element, attrs, transclude);
+                    },
+                    post: function () {
+                        tab.build();
+                    }
+                };
+            },
+            template: ("\
+\n                <div class=\"ui-tab tabbable-custom\" ng-class=\"{'tabbable-close': close}\">\
+\n                    <ul class=\"nav nav-tabs\">\
+\n                    </ul>\
+\n                    <div class=\"tab-content\" style=\"min-height: 100px;\">\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+
+//------------------------------------------------------
+//
+//
+// 依赖 qm.table.js
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .factory('UITableToolBarControl', function ($state) {
+        var UITableToolBarControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableToolBarControl, super$0);var proto$0={};
+            function UITableToolBarControl(scope, element, attrs, transclude) {
+                super$0.call(this);
+                this.element = element;
+                this.scope = scope;
+                this.attrs = attrs;
+                this.transclude = transclude;
+                this.table = null;
+                this.isEdit = false;
+                this.message = new Message('UITableToolBar');
+                this.init();
+                this.initEvents();
+            }if(super$0!==null)SP$0(UITableToolBarControl,super$0);UITableToolBarControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableToolBarControl,"configurable":true,"writable":true}});DP$0(UITableToolBarControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {var this$0 = this;
+                this.transclude(this.scope, function(dom)  {
+                    this$0.element.find('.btn-group:eq(0)').append(dom);
+                });
+                this.scope.component = this;
+                this.scope.editText = '开启';
+                this.triggerComplete(this.scope, this.attrs.ref || '$tableToolbar', this);
+            };
+
+            proto$0.initEvents = function() {var this$0 = this;
+                this.scope.$parent.$on('uitable.complete', function(evt, uiTable)  {
+                    this$0.scope.table = uiTable;
+                });
+            };
+
+            proto$0.toggleEdit = function() {
+                this.isEdit = !this.isEdit;
+                this.scope.editText = this.isEdit ? '关闭' : '开启';
+                this.scope.$parent.$broadcast('uitable.column.edit', this.isEdit);
+            };
+
+            proto$0.doAddItem = function() {
+                if (this.scope[this.attrs.add]) {
+                    this.scope[this.attrs.add]();
+                }
+                else if (this.attrs.add && this.attrs.add.indexOf('/') != -1) {
+                    if (this.attrs.addDialog) {
+                        //TODO: 弹出框
+                    }
+                    else {
+                        $state.go(this.attrs.add);
+                    }
+                }
+                else {
+                    this.message.error('点击添加数据按钮，但是没有设置地址, 请在add="地址"');
+                }
+            };
+
+            proto$0.doDelItems = function() {
+                var table = this.scope.table,
+                    selectValues = table.selectValues;
+                if (this.scope[this.attrs.del]) {
+                    this.scope[this.attrs.del](selectValues);
+                }
+                else {
+                    if (this.attrs.del) {
+                        if (selectValues.length > 1) {
+                            ajax.remove(this.attrs.del, {ids: selectValues.join(',')}).then(function()  {
+                                table.refresh();
+                            });
+                        }
+                        else {
+                            ajax.remove(this.attrs.del + '/' + selectValues[0]).then(function()  {
+                                table.refresh();
+                            });
+                        }
+                    }
+                    else {
+                        this.message.error('点击删除数据按钮，但是没有设置地址, 请在del="地址"');
+                    }
+                }
+            };
+
+            proto$0.isShow = function(index, column) {
+                if (column.className == 'CheckColumn' || column.className == 'OperationColumn') {
+                    return false;
+                }
+                return true;
+            };
+
+            proto$0.toggleColumn = function(evt, column) {
+                column.bVisible = !column.bVisible;
+                this.scope.$parent.$broadcast('uitable.column.visable', column);
+            };
+        MIXIN$0(UITableToolBarControl.prototype,proto$0);proto$0=void 0;return UITableToolBarControl;})(ComponentEvent);
+        return UITableToolBarControl;
+    });
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiToolBarTable', function (UITableToolBarControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                editable: '@',
+                add: '@',
+                del: '@',
+                tip: '@'
+            },
+            controller: function($scope, $element, $attrs, $transclude)  {
+                new UITableToolBarControl($scope, $element, $attrs, $transclude);
+            },
+            template: ("\
+\n                <div class=\"ui-toolbar table-toolbar\">\
+\n                    <div class=\"btn-group pull-left\">\
+\n                        <button ng-if=\"editable\" type=\"button\" class=\"btn btn-sm btn-info\" ng-click=\"component.toggleEdit()\"><i class=\"fa fa-edit\"></i> <span ng-bind=\"editText\"></span>快速编辑</button>&nbsp;&nbsp;\
+\n                        <button ng-if=\"add\" type=\"button\" class=\"btn btn-sm btn-primary\" ng-click=\"component.doAddItem()\"><i class=\"fa fa-plus-circle\"></i> 新增{{tip}}</button>&nbsp;&nbsp;\
+\n                        <button ng-if=\"del\" type=\"button\" ng-class=\"{'btn-danger': table.selectItems.selectValues.length > 0}\" class=\"btn btn-sm\" ng-disabled=\"table.selectItems.length==0\" ng-click=\"component.doDelItem()\"><i class=\"fa fa-times-circle\"></i> 删除{{tip}}</button>&nbsp;&nbsp;\
+\n                    </div>\
+\n\
+\n                    <span ng-show=\"table.selectItems.length > 0\" class=\"table-toolbar-tip fadeInRight\">您已选择 <strong ng-bind=\"selectItems.length\"></strong> 个{{tip}}，支持翻页选择多个{{tip}}。</span>\
+\n\
+\n                    <div class=\"btn-group pull-right\">\
+\n                        <a class=\"btn default btn-sm\" href=\"#\" data-hover=\"dropdown\"><i class=\"fa fa-table\"></i></a>\
+\n                        <div class=\"dropdown-menu dropdown-checkboxes pull-right\">\
+\n                            <label ng-repeat=\"column in table.aoColumns\" ng-if=\"component.isShow($index, column)\" style=\"cursor:pointer\" >\
+\n                                <div class=\"checker\">\
+\n                                    <span ng-class=\"{checked: column.bVisible}\">\
+\n                                        <input type=\"checkbox\" ng-click=\"component.toggleColumn($event, column)\">\
+\n                                    </span>\
+\n                                </div>\
+\n                                <span ng-bind=\"column.mTitle\"/>\
+\n                            </label>\
+\n                         </div>\
+\n                    </div>\
+\n                    <div style=\"clear:both\"></div>\
+\n                </div>\
+\n            ")
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('tooltip', function () {
+        return {
+            restrict: 'A',
+            replace: false,
+            link: function (scope, element, attrs) {
+                var content = attrs.tooltip,
+                    title = attrs.title,
+                    placement = attrs.placement || (title ? 'right' : 'top');
+
+                //如果有标题有内容, 那么使用popup over
+                if (title) {
+                    element.popover({
+                        title: title,
+                        content: content,
+                        placement: placement,
+                        trigger: 'hover'
+                    });
+                }
+                //否则使用tooltip
+                else {
+                    element.tooltip({
+                        title: content,
+                        placement: placement
+                    });
+                }
+            }
+        };
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5074,276 +5344,6 @@ angular.module('admin.component')
         };
     });
 
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('UITabControl', function () {
-        var UITabControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabControl, super$0);var proto$0={};
-            function UITabControl(scope, element, attrs, transclude) {
-                super$0.call(this);
-                this.element = element;
-                this.scope = scope;
-                this.attrs = attrs;
-                this.transclude = transclude;
-                this.message = new Message('UITab');
-                this.init();
-                this.initEvents();
-            }if(super$0!==null)SP$0(UITabControl,super$0);UITabControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabControl,"configurable":true,"writable":true}});DP$0(UITabControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {var this$0 = this;
-                this.scope.component = this;
-                this.isLazy = this.scope.lazy != 'false';
-                this.transclude(this.scope, function(dom)  {
-                    this$0.element.find('ul').append(dom);
-                });
-                this.triggerComplete(this.scope, this.attrs.ref || '$tab', this);
-            };
-
-            proto$0.initEvents = function() {
-            };
-
-            proto$0.build = function() {
-                this.showAtIndex(this.scope.default || '0');
-            };
-
-            proto$0.showAtIndex = function(index) {
-                index && this.scope.$broadcast('uitab.item.show', {index: index, lazy: this.isLazy});
-            };
-
-            proto$0.removeAtIndex = function(index) {
-                index && this.scope.$broadcast('uitab.item.remove', index);
-            };
-        MIXIN$0(UITabControl.prototype,proto$0);proto$0=void 0;return UITabControl;})(ComponentEvent);
-
-        return UITabControl;
-    });
-angular.module('admin.component')
-    .directive('uiTab', function (UITabControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                close: '@',
-                default: '@',
-                lazy: '@',
-                url: '@'
-            },
-            compile: function () {
-                var tab = null;
-                return {
-                    pre: function (scope, element, attrs, controller, transclude) {
-                        tab = new UITabControl(scope, element, attrs, transclude);
-                    },
-                    post: function () {
-                        tab.build();
-                    }
-                };
-            },
-            template: ("\
-\n                <div class=\"ui-tab tabbable-custom\" ng-class=\"{'tabbable-close': close}\">\
-\n                    <ul class=\"nav nav-tabs\">\
-\n                    </ul>\
-\n                    <div class=\"tab-content\" style=\"min-height: 100px;\">\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-
-//------------------------------------------------------
-//
-//
-// 依赖 qm.table.js
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('UITableToolBarControl', function ($state) {
-        var UITableToolBarControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableToolBarControl, super$0);var proto$0={};
-            function UITableToolBarControl(scope, element, attrs, transclude) {
-                super$0.call(this);
-                this.element = element;
-                this.scope = scope;
-                this.attrs = attrs;
-                this.transclude = transclude;
-                this.table = null;
-                this.isEdit = false;
-                this.message = new Message('UITableToolBar');
-                this.init();
-                this.initEvents();
-            }if(super$0!==null)SP$0(UITableToolBarControl,super$0);UITableToolBarControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableToolBarControl,"configurable":true,"writable":true}});DP$0(UITableToolBarControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {var this$0 = this;
-                this.transclude(this.scope, function(dom)  {
-                    this$0.element.find('.btn-group:eq(0)').append(dom);
-                });
-                this.scope.component = this;
-                this.scope.editText = '开启';
-                this.triggerComplete(this.scope, this.attrs.ref || '$tableToolbar', this);
-            };
-
-            proto$0.initEvents = function() {var this$0 = this;
-                this.scope.$parent.$on('uitable.complete', function(evt, uiTable)  {
-                    this$0.scope.table = uiTable;
-                });
-            };
-
-            proto$0.toggleEdit = function() {
-                this.isEdit = !this.isEdit;
-                this.scope.editText = this.isEdit ? '关闭' : '开启';
-                this.scope.$parent.$broadcast('uitable.column.edit', this.isEdit);
-            };
-
-            proto$0.doAddItem = function() {
-                if (this.scope[this.attrs.add]) {
-                    this.scope[this.attrs.add]();
-                }
-                else if (this.attrs.add && this.attrs.add.indexOf('/') != -1) {
-                    if (this.attrs.addDialog) {
-                        //TODO: 弹出框
-                    }
-                    else {
-                        $state.go(this.attrs.add);
-                    }
-                }
-                else {
-                    this.message.error('点击添加数据按钮，但是没有设置地址, 请在add="地址"');
-                }
-            };
-
-            proto$0.doDelItems = function() {
-                var table = this.scope.table,
-                    selectValues = table.selectValues;
-                if (this.scope[this.attrs.del]) {
-                    this.scope[this.attrs.del](selectValues);
-                }
-                else {
-                    if (this.attrs.del) {
-                        if (selectValues.length > 1) {
-                            ajax.remove(this.attrs.del, {ids: selectValues.join(',')}).then(function()  {
-                                table.refresh();
-                            });
-                        }
-                        else {
-                            ajax.remove(this.attrs.del + '/' + selectValues[0]).then(function()  {
-                                table.refresh();
-                            });
-                        }
-                    }
-                    else {
-                        this.message.error('点击删除数据按钮，但是没有设置地址, 请在del="地址"');
-                    }
-                }
-            };
-
-            proto$0.isShow = function(index, column) {
-                if (column.className == 'CheckColumn' || column.className == 'OperationColumn') {
-                    return false;
-                }
-                return true;
-            };
-
-            proto$0.toggleColumn = function(evt, column) {
-                column.bVisible = !column.bVisible;
-                this.scope.$parent.$broadcast('uitable.column.visable', column);
-            };
-        MIXIN$0(UITableToolBarControl.prototype,proto$0);proto$0=void 0;return UITableToolBarControl;})(ComponentEvent);
-        return UITableToolBarControl;
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiToolBarTable', function (UITableToolBarControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                editable: '@',
-                add: '@',
-                del: '@',
-                tip: '@'
-            },
-            controller: function($scope, $element, $attrs, $transclude)  {
-                new UITableToolBarControl($scope, $element, $attrs, $transclude);
-            },
-            template: ("\
-\n                <div class=\"ui-toolbar table-toolbar\">\
-\n                    <div class=\"btn-group pull-left\">\
-\n                        <button ng-if=\"editable\" type=\"button\" class=\"btn btn-sm btn-info\" ng-click=\"component.toggleEdit()\"><i class=\"fa fa-edit\"></i> <span ng-bind=\"editText\"></span>快速编辑</button>&nbsp;&nbsp;\
-\n                        <button ng-if=\"add\" type=\"button\" class=\"btn btn-sm btn-primary\" ng-click=\"component.doAddItem()\"><i class=\"fa fa-plus-circle\"></i> 新增{{tip}}</button>&nbsp;&nbsp;\
-\n                        <button ng-if=\"del\" type=\"button\" ng-class=\"{'btn-danger': table.selectItems.selectValues.length > 0}\" class=\"btn btn-sm\" ng-disabled=\"table.selectItems.length==0\" ng-click=\"component.doDelItem()\"><i class=\"fa fa-times-circle\"></i> 删除{{tip}}</button>&nbsp;&nbsp;\
-\n                    </div>\
-\n\
-\n                    <span ng-show=\"table.selectItems.length > 0\" class=\"table-toolbar-tip fadeInRight\">您已选择 <strong ng-bind=\"selectItems.length\"></strong> 个{{tip}}，支持翻页选择多个{{tip}}。</span>\
-\n\
-\n                    <div class=\"btn-group pull-right\">\
-\n                        <a class=\"btn default btn-sm\" href=\"#\" data-hover=\"dropdown\"><i class=\"fa fa-table\"></i></a>\
-\n                        <div class=\"dropdown-menu dropdown-checkboxes pull-right\">\
-\n                            <label ng-repeat=\"column in table.aoColumns\" ng-if=\"component.isShow($index, column)\" style=\"cursor:pointer\" >\
-\n                                <div class=\"checker\">\
-\n                                    <span ng-class=\"{checked: column.bVisible}\">\
-\n                                        <input type=\"checkbox\" ng-click=\"component.toggleColumn($event, column)\">\
-\n                                    </span>\
-\n                                </div>\
-\n                                <span ng-bind=\"column.mTitle\"/>\
-\n                            </label>\
-\n                         </div>\
-\n                    </div>\
-\n                    <div style=\"clear:both\"></div>\
-\n                </div>\
-\n            ")
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('tooltip', function () {
-        return {
-            restrict: 'A',
-            replace: false,
-            link: function (scope, element, attrs) {
-                var content = attrs.tooltip,
-                    title = attrs.title,
-                    placement = attrs.placement || (title ? 'right' : 'top');
-
-                //如果有标题有内容, 那么使用popup over
-                if (title) {
-                    element.popover({
-                        title: title,
-                        content: content,
-                        placement: placement,
-                        trigger: 'hover'
-                    });
-                }
-                //否则使用tooltip
-                else {
-                    element.tooltip({
-                        title: content,
-                        placement: placement
-                    });
-                }
-            }
-        };
-    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5455,6 +5455,9 @@ angular.module('admin.component')
                             else if (!this.attrs.manual) {
                                 this.message.error('未设置url, 无法请求');
                             }
+                            else {
+                                this.setData([]);
+                            }
                         };
 
                         proto$0.setData = function(resData, isFilter) {
@@ -5509,7 +5512,7 @@ angular.module('admin.component')
                             data[idName] = id;
                             data[labelName] = name;
                             data[pidName] = pid;
-                            if (pid && this.instance) {
+                            if (pid != undefined && this.instance) {
                                 var parent = this.instance.getNodeByParam(idName, pid, null);
                                 this.instance.addNodes(parent, data);
                             }
@@ -5519,6 +5522,15 @@ angular.module('admin.component')
                             this.dataList = this.dataList || [];
                             this.dataList.push(data);
                             this.dataMap[id] = data;
+                        };
+
+                        proto$0.clickItemById = function(id, isAll) {
+                            if (this.instance) {
+                                var node = this.instance.getNodeByParam(idName, id, null);
+                                if (node) {
+                                    this.instance.selectNode(node, isAll);
+                                }
+                            }
                         };
 
                         proto$0._filter = function(filterText) {var this$0 = this;

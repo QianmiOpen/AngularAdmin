@@ -109,6 +109,9 @@
                             else if (!this.attrs.manual) {
                                 this.message.error('未设置url, 无法请求');
                             }
+                            else {
+                                this.setData([]);
+                            }
                         }
 
                         setData(resData, isFilter) {
@@ -163,7 +166,7 @@
                             data[idName] = id;
                             data[labelName] = name;
                             data[pidName] = pid;
-                            if (pid && this.instance) {
+                            if (pid != undefined && this.instance) {
                                 let parent = this.instance.getNodeByParam(idName, pid, null);
                                 this.instance.addNodes(parent, data);
                             }
@@ -173,6 +176,15 @@
                             this.dataList = this.dataList || [];
                             this.dataList.push(data);
                             this.dataMap[id] = data;
+                        }
+
+                        clickItemById(id, isAll) {
+                            if (this.instance) {
+                                let node = this.instance.getNodeByParam(idName, id, null);
+                                if (node) {
+                                    this.instance.selectNode(node, isAll);
+                                }
+                            }
                         }
 
                         _filter(filterText) {
