@@ -166,6 +166,12 @@
                             return this.dataMap[data[pidName]];
                         }
 
+                        getTreeNodeById(id){
+                            if(this.instance){
+                                return this.instance.getNodeByParam(idName, id, null);
+                            }
+                        }
+
                         appendData(id, name, pid) {
                             let data = {};
                             data[idName] = id;

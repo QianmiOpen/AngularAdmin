@@ -508,7 +508,7 @@ angular.module('admin.service')
         proto$0.bind = function(label, callback, opt) {
             opt = $.extend({}, defaultOpt, opt);
             label = label.toLowerCase();
-            var el = opt && opt.target ? opt.target : this.window.document;
+            var el = opt && opt.target ? opt.target : document;
             this.keyboardEvent[label] = {
                 callback: this.handler,
                 target: el,
@@ -531,7 +531,8 @@ angular.module('admin.service')
         };
 
         proto$0.handler = function(callback, label, evt) {
-            var opt = this.keyboardEvent[label];
+            var opt = this.keyboardEvent[label],
+                code = evt.keyCode;
 
             //输入框不监听
             if (opt.inputDisabled) {
@@ -563,6 +564,8 @@ angular.module('admin.service')
                 alt: {
                     wanted: false,
                     pressed: evt.altKey ? true : false
+                },
+                meta: {
                 }
             };
             for (var i = 0, l = keys.length, k; k = keys[i], i < l; i++) {
@@ -600,8 +603,8 @@ angular.module('admin.service')
                 modifiers.shift.pressed == modifiers.shift.wanted &&
                 modifiers.alt.pressed == modifiers.alt.wanted &&
                 modifiers.meta.pressed == modifiers.meta.wanted) {
-                this.timeout(function () {
-                    callback(e);
+                setTimeout(function () {
+                    callback(evt);
                 }, 1);
 
                 if (opt.propagation) {
@@ -613,8 +616,9 @@ angular.module('admin.service')
     MIXIN$0(Shortcut.prototype,proto$0);proto$0=void 0;return Shortcut;})();
 
 
+    var instance = new Shortcut();
     angular.module('admin.service')
-        .factory('Shortcut', Shortcut);
+        .factory('Shortcut', function()  {return instance});
 })();
 //-----------------------------------------------------------------------------------------------
 //
@@ -5510,6 +5514,12 @@ angular.module('admin.component')
 
                         proto$0.getParentData = function(data) {
                             return this.dataMap[data[pidName]];
+                        };
+
+                        proto$0.getTreeNodeById = function(id){
+                            if(this.instance){
+                                return this.instance.getNodeByParam(idName, id, null);
+                            }
                         };
 
                         proto$0.appendData = function(id, name, pid) {

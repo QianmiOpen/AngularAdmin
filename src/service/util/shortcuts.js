@@ -99,7 +99,7 @@
         bind(label, callback, opt) {
             opt = $.extend({}, defaultOpt, opt);
             label = label.toLowerCase();
-            var el = opt && opt.target ? opt.target : this.window.document;
+            var el = opt && opt.target ? opt.target : document;
             this.keyboardEvent[label] = {
                 callback: this.handler,
                 target: el,
@@ -122,7 +122,8 @@
         }
 
         handler(callback, label, evt) {
-            let opt = this.keyboardEvent[label];
+            let opt = this.keyboardEvent[label],
+                code = evt.keyCode;
 
             //输入框不监听
             if (opt.inputDisabled) {
@@ -154,6 +155,8 @@
                 alt: {
                     wanted: false,
                     pressed: evt.altKey ? true : false
+                },
+                meta: {
                 }
             };
             for (var i = 0, l = keys.length, k; k = keys[i], i < l; i++) {
@@ -191,8 +194,8 @@
                 modifiers.shift.pressed == modifiers.shift.wanted &&
                 modifiers.alt.pressed == modifiers.alt.wanted &&
                 modifiers.meta.pressed == modifiers.meta.wanted) {
-                this.timeout(function () {
-                    callback(e);
+                setTimeout(function () {
+                    callback(evt);
                 }, 1);
 
                 if (opt.propagation) {
@@ -204,6 +207,7 @@
     }
 
 
+    var instance = new Shortcut();
     angular.module('admin.service')
-        .factory('Shortcut', Shortcut);
+        .factory('Shortcut', () => instance);
 })();
