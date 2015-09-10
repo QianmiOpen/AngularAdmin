@@ -848,22 +848,48 @@ angular.module('admin.component', []);
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormItem', function (componentHelper, defaultCol) {
+    .directive('uiFormItem', function () {
+
+        var UIFormControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIFormControl, super$0);var proto$0={};
+            function UIFormControl(s, e, a, t) {
+                this.transclude = t;
+                super$0.call(this, s, e, a);
+            }if(super$0!==null)SP$0(UIFormControl,super$0);UIFormControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIFormControl,"configurable":true,"writable":true}});DP$0(UIFormControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                super$0.prototype.init.call(this);
+                this.content = this.transclude(this.scope.$parent);
+            };
+
+            proto$0.render = function() {
+                this.element.find('.ui-form-item-body').append(this.content);
+            };
+        MIXIN$0(UIFormControl.prototype,proto$0);proto$0=void 0;return UIFormControl;})(UIFormItemControl);
+
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: function (scope, element, attrs, controller, tranclude) {
-                element.find('>div').append(tranclude(scope));
-                element.removeAttr('name').removeAttr('model');
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                help: '@'
             },
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.item', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
+            link: function (scope, element, attrs, controller, tranclude) {
+                new UIFormControl(scope, element, attrs, tranclude);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <div class=\"ui-form-item-body\"></div>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
         };
     });
 //------------------------------------------------------

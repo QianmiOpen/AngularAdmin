@@ -6,21 +6,47 @@
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormItem', function (componentHelper, defaultCol) {
+    .directive('uiFormItem', function () {
+
+        class UIFormControl extends UIFormItemControl {
+            constructor(s, e, a, t) {
+                this.transclude = t;
+                super(s, e, a);
+            }
+
+            init() {
+                super.init();
+                this.content = this.transclude(this.scope.$parent);
+            }
+
+            render() {
+                this.element.find('.ui-form-item-body').append(this.content);
+            }
+        }
+
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: function (scope, element, attrs, controller, tranclude) {
-                element.find('>div').append(tranclude(scope));
-                element.removeAttr('name').removeAttr('model');
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                help: '@'
             },
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.item', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
+            link: function (scope, element, attrs, controller, tranclude) {
+                new UIFormControl(scope, element, attrs, tranclude);
+            },
+            template: `
+                <div class="form-group">
+                   <label class="col-md-{{lcol || DefaultCol.l}} control-label">{{label}}</label>
+                   <div class="col-md-{{rcol || DefaultCol.r}}">
+                       <div class="ui-form-item-body"></div>
+                       <span ng-if="help" class="help-block">{{help}}</span>
+                   </div>
+               </div>'
+            `
         };
     });
