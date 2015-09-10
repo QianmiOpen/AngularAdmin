@@ -4514,6 +4514,23 @@ angular.module('admin.component')
             };
         });
 })();
+angular.module('admin.component')
+    .directive('uiCol', function () {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                col: '@'
+            },
+            link: function(s, e, a, c, t)  {
+                e.append(t(s.$parent));
+            },
+            template: ("\
+\n                <div class=\"col-md-{{col}}\"></div>\
+\n            ")
+        };
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4598,6 +4615,20 @@ angular.module('admin.component')
             };
         });
 })();
+angular.module('admin.component')
+    .directive('uiRow', function () {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: function(s, e, a, c, t)  {
+                e.append(t(s));
+            },
+            template: ("\
+\n                <div class=\"row\"></div>\
+\n            ")
+        };
+    });
 //------------------------------------------------------
 //
 //
@@ -5345,42 +5376,6 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('tooltip', function () {
-        return {
-            restrict: 'A',
-            replace: false,
-            link: function (scope, element, attrs) {
-                var content = attrs.tooltip,
-                    title = attrs.title,
-                    placement = attrs.placement || (title ? 'right' : 'top');
-
-                //如果有标题有内容, 那么使用popup over
-                if (title) {
-                    element.popover({
-                        title: title,
-                        content: content,
-                        placement: placement,
-                        trigger: 'hover'
-                    });
-                }
-                //否则使用tooltip
-                else {
-                    element.tooltip({
-                        title: content,
-                        placement: placement
-                    });
-                }
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
 (function () {
 
     var requestMethod = 'post',
@@ -5728,6 +5723,8 @@ angular.module('admin.component')
                 onDataFail: '&',
                 onCheck: '&',
 
+                onComplete: '&',
+
                 onAdd: '@',
                 onEdit: '@',
                 onRemove: '&',
@@ -5758,6 +5755,42 @@ angular.module('admin.component')
 \n                    </div>\
 \n                </div>\
 \n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('tooltip', function () {
+        return {
+            restrict: 'A',
+            replace: false,
+            link: function (scope, element, attrs) {
+                var content = attrs.tooltip,
+                    title = attrs.title,
+                    placement = attrs.placement || (title ? 'right' : 'top');
+
+                //如果有标题有内容, 那么使用popup over
+                if (title) {
+                    element.popover({
+                        title: title,
+                        content: content,
+                        placement: placement,
+                        trigger: 'hover'
+                    });
+                }
+                //否则使用tooltip
+                else {
+                    element.tooltip({
+                        title: content,
+                        placement: placement
+                    });
+                }
+            }
         };
     });
 //-----------------------------------------------------------------------------------------------

@@ -32,6 +32,8 @@ angular.module('admin.component')
                 onDataFail: '&',
                 onCheck: '&',
 
+                onComplete: '&',
+
                 onAdd: '@',
                 onEdit: '@',
                 onRemove: '&',
