@@ -16,10 +16,10 @@ angular.module('admin.component')
             }
 
             init() {
-                super.init();
-                this.scope.component = this;
                 this.scope.lcol = this.scope.lcol || 11;
                 this.scope.rcol = this.scope.rcol || 1;
+                super.init();
+                this.scope.component = this;
                 this.element.find('.row > div:eq(0)').append(this.content);
             }
 

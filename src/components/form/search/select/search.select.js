@@ -18,7 +18,9 @@ angular.module('admin.component')
                 model: '=',
                 change: '&',
                 multiple: '@',
-                render: '&'
+                render: '&',
+                labelName: '@',
+                valueName: '@'
             },
             link: function (s, e, a) {
                 new UISelectControl(s, e, a);

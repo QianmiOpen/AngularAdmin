@@ -37,6 +37,9 @@
                     if (this.attrs.url) {
                         this.load(this.attrs.url);
                     }
+
+                    this.scope.labelName = this.scope.labelName || 'name';
+                    this.scope.valueName = this.scope.valueName || 'id';
                 }
 
                 initEvents() {
@@ -90,21 +93,21 @@
                 }
 
                 setData(data, isClean, dataName, dataValue) {
-                    dataName = dataName || this.scope.dataKeyName;
-                    dataValue = dataValue || this.scope.dataValueName;
+                    dataName = dataName || this.scope.labelName;
+                    dataValue = dataValue || this.scope.valueName;
                     if (isClean) {
                         this.formEl.html('');
                     }
                     if (_.isArray(data)) {
                         $.each(data, (i, item) => {
-                            this.formEl.append(this.toOption(item, dataName, dataValue));
+                            this.formEl.append(this.toOption(item, dataValue, dataName));
                         });
                     }
                     else {
                         $.each(data, (group, items) => {
                             var $optionGroup = this.toOptionGroup(group);
                             $.each(items, (i, item) => {
-                                $optionGroup.append(this.toOption(item, dataName, dataValue));
+                                $optionGroup.append(this.toOption(item, dataValue, dataName));
                             });
                             this.formEl.append($optionGroup);
                         });
@@ -128,6 +131,11 @@
                 toOptionGroup(name) {
                     var $option = $('<optgroup/>').attr('label', name);
                     return $option;
+                }
+
+                reset(){
+                    super.reset();
+                    this.render();
                 }
             }
 

@@ -1017,8 +1017,8 @@ angular.module('admin.component')
             template: ("\
 \n                <form novalidate action=\"\" class=\"ui-search-form form-inline\">\
 \n                    <div class=\"row\">\
-\n                        <div class=\"col-md-{{leftCol}}\"></div>\
-\n                        <div class=\"text-right col-md-{{rightCol}}\">\
+\n                        <div class=\"col-md-{{lcol}}\"></div>\
+\n                        <div class=\"text-right col-md-{{rcol}}\">\
 \n                            <a title=\"回车键也可触发搜索\" class=\"btn blue-chambray btn-sm\" ng-click=\"component.search()\" style=\"width: 30px\"><i class=\"fa fa-search\"></i></button>\
 \n                            <a title=\"重置搜索选项\" class=\"btn default btn-sm\" ng-click=\"component.reset()\" style=\"width: 30px\"><i class=\"fa fa-undo font-blue-chambray\"></i></a>\
 \n                        </div>\
@@ -2113,10 +2113,10 @@ angular.module('admin.component')
             }if(super$0!==null)SP$0(UISearchFormControl,super$0);UISearchFormControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UISearchFormControl,"configurable":true,"writable":true}});DP$0(UISearchFormControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
             proto$0.init = function() {
-                super$0.prototype.init.call(this);
-                this.scope.component = this;
                 this.scope.lcol = this.scope.lcol || 11;
                 this.scope.rcol = this.scope.rcol || 1;
+                super$0.prototype.init.call(this);
+                this.scope.component = this;
                 this.element.find('.row > div:eq(0)').append(this.content);
             };
 
@@ -2182,6 +2182,9 @@ angular.module('admin.component')
                     if (this.attrs.url) {
                         this.load(this.attrs.url);
                     }
+
+                    this.scope.labelName = this.scope.labelName || 'name';
+                    this.scope.valueName = this.scope.valueName || 'id';
                 };
 
                 proto$0.initEvents = function() {var this$0 = this;
@@ -2235,21 +2238,21 @@ angular.module('admin.component')
                 };
 
                 proto$0.setData = function(data, isClean, dataName, dataValue) {var this$0 = this;
-                    dataName = dataName || this.scope.dataKeyName;
-                    dataValue = dataValue || this.scope.dataValueName;
+                    dataName = dataName || this.scope.labelName;
+                    dataValue = dataValue || this.scope.valueName;
                     if (isClean) {
                         this.formEl.html('');
                     }
                     if (_.isArray(data)) {
                         $.each(data, function(i, item)  {
-                            this$0.formEl.append(this$0.toOption(item, dataName, dataValue));
+                            this$0.formEl.append(this$0.toOption(item, dataValue, dataName));
                         });
                     }
                     else {
                         $.each(data, function(group, items)  {
                             var $optionGroup = this$0.toOptionGroup(group);
                             $.each(items, function(i, item)  {
-                                $optionGroup.append(this$0.toOption(item, dataName, dataValue));
+                                $optionGroup.append(this$0.toOption(item, dataValue, dataName));
                             });
                             this$0.formEl.append($optionGroup);
                         });
@@ -2273,6 +2276,11 @@ angular.module('admin.component')
                 proto$0.toOptionGroup = function(name) {
                     var $option = $('<optgroup/>').attr('label', name);
                     return $option;
+                };
+
+                proto$0.reset = function(){
+                    super$0.prototype.reset.call(this);
+                    this.render();
                 };
             MIXIN$0(UISelectControl.prototype,proto$0);proto$0=void 0;return UISelectControl;})(UIFormItemControl);
 
@@ -3962,6 +3970,44 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
+    .directive('uiSearchRegion', function (UIRegionControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                mode: '@'
+            },
+            link: function(s, e, a)  {
+                if (a.mode === undefined || a.mode == 'a') { //区域查询不支持详细地址
+                    a.mode = 's';
+                }
+                new UIRegionControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"input-inline search-item\">\
+\n                    <div class=\"input-group ui-search-region\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}:</div>\
+\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-1px\" name=\"city\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-2px\" name=\"area\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
     .directive('uiSearchDate', function (UIDateControl) {
         return {
             restrict: 'E',
@@ -4108,44 +4154,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchRegion', function (UIRegionControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                model: '=',
-                change: '&',
-                label: '@',
-                name: '@',
-                mode: '@'
-            },
-            link: function(s, e, a)  {
-                if (a.mode === undefined || a.mode == 'a') { //区域查询不支持详细地址
-                    a.mode = 's';
-                }
-                new UIRegionControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"input-inline search-item\">\
-\n                    <div class=\"input-group ui-search-region\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}:</div>\
-\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-1px\" name=\"city\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-2px\" name=\"area\"/>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
 //
 //
 //-----------------------------------------------------------------------------------------------
@@ -4163,7 +4171,9 @@ angular.module('admin.component')
                 model: '=',
                 change: '&',
                 multiple: '@',
-                render: '&'
+                render: '&',
+                labelName: '@',
+                valueName: '@'
             },
             link: function (s, e, a) {
                 new UISelectControl(s, e, a);
@@ -4372,74 +4382,6 @@ angular.module('admin.component')
 
 
 
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-(function () {
-
-    var UIStateButton = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIStateButton, super$0);var proto$0={};
-        function UIStateButton(scope, element, attrs) {
-            this.scope = scope;
-            this.element = element;
-            this.attrs = attrs;
-            this.message = new Message('uiStateButton');
-        }if(super$0!==null)SP$0(UIStateButton,super$0);UIStateButton.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIStateButton,"configurable":true,"writable":true}});DP$0(UIStateButton,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-        proto$0.init = function() {var this$0 = this;
-            if (!this.scope.clickHandler) {
-                this.message.error('必须设置on-click属性');
-            }
-            this.element.click(function()  {
-                this$0.disable(true);
-                var result = this$0.scope.clickHandler();
-                this$0.wait(result);
-            });
-        };
-
-        proto$0.wait = function(result) {var this$0 = this;
-            if (result && result.finally) {
-                result.finally(function()  {return this$0.disable(false)});
-            }
-            else {
-                this.disable(false);
-            }
-        };
-
-        proto$0.disable = function(isD) {
-            //
-            if (this.scope.target) {
-                Metronic[(("" + (isD ? '' : 'un')) + "blockUI")](this.scope.target);
-            }
-
-            //
-            this.element.prop('disabled', isD);
-        };
-    MIXIN$0(UIStateButton.prototype,proto$0);proto$0=void 0;return UIStateButton;})(Event);
-
-    angular.module('admin.component')
-        .directive('uiStateButton', function () {
-            return {
-                restrict: 'E',
-                replace: true,
-                transclude: true,
-                scope: {
-                    target: '@target',
-                    clickHandler: '@click'
-                },
-                link: function (scope, element, attrs) {
-                    var button = new UIStateButton(scope, element, attrs);
-                    button.init();
-                },
-                template: ("\
-\n                    <button type=\"button\" class=\"btn\" ng-transclude></button>\
-\n                ")
-            };
-        });
-})();
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5394,6 +5336,74 @@ angular.module('admin.component')
             }
         };
     });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+
+    var UIStateButton = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIStateButton, super$0);var proto$0={};
+        function UIStateButton(scope, element, attrs) {
+            this.scope = scope;
+            this.element = element;
+            this.attrs = attrs;
+            this.message = new Message('uiStateButton');
+        }if(super$0!==null)SP$0(UIStateButton,super$0);UIStateButton.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIStateButton,"configurable":true,"writable":true}});DP$0(UIStateButton,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+        proto$0.init = function() {var this$0 = this;
+            if (!this.scope.clickHandler) {
+                this.message.error('必须设置on-click属性');
+            }
+            this.element.click(function()  {
+                this$0.disable(true);
+                var result = this$0.scope.clickHandler();
+                this$0.wait(result);
+            });
+        };
+
+        proto$0.wait = function(result) {var this$0 = this;
+            if (result && result.finally) {
+                result.finally(function()  {return this$0.disable(false)});
+            }
+            else {
+                this.disable(false);
+            }
+        };
+
+        proto$0.disable = function(isD) {
+            //
+            if (this.scope.target) {
+                Metronic[(("" + (isD ? '' : 'un')) + "blockUI")](this.scope.target);
+            }
+
+            //
+            this.element.prop('disabled', isD);
+        };
+    MIXIN$0(UIStateButton.prototype,proto$0);proto$0=void 0;return UIStateButton;})(Event);
+
+    angular.module('admin.component')
+        .directive('uiStateButton', function () {
+            return {
+                restrict: 'E',
+                replace: true,
+                transclude: true,
+                scope: {
+                    target: '@target',
+                    clickHandler: '@click'
+                },
+                link: function (scope, element, attrs) {
+                    var button = new UIStateButton(scope, element, attrs);
+                    button.init();
+                },
+                template: ("\
+\n                    <button type=\"button\" class=\"btn\" ng-transclude></button>\
+\n                ")
+            };
+        });
+})();
 //-----------------------------------------------------------------------------------------------
 //
 //
