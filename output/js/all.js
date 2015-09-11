@@ -1002,30 +1002,29 @@ angular.module('admin.component')
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchForm', function (uiSearchFormFactory, componentHelper) {
+    .directive('uiSearchForm', function (UISearchFormControl) {
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: function (scope, element, attrs) {
-                var ref = componentHelper.getComponentRef(element.parent().find('.ui-table'), '$table');
-
-                //
-                var searchForm = new uiSearchFormFactory(scope, element, attrs, ref),
-                    thisRef = attrs.ref || '$searchForm';
-                scope[thisRef] = searchForm;
-                componentHelper.tiggerComplete(scope, thisRef, searchForm);
+            scope: {
+                lcol: '@',
+                rcol: '@'
             },
-            template: function (element, attrs) {
-                var col = attrs.column || "11:1",
-                    ref = attrs.ref || '$searchForm';
-                var cc = col.split(':');
-                return componentHelper.getTemplate('tpl.searchform', {
-                    leftCol: cc[0],
-                    rightCol: cc[1],
-                    ref: ref
-                });
-            }
+            link: function (scope, element, attrs, controller, transclude) {
+                new UISearchFormControl(scope, element, attrs, transclude);
+            },
+            template: ("\
+\n                <form novalidate action=\"\" class=\"ui-search-form form-inline\">\
+\n                    <div class=\"row\">\
+\n                        <div class=\"col-md-{{leftCol}}\"></div>\
+\n                        <div class=\"text-right col-md-{{rightCol}}\">\
+\n                            <a title=\"回车键也可触发搜索\" class=\"btn blue-chambray btn-sm\" ng-click=\"component.search()\" style=\"width: 30px\"><i class=\"fa fa-search\"></i></button>\
+\n                            <a title=\"重置搜索选项\" class=\"btn default btn-sm\" ng-click=\"component.reset()\" style=\"width: 30px\"><i class=\"fa fa-undo font-blue-chambray\"></i></a>\
+\n                        </div>\
+\n                    </div>\
+\n                </form>\
+\n            ")
         };
     });
 
@@ -2104,58 +2103,45 @@ angular.module('admin.component')
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiSearchFormFactory', function (msg, uiFormControl) {
-        var m = new msg('SearchForm'),
-            SearchForm = function (scope, element, attrs, tableId) {
-                this.elementContainer = element.find('.row > div:eq(0)');
-                this.tableId = tableId;
-                uiFormControl.apply(this, arguments);
+    .factory('UISearchFormControl', function()  {
+        var UISearchFormControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UISearchFormControl, super$0);var proto$0={};
+
+            function UISearchFormControl(s, e, a, transclude) {
+                this.className = 'searchForm';
+                this.content = transclude(s.$parent);
+                super$0.call(this, s, e, a);
+            }if(super$0!==null)SP$0(UISearchFormControl,super$0);UISearchFormControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UISearchFormControl,"configurable":true,"writable":true}});DP$0(UISearchFormControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                super$0.prototype.init.call(this);
+                this.scope.component = this;
+                this.scope.lcol = this.scope.lcol || 11;
+                this.scope.rcol = this.scope.rcol || 1;
+                this.element.find('.row > div:eq(0)').append(this.content);
             };
-        SearchForm.prototype = $.extend(new uiFormControl(), {
-            _init: function () {
-                $(document).keydown(function (evt) {
-                    if (evt.keyCode == 13) {
-                        this.search();
-                    }
-                }.bind(this));
-                this.element.submit(function (evt) {
-                    evt.preventDefault();
-                    return false;
-                });
-            },
 
-            addFormItem: function (formItem) {
-                this.elementContainer.append(formItem);
-            },
+            proto$0.initEvents = function() {
+                super$0.prototype.initEvents.call(this);
+            };
 
-            formData: function () {
+            proto$0.formData = function() {
                 return this.element.serializeArray();
-            },
+            };
 
-            formParamData: function () {
+            proto$0.formParamData = function() {
                 return this.element.serialize();
-            },
+            };
 
-            search: function () {
+            proto$0.search = function() {
                 var data = this.formData();
-                this.$emit('uisearchform.doSubmit', data);
-                if (this.scope[this.tableId]) {
-                    this.scope[this.tableId].search(data);
-                }
-                else {
-                    m.error('为发现ref为[' + this.tableId + ']的组件, 无法调用查询');
-                }
-            },
+                this.scope.$parent.$broadcast('uitable.search', data);
+            };
 
-            submit: function (fn) {
-                this.$on('uisearchform.doSubmit', fn);
-            },
-
-            reset: function () {
+            proto$0.reset = function() {
                 this.scope.$broadcast('uisearchform.reset');
-            }
-        });
-        return SearchForm;
+            };
+        MIXIN$0(UISearchFormControl.prototype,proto$0);proto$0=void 0;return UISearchFormControl;})(UIFormItemControl);
+        return UISearchFormControl;
     });
 //-----------------------------------------------------------------------------------------------
 //
@@ -2877,7 +2863,7 @@ angular.module('admin.component')
             },
             template: ("\
 \n                <div class=\"portlet\">\
-\n                    <div class=\"portlet-title tabbable-line\">\
+\n                    <div ng-if=\"title\" class=\"portlet-title tabbable-line\">\
 \n                        <div class=\"caption\">\
 \n                            <i ng-if=\"icon\" class=\"{{icon}}\"></i>\
 \n                            <span class=\"caption-subject {{captionClass}}\">{{title}}</span>\
@@ -5014,6 +5000,9 @@ angular.module('admin.component')
                                 var i = _.indexOf(this$0.aoColumns, column);
                                 this$0.instance.fnSetColumnVis(i, column.bVisible, false);
                             });
+                            this.scope.$on('uitable.search', function(evt, params)  {
+                                this$0.refresh(params);
+                            });
                         };
 
                         proto$0.build = function() {var this$0 = this;
@@ -5369,6 +5358,42 @@ angular.module('admin.component')
         };
     });
 
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('tooltip', function () {
+        return {
+            restrict: 'A',
+            replace: false,
+            link: function (scope, element, attrs) {
+                var content = attrs.tooltip,
+                    title = attrs.title,
+                    placement = attrs.placement || (title ? 'right' : 'top');
+
+                //如果有标题有内容, 那么使用popup over
+                if (title) {
+                    element.popover({
+                        title: title,
+                        content: content,
+                        placement: placement,
+                        trigger: 'hover'
+                    });
+                }
+                //否则使用tooltip
+                else {
+                    element.tooltip({
+                        title: content,
+                        placement: placement
+                    });
+                }
+            }
+        };
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5755,42 +5780,6 @@ angular.module('admin.component')
 \n                    </div>\
 \n                </div>\
 \n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('tooltip', function () {
-        return {
-            restrict: 'A',
-            replace: false,
-            link: function (scope, element, attrs) {
-                var content = attrs.tooltip,
-                    title = attrs.title,
-                    placement = attrs.placement || (title ? 'right' : 'top');
-
-                //如果有标题有内容, 那么使用popup over
-                if (title) {
-                    element.popover({
-                        title: title,
-                        content: content,
-                        placement: placement,
-                        trigger: 'hover'
-                    });
-                }
-                //否则使用tooltip
-                else {
-                    element.tooltip({
-                        title: content,
-                        placement: placement
-                    });
-                }
-            }
         };
     });
 //-----------------------------------------------------------------------------------------------

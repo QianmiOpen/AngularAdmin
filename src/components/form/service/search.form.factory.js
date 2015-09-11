@@ -6,56 +6,43 @@
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .factory('uiSearchFormFactory', function (msg, uiFormControl) {
-        var m = new msg('SearchForm'),
-            SearchForm = function (scope, element, attrs, tableId) {
-                this.elementContainer = element.find('.row > div:eq(0)');
-                this.tableId = tableId;
-                uiFormControl.apply(this, arguments);
-            };
-        SearchForm.prototype = $.extend(new uiFormControl(), {
-            _init: function () {
-                $(document).keydown(function (evt) {
-                    if (evt.keyCode == 13) {
-                        this.search();
-                    }
-                }.bind(this));
-                this.element.submit(function (evt) {
-                    evt.preventDefault();
-                    return false;
-                });
-            },
+    .factory('UISearchFormControl', () => {
+        class UISearchFormControl extends UIFormItemControl {
 
-            addFormItem: function (formItem) {
-                this.elementContainer.append(formItem);
-            },
+            constructor(s, e, a, transclude) {
+                this.className = 'searchForm';
+                this.content = transclude(s.$parent);
+                super(s, e, a);
+            }
 
-            formData: function () {
+            init() {
+                super.init();
+                this.scope.component = this;
+                this.scope.lcol = this.scope.lcol || 11;
+                this.scope.rcol = this.scope.rcol || 1;
+                this.element.find('.row > div:eq(0)').append(this.content);
+            }
+
+            initEvents() {
+                super.initEvents();
+            }
+
+            formData() {
                 return this.element.serializeArray();
-            },
+            }
 
-            formParamData: function () {
+            formParamData() {
                 return this.element.serialize();
-            },
+            }
 
-            search: function () {
+            search() {
                 var data = this.formData();
-                this.$emit('uisearchform.doSubmit', data);
-                if (this.scope[this.tableId]) {
-                    this.scope[this.tableId].search(data);
-                }
-                else {
-                    m.error('为发现ref为[' + this.tableId + ']的组件, 无法调用查询');
-                }
-            },
+                this.scope.$parent.$broadcast('uitable.search', data);
+            }
 
-            submit: function (fn) {
-                this.$on('uisearchform.doSubmit', fn);
-            },
-
-            reset: function () {
+            reset() {
                 this.scope.$broadcast('uisearchform.reset');
             }
-        });
-        return SearchForm;
+        }
+        return UISearchFormControl;
     });

@@ -146,6 +146,9 @@
                                 let i = _.indexOf(this.aoColumns, column);
                                 this.instance.fnSetColumnVis(i, column.bVisible, false);
                             });
+                            this.scope.$on('uitable.search', (evt, params) => {
+                                this.refresh(params);
+                            });
                         }
 
                         build() {

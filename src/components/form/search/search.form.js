@@ -6,29 +6,28 @@
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchForm', function (uiSearchFormFactory, componentHelper) {
+    .directive('uiSearchForm', function (UISearchFormControl) {
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: function (scope, element, attrs) {
-                var ref = componentHelper.getComponentRef(element.parent().find('.ui-table'), '$table');
-
-                //
-                var searchForm = new uiSearchFormFactory(scope, element, attrs, ref),
-                    thisRef = attrs.ref || '$searchForm';
-                scope[thisRef] = searchForm;
-                componentHelper.tiggerComplete(scope, thisRef, searchForm);
+            scope: {
+                lcol: '@',
+                rcol: '@'
             },
-            template: function (element, attrs) {
-                var col = attrs.column || "11:1",
-                    ref = attrs.ref || '$searchForm';
-                var cc = col.split(':');
-                return componentHelper.getTemplate('tpl.searchform', {
-                    leftCol: cc[0],
-                    rightCol: cc[1],
-                    ref: ref
-                });
-            }
+            link: function (scope, element, attrs, controller, transclude) {
+                new UISearchFormControl(scope, element, attrs, transclude);
+            },
+            template: `
+                <form novalidate action="" class="ui-search-form form-inline">
+                    <div class="row">
+                        <div class="col-md-{{leftCol}}"></div>
+                        <div class="text-right col-md-{{rightCol}}">
+                            <a title="回车键也可触发搜索" class="btn blue-chambray btn-sm" ng-click="component.search()" style="width: 30px"><i class="fa fa-search"></i></button>
+                            <a title="重置搜索选项" class="btn default btn-sm" ng-click="component.reset()" style="width: 30px"><i class="fa fa-undo font-blue-chambray"></i></a>
+                        </div>
+                    </div>
+                </form>
+            `
         };
     });
