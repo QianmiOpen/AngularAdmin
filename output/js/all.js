@@ -932,6 +932,43 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormText', function () {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                help: '@'
+            },
+            link: function (scope, element, attrs, controller, tranclude) {
+                scope.lcol = scope.lcol !== undefined ? scope.lcol : 2;
+                scope.rcol = scope.rcol !== undefined ? scope.rcol : 10;
+                element.find('p').append(tranclude(scope.$parent));
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <p class=\"form-static-control\"></p>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
 //
 //
 //
