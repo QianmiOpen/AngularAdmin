@@ -10,12 +10,12 @@ angular.module('admin.component')
         class UISearchFormControl extends UIFormItemControl {
 
             constructor(s, e, a, transclude) {
-                this.className = 'searchForm';
                 this.content = transclude(s.$parent);
                 super(s, e, a);
             }
 
             init() {
+                this.attrs.ref = this.attrs.ref || '$searchForm';
                 this.scope.lcol = this.scope.lcol || 11;
                 this.scope.rcol = this.scope.rcol || 1;
                 super.init();
@@ -33,6 +33,21 @@ angular.module('admin.component')
 
             formParamData() {
                 return this.element.serialize();
+            }
+
+            formJsonData() {
+                let data = this.formData(),
+                    r = {};
+                for (let item in data) {
+                    if (r[item.name]) {
+                        r[item.name] = _.isArray(r[item.name]) ? r[item.name] : [r[item.name]];
+                        r[item.name].push(r[item.value])
+                    }
+                    else {
+                        r[item.name] = r[item.value];
+                    }
+                }
+                return r;
             }
 
             search() {
