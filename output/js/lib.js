@@ -6173,7 +6173,7 @@ if(f.maximumInputLength&&d.val().length>f.maximumInputLength)return J(f.formatIn
  * http://cameronspear.com/blog/bootstrap-dropdown-on-hover-plugin/
  */;(function(e,t,n){if("ontouchstart"in document)return;var r=e();e.fn.dropdownHover=function(n){r=r.add(this.parent());return this.each(function(){var i=e(this),s=i.parent(),o={delay:500,instantlyCloseOthers:!0},u={delay:e(this).data("delay"),instantlyCloseOthers:e(this).data("close-others")},a=e.extend(!0,{},o,n,u),f;s.hover(function(n){if(!s.hasClass("open")&&!i.is(n.target))return!0;a.instantlyCloseOthers===!0&&r.removeClass("open");t.clearTimeout(f);s.addClass("open");s.trigger(e.Event("show.bs.dropdown"))},function(){f=t.setTimeout(function(){s.removeClass("open");s.trigger("hide.bs.dropdown")},a.delay)});i.hover(function(){a.instantlyCloseOthers===!0&&r.removeClass("open");t.clearTimeout(f);s.addClass("open");s.trigger(e.Event("show.bs.dropdown"))});s.find(".dropdown-submenu").each(function(){var n=e(this),r;n.hover(function(){t.clearTimeout(r);n.children(".dropdown-menu").show();n.siblings().children(".dropdown-menu").hide()},function(){var e=n.children(".dropdown-menu");r=t.setTimeout(function(){e.hide()},a.delay)})})})};e(document).ready(function(){e('[data-hover="dropdown"]').dropdownHover()})})(jQuery,this);
 /* ===========================================================
- * bootstrap-modal.js v2.2.3
+ * bootstrap-modal.js v2.2.5
  * ===========================================================
  * Copyright 2012 Jordan Schroter
  *
@@ -6191,7 +6191,7 @@ if(f.maximumInputLength&&d.val().length>f.maximumInputLength)return J(f.formatIn
  * ========================================================== */
 
 
-;!function ($) {
+!function ($) {
 
 	"use strict"; // jshint ;_;
 
@@ -6255,7 +6255,7 @@ if(f.maximumInputLength&&d.val().length>f.maximumInputLength)return J(f.formatIn
 
 			this.$element.trigger(e);
 
-			if (!this.isShown || e.isDefaultPrevented()) return (this.isShown = false);
+			if (!this.isShown || e.isDefaultPrevented()) return;
 
 			this.isShown = false;
 
@@ -6328,24 +6328,25 @@ if(f.maximumInputLength&&d.val().length>f.maximumInputLength)return J(f.formatIn
 			if (this.isShown && this.options.consumeTab) {
 				this.$element.on('keydown.tabindex.modal', '[data-tabindex]', function (e) {
 			    	if (e.keyCode && e.keyCode == 9){
-						var $next = $(this),
-							$rollover = $(this);
+						var elements = [],
+							tabindex = Number($(this).data('tabindex'));
 
-						that.$element.find('[data-tabindex]:enabled:not([readonly])').each(function (e) {
-							if (!e.shiftKey){
-						 		$next = $next.data('tabindex') < $(this).data('tabindex') ?
-									$next = $(this) :
-									$rollover = $(this);
-							} else {
-								$next = $next.data('tabindex') > $(this).data('tabindex') ?
-									$next = $(this) :
-									$rollover = $(this);
-							}
+						that.$element.find('[data-tabindex]:enabled:visible:not([readonly])').each(function (ev) {
+							elements.push(Number($(this).data('tabindex')));
 						});
-
-						$next[0] !== $(this)[0] ?
-							$next.focus() : $rollover.focus();
-
+						elements.sort(function(a,b){return a-b});
+						
+						var arrayPos = $.inArray(tabindex, elements);
+						if (!e.shiftKey){
+						 		arrayPos < elements.length-1 ?
+									that.$element.find('[data-tabindex='+elements[arrayPos+1]+']').focus() :
+									that.$element.find('[data-tabindex='+elements[0]+']').focus();
+							} else {
+								arrayPos == 0 ?
+									that.$element.find('[data-tabindex='+elements[elements.length-1]+']').focus() :
+									that.$element.find('[data-tabindex='+elements[arrayPos-1]+']').focus();
+							}
+						
 						e.preventDefault();
 					}
 				});
@@ -6468,28 +6469,26 @@ if(f.maximumInputLength&&d.val().length>f.maximumInputLength)return J(f.formatIn
 
 		destroy: function () {
 			var e = $.Event('destroy');
+
 			this.$element.trigger(e);
+
 			if (e.isDefaultPrevented()) return;
 
-			this.teardown();
-		},
-
-		teardown: function () {
-			if (!this.$parent.length){
-				this.$element.remove();
-				this.$element = null;
-				return;
-			}
-
-			if (this.$parent !== this.$element.parent()){
-				this.$element.appendTo(this.$parent);
-			}
-
-			this.$element.off('.modal');
-			this.$element.removeData('modal');
 			this.$element
+				.off('.modal')
+				.removeData('modal')
 				.removeClass('in')
 				.attr('aria-hidden', true);
+			
+			if (this.$parent !== this.$element.parent()) {
+				this.$element.appendTo(this.$parent);
+			} else if (!this.$parent.length) {
+				// modal is not part of the DOM so remove it.
+				this.$element.remove();
+				this.$element = null;
+			}
+
+			this.$element.trigger('destroyed');
 		}
 	};
 
@@ -6553,7 +6552,7 @@ if(f.maximumInputLength&&d.val().length>f.maximumInputLength)return J(f.formatIn
 }(window.jQuery);
 
 /* ===========================================================
- * bootstrap-modalmanager.js v2.2.3
+ * bootstrap-modalmanager.js v2.2.5
  * ===========================================================
  * Copyright 2012 Jordan Schroter.
  *
@@ -6570,7 +6569,7 @@ if(f.maximumInputLength&&d.val().length>f.maximumInputLength)return J(f.formatIn
  * limitations under the License.
  * ========================================================== */
 
-;!function ($) {
+!function ($) {
 
 	"use strict"; // jshint ;_;
 
@@ -6682,10 +6681,9 @@ if(f.maximumInputLength&&d.val().length>f.maximumInputLength)return J(f.formatIn
 
 			}));
 
-			modal.$element.on('destroy.modalmanager', targetIsSelf(function (e) {
+			modal.$element.on('destroyed.modalmanager', targetIsSelf(function (e) {
 				that.destroyModal(modal);
 			}));
-
 		},
 
 		getOpenModals: function () {
@@ -6940,7 +6938,7 @@ if(f.maximumInputLength&&d.val().length>f.maximumInputLength)return J(f.formatIn
 	// if Boostsrap namespaced events, this would not be needed.
 	function targetIsSelf(callback){
 		return function (e) {
-			if (this === e.target){
+			if (e && this === e.target){
 				return callback.apply(this, arguments);
 			}
 		}

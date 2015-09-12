@@ -48,9 +48,9 @@
                             });
                     }
                     else {
-                        this.content = this.transclude(this.scope);
+                        this.content = this.transclude(this.scope).filter('.modal');
                         this._addEvents();
-                        return this.content;
+                        return Util.toPromise(this.content);
                     }
                 }
 
