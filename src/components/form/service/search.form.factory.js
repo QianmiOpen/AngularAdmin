@@ -38,7 +38,10 @@ angular.module('admin.component')
             formJsonData() {
                 let data = this.formData(),
                     r = {};
-                for (let item in data) {
+                for (let item of data) {
+                    if (r[item.value] === undefined) {
+                        continue;
+                    }
                     if (r[item.name]) {
                         r[item.name] = _.isArray(r[item.name]) ? r[item.name] : [r[item.name]];
                         r[item.name].push(r[item.value])

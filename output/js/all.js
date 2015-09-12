@@ -60,6 +60,100 @@ angular.module('admin.filter', []);
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.service', []);
 
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.service')
+    .provider('Ajax', function()  {
+        var successHandler,
+            failHandler,
+            result = {
+                setSuccessHandler: function(handler) {
+                    successHandler = handler;
+                },
+
+                setFailHandler: function(handler) {
+                    failHandler = handler;
+                },
+
+                $get: function($q, Util, Message) {
+                    var _msg = new Message('Ajax'),
+                        _execute = function(method, url, data)  {
+                            var defer = $q.defer();
+                            $.ajax({
+                                url: url, cache: false, data: data, type: method, dataType: 'json',
+                                success: function(resData)  {
+                                    var success = successHandler(resData),
+                                        error = failHandler(resData);
+                                    if (success) {
+                                        defer.resolve(success);
+                                    }
+                                    else {
+                                        defer.reject(error);
+                                    }
+                                },
+                                error: function(xhr, status)  {
+                                    var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
+                                    _msg.error(errMsg || '服务器出现了问题,请稍后重试');
+                                }
+                            });
+                            return defer.promise;
+                        };
+                    return {
+
+                        get: function(url, data) {
+                            return _execute('GET', url, data);
+                        },
+
+                        post: function(url, data) {
+                            return _execute('POST', url, data);
+                        },
+
+                        message: function(url, data, successMsg, failMsg) {
+                            return this.post(url, data)
+                                .then(function()  {return _msg.success(successMsg)})
+                                .catch(function()  {return _msg.error(failMsg)});
+                        },
+
+                        add: function(url, data) {
+                            return this.message(url, data, '添加数据成功', '添加数据失败');
+                        },
+
+                        update: function(url, data) {
+                            return this.message(url, data, '更新数据成功', '更新数据失败');
+                        },
+
+                        remove: function(url, data, options) {var this$0 = this;
+                            return util.confirm((("您确认删除该" + (options.label || '数据')) + "吗?"))
+                                .then(function()  {return this$0.message(url, data, '删除数据成功', '删除数据失败')});
+                        },
+
+                        load: function(url) {
+                            var $dom = $('<div/>').hide().appendTo(document.body),
+                                defer = $q.defer();
+                            $dom.load(url, function(html)  {
+                                $dom.remove();
+                                defer.resolve(html);
+                            });
+                            return defer.promise;
+                        },
+
+                        getScript: function(url) {
+                            return $.ajax({
+                                url: url,
+                                dataType: "script",
+                                cache: true
+                            });
+                        }
+                    };
+                }
+            };
+        return result;
+    });
 var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};//-----------------------------------------------------------------------------------------------
 //
 //
@@ -738,100 +832,6 @@ angular.module('admin.service')
         .service('ValueService', ValueService);
 })();
 
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.service')
-    .provider('Ajax', function()  {
-        var successHandler,
-            failHandler,
-            result = {
-                setSuccessHandler: function(handler) {
-                    successHandler = handler;
-                },
-
-                setFailHandler: function(handler) {
-                    failHandler = handler;
-                },
-
-                $get: function($q, Util, Message) {
-                    var _msg = new Message('Ajax'),
-                        _execute = function(method, url, data)  {
-                            var defer = $q.defer();
-                            $.ajax({
-                                url: url, cache: false, data: data, type: method, dataType: 'json',
-                                success: function(resData)  {
-                                    var success = successHandler(resData),
-                                        error = failHandler(resData);
-                                    if (success) {
-                                        defer.resolve(success);
-                                    }
-                                    else {
-                                        defer.reject(error);
-                                    }
-                                },
-                                error: function(xhr, status)  {
-                                    var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
-                                    _msg.error(errMsg || '服务器出现了问题,请稍后重试');
-                                }
-                            });
-                            return defer.promise;
-                        };
-                    return {
-
-                        get: function(url, data) {
-                            return _execute('GET', url, data);
-                        },
-
-                        post: function(url, data) {
-                            return _execute('POST', url, data);
-                        },
-
-                        message: function(url, data, successMsg, failMsg) {
-                            return this.post(url, data)
-                                .then(function()  {return _msg.success(successMsg)})
-                                .catch(function()  {return _msg.error(failMsg)});
-                        },
-
-                        add: function(url, data) {
-                            return this.message(url, data, '添加数据成功', '添加数据失败');
-                        },
-
-                        update: function(url, data) {
-                            return this.message(url, data, '更新数据成功', '更新数据失败');
-                        },
-
-                        remove: function(url, data, options) {var this$0 = this;
-                            return util.confirm((("您确认删除该" + (options.label || '数据')) + "吗?"))
-                                .then(function()  {return this$0.message(url, data, '删除数据成功', '删除数据失败')});
-                        },
-
-                        load: function(url) {
-                            var $dom = $('<div/>').hide().appendTo(document.body),
-                                defer = $q.defer();
-                            $dom.load(url, function(html)  {
-                                $dom.remove();
-                                defer.resolve(html);
-                            });
-                            return defer.promise;
-                        },
-
-                        getScript: function(url) {
-                            return $.ajax({
-                                url: url,
-                                dataType: "script",
-                                cache: true
-                            });
-                        }
-                    };
-                }
-            };
-        return result;
-    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -2134,10 +2134,13 @@ angular.module('admin.component')
                 return this.element.serialize();
             };
 
-            proto$0.formJsonData = function() {
+            proto$0.formJsonData = function() {var S_ITER$0 = typeof Symbol!=='undefined'&&Symbol&&Symbol.iterator||'@@iterator';var S_MARK$0 = typeof Symbol!=='undefined'&&Symbol&&Symbol["__setObjectSetter__"];function GET_ITER$0(v){if(v){if(Array.isArray(v))return 0;var f;if(S_MARK$0)S_MARK$0(v);if(typeof v==='object'&&typeof (f=v[S_ITER$0])==='function'){if(S_MARK$0)S_MARK$0(void 0);return f.call(v);}if(S_MARK$0)S_MARK$0(void 0);if((v+'')==='[object Generator]')return v;}throw new Error(v+' is not iterable')};var $D$0;var $D$1;var $D$2;
                 var data = this.formData(),
                     r = {};
-                for (var item in data) {
+                $D$0 = GET_ITER$0(data);$D$2 = $D$0 === 0;$D$1 = ($D$2 ? data.length : void 0);for (var item ;$D$2 ? ($D$0 < $D$1) : !($D$1 = $D$0["next"]())["done"];){item = ($D$2 ? data[$D$0++] : $D$1["value"]);
+                    if (r[item.value] === undefined) {
+                        continue;
+                    }
                     if (r[item.name]) {
                         r[item.name] = _.isArray(r[item.name]) ? r[item.name] : [r[item.name]];
                         r[item.name].push(r[item.value])
@@ -2145,7 +2148,7 @@ angular.module('admin.component')
                     else {
                         r[item.name] = r[item.value];
                     }
-                }
+                };$D$0 = $D$1 = $D$2 = void 0;
                 return r;
             };
 
@@ -3571,136 +3574,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  参数
-//      p -- 省, 开关, 默认开, 可不填
-//      c -- 市, 开关, 默认开, 可不填
-//      s -- 区, 开关, 默认开, 可不填
-//      a -- 地址, 开关, 默认关
-//
-//      s-name -- 区域的name
-//      a-name -- 详细地址的name
-//
-//
-//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
-//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
-//      s-value -- 区域默认值
-//      a-value -- 地址值
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormRegion', function (UIRegionControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@',
-                type: '@',
-                mode: '@'
-            },
-            link: function(s, e, a)  {
-                new UIRegionControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-region\">\
-\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"city\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"area\"/>\
-\n                        <input type=\"text\" class=\"input-medium form-control input-inline\" name=\"address\" ng-value=\"{{aValue}}\" placeholder=\"请输入详细地址\" />\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>'\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSelect', function (UISelectControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                placeholder: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@',
-                multiple: '@',
-                render: '&'
-            },
-            link: function (s, e, a) {
-                new UISelectControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                    <label class=\"col-md-{{lcol}} control-label\">{{label}}</label>\
-\n                    <div class=\"col-md-{{rcol}}\">\
-\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" ng-transclude></select>\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormTag', function (UITagControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                name: '@',
-                model: '=',
-                placeholder: '@',
-                change: '&',
-                help: '@'
-            },
-            link: function (scope, element, attrs) {
-                new UITagControl(scope, element, attrs);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <input type=\"text\" class=\"form-control\" name=\"{{name}}\"/>\
-\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>\
-\n            ")
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
 //  针对input的封装
 //
 //
@@ -3851,6 +3724,136 @@ angular.module('admin.component')
             }
         };
     });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  参数
+//      p -- 省, 开关, 默认开, 可不填
+//      c -- 市, 开关, 默认开, 可不填
+//      s -- 区, 开关, 默认开, 可不填
+//      a -- 地址, 开关, 默认关
+//
+//      s-name -- 区域的name
+//      a-name -- 详细地址的name
+//
+//
+//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
+//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
+//      s-value -- 区域默认值
+//      a-value -- 地址值
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormRegion', function (UIRegionControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@',
+                type: '@',
+                mode: '@'
+            },
+            link: function(s, e, a)  {
+                new UIRegionControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-region\">\
+\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"city\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"area\"/>\
+\n                        <input type=\"text\" class=\"input-medium form-control input-inline\" name=\"address\" ng-value=\"{{aValue}}\" placeholder=\"请输入详细地址\" />\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSelect', function (UISelectControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@',
+                multiple: '@',
+                render: '&'
+            },
+            link: function (s, e, a) {
+                new UISelectControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                    <label class=\"col-md-{{lcol}} control-label\">{{label}}</label>\
+\n                    <div class=\"col-md-{{rcol}}\">\
+\n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" ng-transclude></select>\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormTag', function (UITagControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                name: '@',
+                model: '=',
+                placeholder: '@',
+                change: '&',
+                help: '@'
+            },
+            link: function (scope, element, attrs) {
+                new UITagControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <input type=\"text\" class=\"form-control\" name=\"{{name}}\"/>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
