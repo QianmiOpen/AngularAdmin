@@ -54,7 +54,7 @@
                 transclude: true,
                 scope: {
                     target: '@',
-                    onClick: '@'
+                    onClick: '&'
                 },
                 link: function (scope, element, attrs) {
                     let button = new UIStateButton(scope, element, attrs);

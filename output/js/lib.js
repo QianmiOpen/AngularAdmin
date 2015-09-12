@@ -6117,7 +6117,7 @@ if(f.maximumInputLength&&d.val().length>f.maximumInputLength)return J(f.formatIn
             },
 
             getGlobalImgPath: function () {
-                return assetsPath + globalImgPath;
+                return 'http://7xllk7.com1.z0.glb.clouddn.com/assets/img/';
             },
 
             setGlobalPluginsPath: function (path) {
