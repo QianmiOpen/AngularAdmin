@@ -13,7 +13,9 @@ angular.module('admin.component')
             transclude: true,
             scope: {
                 lcol: '@',
-                rcol: '@'
+                rcol: '@',
+                onSearch: '&',
+                onReset: '&'
             },
             link: function (scope, element, attrs, controller, transclude) {
                 new UISearchFormControl(scope, element, attrs, transclude);

@@ -37,10 +37,12 @@ angular.module('admin.component')
 
             search() {
                 var data = this.formData();
+                this.scope.onSearch({data: data});
                 this.scope.$parent.$broadcast('uitable.search', data);
             }
 
             reset() {
+                this.scope.onReset();
                 this.scope.$broadcast('uisearchform.reset');
             }
         }
