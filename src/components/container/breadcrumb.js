@@ -29,7 +29,15 @@
 
                 handler(dataList) {
                     this.scope.items = (dataList || []).map((item) => {
-                        return {name: item.name ? item.name : item, url: item.url ? item.url : ''};
+                        if (_.isArray(item)) {
+                            return {name: item[0], url: item[1]};
+                        }
+                        else if (_.isObject(item)) {
+                            return {name: item.name, url: item.url};
+                        }
+                        else {
+                            return {name: item, url: '#'};
+                        }
                     });
                 }
             }
@@ -40,6 +48,7 @@
                 transclude: true,
                 scope: {
                     datas: '@',
+                    isRoute: '@',
                     url: '@'
                 },
                 link: function (scope) {
@@ -49,7 +58,8 @@
                     <div class="page-bar">
                         <ul class="page-breadcrumb">
                             <li ng-repeat="item in items">
-                                <a ng-href="item.url" ng-bind="item.name"></a>
+                                <a ng-if="isRoute" ng-sref="{{item.url}}" ng-bind="item.name"></a>
+                                <a ng-if="!isRoute" ng-href="{{item.url}}" ng-bind="item.name"></a>
                                 <i ng-if="!$last" class="fa fa-angle-right"></i>
                             </li>
                         </ul>

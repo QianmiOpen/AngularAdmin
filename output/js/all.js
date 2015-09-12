@@ -4550,7 +4550,15 @@ angular.module('admin.component')
 
                 proto$0.handler = function(dataList) {
                     this.scope.items = (dataList || []).map(function(item)  {
-                        return {name: item.name ? item.name : item, url: item.url ? item.url : ''};
+                        if (_.isArray(item)) {
+                            return {name: item[0], url: item[1]};
+                        }
+                        else if (_.isObject(item)) {
+                            return {name: item.name, url: item.url};
+                        }
+                        else {
+                            return {name: item, url: '#'};
+                        }
                     });
                 };
             MIXIN$0(UIBreadcrumb.prototype,proto$0);proto$0=void 0;return UIBreadcrumb;})(Event);
@@ -4561,6 +4569,7 @@ angular.module('admin.component')
                 transclude: true,
                 scope: {
                     datas: '@',
+                    isRoute: '@',
                     url: '@'
                 },
                 link: function (scope) {
@@ -4570,7 +4579,8 @@ angular.module('admin.component')
 \n                    <div class=\"page-bar\">\
 \n                        <ul class=\"page-breadcrumb\">\
 \n                            <li ng-repeat=\"item in items\">\
-\n                                <a ng-href=\"item.url\" ng-bind=\"item.name\"></a>\
+\n                                <a ng-if=\"isRoute\" ng-sref=\"{{item.url}}\" ng-bind=\"item.name\"></a>\
+\n                                <a ng-if=\"!isRoute\" ng-href=\"{{item.url}}\" ng-bind=\"item.name\"></a>\
 \n                                <i ng-if=\"!$last\" class=\"fa fa-angle-right\"></i>\
 \n                            </li>\
 \n                        </ul>\
