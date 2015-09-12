@@ -39,9 +39,6 @@
         }
 
         disable(isD) {
-            console.log(isD);
-
-            //
             if (this.scope.target) {
                 if(isD){
                     Metronic.blockUI({target: this.scope.target});
