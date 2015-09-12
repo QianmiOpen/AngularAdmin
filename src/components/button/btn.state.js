@@ -30,15 +30,25 @@
             if (result && result.finally) {
                 result.finally(() => this.disable(false));
             }
+            else if (result && result.always) {
+                result.always(() => this.disable(false));
+            }
             else {
                 this.disable(false);
             }
         }
 
         disable(isD) {
+            console.log(isD);
+
             //
             if (this.scope.target) {
-                Metronic[`${isD ? '' : 'un'}blockUI`](this.scope.target);
+                if(isD){
+                    Metronic.blockUI({target: this.scope.target});
+                }
+                else{
+                    Metronic.unblockUI(this.scope.target);
+                }
             }
 
             //
