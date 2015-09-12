@@ -23,7 +23,7 @@ angular.module('admin.component')
             },
             template: `
                 <div class="portlet">
-                    <div ng-if="title" class="portlet-title tabbable-line">
+                    <div class="portlet-title tabbable-line">
                         <div class="caption">
                             <i ng-if="icon" class="{{icon}}"></i>
                             <span class="caption-subject {{captionClass}}">{{title}}</span>

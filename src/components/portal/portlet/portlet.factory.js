@@ -45,6 +45,9 @@ angular.module('admin.component')
                 if ($toolbar.length !== 0) {
                     this.headElement.append($toolbar);
                 }
+                if (!this.scope.title) {
+                    this.headElement.hide();
+                }
                 this.load();
             }
 
