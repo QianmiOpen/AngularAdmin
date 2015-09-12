@@ -28,7 +28,7 @@ angular.module('admin.component')
                 <div class="form-group">
                    <label class="col-md-{{lcol || DefaultCol.l}} control-label">{{label}}</label>
                    <div class="col-md-{{rcol || DefaultCol.r}}">
-                       <p class="form-static-control"></p>
+                       <p class="form-control-static"></p>
                        <span ng-if="help" class="help-block">{{help}}</span>
                    </div>
                </div>'

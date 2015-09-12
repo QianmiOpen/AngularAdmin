@@ -16,12 +16,12 @@
         }
 
         init() {
-            if (!this.scope.clickHandler) {
+            if (!this.scope.onClick) {
                 this.message.error('必须设置on-click属性');
             }
             this.element.click(() => {
                 this.disable(true);
-                let result = this.scope.clickHandler();
+                let result = this.scope.onClick({});
                 this.wait(result);
             });
         }
@@ -53,15 +53,15 @@
                 replace: true,
                 transclude: true,
                 scope: {
-                    target: '@target',
-                    clickHandler: '@click'
+                    target: '@',
+                    onClick: '@'
                 },
                 link: function (scope, element, attrs) {
                     let button = new UIStateButton(scope, element, attrs);
                     button.init();
                 },
                 template: `
-                    <button type="button" class="btn" ng-transclude></button>
+                    <button type="button" ng-transclude></button>
                 `
             };
         });
