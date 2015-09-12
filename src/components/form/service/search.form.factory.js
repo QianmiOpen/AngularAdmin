@@ -39,15 +39,15 @@ angular.module('admin.component')
                 let data = this.formData(),
                     r = {};
                 for (let item of data) {
-                    if (r[item.value] === undefined) {
+                    if (item.value === undefined) {
                         continue;
                     }
                     if (r[item.name]) {
                         r[item.name] = _.isArray(r[item.name]) ? r[item.name] : [r[item.name]];
-                        r[item.name].push(r[item.value])
+                        r[item.name].push(item.value)
                     }
                     else {
-                        r[item.name] = r[item.value];
+                        r[item.name] = item.value;
                     }
                 }
                 return r;
@@ -61,7 +61,7 @@ angular.module('admin.component')
 
             reset() {
                 this.scope.onReset();
-                this.scope.$broadcast('uisearchform.reset');
+                this.scope.$parent.$broadcast('uisearchform.reset');
             }
         }
         return UISearchFormControl;

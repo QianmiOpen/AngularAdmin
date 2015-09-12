@@ -26,7 +26,7 @@ angular.module('admin.component')
                 new UISelectControl(s, e, a);
             },
             template: `
-                <div class="input-inline search-item">
+                <div class="input-inline ui-search-item">
                     <div class="input-group">
                         <div ng-if="label" class="input-group-addon">{{label}}</div>
                         <select class="form-control show-tick" data-live-search="true" data-style="{{buttonClass}}" name="{{name}}" ng-transclude></select>

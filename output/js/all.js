@@ -1038,7 +1038,7 @@ var UIFormItemControl = (function(super$0){"use strict";var PRS$0 = (function(o,
         this.scope = scope;
         this.element = element;
         this.attrs = attrs;
-        this.isSearchControl = element.parents('.ui-search-form').length > 0;
+        this.isSearchControl = element.hasClass('ui-search-item');
         this.formPrefix = this.isSearchControl ? '$search' : '$form';
         this.formResetEventName = this.isSearchControl ? 'uisearchform.reset' : 'uiform.reset';
         this.init();
@@ -2138,15 +2138,15 @@ angular.module('admin.component')
                 var data = this.formData(),
                     r = {};
                 $D$0 = GET_ITER$0(data);$D$2 = $D$0 === 0;$D$1 = ($D$2 ? data.length : void 0);for (var item ;$D$2 ? ($D$0 < $D$1) : !($D$1 = $D$0["next"]())["done"];){item = ($D$2 ? data[$D$0++] : $D$1["value"]);
-                    if (r[item.value] === undefined) {
+                    if (item.value === undefined) {
                         continue;
                     }
                     if (r[item.name]) {
                         r[item.name] = _.isArray(r[item.name]) ? r[item.name] : [r[item.name]];
-                        r[item.name].push(r[item.value])
+                        r[item.name].push(item.value)
                     }
                     else {
-                        r[item.name] = r[item.value];
+                        r[item.name] = item.value;
                     }
                 };$D$0 = $D$1 = $D$2 = void 0;
                 return r;
@@ -2160,7 +2160,7 @@ angular.module('admin.component')
 
             proto$0.reset = function() {
                 this.scope.onReset();
-                this.scope.$broadcast('uisearchform.reset');
+                this.scope.$parent.$broadcast('uisearchform.reset');
             };
         MIXIN$0(UISearchFormControl.prototype,proto$0);proto$0=void 0;return UISearchFormControl;})(UIFormItemControl);
         return UISearchFormControl;
@@ -4008,7 +4008,7 @@ angular.module('admin.component')
                 new UIDateControl(s, e, a);
             },
             template: ("\
-\n                 <div class=\"input-inline search-item\">\
+\n                 <div class=\"input-inline ui-search-item\">\
 \n                    <div class=\"input-group\">\
 \n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
 \n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\" readonly=\"true\"/>\
@@ -4041,7 +4041,7 @@ angular.module('admin.component')
                 label: '@'
             },
             template: ("\
-\n                 <div class=\"input-inline search-item input-mlarge {{css}}\">\
+\n                 <div class=\"input-inline ui-search-item input-mlarge {{css}}\">\
 \n                    <div class=\"input-group\">\
 \n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{fromName}}\" ng-model=\"fromModel\"/>\
 \n                        <span class=\"input-group-addon\">{{label || '到'}}</span>\
@@ -4075,7 +4075,7 @@ angular.module('admin.component')
                 new UIInputControl(s, e, a);
             },
             template: ("\
-\n                 <div class=\"input-inline search-item\">\
+\n                 <div class=\"input-inline ui-search-item\">\
 \n                    <div class=\"input-group\">\
 \n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
 \n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\"/>\
@@ -4161,7 +4161,7 @@ angular.module('admin.component')
                 new UIRegionControl(s, e, a);
             },
             template: ("\
-\n                <div class=\"input-inline search-item\">\
+\n                <div class=\"input-inline ui-search-item\">\
 \n                    <div class=\"input-group ui-search-region\">\
 \n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}:</div>\
 \n                        <input type=\"hidden\" name=\"{{name}}\"/>\
@@ -4201,7 +4201,7 @@ angular.module('admin.component')
                 new UISelectControl(s, e, a);
             },
             template: ("\
-\n                <div class=\"input-inline search-item\">\
+\n                <div class=\"input-inline ui-search-item\">\
 \n                    <div class=\"input-group\">\
 \n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
 \n                        <select class=\"form-control show-tick\" data-live-search=\"true\" data-style=\"{{buttonClass}}\" name=\"{{name}}\" ng-transclude></select>\
@@ -4233,7 +4233,7 @@ angular.module('admin.component')
                 new UITagControl(scope, element, attrs);
             },
             template: ("\
-\n                <div class=\"input-large\">\
+\n                <div class=\"input-large ui-search-item\">\
 \n                    <div class=\"input-group\">\
 \n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
 \n                        <input class=\"form-control\" name=\"{{name}}\" />\

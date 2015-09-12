@@ -21,7 +21,7 @@ angular.module('admin.component')
                 new UITagControl(scope, element, attrs);
             },
             template: `
-                <div class="input-large">
+                <div class="input-large ui-search-item">
                     <div class="input-group">
                         <div ng-if="label" class="input-group-addon">{{label}}</div>
                         <input class="form-control" name="{{name}}" />

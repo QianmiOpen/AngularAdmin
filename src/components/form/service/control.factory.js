@@ -6,7 +6,7 @@ class UIFormItemControl extends ComponentEvent {
         this.scope = scope;
         this.element = element;
         this.attrs = attrs;
-        this.isSearchControl = element.parents('.ui-search-form').length > 0;
+        this.isSearchControl = element.hasClass('ui-search-item');
         this.formPrefix = this.isSearchControl ? '$search' : '$form';
         this.formResetEventName = this.isSearchControl ? 'uisearchform.reset' : 'uiform.reset';
         this.init();

@@ -24,7 +24,7 @@ angular.module('admin.component')
                 new UIRegionControl(s, e, a);
             },
             template: `
-                <div class="input-inline search-item">
+                <div class="input-inline ui-search-item">
                     <div class="input-group ui-search-region">
                         <div ng-if="label" class="input-group-addon">{{label}}:</div>
                         <input type="hidden" name="{{name}}"/>
