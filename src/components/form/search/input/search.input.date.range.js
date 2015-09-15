@@ -17,7 +17,9 @@ angular.module('admin.component')
                 css: '@',
                 name: '@',
                 fromModel: '=',
+                fromName: '@',
                 toModel: '=',
+                toName: '@',
                 change: '&',
                 label: '@'
             },

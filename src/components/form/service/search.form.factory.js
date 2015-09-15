@@ -54,7 +54,7 @@ angular.module('admin.component')
             }
 
             search() {
-                var data = this.formData();
+                var data = this.formJsonData();
                 this.scope.onSearch({data: data});
                 this.scope.$parent.$broadcast('uitable.search', data);
             }

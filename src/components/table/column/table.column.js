@@ -39,7 +39,8 @@ angular.module('admin.component')
             replace: true,
             transclude: true,
             scope: {
-                head: '@'
+                head: '@',
+                onRender: '&'
             },
             compile: function (tElement, tAttrs, transclude) {
                 return {

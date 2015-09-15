@@ -113,6 +113,7 @@
                             this.formEl.append($optionGroup);
                         });
                     }
+                    this.dataList = data;
                     this.reset();
                 }
 
@@ -134,7 +135,7 @@
                     return $option;
                 }
 
-                reset(){
+                reset() {
                     super.reset();
                     this.render();
                 }

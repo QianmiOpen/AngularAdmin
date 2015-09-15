@@ -19,8 +19,31 @@ angular.module('admin.component')
 
             render(rowData) {
                 var val = this.getValue(rowData),
-                    defaultValue = this.attrs.default,
-                    $dom, $s = this.scope.$new();
+                    $dom;
+                if (this.hasTransclude) {
+                    $dom = this._getFromTransclude(rowData, val);
+                }
+                else if (this.scope.map) {
+                    $dom = this._getFromMap(val)
+                }
+                return $dom;
+            }
+
+            _getFromMap(val) {
+                if (_.isArray(this.scope.map)) {
+                    for (let item of this.scope.map) {
+                        if (item[this.sName] == val) {
+                            return item.name;
+                        }
+                    }
+                }
+                else if (_.isObject(this.scope.map)) {
+                    return this.scope.map[val];
+                }
+            }
+
+            _getFromTransclude(rowData, val) {
+                let $dom, $s = this.scope.$new(), defaultValue = this.attrs.default;
                 $s.data = rowData;
                 this.transclude($s, function (clone) {
                     $dom = clone.filter('[state="' + val + '"]');
@@ -43,7 +66,8 @@ angular.module('admin.component')
             replace: true,
             transclude: true,
             scope: {
-                head: '@'
+                head: '@',
+                map: '='
             },
             controller: function ($scope, $element, $attrs, $transclude) {
                 return new UITableStateColumnControl($scope, $element, $attrs, $transclude);

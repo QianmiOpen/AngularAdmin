@@ -61,9 +61,9 @@ angular.module('admin.component')
                     return this.getTransclude(rowData);
                 }
                 else {
-                    var customRenderName = 'render' + name.charAt(0).toUpperCase() + name.substr(1);
-                    if (this.scope[customRenderName]) {
-                        return this.scope[customRenderName](rowData);
+                    let custom = this.scope.onRender({rowData: rowData});
+                    if (custom != undefined) {
+                        return custom;
                     }
                     else {
                         return this.getValue(rowData);
