@@ -20,7 +20,7 @@
                     super.init();
                 }
 
-                initEvents(){
+                initEvents() {
                     super.initEvents();
 
                     //选中
@@ -31,7 +31,13 @@
                         this.selectValues.push(evt.val);
                         this.selectItems.push(evt.object);
                         this.scope.model = this.selectValues;
-                        this.scope.change({isAdd: true, val: evt.val, item: evt.object, vals: this.selectValues, items: this.selectItems});
+                        this.scope.change({
+                            isAdd: true,
+                            val: evt.val,
+                            item: evt.object,
+                            vals: this.selectValues,
+                            items: this.selectItems
+                        });
                         return true;
                     });
 
@@ -44,14 +50,27 @@
                             return item != evt.choice;
                         });
                         this.scope.model = this.selectValues;
-                        this.scope.change({isAdd: false, val: evt.val, item: evt.object, vals: this.selectValues, items: this.selectItems});
+                        this.scope.change({
+                            isAdd: false,
+                            val: evt.val,
+                            item: evt.object,
+                            vals: this.selectValues,
+                            items: this.selectItems
+                        });
+                    });
+
+                    //
+                    this.scope.$watch('model', (val) => {
+                        if (val) {
+                            this.val(val);
+                        }
                     });
                 }
 
                 render() {
                     super.render();
                     let config = this._getConfig();
-                    this.element.find('input').select2(config);
+                    this.inputElement = this.element.find('input').select2(config);
                 }
 
                 _getConfig() {
@@ -132,7 +151,7 @@
                         $.each(rs, (i, r) => {
                             var isC = false;
                             if (o.init) { //初始化, 那么只会根据
-                                isC = this.attrs.multi ? o.term.indexOf(this.formatId(r)) != -1 : this.formatId(r) == o.term;
+                                isC = this.attrs.multi ? o.term.indexOf(this._formatId(r)) != -1 : this._formatId(r) == o.term;
                             }
                             else { //根据属性过滤
                                 if (sfs.length === 0 || sfs[0] === '') {
@@ -169,7 +188,7 @@
                     }
                     else if (element.val() !== undefined) {
                         self.isInit = false;
-                        this.filterData({
+                        this._filterData({
                             term: element.val(),
                             init: true,
                             callback: handler
@@ -208,7 +227,7 @@
                             self = this;
                         this.loadData().then(function (datas) {
                             self.selectItems = $.grep(datas, function (data) {
-                                return values.indexOf(',' + self.formatId(data) + ',') != -1;
+                                return values.indexOf(',' + self._formatId(data) + ',') != -1;
                             });
                         });
                     }

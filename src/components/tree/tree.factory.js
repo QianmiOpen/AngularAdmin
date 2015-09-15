@@ -52,12 +52,18 @@
                         }
 
                         init() {
+                            this.selectItems = [];
+                            this.selectValues = [];
                             this.treeElement.attr('id', 'uiTree' + new Date().getTime());
                             this.callback = {
                                 beforeClick: (treeId, treeNode, treeNodeId) => this.scope.onBeforeClick({treeNode: treeNode}),
                                 onClick: (evt, treeId, treeNode, treeNodeId) => this.scope.onClick({treeNode: treeNode}),
                                 beforeCheck: (treeId, treeNode) => this.scope.onBeforeCheck({treeNode: treeNode}),
-                                onCheck: (evt, treeId, treeNode) => this.scope.onCheck({treeNode: treeNode})
+                                onCheck: (evt, treeId, treeNode) => {
+                                    this.selectItems.push(treeNode);
+                                    this.selectValues.push(treeNode[idName]);
+                                    this.scope.onCheck({treeNode: treeNode});
+                                }
                             };
                             this.view = {
                                 addHoverDom: (treeId, treeNode) => this._onMouseEnterTreeNode(treeNode),
@@ -173,6 +179,13 @@
                             if (this.instance) {
                                 return this.instance.getNodeByParam(idName, id, null);
                             }
+                        }
+
+                        cleanChecked(){
+                            $.each(this.selectItems, (i, selectItem) => {
+                                var node = this.instance.getNodeByParam(idName, selectItem.id, null);
+                                node && this.instance.checkNode(node, false, true);
+                            });
                         }
 
                         appendData(id, name, pid) {
