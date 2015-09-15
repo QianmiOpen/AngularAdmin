@@ -62,13 +62,13 @@
 
                 static alert(msg) {
                     let defer = $q.defer();
-                    bootbox.alert({size: 'small', message: msg, callback: () => defer.resolve()});
+                    bootbox.alert({message: msg, callback: () => defer.resolve()});
                     return defer.promise;
                 }
 
                 static confirm(msg) {
                     let defer = $q.defer();
-                    bootbox.confirm({size: 'small', message: msg, callback: (r) => r ? defer.resolve() : defer.reject()});
+                    bootbox.confirm({message: msg, callback: (r) => r ? defer.resolve() : defer.reject()});
                     return defer.promise;
                 }
 

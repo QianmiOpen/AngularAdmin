@@ -4772,13 +4772,13 @@ angular.module('admin.component')
 
                 static$0.alert = function(msg) {
                     var defer = $q.defer();
-                    bootbox.alert({size: 'small', message: msg, callback: function()  {return defer.resolve()}});
+                    bootbox.alert({message: msg, callback: function()  {return defer.resolve()}});
                     return defer.promise;
                 };
 
                 static$0.confirm = function(msg) {
                     var defer = $q.defer();
-                    bootbox.confirm({size: 'small', message: msg, callback: function(r)  {return r ? defer.resolve() : defer.reject()}});
+                    bootbox.confirm({message: msg, callback: function(r)  {return r ? defer.resolve() : defer.reject()}});
                     return defer.promise;
                 };
 
