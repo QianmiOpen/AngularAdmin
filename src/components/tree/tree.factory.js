@@ -121,6 +121,9 @@
 
                         setData(resData, isFilter) {
                             resData = resData || [];
+                            if (this.instance) {
+                                this.instance.destroy();
+                            }
                             if ($.fn.zTree) {
                                 this.instance = $.fn.zTree.init(this.treeElement, $.extend({}, defaultConfig, this), resData);
                                 this.expand();
@@ -166,8 +169,8 @@
                             return this.dataMap[data[pidName]];
                         }
 
-                        getTreeNodeById(id){
-                            if(this.instance){
+                        getTreeNodeById(id) {
+                            if (this.instance) {
                                 return this.instance.getNodeByParam(idName, id, null);
                             }
                         }
