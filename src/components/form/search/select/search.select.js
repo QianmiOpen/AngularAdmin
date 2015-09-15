@@ -20,7 +20,8 @@ angular.module('admin.component')
                 multiple: '@',
                 render: '&',
                 labelName: '@',
-                valueName: '@'
+                valueName: '@',
+                buttonClass: '@'
             },
             link: function (s, e, a) {
                 new UISelectControl(s, e, a);
@@ -29,7 +30,7 @@ angular.module('admin.component')
                 <div class="input-inline ui-search-item">
                     <div class="input-group">
                         <div ng-if="label" class="input-group-addon">{{label}}</div>
-                        <select class="form-control show-tick" data-live-search="true" data-style="{{buttonClass}}" name="{{name}}" ng-transclude></select>
+                        <select class="form-control show-tick" data-live-search="true" name="{{name}}" ng-transclude></select>
                     </div>
                 </div>
             `

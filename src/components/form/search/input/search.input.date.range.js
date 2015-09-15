@@ -22,7 +22,7 @@ angular.module('admin.component')
                 label: '@'
             },
             template: `
-                 <div class="input-inline ui-search-item input-mlarge {{css}}">
+                 <div class="input-inline ui-search-item input-xlarge {{css}}">
                     <div class="input-group">
                         <input type="text" readonly class="form-control" name="{{fromName}}" ng-model="fromModel"/>
                         <span class="input-group-addon">{{label || '到'}}</span>

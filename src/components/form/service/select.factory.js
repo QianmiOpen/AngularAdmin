@@ -66,6 +66,7 @@
                         this.formEl.selectpicker({
                             iconBase: 'fa',
                             tickIcon: 'fa-check',
+                            style: this.scope.buttonClass || '',
                             title: this.attrs.placeholder || '请选择'
                         });
                         this.isInit = true;

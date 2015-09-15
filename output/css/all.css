@@ -5522,62 +5522,6 @@ select[multiple].form-group-lg .form-control, select[multiple].input-lg, textare
     color: #737373
 }
 
-@media (min-width: 768px) {
-    .form-inline .form-group {
-        display: inline-block;
-        margin-bottom: 0;
-        vertical-align: middle
-    }
-
-    .form-inline .form-control {
-        display: inline-block;
-        width: auto;
-        vertical-align: middle
-    }
-
-    .form-inline .form-control-static {
-        display: inline-block
-    }
-
-    .form-inline .input-group {
-        display: inline-table;
-        vertical-align: middle
-    }
-
-    .form-inline .input-group .form-control, .form-inline .input-group .input-group-addon, .form-inline .input-group .input-group-btn {
-        width: auto
-    }
-
-    .form-inline .input-group > .form-control {
-        width: 100%
-    }
-
-    .form-inline .control-label {
-        margin-bottom: 0;
-        vertical-align: middle
-    }
-
-    .form-inline .checkbox, .form-inline .radio {
-        display: inline-block;
-        margin-top: 0;
-        margin-bottom: 0;
-        vertical-align: middle
-    }
-
-    .form-inline .checkbox label, .form-inline .radio label {
-        padding-left: 0
-    }
-
-    .form-inline .checkbox input[type=checkbox], .form-inline .radio input[type=radio] {
-        position: relative;
-        margin-left: 0
-    }
-
-    .form-inline .has-feedback .form-control-feedback {
-        top: 0
-    }
-}
-
 .form-horizontal .checkbox, .form-horizontal .checkbox-inline, .form-horizontal .radio, .form-horizontal .radio-inline {
     padding-top: 7px;
     margin-top: 0;
@@ -27477,7 +27421,7 @@ button.toast-close-button {
     display: inline-block;
     position: absolute;
     right: 15px;
-    margin-top: 2.5px
+    margin-top: 7.5px
 }
 
 .bootstrap-select.btn-group .dropdown-menu li a i.check-mark {
