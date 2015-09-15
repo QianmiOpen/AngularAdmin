@@ -7,7 +7,7 @@
 //------------------------------------------------------
 (function () {
     angular.module('admin.component')
-        .factory('UIDialogControl', function (Util, Ajax, $compile, $controller) {
+        .factory('UIDialogControl', function (Util, Ajax, $compile, $controller, $q) {
             class UIDialogControl extends ComponentEvent {
                 constructor(scope, url, urlParam, transclude) {
                     super();
@@ -54,10 +54,22 @@
                     }
                 }
 
-                remove(){
+                remove() {
                     super.remove();
                     this.content.unbind('shown.bs.modal');
                     this.content.unbind('hidden.bs.modal');
+                }
+
+                static alert(msg) {
+                    let defer = $q.defer();
+                    bootbox.alert({size: 'small', message: msg, callback: () => defer.resolve()});
+                    return defer.promise;
+                }
+
+                static confirm(msg) {
+                    let defer = $q.defer();
+                    bootbox.confirm({size: 'small', message: msg, callback: (r) => r ? defer.resolve() : defer.reject()});
+                    return defer.promise;
                 }
 
                 _addEvents() {

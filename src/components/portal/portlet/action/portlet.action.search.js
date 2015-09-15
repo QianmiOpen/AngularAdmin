@@ -15,6 +15,9 @@ angular.module('admin.component')
                 placeholder: '@',
                 model: '='
             },
+            link: (scope) => {
+                scope.model = '';
+            },
             template: `
                 <div class="inputs portlet-tool-bar">
                     <div class="portlet-input input-inline input-small">

@@ -31,24 +31,25 @@ angular.module('admin.component')
             }
 
             render() {
-                let $content = this.transclude(this.scope.$parent),
-                    $toolbar = $content.filter('.portlet-tool-bar');
-                if ($toolbar.length === 0) {
-                    $.each($content, (i, c) => {
-                        if (c.nodeName.indexOf('UI-PORTLET-ACTION') != -1) {
-                            $toolbar = $(c);
-                            return false;
-                        }
-                    });
-                }
-                this.bodyElement.append($content);
-                if ($toolbar.length !== 0) {
-                    this.headElement.append($toolbar);
-                }
-                if (!this.scope.title) {
-                    this.headElement.hide();
-                }
-                this.load();
+                this.transclude(this.scope.$parent, ($content) => {
+                    let $toolbar = $content.filter('.portlet-tool-bar');
+                    if ($toolbar.length === 0) {
+                        $.each($content, (i, c) => {
+                            if (c.nodeName.indexOf('UI-PORTLET-ACTION') != -1) {
+                                $toolbar = $(c);
+                                return false;
+                            }
+                        });
+                    }
+                    this.bodyElement.append($content);
+                    if ($toolbar.length !== 0) {
+                        this.headElement.append($toolbar);
+                    }
+                    if (!this.scope.title) {
+                        this.headElement.hide();
+                    }
+                    this.load();
+                });
             }
 
             load(params, url) {

@@ -14,6 +14,8 @@
     "gulp-jshint": "*",
     "gulp-livereload": "^3.8.0",
     "gulp-rename": "*",
-    "gulp-uglify": "*"
+    "gulp-uglify": "*",
+    "gulp-minify-css": "*",
+    "gulp-concat-css": "*"
   }
 }

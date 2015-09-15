@@ -2869,25 +2869,26 @@ angular.module('admin.component')
             proto$0.initEvents = function() {
             };
 
-            proto$0.render = function() {
-                var $content = this.transclude(this.scope.$parent),
-                    $toolbar = $content.filter('.portlet-tool-bar');
-                if ($toolbar.length === 0) {
-                    $.each($content, function(i, c)  {
-                        if (c.nodeName.indexOf('UI-PORTLET-ACTION') != -1) {
-                            $toolbar = $(c);
-                            return false;
-                        }
-                    });
-                }
-                this.bodyElement.append($content);
-                if ($toolbar.length !== 0) {
-                    this.headElement.append($toolbar);
-                }
-                if (!this.scope.title) {
-                    this.headElement.hide();
-                }
-                this.load();
+            proto$0.render = function() {var this$0 = this;
+                this.transclude(this.scope.$parent, function($content)  {
+                    var $toolbar = $content.filter('.portlet-tool-bar');
+                    if ($toolbar.length === 0) {
+                        $.each($content, function(i, c)  {
+                            if (c.nodeName.indexOf('UI-PORTLET-ACTION') != -1) {
+                                $toolbar = $(c);
+                                return false;
+                            }
+                        });
+                    }
+                    this$0.bodyElement.append($content);
+                    if ($toolbar.length !== 0) {
+                        this$0.headElement.append($toolbar);
+                    }
+                    if (!this$0.scope.title) {
+                        this$0.headElement.hide();
+                    }
+                    this$0.load();
+                });
             };
 
             proto$0.load = function(params, url) {var this$0 = this;
@@ -4390,6 +4391,9 @@ angular.module('admin.component')
                 placeholder: '@',
                 model: '='
             },
+            link: function(scope)  {
+                scope.model = '';
+            },
             template: ("\
 \n                <div class=\"inputs portlet-tool-bar\">\
 \n                    <div class=\"portlet-input input-inline input-small\">\
@@ -4713,8 +4717,8 @@ angular.module('admin.component')
 //------------------------------------------------------
 (function () {
     angular.module('admin.component')
-        .factory('UIDialogControl', function (Util, Ajax, $compile, $controller) {
-            var UIDialogControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDialogControl, super$0);var proto$0={};
+        .factory('UIDialogControl', function (Util, Ajax, $compile, $controller, $q) {
+            var UIDialogControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDialogControl, super$0);var static$0={},proto$0={};
                 function UIDialogControl(scope, url, urlParam, transclude) {
                     super$0.call(this);
                     this.scope = scope;
@@ -4760,10 +4764,22 @@ angular.module('admin.component')
                     }
                 };
 
-                proto$0.remove = function(){
+                proto$0.remove = function() {
                     super$0.prototype.remove.call(this);
                     this.content.unbind('shown.bs.modal');
                     this.content.unbind('hidden.bs.modal');
+                };
+
+                static$0.alert = function(msg) {
+                    var defer = $q.defer();
+                    bootbox.alert({size: 'small', message: msg, callback: function()  {return defer.resolve()}});
+                    return defer.promise;
+                };
+
+                static$0.confirm = function(msg) {
+                    var defer = $q.defer();
+                    bootbox.confirm({size: 'small', message: msg, callback: function(r)  {return r ? defer.resolve() : defer.reject()}});
+                    return defer.promise;
                 };
 
                 proto$0._addEvents = function() {var this$0 = this;
@@ -4774,7 +4790,7 @@ angular.module('admin.component')
                         this$0.scope.onHide();
                     });
                 };
-            MIXIN$0(UIDialogControl.prototype,proto$0);proto$0=void 0;return UIDialogControl;})(ComponentEvent);
+            MIXIN$0(UIDialogControl,static$0);MIXIN$0(UIDialogControl.prototype,proto$0);static$0=proto$0=void 0;return UIDialogControl;})(ComponentEvent);
             return UIDialogControl;
         });
 })();
