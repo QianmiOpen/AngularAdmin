@@ -40,6 +40,16 @@
 
                     this.scope.labelName = this.scope.labelName || 'name';
                     this.scope.valueName = this.scope.valueName || 'id';
+
+                    //
+                    this.dataList = [];
+                    this.formEl.find('option').each((i, o) => {
+                        let r = {};
+                        r[this.scope.labelName] = o.innerHTML;
+                        r[this.scope.valueName] = o.value;
+                        this.dataList.push(r);
+                    });
+                    console.log(this.dataList);
                 }
 
                 initEvents() {

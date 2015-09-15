@@ -2222,7 +2222,7 @@ angular.module('admin.component')
                     super$0.call(this, s, e, a);
                 }if(super$0!==null)SP$0(UISelectControl,super$0);UISelectControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UISelectControl,"configurable":true,"writable":true}});DP$0(UISelectControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
-                proto$0.init = function() {
+                proto$0.init = function() {var this$0 = this;
                     super$0.prototype.init.call(this);
 
                     //是否多选
@@ -2244,6 +2244,16 @@ angular.module('admin.component')
 
                     this.scope.labelName = this.scope.labelName || 'name';
                     this.scope.valueName = this.scope.valueName || 'id';
+
+                    //
+                    this.dataList = [];
+                    this.formEl.find('option').each(function(i, o)  {
+                        var r = {};
+                        r[this$0.scope.labelName] = o.innerHTML;
+                        r[this$0.scope.valueName] = o.value;
+                        this$0.dataList.push(r);
+                    });
+                    console.log(this.dataList);
                 };
 
                 proto$0.initEvents = function() {var this$0 = this;
@@ -3555,7 +3565,7 @@ angular.module('admin.component')
             proto$0._getFromMap = function(val) {var S_ITER$0 = typeof Symbol!=='undefined'&&Symbol&&Symbol.iterator||'@@iterator';var S_MARK$0 = typeof Symbol!=='undefined'&&Symbol&&Symbol["__setObjectSetter__"];function GET_ITER$0(v){if(v){if(Array.isArray(v))return 0;var f;if(S_MARK$0)S_MARK$0(v);if(typeof v==='object'&&typeof (f=v[S_ITER$0])==='function'){if(S_MARK$0)S_MARK$0(void 0);return f.call(v);}if(S_MARK$0)S_MARK$0(void 0);if((v+'')==='[object Generator]')return v;}throw new Error(v+' is not iterable')};var $D$0;var $D$1;var $D$2;var $D$3;
                 if (_.isArray(this.scope.map)) {
                     $D$3 = (this.scope.map);$D$0 = GET_ITER$0($D$3);$D$2 = $D$0 === 0;$D$1 = ($D$2 ? $D$3.length : void 0);for (var item ;$D$2 ? ($D$0 < $D$1) : !($D$1 = $D$0["next"]())["done"];){item = ($D$2 ? $D$3[$D$0++] : $D$1["value"]);
-                        if (item[this.sName] == val) {
+                        if (item.id == val) {
                             return item.name;
                         }
                     };$D$0 = $D$1 = $D$2 = $D$3 = void 0;

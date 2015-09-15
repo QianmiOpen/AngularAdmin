@@ -32,7 +32,7 @@ angular.module('admin.component')
             _getFromMap(val) {
                 if (_.isArray(this.scope.map)) {
                     for (let item of this.scope.map) {
-                        if (item[this.sName] == val) {
+                        if (item.id == val) {
                             return item.name;
                         }
                     }
