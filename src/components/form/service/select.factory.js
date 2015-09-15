@@ -86,7 +86,7 @@
                             this.val(value);
                         }
                         else {
-                            var val = self.val(),
+                            var val = this.val(),
                                 m = /^\?.+:(.+)\s+\?$/.exec(val);
                             this.val(m ? m[1] : val);
                         }

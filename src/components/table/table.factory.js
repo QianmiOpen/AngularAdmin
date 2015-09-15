@@ -254,8 +254,8 @@
                             else {
                                 result = {
                                     aaData: data[dataName],
-                                    iTotalDisplayRecords: result[totalName],
-                                    iTotalRecords: result[totalName]
+                                    iTotalDisplayRecords: data[totalName],
+                                    iTotalRecords: data[totalName]
                                 };
                             }
                             return result;
