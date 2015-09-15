@@ -29484,6 +29484,10 @@ div.DTFC_LeftBodyWrapper tbody tr:first-child td, div.DTFC_LeftBodyWrapper tbody
     margin-bottom: 4px
 }
 
+.ui-search-date-range .form-control {
+    background-color: #FFF;
+}
+
 .ui-tree {
     width: 100%;
     height: 100%;

@@ -1031,42 +1031,6 @@ angular.module('admin.component')
         return this.optional(element) || reg.test(value);
     }, "密码由8-16位字母、数字和特殊字符组成，且至少有一个大写字母或者特殊字符！");
 })(jQuery);
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchForm', function (UISearchFormControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                onSearch: '&',
-                onReset: '&'
-            },
-            link: function (scope, element, attrs, controller, transclude) {
-                new UISearchFormControl(scope, element, attrs, transclude);
-            },
-            template: ("\
-\n                <form novalidate action=\"\" class=\"ui-search-form form-inline\">\
-\n                    <div class=\"row\">\
-\n                        <div class=\"col-md-{{lcol}}\"></div>\
-\n                        <div class=\"text-right col-md-{{rcol}}\">\
-\n                            <a title=\"回车键也可触发搜索\" class=\"btn blue-chambray btn-sm\" ng-click=\"component.search()\" style=\"width: 30px\"><i class=\"fa fa-search\"></i></button>\
-\n                            <a title=\"重置搜索选项\" class=\"btn default btn-sm\" ng-click=\"component.reset()\" style=\"width: 30px\"><i class=\"fa fa-undo font-blue-chambray\"></i></a>\
-\n                        </div>\
-\n                    </div>\
-\n                </form>\
-\n            ")
-        };
-    });
-
 /**
  * 表单控件
  */
@@ -2270,7 +2234,7 @@ angular.module('admin.component')
                         this.formEl.selectpicker({
                             iconBase: 'fa',
                             tickIcon: 'fa-check',
-                            style: this.scope.buttonClass || '',
+                            style: this.scope.buttonClass || 'btn-default',
                             title: this.attrs.placeholder || '请选择'
                         });
                         this.isInit = true;
@@ -2838,6 +2802,42 @@ angular.module('admin.component')
             return result;
         });
 })();
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchForm', function (UISearchFormControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                onSearch: '&',
+                onReset: '&'
+            },
+            link: function (scope, element, attrs, controller, transclude) {
+                new UISearchFormControl(scope, element, attrs, transclude);
+            },
+            template: ("\
+\n                <form novalidate action=\"\" class=\"ui-search-form form-inline\">\
+\n                    <div class=\"row\">\
+\n                        <div class=\"col-md-{{lcol}}\"></div>\
+\n                        <div class=\"text-right col-md-{{rcol}}\">\
+\n                            <a title=\"回车键也可触发搜索\" class=\"btn blue-chambray btn-sm\" ng-click=\"component.search()\" style=\"width: 30px\"><i class=\"fa fa-search\"></i></button>\
+\n                            <a title=\"重置搜索选项\" class=\"btn default btn-sm\" ng-click=\"component.reset()\" style=\"width: 30px\"><i class=\"fa fa-undo font-blue-chambray\"></i></a>\
+\n                        </div>\
+\n                    </div>\
+\n                </form>\
+\n            ")
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4034,44 +4034,6 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchRegion', function (UIRegionControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                model: '=',
-                change: '&',
-                label: '@',
-                name: '@',
-                mode: '@'
-            },
-            link: function(s, e, a)  {
-                if (a.mode === undefined || a.mode == 'a') { //区域查询不支持详细地址
-                    a.mode = 's';
-                }
-                new UIRegionControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"input-inline ui-search-item\">\
-\n                    <div class=\"input-group ui-search-region\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}:</div>\
-\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-1px\" name=\"city\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-2px\" name=\"area\"/>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
     .directive('uiSearchDate', function (UIDateControl) {
         return {
             restrict: 'E',
@@ -4121,7 +4083,7 @@ angular.module('admin.component')
                 label: '@'
             },
             template: ("\
-\n                 <div class=\"input-inline ui-search-item input-xlarge {{css}}\">\
+\n                 <div class=\"input-inline ui-search-item ui-search-date-range input-xlarge {{css}}\">\
 \n                    <div class=\"input-group\">\
 \n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{fromName}}\" ng-model=\"fromModel\"/>\
 \n                        <span class=\"input-group-addon\">{{label || '到'}}</span>\
@@ -4213,6 +4175,44 @@ angular.module('admin.component')
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.input.select', attrs);
             }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchRegion', function (UIRegionControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                mode: '@'
+            },
+            link: function(s, e, a)  {
+                if (a.mode === undefined || a.mode == 'a') { //区域查询不支持详细地址
+                    a.mode = 's';
+                }
+                new UIRegionControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"input-inline ui-search-item\">\
+\n                    <div class=\"input-group ui-search-region\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}:</div>\
+\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-1px\" name=\"city\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-2px\" name=\"area\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------
@@ -4525,113 +4525,6 @@ angular.module('admin.component')
             };
         });
 })();
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-(function () {
-    angular.module('admin.component')
-        .factory('UIDialogControl', function (Util, Ajax, $compile, $controller, $q) {
-            var UIDialogControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDialogControl, super$0);var static$0={},proto$0={};
-                function UIDialogControl(scope, url, urlParam, transclude) {
-                    super$0.call(this);
-                    this.scope = scope;
-                    this.url = url;
-                    this.urlParams = urlParam;
-                    this.transclude = transclude;
-                    this.message = new Message('UIDialogHelper');
-                }if(super$0!==null)SP$0(UIDialogControl,super$0);UIDialogControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDialogControl,"configurable":true,"writable":true}});DP$0(UIDialogControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-                proto$0.show = function() {var this$0 = this;
-                    return this.getContent()
-                        .then(function()  {
-                            this$0.content.modal({
-                                "keyboard": true,
-                                "show": true
-                            });
-                        });
-                };
-
-                proto$0.hide = function() {
-                    if (this.content) {
-                        this.content.modal({
-                            "show": false
-                        });
-                    }
-                };
-
-                proto$0.getContent = function() {var this$0 = this;
-                    if (this.content) {
-                        return Util.toPromise(this.content);
-                    }
-                    else if (this.url) {
-                        return Ajax.load(this.url, this.urlParams || {})
-                            .then(function(html)  {
-                                this$0.content = $compile(html)(this$0.scope);
-                                this$0._addEvents();
-                            });
-                    }
-                    else {
-                        this.content = this.transclude(this.scope).filter('.modal');
-                        this._addEvents();
-                        return Util.toPromise(this.content);
-                    }
-                };
-
-                proto$0.remove = function() {
-                    super$0.prototype.remove.call(this);
-                    this.content.unbind('shown.bs.modal');
-                    this.content.unbind('hidden.bs.modal');
-                };
-
-                static$0.alert = function(msg) {
-                    var defer = $q.defer();
-                    bootbox.alert({message: msg, callback: function()  {return defer.resolve()}});
-                    return defer.promise;
-                };
-
-                static$0.confirm = function(msg) {
-                    var defer = $q.defer();
-                    bootbox.confirm({message: msg, callback: function(r)  {return r ? defer.resolve() : defer.reject()}});
-                    return defer.promise;
-                };
-
-                proto$0._addEvents = function() {var this$0 = this;
-                    this.content.bind('shown.bs.modal', function()  {
-                        this$0.scope.onShow();
-                    });
-                    this.content.bind('hidden.bs.modal', function()  {
-                        this$0.scope.onHide();
-                    });
-                };
-            MIXIN$0(UIDialogControl,static$0);MIXIN$0(UIDialogControl.prototype,proto$0);static$0=proto$0=void 0;return UIDialogControl;})(ComponentEvent);
-            return UIDialogControl;
-        });
-})();
-angular.module('admin.component')
-    .directive('uiDialog', function (UIDialogControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                url: '@',
-                initParams: '=',
-                onShow: '&',
-                onHide: '&'
-            },
-            link: function (scope, element, attrs, controller, transclude) {
-                var control = new UIDialogControl(scope, scope.url, scope.initParams, transclude);
-                control.triggerComplete(scope, attrs.ref || '$dialog', control);
-            },
-            template: ("\
-\n                <div class=\"ui-dialog\"></div>\
-\n            ")
-        };
-    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4814,6 +4707,113 @@ angular.module('admin.component')
             },
             template: ("\
 \n                <div class=\"row\"></div>\
+\n            ")
+        };
+    });
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+(function () {
+    angular.module('admin.component')
+        .factory('UIDialogControl', function (Util, Ajax, $compile, $controller, $q) {
+            var UIDialogControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDialogControl, super$0);var static$0={},proto$0={};
+                function UIDialogControl(scope, url, urlParam, transclude) {
+                    super$0.call(this);
+                    this.scope = scope;
+                    this.url = url;
+                    this.urlParams = urlParam;
+                    this.transclude = transclude;
+                    this.message = new Message('UIDialogHelper');
+                }if(super$0!==null)SP$0(UIDialogControl,super$0);UIDialogControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDialogControl,"configurable":true,"writable":true}});DP$0(UIDialogControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.show = function() {var this$0 = this;
+                    return this.getContent()
+                        .then(function()  {
+                            this$0.content.modal({
+                                "keyboard": true,
+                                "show": true
+                            });
+                        });
+                };
+
+                proto$0.hide = function() {
+                    if (this.content) {
+                        this.content.modal({
+                            "show": false
+                        });
+                    }
+                };
+
+                proto$0.getContent = function() {var this$0 = this;
+                    if (this.content) {
+                        return Util.toPromise(this.content);
+                    }
+                    else if (this.url) {
+                        return Ajax.load(this.url, this.urlParams || {})
+                            .then(function(html)  {
+                                this$0.content = $compile(html)(this$0.scope);
+                                this$0._addEvents();
+                            });
+                    }
+                    else {
+                        this.content = this.transclude(this.scope).filter('.modal');
+                        this._addEvents();
+                        return Util.toPromise(this.content);
+                    }
+                };
+
+                proto$0.remove = function() {
+                    super$0.prototype.remove.call(this);
+                    this.content.unbind('shown.bs.modal');
+                    this.content.unbind('hidden.bs.modal');
+                };
+
+                static$0.alert = function(msg) {
+                    var defer = $q.defer();
+                    bootbox.alert({message: msg, callback: function()  {return defer.resolve()}});
+                    return defer.promise;
+                };
+
+                static$0.confirm = function(msg) {
+                    var defer = $q.defer();
+                    bootbox.confirm({message: msg, callback: function(r)  {return r ? defer.resolve() : defer.reject()}});
+                    return defer.promise;
+                };
+
+                proto$0._addEvents = function() {var this$0 = this;
+                    this.content.bind('shown.bs.modal', function()  {
+                        this$0.scope.onShow();
+                    });
+                    this.content.bind('hidden.bs.modal', function()  {
+                        this$0.scope.onHide();
+                    });
+                };
+            MIXIN$0(UIDialogControl,static$0);MIXIN$0(UIDialogControl.prototype,proto$0);static$0=proto$0=void 0;return UIDialogControl;})(ComponentEvent);
+            return UIDialogControl;
+        });
+})();
+angular.module('admin.component')
+    .directive('uiDialog', function (UIDialogControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                url: '@',
+                initParams: '=',
+                onShow: '&',
+                onHide: '&'
+            },
+            link: function (scope, element, attrs, controller, transclude) {
+                var control = new UIDialogControl(scope, scope.url, scope.initParams, transclude);
+                control.triggerComplete(scope, attrs.ref || '$dialog', control);
+            },
+            template: ("\
+\n                <div class=\"ui-dialog\"></div>\
 \n            ")
         };
     });
