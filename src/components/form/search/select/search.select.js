@@ -21,7 +21,8 @@ angular.module('admin.component')
                 render: '&',
                 labelName: '@',
                 valueName: '@',
-                buttonClass: '@'
+                buttonClass: '@',
+                onRender: '&'
             },
             link: function (s, e, a) {
                 new UISelectControl(s, e, a);

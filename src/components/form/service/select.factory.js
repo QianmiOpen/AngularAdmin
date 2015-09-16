@@ -137,6 +137,10 @@
                         $option.data('content', renderHtml);
                     }
                     $option.data('item', item);
+                    var dataContent = this.scope.onRender({item});
+                    if (dataContent) {
+                        $option.data('content', dataContent);
+                    }
                     return $option;
                 }
 
