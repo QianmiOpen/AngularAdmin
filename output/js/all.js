@@ -3671,59 +3671,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  参数
-//      p -- 省, 开关, 默认开, 可不填
-//      c -- 市, 开关, 默认开, 可不填
-//      s -- 区, 开关, 默认开, 可不填
-//      a -- 地址, 开关, 默认关
-//
-//      s-name -- 区域的name
-//      a-name -- 详细地址的name
-//
-//
-//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
-//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
-//      s-value -- 区域默认值
-//      a-value -- 地址值
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormRegion', function (UIRegionControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@',
-                type: '@',
-                mode: '@'
-            },
-            link: function(s, e, a)  {
-                new UIRegionControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-region\">\
-\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"city\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"area\"/>\
-\n                        <input type=\"text\" class=\"input-medium form-control input-inline\" name=\"address\" ng-value=\"{{aValue}}\" placeholder=\"请输入详细地址\" />\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>'\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
 //  针对input的封装
 //
 //
@@ -3872,6 +3819,59 @@ angular.module('admin.component')
                     rightCol: cc[1]
                 }, attrs));
             }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  参数
+//      p -- 省, 开关, 默认开, 可不填
+//      c -- 市, 开关, 默认开, 可不填
+//      s -- 区, 开关, 默认开, 可不填
+//      a -- 地址, 开关, 默认关
+//
+//      s-name -- 区域的name
+//      a-name -- 详细地址的name
+//
+//
+//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
+//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
+//      s-value -- 区域默认值
+//      a-value -- 地址值
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormRegion', function (UIRegionControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@',
+                type: '@',
+                mode: '@'
+            },
+            link: function(s, e, a)  {
+                new UIRegionControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-region\">\
+\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"city\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"area\"/>\
+\n                        <input type=\"text\" class=\"input-medium form-control input-inline\" name=\"address\" ng-value=\"{{aValue}}\" placeholder=\"请输入详细地址\" />\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------
@@ -4041,54 +4041,6 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormUpload', function (UIInputControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function (scope, element, attrs) {
-                new UIInputControl(scope, element, attrs);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-upload\">\
-\n                       <div>\
-\n                           <img class=\"{{css}}\"/>\
-\n                       </div>\
-\n                       <div class=\"btn-group\">\
-\n                           <button type=\"button\" class=\"btn blue start\">\
-\n                               <i class=\"fa fa-upload\"></i>\
-\n                               <span>选择文件</span>\
-\n                           </button>\
-\n                           <button type=\"button\" class=\"btn red start\">\
-\n                               <i class=\"fa fa-upload\"></i>\
-\n                               <span>删除文件</span>\
-\n                           </button>\
-\n                       </div>\
-\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>'\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
     .directive('uiSearchDate', function (UIDateControl) {
         return {
             restrict: 'E',
@@ -4232,6 +4184,54 @@ angular.module('admin.component')
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.input.select', attrs);
             }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormUpload', function (UIInputControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function (scope, element, attrs) {
+                new UIInputControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-upload\">\
+\n                       <div>\
+\n                           <img class=\"{{css}}\"/>\
+\n                       </div>\
+\n                       <div class=\"btn-group\">\
+\n                           <button type=\"button\" class=\"btn blue start\">\
+\n                               <i class=\"fa fa-upload\"></i>\
+\n                               <span>选择文件</span>\
+\n                           </button>\
+\n                           <button type=\"button\" class=\"btn red start\">\
+\n                               <i class=\"fa fa-upload\"></i>\
+\n                               <span>删除文件</span>\
+\n                           </button>\
+\n                       </div>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------
@@ -4943,7 +4943,7 @@ angular.module('admin.component')
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .factory('UITabControl', function () {
+    .factory('UITabControl', function ($compile) {
         var UITabControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabControl, super$0);var proto$0={};
             function UITabControl(scope, element, attrs, transclude) {
                 super$0.call(this);
@@ -4958,6 +4958,7 @@ angular.module('admin.component')
 
             proto$0.init = function() {var this$0 = this;
                 this.scope.component = this;
+                this.bodyElement = this.element.find('ul');
                 this.isLazy = this.scope.lazy != 'false';
                 this.transclude(this.scope, function(dom)  {
                     this$0.element.find('ul').append(dom);
@@ -4972,12 +4973,21 @@ angular.module('admin.component')
                 this.showAtIndex(this.scope.default || '0');
             };
 
+            proto$0.addTab = function(head, content, active) {
+                var $h = $((("<ui-tab-item head=\"" + head) + ("\">" + content) + "</ui-tab-item>"));
+                this.bodyElement.append($h);
+                $compile($h)(this.scope);
+                if (active) {
+                    this.showAtIndex(this.bodyElement.find('li').length - 1);
+                }
+            };
+
             proto$0.showAtIndex = function(index) {
-                index && this.scope.$broadcast('uitab.item.show', {index: index, lazy: this.isLazy});
+                index != undefined && this.scope.$broadcast('uitab.item.show', {index: index, lazy: this.isLazy});
             };
 
             proto$0.removeAtIndex = function(index) {
-                index && this.scope.$broadcast('uitab.item.remove', index);
+                index != undefined && this.scope.$broadcast('uitab.item.remove', index);
             };
         MIXIN$0(UITabControl.prototype,proto$0);proto$0=void 0;return UITabControl;})(ComponentEvent);
 
