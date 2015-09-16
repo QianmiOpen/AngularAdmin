@@ -15,6 +15,7 @@ angular.module('admin.component')
                 lcol: '@',
                 rcol: '@',
                 label: '@',
+                model: '=',
                 css: '@',
                 placeholder: '@',
                 help: '@'
@@ -28,7 +29,7 @@ angular.module('admin.component')
                 <div class="form-group">
                    <label class="col-md-{{lcol || DefaultCol.l}} control-label">{{label}}</label>
                    <div class="col-md-{{rcol || DefaultCol.r}}">
-                       <p class="form-control-static"></p>
+                       <p class="form-control-static" ng-bind="model"></p>
                        <span ng-if="help" class="help-block">{{help}}</span>
                    </div>
                </div>'

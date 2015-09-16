@@ -946,6 +946,7 @@ angular.module('admin.component')
                 lcol: '@',
                 rcol: '@',
                 label: '@',
+                model: '=',
                 css: '@',
                 placeholder: '@',
                 help: '@'
@@ -959,7 +960,7 @@ angular.module('admin.component')
 \n                <div class=\"form-group\">\
 \n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
 \n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <p class=\"form-control-static\"></p>\
+\n                       <p class=\"form-control-static\" ng-bind=\"model\"></p>\
 \n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
 \n                   </div>\
 \n               </div>'\
@@ -2674,12 +2675,7 @@ angular.module('admin.component')
                 proto$0._initSelection = function(element, callback) {
                     var self = this,
                         handler = function (data) {
-                            if (self.attrs.multi !== undefined) {
-                                callback(data.results);
-                            }
-                            else {
-                                callback(data.results[0]);
-                            }
+                            callback(data.results);
                         };
                     if (self.isFocusInit) {
                         self.isFocusInit = false;
@@ -4302,7 +4298,7 @@ angular.module('admin.component')
             },
             template: ("\
 \n                <div class=\"input-inline ui-search-item\">\
-\n                    <div class=\"input-group\">\
+\n                    <div ng-class=\"{'input-group': label}\">\
 \n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
 \n                        <select class=\"form-control show-tick\" data-live-search=\"true\" name=\"{{name}}\" ng-transclude></select>\
 \n                    </div>\

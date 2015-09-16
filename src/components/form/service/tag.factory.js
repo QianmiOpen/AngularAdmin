@@ -174,12 +174,7 @@
                 _initSelection(element, callback) {
                     var self = this,
                         handler = function (data) {
-                            if (self.attrs.multi !== undefined) {
-                                callback(data.results);
-                            }
-                            else {
-                                callback(data.results[0]);
-                            }
+                            callback(data.results);
                         };
                     if (self.isFocusInit) {
                         self.isFocusInit = false;

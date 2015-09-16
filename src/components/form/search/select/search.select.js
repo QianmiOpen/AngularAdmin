@@ -28,7 +28,7 @@ angular.module('admin.component')
             },
             template: `
                 <div class="input-inline ui-search-item">
-                    <div class="input-group">
+                    <div ng-class="{'input-group': label}">
                         <div ng-if="label" class="input-group-addon">{{label}}</div>
                         <select class="form-control show-tick" data-live-search="true" name="{{name}}" ng-transclude></select>
                     </div>
