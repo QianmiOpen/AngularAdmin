@@ -8,7 +8,9 @@ angular.module('admin.component')
                 close: '@',
                 default: '@',
                 lazy: '@',
-                url: '@'
+                url: '@',
+                onRemove: '&',
+                onChange: '&'
             },
             compile: function () {
                 var tab = null;

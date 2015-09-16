@@ -4955,21 +4955,31 @@ angular.module('admin.component')
                 this.triggerComplete(this.scope, this.attrs.ref || '$tab', this);
             };
 
-            proto$0.initEvents = function() {
+            proto$0.initEvents = function() {var this$0 = this;
+                this.scope.$on('uitab.item.show', function(evt, info)  {
+                    this$0.scope.onChange({index: info.index});
+                });
+                this.scope.$on('uitab.item.remove', function(evt, index)  {
+                    this$0.scope.onRemove({index: index});
+                });
             };
 
             proto$0.build = function() {
                 this.showAtIndex(this.scope.default || '0');
             };
 
-            proto$0.addTab = function(head, content, active) {var this$0 = this;
-                var $h = $((("<ui-tab-item head=\"" + head) + ("\">" + content) + "</ui-tab-item>"));
+            proto$0.addTab = function(head, content, active) {
+                this.addCustomTab((("<ui-tab-item head=\"" + head) + ("\">" + (content || '')) + "</ui-tab-item>"), active)
+            };
+
+            proto$0.addCustomTab = function(tpl, active){var this$0 = this;
+                var $h = $(tpl);
                 this.bodyElement.append($h);
                 $compile($h)(this.scope);
                 if (active) {
                     setTimeout(function()  {
                         this$0.showAtIndex(this$0.bodyElement.find('li').length - 1);
-                    }, 10);
+                    }, 50);
                 }
             };
 
@@ -4994,7 +5004,9 @@ angular.module('admin.component')
                 close: '@',
                 default: '@',
                 lazy: '@',
-                url: '@'
+                url: '@',
+                onRemove: '&',
+                onChange: '&'
             },
             compile: function () {
                 var tab = null;
@@ -5810,10 +5822,10 @@ angular.module('admin.component')
                                 var scope = this.scope.$new(),
                                     $dom = this.element.find('>span').clone(true);
                                 scope.treeNode = treeNode;
-                                this.transclude(scope, function($dom2)  {
+                                this.transclude(scope.$parent, function($dom2)  {
                                     $dom.data('treeNode', treeNode);
                                     $dom.append($dom2).show();
-                                    $("#" + treeNode.tId + "_span").append($dom);
+                                    $dom.insertAfter($("#" + treeNode.tId + "_span"));
                                     this$0.treeNodeBtnMap[treeNode.id] = $dom;
                                 });
                             }

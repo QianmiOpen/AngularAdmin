@@ -248,10 +248,10 @@
                                 let scope = this.scope.$new(),
                                     $dom = this.element.find('>span').clone(true);
                                 scope.treeNode = treeNode;
-                                this.transclude(scope, ($dom2) => {
+                                this.transclude(scope.$parent, ($dom2) => {
                                     $dom.data('treeNode', treeNode);
                                     $dom.append($dom2).show();
-                                    $("#" + treeNode.tId + "_span").append($dom);
+                                    $dom.insertAfter($("#" + treeNode.tId + "_span"));
                                     this.treeNodeBtnMap[treeNode.id] = $dom;
                                 });
                             }

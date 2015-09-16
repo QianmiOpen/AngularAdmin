@@ -30,6 +30,12 @@ angular.module('admin.component')
             }
 
             initEvents() {
+                this.scope.$on('uitab.item.show', (evt, info) => {
+                    this.scope.onChange({index: info.index});
+                });
+                this.scope.$on('uitab.item.remove', (evt, index) => {
+                    this.scope.onRemove({index: index});
+                });
             }
 
             build() {
@@ -37,13 +43,17 @@ angular.module('admin.component')
             }
 
             addTab(head, content, active) {
-                var $h = $(`<ui-tab-item head="${head}">${content}</ui-tab-item>`);
+                this.addCustomTab(`<ui-tab-item head="${head}">${content || ''}</ui-tab-item>`, active)
+            }
+
+            addCustomTab(tpl, active){
+                var $h = $(tpl);
                 this.bodyElement.append($h);
                 $compile($h)(this.scope);
                 if (active) {
                     setTimeout(() => {
                         this.showAtIndex(this.bodyElement.find('li').length - 1);
-                    }, 10);
+                    }, 50);
                 }
             }
 
