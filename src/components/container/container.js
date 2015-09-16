@@ -16,22 +16,19 @@
                     this.element = element;
                     this.attrs = attrs;
                     this.transclude = $transclude;
-                    this.init();
                 }
 
                 init() {
                     this.completeName = this.attrs.complete;
                     this.scope.$on('componentComplete', this.initHandler.bind(this));
-                    this.content = this.transclude(this.scope);
+                    this.content = this.transclude(this.scope.$parent);
                     this.element
                         .show()
                         .append(this.content);
-
-                    this.lazyInit();
                 }
 
-                lazyInit() {
-                    var ctrl = this.attrs.controller;
+                initController() {
+                    var ctrl = this.scope.controller;
                     $timeout(() => {
                         // 全局定义
                         if (ctrl && window[ctrl]) {
@@ -50,9 +47,7 @@
                         }
 
                         //
-                        if (this.scope[this.completeName]) {
-                            this.scope[this.completeName]();
-                        }
+                        this.scope.onComplete({});
                     });
                 }
 
@@ -73,8 +68,22 @@
                 restrict: 'E',
                 replace: true,
                 transclude: true,
-                link: function (scope, element, attrs, ctrl, tranclude) {
-                    new UIContainer(scope, element, attrs, tranclude);
+                scope: {
+                    controller: '@',
+                    onComplete: '&'
+                },
+                compile: function () {
+                    var uiContainer = null;
+                    return {
+                        pre: function (scope, element, attrs, controller, transclude) {
+                            new UIContainer(scope, element, attrs, transclude);
+                            uiContainer.init();
+                            uiContainer.initEvents();
+                        },
+                        post: function () {
+                            uiContainer.initController();
+                        }
+                    };
                 },
                 template: `
                     <div></div>
