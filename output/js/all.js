@@ -128,8 +128,9 @@ angular.module('admin.service')
                         },
 
                         remove: function(url, data, options) {var this$0 = this;
-                            return util.confirm((("您确认删除该" + (options.label || '数据')) + "吗?"))
-                                .then(function()  {return this$0.message(url, data, '删除数据成功', '删除数据失败')});
+                            options = options || {};
+                            return Util.confirm((("您确认删除该" + (options.label || '数据')) + "吗?"))
+                                .then(function()  {return this$0[options.method ? options.method : 'get'](url, data, options)});
                         },
 
                         load: function(url) {
@@ -4041,6 +4042,54 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
+    .directive('uiFormUpload', function (UIInputControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function (scope, element, attrs) {
+                new UIInputControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-upload\">\
+\n                       <div>\
+\n                           <img class=\"{{css}}\"/>\
+\n                       </div>\
+\n                       <div class=\"btn-group\">\
+\n                           <button type=\"button\" class=\"btn blue start\">\
+\n                               <i class=\"fa fa-upload\"></i>\
+\n                               <span>选择文件</span>\
+\n                           </button>\
+\n                           <button type=\"button\" class=\"btn red start\">\
+\n                               <i class=\"fa fa-upload\"></i>\
+\n                               <span>删除文件</span>\
+\n                           </button>\
+\n                       </div>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
     .directive('uiSearchDate', function (UIDateControl) {
         return {
             restrict: 'E',
@@ -4184,54 +4233,6 @@ angular.module('admin.component')
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.input.select', attrs);
             }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormUpload', function (UIInputControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function (scope, element, attrs) {
-                new UIInputControl(scope, element, attrs);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-upload\">\
-\n                       <div>\
-\n                           <img class=\"{{css}}\"/>\
-\n                       </div>\
-\n                       <div class=\"btn-group\">\
-\n                           <button type=\"button\" class=\"btn blue start\">\
-\n                               <i class=\"fa fa-upload\"></i>\
-\n                               <span>选择文件</span>\
-\n                           </button>\
-\n                           <button type=\"button\" class=\"btn red start\">\
-\n                               <i class=\"fa fa-upload\"></i>\
-\n                               <span>删除文件</span>\
-\n                           </button>\
-\n                       </div>\
-\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>'\
-\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------
@@ -4778,7 +4779,7 @@ angular.module('admin.component')
 (function () {
     angular.module('admin.component')
         .factory('UIDialogControl', function (Util, Ajax, $compile, $controller, $q) {
-            var UIDialogControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDialogControl, super$0);var static$0={},proto$0={};
+            var UIDialogControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDialogControl, super$0);var proto$0={};
                 function UIDialogControl(scope, url, urlParam, transclude) {
                     super$0.call(this);
                     this.scope = scope;
@@ -4830,18 +4831,6 @@ angular.module('admin.component')
                     this.content.unbind('hidden.bs.modal');
                 };
 
-                static$0.alert = function(msg) {
-                    var defer = $q.defer();
-                    bootbox.alert({message: msg, callback: function()  {return defer.resolve()}});
-                    return defer.promise;
-                };
-
-                static$0.confirm = function(msg) {
-                    var defer = $q.defer();
-                    bootbox.confirm({message: msg, callback: function(r)  {return r ? defer.resolve() : defer.reject()}});
-                    return defer.promise;
-                };
-
                 proto$0._addEvents = function() {var this$0 = this;
                     this.content.bind('shown.bs.modal', function()  {
                         this$0.scope.onShow();
@@ -4850,7 +4839,7 @@ angular.module('admin.component')
                         this$0.scope.onHide();
                     });
                 };
-            MIXIN$0(UIDialogControl,static$0);MIXIN$0(UIDialogControl.prototype,proto$0);static$0=proto$0=void 0;return UIDialogControl;})(ComponentEvent);
+            MIXIN$0(UIDialogControl.prototype,proto$0);proto$0=void 0;return UIDialogControl;})(ComponentEvent);
             return UIDialogControl;
         });
 })();
@@ -4973,12 +4962,14 @@ angular.module('admin.component')
                 this.showAtIndex(this.scope.default || '0');
             };
 
-            proto$0.addTab = function(head, content, active) {
+            proto$0.addTab = function(head, content, active) {var this$0 = this;
                 var $h = $((("<ui-tab-item head=\"" + head) + ("\">" + content) + "</ui-tab-item>"));
                 this.bodyElement.append($h);
                 $compile($h)(this.scope);
                 if (active) {
-                    this.showAtIndex(this.bodyElement.find('li').length - 1);
+                    setTimeout(function()  {
+                        this$0.showAtIndex(this$0.bodyElement.find('li').length - 1);
+                    }, 10);
                 }
             };
 

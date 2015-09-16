@@ -66,8 +66,9 @@ angular.module('admin.service')
                         },
 
                         remove(url, data, options) {
-                            return util.confirm(`您确认删除该${options.label || '数据'}吗?`)
-                                .then(() => this.message(url, data, '删除数据成功', '删除数据失败'));
+                            options = options || {};
+                            return Util.confirm(`您确认删除该${options.label || '数据'}吗?`)
+                                .then(() => this[options.method ? options.method : 'get'](url, data, options));
                         },
 
                         load(url) {
