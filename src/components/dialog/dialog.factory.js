@@ -25,12 +25,9 @@
                         .show()
                         .then(() => {
                             try {
-                                $controller(controller, {$scope})
+                                $controller(window[controller] || controller, {$scope})
                             }
                             catch (e) {
-                                if (window[controller]) {
-                                    window[controller]($scope);
-                                }
                             }
                         });
                     return defer.promise;

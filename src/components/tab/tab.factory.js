@@ -33,7 +33,7 @@ angular.module('admin.component')
             initEvents() {
                 this.scope.$on('uitab.item.show', (evt, info) => {
                     setTimeout(() => {
-                        this.scope.onChange({index: info.index});
+                        this.scope.onChange({index: info.index, tabItem: this.tabItems[info.index]});
                     }, 60);
                 });
                 this.scope.$on('uitab.item.remove', (evt, index) => {
