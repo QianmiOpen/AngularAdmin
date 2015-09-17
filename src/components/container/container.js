@@ -33,7 +33,7 @@
                         // 全局定义
                         if (ctrl && window[ctrl]) {
                             var ctrlArgs = /\(([^\)]+)\)/.exec(window[ctrl].toString())[1],
-                                args = {$scope: this.scope};
+                                args = {$scope: this.scope.$parent};
                             ctrlArgs = ctrlArgs.split(',');
                             for (var i = 1, arg; i < ctrlArgs.length; i++) {
                                 arg = $.trim(ctrlArgs[i]);
@@ -43,7 +43,7 @@
                         }
                         //
                         else if (ctrl) {
-                            $controller(ctrl, {$scope: this.scope});
+                            $controller(ctrl, {$scope: this.scope.$parent});
                         }
 
                         //
