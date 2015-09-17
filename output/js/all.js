@@ -164,47 +164,46 @@ angular.module('admin.service')
 //
 //
 //-----------------------------------------------------------------------------------------------
+var c = window.console;
+var Logger = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var static$0={},proto$0={};
+
+    function Logger(className) {
+        this.className = className;
+    }DP$0(Logger,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+    proto$0.debug = function(m) {
+        Logger.debug((("" + (this.className)) + (" : " + m) + ""));
+    };
+
+    proto$0.info = function(m) {
+        Logger.info((("" + (this.className)) + (" : " + m) + ""));
+    };
+
+    proto$0.error = function(m) {
+        Logger.error((("" + (this.className)) + (" : " + m) + ""));
+    };
+
+    static$0.debug = function(m) {
+        if (c) {
+            c.debug ? c.debug(m) : c.log(m);
+        }
+    };
+
+    static$0.info = function(m) {
+        if (c) {
+            c.info ? c.info(m) : c.log(m);
+        }
+    };
+
+    static$0.error = function(m) {
+        if (c) {
+            c.error ? c.error(m) : c.log(m);
+        }
+    };
+
+MIXIN$0(Logger,static$0);MIXIN$0(Logger.prototype,proto$0);static$0=proto$0=void 0;return Logger;})();
 angular.module('admin.service')
     .factory('Logger', function () {
-        var c = window.console;
-        var Logger = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var static$0={},proto$0={};
-
-            function Logger(className) {
-                this.className = className;
-            }DP$0(Logger,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.debug = function(m) {
-                Logger.debug((("" + (this.className)) + (" : " + m) + ""));
-            };
-
-            proto$0.info = function(m) {
-                Logger.info((("" + (this.className)) + (" : " + m) + ""));
-            };
-
-            proto$0.error = function(m) {
-                Logger.error((("" + (this.className)) + (" : " + m) + ""));
-            };
-
-            static$0.debug = function(m) {
-                if (c) {
-                    c.debug ? c.debug(m) : c.log(m);
-                }
-            };
-
-            static$0.info = function(m) {
-                if (c) {
-                    c.info ? c.info(m) : c.log(m);
-                }
-            };
-
-            static$0.error = function(m) {
-                if (c) {
-                    c.error ? c.error(m) : c.log(m);
-                }
-            };
-
-        MIXIN$0(Logger,static$0);MIXIN$0(Logger.prototype,proto$0);static$0=proto$0=void 0;return Logger;})();
-
         return Logger;
     });
 var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};//-----------------------------------------------------------------------------------------------
@@ -1127,6 +1126,7 @@ var UIFormItemControl = (function(super$0){"use strict";var PRS$0 = (function(o,
         this.isSearchControl = element.hasClass('ui-search-item');
         this.formPrefix = this.isSearchControl ? '$search' : '$form';
         this.formResetEventName = this.isSearchControl ? 'uisearchform.reset' : 'uiform.reset';
+        this.logger = new Logger(this.formPrefix + this.className);
         this.init();
         this.initEvents();
         this.cleanElement();
@@ -1193,7 +1193,9 @@ MIXIN$0(UIFormItemControl.prototype,proto$0);proto$0=void 0;return UIFormItemCon
 
 
 angular.module('admin.component')
-    .factory('uiFormControl', function()  {return UIFormControl});
+    .factory('uiFormControl', function(){
+        return UIFormItemControl;
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -2348,8 +2350,9 @@ angular.module('admin.component')
                             this$0.val(value);
                         }
                         else {
-                            var val = this$0.val(),
+                            var val = this$0.val() || this$0.scope.model,
                                 m = /^\?.+:(.+)\s+\?$/.exec(val);
+                            this$0.logger.debug(("load => " + val));
                             this$0.val(m ? m[1] : val);
                         }
                     });
@@ -4137,6 +4140,44 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
+    .directive('uiSearchRegion', function (UIRegionControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                mode: '@'
+            },
+            link: function(s, e, a)  {
+                if (a.mode === undefined || a.mode == 'a') { //区域查询不支持详细地址
+                    a.mode = 's';
+                }
+                new UIRegionControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"input-inline ui-search-item\">\
+\n                    <div class=\"input-group ui-search-region\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}:</div>\
+\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-1px\" name=\"city\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-2px\" name=\"area\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
     .directive('uiSearchDate', function (UIDateControl) {
         return {
             restrict: 'E',
@@ -4280,44 +4321,6 @@ angular.module('admin.component')
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.input.select', attrs);
             }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchRegion', function (UIRegionControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                model: '=',
-                change: '&',
-                label: '@',
-                name: '@',
-                mode: '@'
-            },
-            link: function(s, e, a)  {
-                if (a.mode === undefined || a.mode == 'a') { //区域查询不支持详细地址
-                    a.mode = 's';
-                }
-                new UIRegionControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"input-inline ui-search-item\">\
-\n                    <div class=\"input-group ui-search-region\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}:</div>\
-\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-1px\" name=\"city\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-2px\" name=\"area\"/>\
-\n                    </div>\
-\n                </div>\
-\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------

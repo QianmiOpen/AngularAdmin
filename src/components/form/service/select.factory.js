@@ -95,8 +95,9 @@
                             this.val(value);
                         }
                         else {
-                            var val = this.val(),
+                            var val = this.val() || this.scope.model,
                                 m = /^\?.+:(.+)\s+\?$/.exec(val);
+                            this.logger.debug(`load => ${val}`);
                             this.val(m ? m[1] : val);
                         }
                     });

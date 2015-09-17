@@ -9,6 +9,7 @@ class UIFormItemControl extends ComponentEvent {
         this.isSearchControl = element.hasClass('ui-search-item');
         this.formPrefix = this.isSearchControl ? '$search' : '$form';
         this.formResetEventName = this.isSearchControl ? 'uisearchform.reset' : 'uiform.reset';
+        this.logger = new Logger(this.formPrefix + this.className);
         this.init();
         this.initEvents();
         this.cleanElement();
@@ -75,4 +76,6 @@ class UIFormItemControl extends ComponentEvent {
 
 
 angular.module('admin.component')
-    .factory('uiFormControl', () => UIFormControl);
+    .factory('uiFormControl', function(){
+        return UIFormItemControl;
+    });
