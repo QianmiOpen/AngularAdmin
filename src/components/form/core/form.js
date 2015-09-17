@@ -13,11 +13,14 @@ angular.module('admin.component')
             replace: true,
             scope: false,
             transclude: true,
+            scope: {
+                action: '@'
+            },
             compile: function () {
                 var form = null;
                 return {
                     pre: function (scope, element, attrs, controller, transclude) {
-                        form = new UIFormControl(scope, element, attrs, transclude(scope));
+                        form = new UIFormControl(scope, element, attrs, transclude(scope.$parent));
                     },
                     post: function () {
                         form.layout();
@@ -25,10 +28,13 @@ angular.module('admin.component')
                 };
             },
             template: `
-                <form action="#" class="form-horizontal">
-                    <div class="form-body">
-                    </div>
-                </form>
+                <div class="form">
+                    <form action="{{action}}" class="form-horizontal form-bordered form-row-stripped">
+                        <div class="form-body">
+                        </div>
+                    </form>
+                </div>
+
             `
         };
     });

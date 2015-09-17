@@ -40,7 +40,8 @@
 
                 init() {
                     super.init();
-                    this.action = this.attrs.action.replace(/#/g, '');
+                    if(this.scope.action)
+                        this.action = this.scope.action.replace(/#/g, '');
                     this.scope.$on('componentComplete', (evt, o) => {
                         this.formControlMap[o.name] = o.component;
                     });

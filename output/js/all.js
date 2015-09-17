@@ -953,11 +953,14 @@ angular.module('admin.component')
             replace: true,
             scope: false,
             transclude: true,
+            scope: {
+                action: '@'
+            },
             compile: function () {
                 var form = null;
                 return {
                     pre: function (scope, element, attrs, controller, transclude) {
-                        form = new UIFormControl(scope, element, attrs, transclude(scope));
+                        form = new UIFormControl(scope, element, attrs, transclude(scope.$parent));
                     },
                     post: function () {
                         form.layout();
@@ -965,10 +968,13 @@ angular.module('admin.component')
                 };
             },
             template: ("\
-\n                <form action=\"#\" class=\"form-horizontal\">\
-\n                    <div class=\"form-body\">\
-\n                    </div>\
-\n                </form>\
+\n                <div class=\"form\">\
+\n                    <form action=\"{{action}}\" class=\"form-horizontal form-bordered form-row-stripped\">\
+\n                        <div class=\"form-body\">\
+\n                        </div>\
+\n                    </form>\
+\n                </div>\
+\n\
 \n            ")
         };
     });
@@ -1490,7 +1496,8 @@ angular.module('admin.component')
 
                 proto$0.init = function() {var this$0 = this;
                     super$0.prototype.init.call(this);
-                    this.action = this.attrs.action.replace(/#/g, '');
+                    if(this.scope.action)
+                        this.action = this.scope.action.replace(/#/g, '');
                     this.scope.$on('componentComplete', function(evt, o)  {
                         this$0.formControlMap[o.name] = o.component;
                     });
@@ -4560,6 +4567,38 @@ angular.module('admin.component')
 
 
 
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+
+    angular.module('admin.component')
+        .directive('maxlength', function () {
+            return {
+                restrict: 'a',
+                link: function (scope, element, attrs) {
+                    var length = attrs.maxlength;
+                    if (/^\d+$/g.test(length)) {
+                        $('input.className').maxlength({
+                            alwaysShow: true,
+                            threshold: Math.ceil(length / 2),
+                            warningClass: "label label-info",
+                            limitReachedClass: "label label-warning",
+                            placement: 'bottom ',
+                            preText: '已输入 ',
+                            postText: ' 个字符',
+                            separator: ' - '
+                        });
+                    }
+                },
+                template: ("")
+            };
+        });
+})();
 //-----------------------------------------------------------------------------------------------
 //
 //

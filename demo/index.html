@@ -17,7 +17,7 @@
     <ui-breadcrumb datas="['A', 'B', 'C', 'D', 'E']"></ui-breadcrumb>
 
     <h4>输入表单</h4>
-    <form action="#" class="form-horizontal">
+    <ui-form>
         <ui-form-date mode="datetime" label="日期:" placeholder="什么鬼" help="醉了" model="item.formDate" change="dateChangeHandler(val)"></ui-form-date>
         <ui-form-date-range mode="datetime" label="日期范围:" help="醉了3" from-model="item.formRangeFromDate" to-model="item.formRangeToDate" change="dateRangeChangeHandler(startVal, endVal)"></ui-form-date-range>
         <ui-form-input label="输入框:" help="醉了4" model="item.formInput" change="inputChangeHandler()"></ui-form-input>
@@ -32,7 +32,7 @@
         <ui-form-region label="地域:" model="item.formRegion" help="醉了8" change="regionChangeHandler(mode, val, p, c, s)"></ui-form-region>
         <ui-form-editor label="百度编辑器:" model="item.formEditor" help="醉了9" change="editorChangeHandler(val)"></ui-form-editor>
         <ui-form-upload label="七牛上传:" model="item.formUpload" help="醉了10" change="uploadChangeHandler(val, name)" css="uploadImage"></ui-form-upload>
-    </form>
+    </ui-form>
 
     <h4>查询表单</h4>
     <form action="#" class="form-inline">
