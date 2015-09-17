@@ -20,6 +20,7 @@ angular.module('admin.component')
             }
 
             init() {
+                this.tabItems = [];
                 this.scope.component = this;
                 this.bodyElement = this.element.find('ul');
                 this.isLazy = this.scope.lazy != 'false';
@@ -37,6 +38,9 @@ angular.module('admin.component')
                 });
                 this.scope.$on('uitab.item.remove', (evt, index) => {
                     this.scope.onRemove({index: index});
+                });
+                this.scope.$on('uitab.item.complete', (evt, item) => {
+                    this.tabItems.push(item);
                 });
             }
 

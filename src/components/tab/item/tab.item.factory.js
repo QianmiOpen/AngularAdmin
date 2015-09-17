@@ -21,6 +21,7 @@ angular.module('admin.component')
 
             init() {
                 this.scope.component = this;
+                this.scope.$emit('uitab.item.complete', this);
             }
 
             initEvents() {
@@ -45,6 +46,10 @@ angular.module('admin.component')
                         });
                     }
                 });
+            }
+
+            setTitle(title) {
+                this.scope.head = title;
             }
 
             clickHandler(evt) {
