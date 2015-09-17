@@ -53,6 +53,7 @@ var scripts = [
         './output/assets/js/bootstrap-modal/js/bootstrap-modal.js',
         './output/assets/js/bootstrap-modal/js/bootstrap-modalmanager.js',
         './output/assets/js/bootstrap-editable/bootstrap-editable/js/bootstrap-editable.js',
+        './output/assets/js/bootstrap-maxlength.min.js'
         //'./output/assets/js/highcharts/js/highcharts.js',
         //'./output/assets/js/zTree_v3/js/jquery.ztree.all-3.5.min.js'
     ];
