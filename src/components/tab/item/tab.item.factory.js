@@ -72,9 +72,10 @@ angular.module('admin.component')
                     return Util.toPromise(this.wrapperContent(html));
                 }
                 else if (this.scope.url) {
-                    return Ajax.get(this.scope.url)
+                    return Ajax.load(this.scope.url)
                         .then((html) => {
-                            return this.wrapperContent(html);
+                            this.content = this.wrapperContent(html);
+                            return this.content;
                         });
                 }
                 else {

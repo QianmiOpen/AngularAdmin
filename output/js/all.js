@@ -163,193 +163,6 @@ angular.module('admin.service')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.service')
-    .factory('Logger', function () {
-        var c = window.console;
-        var Logger = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var static$0={},proto$0={};
-
-            function Logger(className) {
-                this.className = className;
-            }DP$0(Logger,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.debug = function(m) {
-                Logger.debug((("" + (this.className)) + (" : " + m) + ""));
-            };
-
-            proto$0.info = function(m) {
-                Logger.info((("" + (this.className)) + (" : " + m) + ""));
-            };
-
-            proto$0.error = function(m) {
-                Logger.error((("" + (this.className)) + (" : " + m) + ""));
-            };
-
-            static$0.debug = function(m) {
-                if (c) {
-                    c.debug ? c.debug(m) : c.log(m);
-                }
-            };
-
-            static$0.info = function(m) {
-                if (c) {
-                    c.info ? c.info(m) : c.log(m);
-                }
-            };
-
-            static$0.error = function(m) {
-                if (c) {
-                    c.error ? c.error(m) : c.log(m);
-                }
-            };
-
-        MIXIN$0(Logger,static$0);MIXIN$0(Logger.prototype,proto$0);static$0=proto$0=void 0;return Logger;})();
-
-        return Logger;
-    });
-var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-if (window.toastr) {
-    toastr.options = {
-        "closeButton": true,
-        "debug": false,
-        "positionClass": "toast-top-center",
-        "showDuration": "1000",
-        "hideDuration": "1000",
-        "timeOut": "5000",
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
-    };
-}
-else {
-    console.error('需要 toastr库 支持, 请导入...');
-}
-
-var Message = (function(){"use strict";var static$0={},proto$0={};
-    function Message(className) {
-        this.className = className ? className + ': ' : '';
-    }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-    proto$0.success = function(msg, title) {
-        Message.success(this.className + msg, title);
-    };
-
-    static$0.success = function(msg, title) {
-        title = title || '成功';
-        toastr.success((this.className || '') + msg, title);
-    };
-
-    proto$0.info = function(msg, title) {
-        Message.info(this.className + msg, title);
-    };
-
-    static$0.info = function(msg, title) {
-        title = title || '消息';
-        toastr.info((this.className || '') + msg, title);
-    };
-
-    proto$0.warning = function(msg, title) {
-        Message.warning(this.className + msg, title);
-    };
-
-    static$0.warning = function(msg, title) {
-        title = title || '警告';
-        toastr.warning(msg, title);
-    };
-
-    proto$0.error = function(msg, title) {
-        Message.error(this.className + msg, title);
-    };
-
-    static$0.error = function(msg, title) {
-        title = title || '错误';
-        toastr.error(msg, title);
-    };
-MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
-
-var MessageProvider = (function(){"use strict";function MessageProvider() {}DP$0(MessageProvider,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
-
-    proto$0.setPostion = function(v, h) {
-        toastr.options.positionClass = 'toast-' + v + '-' + h;
-    };
-
-    proto$0.$get = function() {
-        return Message;
-    };
-MIXIN$0(MessageProvider.prototype,proto$0);proto$0=void 0;return MessageProvider;})();
-
-/**
- * 导出
- */
-angular.module('admin.service')
-    .provider('msg', MessageProvider)
-    .provider('Message', function()  {
-        var result = {
-            setPosition: function(v, h) {
-                toastr.options.positionClass = 'toast-' + v + '-' + h;
-            },
-
-            $get: function() {
-                var Message = (function(){var static$0={},proto$0={};
-                    function Message(className) {
-                        this.className = className ? className + ': ' : '';
-                    }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-                    proto$0.success = function(msg, title) {
-                        Message.success(this.className + msg, title);
-                    };
-
-                    static$0.success = function(msg, title) {
-                        title = title || '成功';
-                        toastr.success((this.className || '') + msg, title);
-                    };
-
-                    proto$0.info = function(msg, title) {
-                        Message.info(this.className + msg, title);
-                    };
-
-                    static$0.info = function(msg, title) {
-                        title = title || '消息';
-                        toastr.info((this.className || '') + msg, title);
-                    };
-
-                    proto$0.warning = function(msg, title) {
-                        Message.warning(this.className + msg, title);
-                    };
-
-                    static$0.warning = function(msg, title) {
-                        title = title || '警告';
-                        toastr.warning(msg, title);
-                    };
-
-                    proto$0.error = function(msg, title) {
-                        Message.error(this.className + msg, title);
-                    };
-
-                    static$0.error = function(msg, title) {
-                        title = title || '错误';
-                        toastr.error(msg, title);
-                    };
-                MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
-                return Message;
-            }
-        };
-        return result;
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.service')
     .factory('PaginationFactory', function (Ajax) {
         var P = function (url, index, size, pageLimit, dataName, totalName) {
             this.url = url;
@@ -641,7 +454,7 @@ angular.module('admin.service')
                 } else {
                     if (character == k) kp++;
                     else {
-                        if (shift_nums[character] && e.shiftKey) {
+                        if (shift_nums[character] && evt.shiftKey) {
                             character = shift_nums[character];
                             if (character == k) kp++;
                         }
@@ -799,16 +612,11 @@ angular.module('admin.service')
              * @returns {promise}
              */
             confirm: function (msg) {
-                if (bootbox) {
-                    var def = $q.defer();
-                    bootbox.confirm(msg, function (result) {
-                        result ? def.resolve() : def.reject();
-                    });
-                    return def.promise;
-                }
-                else {
-                    throw new Error('需要 bootbox库 支持, 请导入....');
-                }
+                var def = $q.defer();
+                bootbox.confirm(msg, function (result) {
+                    result ? def.resolve() : def.reject();
+                });
+                return def.promise;
             },
 
             /**
@@ -883,6 +691,193 @@ angular.module('admin.service')
         .service('ValueService', ValueService);
 })();
 
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.service')
+    .factory('Logger', function () {
+        var c = window.console;
+        var Logger = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var static$0={},proto$0={};
+
+            function Logger(className) {
+                this.className = className;
+            }DP$0(Logger,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.debug = function(m) {
+                Logger.debug((("" + (this.className)) + (" : " + m) + ""));
+            };
+
+            proto$0.info = function(m) {
+                Logger.info((("" + (this.className)) + (" : " + m) + ""));
+            };
+
+            proto$0.error = function(m) {
+                Logger.error((("" + (this.className)) + (" : " + m) + ""));
+            };
+
+            static$0.debug = function(m) {
+                if (c) {
+                    c.debug ? c.debug(m) : c.log(m);
+                }
+            };
+
+            static$0.info = function(m) {
+                if (c) {
+                    c.info ? c.info(m) : c.log(m);
+                }
+            };
+
+            static$0.error = function(m) {
+                if (c) {
+                    c.error ? c.error(m) : c.log(m);
+                }
+            };
+
+        MIXIN$0(Logger,static$0);MIXIN$0(Logger.prototype,proto$0);static$0=proto$0=void 0;return Logger;})();
+
+        return Logger;
+    });
+var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+if (window.toastr) {
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "positionClass": "toast-top-center",
+        "showDuration": "1000",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+}
+else {
+    console.error('需要 toastr库 支持, 请导入...');
+}
+
+var Message = (function(){"use strict";var static$0={},proto$0={};
+    function Message(className) {
+        this.className = className ? className + ': ' : '';
+    }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+    proto$0.success = function(msg, title) {
+        Message.success(this.className + msg, title);
+    };
+
+    static$0.success = function(msg, title) {
+        title = title || '成功';
+        toastr.success((this.className || '') + msg, title);
+    };
+
+    proto$0.info = function(msg, title) {
+        Message.info(this.className + msg, title);
+    };
+
+    static$0.info = function(msg, title) {
+        title = title || '消息';
+        toastr.info((this.className || '') + msg, title);
+    };
+
+    proto$0.warning = function(msg, title) {
+        Message.warning(this.className + msg, title);
+    };
+
+    static$0.warning = function(msg, title) {
+        title = title || '警告';
+        toastr.warning(msg, title);
+    };
+
+    proto$0.error = function(msg, title) {
+        Message.error(this.className + msg, title);
+    };
+
+    static$0.error = function(msg, title) {
+        title = title || '错误';
+        toastr.error(msg, title);
+    };
+MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
+
+var MessageProvider = (function(){"use strict";function MessageProvider() {}DP$0(MessageProvider,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
+
+    proto$0.setPostion = function(v, h) {
+        toastr.options.positionClass = 'toast-' + v + '-' + h;
+    };
+
+    proto$0.$get = function() {
+        return Message;
+    };
+MIXIN$0(MessageProvider.prototype,proto$0);proto$0=void 0;return MessageProvider;})();
+
+/**
+ * 导出
+ */
+angular.module('admin.service')
+    .provider('msg', MessageProvider)
+    .provider('Message', function()  {
+        var result = {
+            setPosition: function(v, h) {
+                toastr.options.positionClass = 'toast-' + v + '-' + h;
+            },
+
+            $get: function() {
+                var Message = (function(){var static$0={},proto$0={};
+                    function Message(className) {
+                        this.className = className ? className + ': ' : '';
+                    }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                    proto$0.success = function(msg, title) {
+                        Message.success(this.className + msg, title);
+                    };
+
+                    static$0.success = function(msg, title) {
+                        title = title || '成功';
+                        toastr.success((this.className || '') + msg, title);
+                    };
+
+                    proto$0.info = function(msg, title) {
+                        Message.info(this.className + msg, title);
+                    };
+
+                    static$0.info = function(msg, title) {
+                        title = title || '消息';
+                        toastr.info((this.className || '') + msg, title);
+                    };
+
+                    proto$0.warning = function(msg, title) {
+                        Message.warning(this.className + msg, title);
+                    };
+
+                    static$0.warning = function(msg, title) {
+                        title = title || '警告';
+                        toastr.warning(msg, title);
+                    };
+
+                    proto$0.error = function(msg, title) {
+                        Message.error(this.className + msg, title);
+                    };
+
+                    static$0.error = function(msg, title) {
+                        title = title || '错误';
+                        toastr.error(msg, title);
+                    };
+                MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
+                return Message;
+            }
+        };
+        return result;
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -2918,6 +2913,154 @@ angular.module('admin.component')
             return result;
         });
 })();
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .factory('UITabItemControl', function (Ajax, Util, $compile) {
+        var UITabItemControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabItemControl, super$0);var proto$0={};
+            function UITabItemControl(scope, element, attrs, transclude) {
+                super$0.call(this);
+                this.element = element;
+                this.scope = scope;
+                this.attrs = attrs;
+                this.transclude = transclude;
+                this.message = new Message('UITabItem');
+                this.init();
+                this.initEvents();
+            }if(super$0!==null)SP$0(UITabItemControl,super$0);UITabItemControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabItemControl,"configurable":true,"writable":true}});DP$0(UITabItemControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                this.scope.component = this;
+            };
+
+            proto$0.initEvents = function() {var this$0 = this;
+                this.scope.$on('uitab.item.remove', function(evt, index)  {
+                    if (index == this$0.element.index()) {
+                        this$0.remove();
+                    }
+                });
+                this.scope.$on('uitab.item.show', function(evt, o)  {
+                    var index = o.index,
+                        isLazy = o.lazy;
+                    if (index == this$0.element.index()) {
+                        this$0._show();
+                    }
+                    else if (this$0.content) {
+                        this$0._hide();
+                    }
+                    else if (!isLazy) {
+                        this$0.getContent().then(function()  {
+                            this$0.getContainer().append(this$0.content);
+                            this$0.content.hide();
+                        });
+                    }
+                });
+            };
+
+            proto$0.clickHandler = function(evt) {
+                this.scope.$parent.$broadcast('uitab.item.show', {index: this.element.index()});
+                evt.stopPropagation();
+            };
+
+            proto$0.removeHandler = function(evt) {
+                this.scope.$parent.$broadcast('uitab.item.remove', this.element.index());
+                evt.stopPropagation();
+            };
+
+            proto$0.getContainer = function() {
+                if (!this.bodyElement) {
+                    this.bodyElement = this.element.parents('.ui-tab').find('.tab-content');
+                    if (this.bodyElement.length === 0) {
+                        this.bodyElement = this.element.parents('.portlet').find('.portlet-body');
+                    }
+                }
+                return this.bodyElement;
+            };
+
+            proto$0.getContent = function() {var this$0 = this;
+                if (this.content) {
+                    return Util.toPromise(this.wrapperContent(html));
+                }
+                else if (this.scope.url) {
+                    return Ajax.load(this.scope.url)
+                        .then(function(html)  {
+                            this$0.content = this$0.wrapperContent(html);
+                            return this$0.content;
+                        });
+                }
+                else {
+                    this.transclude(this.scope.$parent.$parent, function(dom)  {
+                        this$0.content = dom;
+                    });
+                    return Util.toPromise(this.content);
+                }
+            };
+
+            proto$0.wrapperContent = function(html) {
+                return $compile(html)(this.scope.$parent.$parent);
+            };
+
+            proto$0._show = function() {var this$0 = this;
+                if (this.content) {
+                    this.content.show();
+                }
+                else {
+                    this.getContent()
+                        .then(function()  {
+                            this$0.getContainer().append(this$0.content);
+                            this$0.content.show();
+                        });
+                }
+                this.scope.active = true;
+            };
+
+            proto$0._hide = function() {
+                if (this.content) {
+                    this.content.hide();
+                }
+                this.scope.active = false;
+            };
+
+            proto$0.remove = function() {var this$0 = this;
+                setTimeout(function() {
+                    this$0.element.remove();
+                    this$0.content && this$0.content.remove();
+                    this$0.scope.$destroy();
+                }, 100);
+            };
+        MIXIN$0(UITabItemControl.prototype,proto$0);proto$0=void 0;return UITabItemControl;})(ComponentEvent);
+
+        return UITabItemControl;
+    });
+angular.module('admin.component')
+    .directive('uiTabItem', function (UITabItemControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                head: '@',
+                url: '@'
+            },
+            link: function($scope, $element, $attrs, controller, $transclude)  {
+                new UITabItemControl($scope, $element, $attrs, $transclude);
+            },
+            template: ("\
+\n                <li ng-class=\"{'active': active}\">\
+\n                    <a href=\"javascript:;\" ng-click=\"component.clickHandler($event)\">\
+\n                        <span>{{head}}</span>\
+\n                        <i class=\"fa fa-times\" ng-click=\"component.removeHandler($event)\"></i>\
+\n                    </a>\
+\n                </li>\
+\n            ")
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -3030,153 +3173,6 @@ angular.module('admin.component')
 
 
 
-
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('UITabItemControl', function (Ajax, Util, $compile) {
-        var UITabItemControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabItemControl, super$0);var proto$0={};
-            function UITabItemControl(scope, element, attrs, transclude) {
-                super$0.call(this);
-                this.element = element;
-                this.scope = scope;
-                this.attrs = attrs;
-                this.transclude = transclude;
-                this.message = new Message('UITabItem');
-                this.init();
-                this.initEvents();
-            }if(super$0!==null)SP$0(UITabItemControl,super$0);UITabItemControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabItemControl,"configurable":true,"writable":true}});DP$0(UITabItemControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                this.scope.component = this;
-            };
-
-            proto$0.initEvents = function() {var this$0 = this;
-                this.scope.$on('uitab.item.remove', function(evt, index)  {
-                    if (index == this$0.element.index()) {
-                        this$0.remove();
-                    }
-                });
-                this.scope.$on('uitab.item.show', function(evt, o)  {
-                    var index = o.index,
-                        isLazy = o.lazy;
-                    if (index == this$0.element.index()) {
-                        this$0._show();
-                    }
-                    else if (this$0.content) {
-                        this$0._hide();
-                    }
-                    else if (!isLazy) {
-                        this$0.getContent().then(function()  {
-                            this$0.getContainer().append(this$0.content);
-                            this$0.content.hide();
-                        });
-                    }
-                });
-            };
-
-            proto$0.clickHandler = function(evt) {
-                this.scope.$parent.$broadcast('uitab.item.show', {index: this.element.index()});
-                evt.stopPropagation();
-            };
-
-            proto$0.removeHandler = function(evt) {
-                this.scope.$parent.$broadcast('uitab.item.remove', this.element.index());
-                evt.stopPropagation();
-            };
-
-            proto$0.getContainer = function() {
-                if (!this.bodyElement) {
-                    this.bodyElement = this.element.parents('.ui-tab').find('.tab-content');
-                    if (this.bodyElement.length === 0) {
-                        this.bodyElement = this.element.parents('.portlet').find('.portlet-body');
-                    }
-                }
-                return this.bodyElement;
-            };
-
-            proto$0.getContent = function() {var this$0 = this;
-                if (this.content) {
-                    return Util.toPromise(this.wrapperContent(html));
-                }
-                else if (this.scope.url) {
-                    return Ajax.get(this.scope.url)
-                        .then(function(html)  {
-                            return this$0.wrapperContent(html);
-                        });
-                }
-                else {
-                    this.transclude(this.scope.$parent.$parent, function(dom)  {
-                        this$0.content = dom;
-                    });
-                    return Util.toPromise(this.content);
-                }
-            };
-
-            proto$0.wrapperContent = function(html) {
-                return $compile(html)(this.scope.$parent.$parent);
-            };
-
-            proto$0._show = function() {var this$0 = this;
-                if (this.content) {
-                    this.content.show();
-                }
-                else {
-                    this.getContent()
-                        .then(function()  {
-                            this$0.getContainer().append(this$0.content);
-                            this$0.content.show();
-                        });
-                }
-                this.scope.active = true;
-            };
-
-            proto$0._hide = function() {
-                if (this.content) {
-                    this.content.hide();
-                }
-                this.scope.active = false;
-            };
-
-            proto$0.remove = function() {var this$0 = this;
-                setTimeout(function() {
-                    this$0.element.remove();
-                    this$0.content && this$0.content.remove();
-                    this$0.scope.$destroy();
-                }, 100);
-            };
-        MIXIN$0(UITabItemControl.prototype,proto$0);proto$0=void 0;return UITabItemControl;})(ComponentEvent);
-
-        return UITabItemControl;
-    });
-angular.module('admin.component')
-    .directive('uiTabItem', function (UITabItemControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                head: '@',
-                url: '@'
-            },
-            link: function($scope, $element, $attrs, controller, $transclude)  {
-                new UITabItemControl($scope, $element, $attrs, $transclude);
-            },
-            template: ("\
-\n                <li ng-class=\"{'active': active}\">\
-\n                    <a href=\"javascript:;\" ng-click=\"component.clickHandler($event)\">\
-\n                        <span>{{head}}</span>\
-\n                        <i class=\"fa fa-times\" ng-click=\"component.removeHandler($event)\"></i>\
-\n                    </a>\
-\n                </li>\
-\n            ")
-        };
-    });
 
 //------------------------------------------------------
 //
@@ -4783,7 +4779,7 @@ angular.module('admin.component')
                         else {
                             $parent[args.ref] = args.component;
                         }
-                        this.logger.debug((("" + (args.ref)) + (" => " + (this.scope[args.ref])) + ""))
+                        this.logger.debug((("" + (args.ref)) + (" => " + ($parent[args.ref])) + ""))
                     }
                 };
             MIXIN$0(UIContainer.prototype,proto$0);proto$0=void 0;return UIContainer;})(Event);
@@ -4837,6 +4833,36 @@ angular.module('admin.component')
 //------------------------------------------------------
 (function () {
     angular.module('admin.component')
+        .factory('UIDialog', function (UIDialogControl, $controller, $q) {
+            return {
+                show: function(url, $scope, controller) {
+                    var defer = $q.defer(),
+                        dialog = new UIDialogControl($scope, url);
+                    //
+                    $scope.onShow = function()  {
+                        defer.resolve(dialog);
+                    };
+                    $scope.onHide = function()  {
+                        defer.reject(dialog);
+                    };
+
+                    //
+                    dialog
+                        .show()
+                        .then(function()  {
+                            try {
+                                $controller(controller, {$scope: $scope})
+                            }
+                            catch (e) {
+                                if (window[controller]) {
+                                    window[controller]($scope);
+                                }
+                            }
+                        });
+                    return defer.promise;
+                }
+            };
+        })
         .factory('UIDialogControl', function (Util, Ajax, $compile, $controller, $q) {
             var UIDialogControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDialogControl, super$0);var proto$0={};
                 function UIDialogControl(scope, url, urlParam, transclude) {
@@ -4853,8 +4879,10 @@ angular.module('admin.component')
                         .then(function()  {
                             this$0.content.modal({
                                 "keyboard": true,
+                                "size": "large",
                                 "show": true
                             });
+                            return this$0.content;
                         });
                 };
 
@@ -4920,66 +4948,6 @@ angular.module('admin.component')
             },
             template: ("\
 \n                <div class=\"ui-dialog\"></div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .controller('UIPortalControl', function () {
-
-        var UIPortalControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIPortalControl, super$0);var proto$0={};
-            function UIPortalControl(scope, element, attrs, transclude) {
-                super$0.call(this);
-                this.element = element;
-                this.scope = scope;
-                this.attrs = attrs;
-                this.transclude = transclude;
-                this.message = new Message('UIPortal');
-                this.init();
-                this.initEvents();
-            }if(super$0!==null)SP$0(UIPortalControl,super$0);UIPortalControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIPortalControl,"configurable":true,"writable":true}});DP$0(UIPortalControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function(){
-            };
-
-            proto$0.initEvents = function(){
-            };
-        MIXIN$0(UIPortalControl.prototype,proto$0);proto$0=void 0;return UIPortalControl;})(ComponentEvent);
-
-        return UIPortalControl;
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiPortal', function (UIPortalControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                url: '@'
-            },
-            link: function(s, e, a, c, t)  {
-                new UIPortalControl(s, e, a, t);
-            },
-            templateUrl: ("\
-\n                <div class=\"row ui-sortable\">\
-\n                    <div class=\"column sortable col-md-{{eachColumn}}\" ng-repeat=\"column in columns\">\
-\n                        <ui-portlet-container ng-repeat=\"portlet in column\"></ui-portlet-container>\
-\n                        <div class=\"portlet-container portlet-sortable-empty\"></div>\
-\n                    </div>\
-\n                </div>\
 \n            ")
         };
     });
@@ -5095,6 +5063,66 @@ angular.module('admin.component')
         };
     });
 
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .controller('UIPortalControl', function () {
+
+        var UIPortalControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIPortalControl, super$0);var proto$0={};
+            function UIPortalControl(scope, element, attrs, transclude) {
+                super$0.call(this);
+                this.element = element;
+                this.scope = scope;
+                this.attrs = attrs;
+                this.transclude = transclude;
+                this.message = new Message('UIPortal');
+                this.init();
+                this.initEvents();
+            }if(super$0!==null)SP$0(UIPortalControl,super$0);UIPortalControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIPortalControl,"configurable":true,"writable":true}});DP$0(UIPortalControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function(){
+            };
+
+            proto$0.initEvents = function(){
+            };
+        MIXIN$0(UIPortalControl.prototype,proto$0);proto$0=void 0;return UIPortalControl;})(ComponentEvent);
+
+        return UIPortalControl;
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiPortal', function (UIPortalControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                url: '@'
+            },
+            link: function(s, e, a, c, t)  {
+                new UIPortalControl(s, e, a, t);
+            },
+            templateUrl: ("\
+\n                <div class=\"row ui-sortable\">\
+\n                    <div class=\"column sortable col-md-{{eachColumn}}\" ng-repeat=\"column in columns\">\
+\n                        <ui-portlet-container ng-repeat=\"portlet in column\"></ui-portlet-container>\
+\n                        <div class=\"portlet-container portlet-sortable-empty\"></div>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //

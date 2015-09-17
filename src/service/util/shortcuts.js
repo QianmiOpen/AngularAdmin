@@ -181,7 +181,7 @@
                 } else {
                     if (character == k) kp++;
                     else {
-                        if (shift_nums[character] && e.shiftKey) {
+                        if (shift_nums[character] && evt.shiftKey) {
                             character = shift_nums[character];
                             if (character == k) kp++;
                         }

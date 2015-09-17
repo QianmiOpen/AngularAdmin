@@ -7,6 +7,36 @@
 //------------------------------------------------------
 (function () {
     angular.module('admin.component')
+        .factory('UIDialog', function (UIDialogControl, $controller, $q) {
+            return {
+                show(url, $scope, controller) {
+                    let defer = $q.defer(),
+                        dialog = new UIDialogControl($scope, url);
+                    //
+                    $scope.onShow = () => {
+                        defer.resolve(dialog);
+                    };
+                    $scope.onHide = () => {
+                        defer.reject(dialog);
+                    };
+
+                    //
+                    dialog
+                        .show()
+                        .then(() => {
+                            try {
+                                $controller(controller, {$scope})
+                            }
+                            catch (e) {
+                                if (window[controller]) {
+                                    window[controller]($scope);
+                                }
+                            }
+                        });
+                    return defer.promise;
+                }
+            };
+        })
         .factory('UIDialogControl', function (Util, Ajax, $compile, $controller, $q) {
             class UIDialogControl extends ComponentEvent {
                 constructor(scope, url, urlParam, transclude) {
@@ -23,8 +53,10 @@
                         .then(() => {
                             this.content.modal({
                                 "keyboard": true,
+                                "size": "large",
                                 "show": true
                             });
+                            return this.content;
                         });
                 }
 

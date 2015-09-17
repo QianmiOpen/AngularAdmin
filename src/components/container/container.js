@@ -61,7 +61,7 @@
                         else {
                             $parent[args.ref] = args.component;
                         }
-                        this.logger.debug(`${args.ref} => ${this.scope[args.ref]}`)
+                        this.logger.debug(`${args.ref} => ${$parent[args.ref]}`)
                     }
                 }
             }

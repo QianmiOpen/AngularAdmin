@@ -126,16 +126,11 @@ angular.module('admin.service')
              * @returns {promise}
              */
             confirm: function (msg) {
-                if (bootbox) {
-                    var def = $q.defer();
-                    bootbox.confirm(msg, function (result) {
-                        result ? def.resolve() : def.reject();
-                    });
-                    return def.promise;
-                }
-                else {
-                    throw new Error('需要 bootbox库 支持, 请导入....');
-                }
+                var def = $q.defer();
+                bootbox.confirm(msg, function (result) {
+                    result ? def.resolve() : def.reject();
+                });
+                return def.promise;
             },
 
             /**
