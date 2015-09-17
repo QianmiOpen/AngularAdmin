@@ -53,9 +53,7 @@ angular.module('admin.component')
                 this.bodyElement.append($h);
                 $compile($h)(this.scope);
                 if (active) {
-                    setTimeout(() => {
-                        this.showAtIndex(this.bodyElement.find('li').length - 1);
-                    }, 50);
+                    this.showAtIndex(this.bodyElement.find('li').length - 1);
                 }
             }
 

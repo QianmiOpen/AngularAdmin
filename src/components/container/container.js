@@ -7,7 +7,7 @@
 (function () {
 
     angular.module('admin.component')
-        .directive('uiContainer', function ($timeout, $controller, $injector) {
+        .directive('uiContainer', function ($timeout, $controller, $injector, Logger) {
 
             class UIContainer extends Event {
 
@@ -16,10 +16,11 @@
                     this.element = element;
                     this.attrs = attrs;
                     this.transclude = $transclude;
+                    this.logger = new Logger('UIContainer');
                 }
 
                 init() {
-                    this.scope.$on('componentComplete', this.initHandler.bind(this));
+                    this.scope.$parent.$on('componentComplete', this.initHandler.bind(this));
                     this.content = this.transclude(this.scope.$parent);
                     this.element
                         .show()
@@ -52,13 +53,15 @@
 
                 initHandler(evt, args) {
                     if (args) {
-                        if (this.scope[args.ref]) {
-                            this.scope[args.ref] = [].concat(this.scope[args.ref]);
-                            this.scope[args.ref].push(args.component);
+                        let $parent = this.scope.$parent;
+                        if ($parent[args.ref]) {
+                            $parent[args.ref] = [].concat($parent[args.ref]);
+                            $parent[args.ref].push(args.component);
                         }
                         else {
-                            this.scope[args.ref] = args.component;
+                            $parent[args.ref] = args.component;
                         }
+                        this.logger.debug(`${args.ref} => ${this.scope[args.ref]}`)
                     }
                 }
             }

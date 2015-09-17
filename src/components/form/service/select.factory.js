@@ -49,7 +49,6 @@
                         r[this.scope.valueName] = o.value;
                         this.dataList.push(r);
                     });
-                    console.log(this.dataList);
                 }
 
                 initEvents() {
