@@ -63,9 +63,7 @@
 
                 hide() {
                     if (this.content) {
-                        this.content.modal({
-                            "show": false
-                        });
+                        this.content.modal('hide');
                     }
                 }
 
@@ -88,9 +86,11 @@
                 }
 
                 remove() {
-                    super.remove();
+                    this.hide();
                     this.content.unbind('shown.bs.modal');
                     this.content.unbind('hidden.bs.modal');
+                    this.content.remove();
+                    super.remove();
                 }
 
                 close() {

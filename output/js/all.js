@@ -165,193 +165,6 @@ angular.module('admin.service')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.service')
-    .factory('Logger', function () {
-        var c = window.console;
-        var Logger = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var static$0={},proto$0={};
-
-            function Logger(className) {
-                this.className = className;
-            }DP$0(Logger,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.debug = function(m) {
-                Logger.debug((("" + (this.className)) + (" : " + m) + ""));
-            };
-
-            proto$0.info = function(m) {
-                Logger.info((("" + (this.className)) + (" : " + m) + ""));
-            };
-
-            proto$0.error = function(m) {
-                Logger.error((("" + (this.className)) + (" : " + m) + ""));
-            };
-
-            static$0.debug = function(m) {
-                if (c) {
-                    c.debug ? c.debug(m) : c.log(m);
-                }
-            };
-
-            static$0.info = function(m) {
-                if (c) {
-                    c.info ? c.info(m) : c.log(m);
-                }
-            };
-
-            static$0.error = function(m) {
-                if (c) {
-                    c.error ? c.error(m) : c.log(m);
-                }
-            };
-
-        MIXIN$0(Logger,static$0);MIXIN$0(Logger.prototype,proto$0);static$0=proto$0=void 0;return Logger;})();
-
-        return Logger;
-    });
-var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-if (window.toastr) {
-    toastr.options = {
-        "closeButton": true,
-        "debug": false,
-        "positionClass": "toast-top-center",
-        "showDuration": "1000",
-        "hideDuration": "1000",
-        "timeOut": "5000",
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
-    };
-}
-else {
-    console.error('需要 toastr库 支持, 请导入...');
-}
-
-var Message = (function(){"use strict";var static$0={},proto$0={};
-    function Message(className) {
-        this.className = className ? className + ': ' : '';
-    }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-    proto$0.success = function(msg, title) {
-        Message.success(this.className + msg, title);
-    };
-
-    static$0.success = function(msg, title) {
-        title = title || '成功';
-        toastr.success((this.className || '') + msg, title);
-    };
-
-    proto$0.info = function(msg, title) {
-        Message.info(this.className + msg, title);
-    };
-
-    static$0.info = function(msg, title) {
-        title = title || '消息';
-        toastr.info((this.className || '') + msg, title);
-    };
-
-    proto$0.warning = function(msg, title) {
-        Message.warning(this.className + msg, title);
-    };
-
-    static$0.warning = function(msg, title) {
-        title = title || '警告';
-        toastr.warning(msg, title);
-    };
-
-    proto$0.error = function(msg, title) {
-        Message.error(this.className + msg, title);
-    };
-
-    static$0.error = function(msg, title) {
-        title = title || '错误';
-        toastr.error(msg, title);
-    };
-MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
-
-var MessageProvider = (function(){"use strict";function MessageProvider() {}DP$0(MessageProvider,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
-
-    proto$0.setPostion = function(v, h) {
-        toastr.options.positionClass = 'toast-' + v + '-' + h;
-    };
-
-    proto$0.$get = function() {
-        return Message;
-    };
-MIXIN$0(MessageProvider.prototype,proto$0);proto$0=void 0;return MessageProvider;})();
-
-/**
- * 导出
- */
-angular.module('admin.service')
-    .provider('msg', MessageProvider)
-    .provider('Message', function()  {
-        var result = {
-            setPosition: function(v, h) {
-                toastr.options.positionClass = 'toast-' + v + '-' + h;
-            },
-
-            $get: function() {
-                var Message = (function(){var static$0={},proto$0={};
-                    function Message(className) {
-                        this.className = className ? className + ': ' : '';
-                    }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-                    proto$0.success = function(msg, title) {
-                        Message.success(this.className + msg, title);
-                    };
-
-                    static$0.success = function(msg, title) {
-                        title = title || '成功';
-                        toastr.success((this.className || '') + msg, title);
-                    };
-
-                    proto$0.info = function(msg, title) {
-                        Message.info(this.className + msg, title);
-                    };
-
-                    static$0.info = function(msg, title) {
-                        title = title || '消息';
-                        toastr.info((this.className || '') + msg, title);
-                    };
-
-                    proto$0.warning = function(msg, title) {
-                        Message.warning(this.className + msg, title);
-                    };
-
-                    static$0.warning = function(msg, title) {
-                        title = title || '警告';
-                        toastr.warning(msg, title);
-                    };
-
-                    proto$0.error = function(msg, title) {
-                        Message.error(this.className + msg, title);
-                    };
-
-                    static$0.error = function(msg, title) {
-                        title = title || '错误';
-                        toastr.error(msg, title);
-                    };
-                MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
-                return Message;
-            }
-        };
-        return result;
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.service')
     .factory('PaginationFactory', function (Ajax) {
         var P = function (url, index, size, pageLimit, dataName, totalName) {
             this.url = url;
@@ -880,6 +693,193 @@ angular.module('admin.service')
         .service('ValueService', ValueService);
 })();
 
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.service')
+    .factory('Logger', function () {
+        var c = window.console;
+        var Logger = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var static$0={},proto$0={};
+
+            function Logger(className) {
+                this.className = className;
+            }DP$0(Logger,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.debug = function(m) {
+                Logger.debug((("" + (this.className)) + (" : " + m) + ""));
+            };
+
+            proto$0.info = function(m) {
+                Logger.info((("" + (this.className)) + (" : " + m) + ""));
+            };
+
+            proto$0.error = function(m) {
+                Logger.error((("" + (this.className)) + (" : " + m) + ""));
+            };
+
+            static$0.debug = function(m) {
+                if (c) {
+                    c.debug ? c.debug(m) : c.log(m);
+                }
+            };
+
+            static$0.info = function(m) {
+                if (c) {
+                    c.info ? c.info(m) : c.log(m);
+                }
+            };
+
+            static$0.error = function(m) {
+                if (c) {
+                    c.error ? c.error(m) : c.log(m);
+                }
+            };
+
+        MIXIN$0(Logger,static$0);MIXIN$0(Logger.prototype,proto$0);static$0=proto$0=void 0;return Logger;})();
+
+        return Logger;
+    });
+var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+if (window.toastr) {
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "positionClass": "toast-top-center",
+        "showDuration": "1000",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+}
+else {
+    console.error('需要 toastr库 支持, 请导入...');
+}
+
+var Message = (function(){"use strict";var static$0={},proto$0={};
+    function Message(className) {
+        this.className = className ? className + ': ' : '';
+    }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+    proto$0.success = function(msg, title) {
+        Message.success(this.className + msg, title);
+    };
+
+    static$0.success = function(msg, title) {
+        title = title || '成功';
+        toastr.success((this.className || '') + msg, title);
+    };
+
+    proto$0.info = function(msg, title) {
+        Message.info(this.className + msg, title);
+    };
+
+    static$0.info = function(msg, title) {
+        title = title || '消息';
+        toastr.info((this.className || '') + msg, title);
+    };
+
+    proto$0.warning = function(msg, title) {
+        Message.warning(this.className + msg, title);
+    };
+
+    static$0.warning = function(msg, title) {
+        title = title || '警告';
+        toastr.warning(msg, title);
+    };
+
+    proto$0.error = function(msg, title) {
+        Message.error(this.className + msg, title);
+    };
+
+    static$0.error = function(msg, title) {
+        title = title || '错误';
+        toastr.error(msg, title);
+    };
+MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
+
+var MessageProvider = (function(){"use strict";function MessageProvider() {}DP$0(MessageProvider,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
+
+    proto$0.setPostion = function(v, h) {
+        toastr.options.positionClass = 'toast-' + v + '-' + h;
+    };
+
+    proto$0.$get = function() {
+        return Message;
+    };
+MIXIN$0(MessageProvider.prototype,proto$0);proto$0=void 0;return MessageProvider;})();
+
+/**
+ * 导出
+ */
+angular.module('admin.service')
+    .provider('msg', MessageProvider)
+    .provider('Message', function()  {
+        var result = {
+            setPosition: function(v, h) {
+                toastr.options.positionClass = 'toast-' + v + '-' + h;
+            },
+
+            $get: function() {
+                var Message = (function(){var static$0={},proto$0={};
+                    function Message(className) {
+                        this.className = className ? className + ': ' : '';
+                    }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                    proto$0.success = function(msg, title) {
+                        Message.success(this.className + msg, title);
+                    };
+
+                    static$0.success = function(msg, title) {
+                        title = title || '成功';
+                        toastr.success((this.className || '') + msg, title);
+                    };
+
+                    proto$0.info = function(msg, title) {
+                        Message.info(this.className + msg, title);
+                    };
+
+                    static$0.info = function(msg, title) {
+                        title = title || '消息';
+                        toastr.info((this.className || '') + msg, title);
+                    };
+
+                    proto$0.warning = function(msg, title) {
+                        Message.warning(this.className + msg, title);
+                    };
+
+                    static$0.warning = function(msg, title) {
+                        title = title || '警告';
+                        toastr.warning(msg, title);
+                    };
+
+                    proto$0.error = function(msg, title) {
+                        Message.error(this.className + msg, title);
+                    };
+
+                    static$0.error = function(msg, title) {
+                        title = title || '错误';
+                        toastr.error(msg, title);
+                    };
+                MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
+                return Message;
+            }
+        };
+        return result;
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4891,9 +4891,7 @@ angular.module('admin.component')
 
                 proto$0.hide = function() {
                     if (this.content) {
-                        this.content.modal({
-                            "show": false
-                        });
+                        this.content.modal('hide');
                     }
                 };
 
@@ -4916,9 +4914,11 @@ angular.module('admin.component')
                 };
 
                 proto$0.remove = function() {
-                    super$0.prototype.remove.call(this);
+                    this.hide();
                     this.content.unbind('shown.bs.modal');
                     this.content.unbind('hidden.bs.modal');
+                    this.content.remove();
+                    super$0.prototype.remove.call(this);
                 };
 
                 proto$0.close = function() {
