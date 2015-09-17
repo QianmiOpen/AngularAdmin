@@ -91,7 +91,7 @@ angular.module('admin.service')
                                 success: function(resData)  {
                                     var success = successHandler(resData),
                                         error = failHandler(resData);
-                                    if (success) {
+                                    if (success != undefined) {
                                         defer.resolve(success);
                                     }
                                     else {
@@ -4561,6 +4561,86 @@ angular.module('admin.component')
 //
 //
 //
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+
+    var UIStateButton = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIStateButton, super$0);var proto$0={};
+        function UIStateButton(scope, element, attrs) {
+            this.scope = scope;
+            this.element = element;
+            this.attrs = attrs;
+            this.message = new Message('uiStateButton');
+        }if(super$0!==null)SP$0(UIStateButton,super$0);UIStateButton.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIStateButton,"configurable":true,"writable":true}});DP$0(UIStateButton,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+        proto$0.init = function() {var this$0 = this;
+            if (!this.scope.onClick) {
+                this.message.error('必须设置on-click属性');
+            }
+            this.element.click(function()  {
+                this$0.disable(true);
+                var result = this$0.scope.onClick({});
+                this$0.wait(result);
+            });
+        };
+
+        proto$0.wait = function(result) {var this$0 = this;
+            if (result && result.finally) {
+                result.finally(function()  {return this$0.disable(false)});
+            }
+            else if (result && result.always) {
+                result.always(function()  {return this$0.disable(false)});
+            }
+            else {
+                this.disable(false);
+            }
+        };
+
+        proto$0.disable = function(isD) {
+            if (this.scope.target) {
+                if (isD) {
+                    Metronic.blockUI({target: this.scope.target});
+                }
+                else {
+                    Metronic.unblockUI(this.scope.target);
+                }
+            }
+
+            //
+            this.element.prop('disabled', isD);
+        };
+    MIXIN$0(UIStateButton.prototype,proto$0);proto$0=void 0;return UIStateButton;})(Event);
+
+    angular.module('admin.component')
+        .directive('uiStateButton', function () {
+            return {
+                restrict: 'E',
+                replace: true,
+                transclude: true,
+                scope: {
+                    target: '@',
+                    onClick: '&'
+                },
+                link: function (scope, element, attrs) {
+                    var button = new UIStateButton(scope, element, attrs);
+                    button.init();
+                },
+                template: function(element, attrs)  {
+                    if (attrs.link != undefined) {
+                        return '<a ng-transclude></a>';
+                    }
+                    else {
+                        return '<button type="button" ng-transclude></button>';
+                    }
+                }
+            };
+        });
+})();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
 //-----------------------------------------------------------------------------------------------
 (function () {
 
@@ -4751,86 +4831,6 @@ angular.module('admin.component')
 \n            ")
         };
     });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-(function () {
-
-    var UIStateButton = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIStateButton, super$0);var proto$0={};
-        function UIStateButton(scope, element, attrs) {
-            this.scope = scope;
-            this.element = element;
-            this.attrs = attrs;
-            this.message = new Message('uiStateButton');
-        }if(super$0!==null)SP$0(UIStateButton,super$0);UIStateButton.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIStateButton,"configurable":true,"writable":true}});DP$0(UIStateButton,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-        proto$0.init = function() {var this$0 = this;
-            if (!this.scope.onClick) {
-                this.message.error('必须设置on-click属性');
-            }
-            this.element.click(function()  {
-                this$0.disable(true);
-                var result = this$0.scope.onClick({});
-                this$0.wait(result);
-            });
-        };
-
-        proto$0.wait = function(result) {var this$0 = this;
-            if (result && result.finally) {
-                result.finally(function()  {return this$0.disable(false)});
-            }
-            else if (result && result.always) {
-                result.always(function()  {return this$0.disable(false)});
-            }
-            else {
-                this.disable(false);
-            }
-        };
-
-        proto$0.disable = function(isD) {
-            if (this.scope.target) {
-                if (isD) {
-                    Metronic.blockUI({target: this.scope.target});
-                }
-                else {
-                    Metronic.unblockUI(this.scope.target);
-                }
-            }
-
-            //
-            this.element.prop('disabled', isD);
-        };
-    MIXIN$0(UIStateButton.prototype,proto$0);proto$0=void 0;return UIStateButton;})(Event);
-
-    angular.module('admin.component')
-        .directive('uiStateButton', function () {
-            return {
-                restrict: 'E',
-                replace: true,
-                transclude: true,
-                scope: {
-                    target: '@',
-                    onClick: '&'
-                },
-                link: function (scope, element, attrs) {
-                    var button = new UIStateButton(scope, element, attrs);
-                    button.init();
-                },
-                template: function(element, attrs)  {
-                    if (attrs.link != undefined) {
-                        return '<a ng-transclude></a>';
-                    }
-                    else {
-                        return '<button type="button" ng-transclude></button>';
-                    }
-                }
-            };
-        });
-})();
 //------------------------------------------------------
 //
 //
