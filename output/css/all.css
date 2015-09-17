@@ -27300,7 +27300,8 @@ button.toast-close-button {
 .bootstrap-select.form-control {
     margin-bottom: 0;
     padding: 0;
-    border: 0
+    border: 0;
+    z-index: 10052;
 }
 
 .bootstrap-select.btn-group.pull-right, .bootstrap-select.btn-group[class*=span].pull-right, .row-fluid .bootstrap-select.btn-group[class*=span].pull-right {
@@ -27909,8 +27910,7 @@ div.DTFC_LeftBodyWrapper tbody tr:first-child td, div.DTFC_LeftBodyWrapper tbody
     bottom: auto;
     right: auto;
     padding: 0;
-    width: 500px;
-    margin-left: -250px;
+    margin-left: -25%;
     background-color: #fff;
     border: 1px solid #999;
     border: 1px solid rgba(0, 0, 0, .2);

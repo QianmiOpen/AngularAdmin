@@ -42,6 +42,7 @@
                 constructor(scope, url, urlParam, transclude) {
                     super();
                     this.scope = scope;
+                    this.scope.dialog = this;
                     this.url = url;
                     this.urlParams = urlParam;
                     this.transclude = transclude;
@@ -90,6 +91,10 @@
                     super.remove();
                     this.content.unbind('shown.bs.modal');
                     this.content.unbind('hidden.bs.modal');
+                }
+
+                close() {
+                    this.remove();
                 }
 
                 _addEvents() {

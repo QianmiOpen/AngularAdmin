@@ -11,8 +11,10 @@ class ComponentEvent extends Event {
     }
 
     remove() {
-        this.element.remove();
-        this.scope.$destroy();
+        if(this.element)
+            this.element.remove();
+        if(this.scope)
+            this.scope.$destroy();
         this.scope = this.element = this.attrs = this.transclude = null;
     }
 }
