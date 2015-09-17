@@ -19,7 +19,6 @@
                 }
 
                 init() {
-                    this.completeName = this.attrs.complete;
                     this.scope.$on('componentComplete', this.initHandler.bind(this));
                     this.content = this.transclude(this.scope.$parent);
                     this.element
@@ -76,9 +75,8 @@
                     var uiContainer = null;
                     return {
                         pre: function (scope, element, attrs, controller, transclude) {
-                            new UIContainer(scope, element, attrs, transclude);
+                            uiContainer = new UIContainer(scope, element, attrs, transclude);
                             uiContainer.init();
-                            uiContainer.initEvents();
                         },
                         post: function () {
                             uiContainer.initController();

@@ -155,143 +155,6 @@ angular.module('admin.service')
             };
         return result;
     });
-var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-if (window.toastr) {
-    toastr.options = {
-        "closeButton": true,
-        "debug": false,
-        "positionClass": "toast-top-center",
-        "showDuration": "1000",
-        "hideDuration": "1000",
-        "timeOut": "5000",
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
-    };
-}
-else {
-    console.error('需要 toastr库 支持, 请导入...');
-}
-
-var Message = (function(){"use strict";var static$0={},proto$0={};
-    function Message(className) {
-        this.className = className ? className + ': ' : '';
-    }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-    proto$0.success = function(msg, title) {
-        Message.success(this.className + msg, title);
-    };
-
-    static$0.success = function(msg, title) {
-        title = title || '成功';
-        toastr.success((this.className || '') + msg, title);
-    };
-
-    proto$0.info = function(msg, title) {
-        Message.info(this.className + msg, title);
-    };
-
-    static$0.info = function(msg, title) {
-        title = title || '消息';
-        toastr.info((this.className || '') + msg, title);
-    };
-
-    proto$0.warning = function(msg, title) {
-        Message.warning(this.className + msg, title);
-    };
-
-    static$0.warning = function(msg, title) {
-        title = title || '警告';
-        toastr.warning(msg, title);
-    };
-
-    proto$0.error = function(msg, title) {
-        Message.error(this.className + msg, title);
-    };
-
-    static$0.error = function(msg, title) {
-        title = title || '错误';
-        toastr.error(msg, title);
-    };
-MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
-
-var MessageProvider = (function(){"use strict";function MessageProvider() {}DP$0(MessageProvider,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
-
-    proto$0.setPostion = function(v, h) {
-        toastr.options.positionClass = 'toast-' + v + '-' + h;
-    };
-
-    proto$0.$get = function() {
-        return Message;
-    };
-MIXIN$0(MessageProvider.prototype,proto$0);proto$0=void 0;return MessageProvider;})();
-
-/**
- * 导出
- */
-angular.module('admin.service')
-    .provider('msg', MessageProvider)
-    .provider('Message', function()  {
-        var result = {
-            setPosition: function(v, h) {
-                toastr.options.positionClass = 'toast-' + v + '-' + h;
-            },
-
-            $get: function() {
-                var Message = (function(){var static$0={},proto$0={};
-                    function Message(className) {
-                        this.className = className ? className + ': ' : '';
-                    }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-                    proto$0.success = function(msg, title) {
-                        Message.success(this.className + msg, title);
-                    };
-
-                    static$0.success = function(msg, title) {
-                        title = title || '成功';
-                        toastr.success((this.className || '') + msg, title);
-                    };
-
-                    proto$0.info = function(msg, title) {
-                        Message.info(this.className + msg, title);
-                    };
-
-                    static$0.info = function(msg, title) {
-                        title = title || '消息';
-                        toastr.info((this.className || '') + msg, title);
-                    };
-
-                    proto$0.warning = function(msg, title) {
-                        Message.warning(this.className + msg, title);
-                    };
-
-                    static$0.warning = function(msg, title) {
-                        title = title || '警告';
-                        toastr.warning(msg, title);
-                    };
-
-                    proto$0.error = function(msg, title) {
-                        Message.error(this.className + msg, title);
-                    };
-
-                    static$0.error = function(msg, title) {
-                        title = title || '错误';
-                        toastr.error(msg, title);
-                    };
-                MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
-                return Message;
-            }
-        };
-        return result;
-    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -833,6 +696,171 @@ angular.module('admin.service')
         .service('ValueService', ValueService);
 })();
 
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.service')
+    .factory('Logger', function () {
+        var c = window.console;
+        return {
+            debug: function (m) {
+                if (c) {
+                    c.debug ? c.debug(m) : c.log(m);
+                }
+            },
+            info: function (m) {
+                if (c) {
+                    c.info ? c.info(m) : c.log(m);
+                }
+            },
+            error: function (m) {
+                if (c) {
+                    c.error ? c.error(m) : c.log(m);
+                }
+            }
+        };
+    });
+var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+if (window.toastr) {
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "positionClass": "toast-top-center",
+        "showDuration": "1000",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+}
+else {
+    console.error('需要 toastr库 支持, 请导入...');
+}
+
+var Message = (function(){"use strict";var static$0={},proto$0={};
+    function Message(className) {
+        this.className = className ? className + ': ' : '';
+    }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+    proto$0.success = function(msg, title) {
+        Message.success(this.className + msg, title);
+    };
+
+    static$0.success = function(msg, title) {
+        title = title || '成功';
+        toastr.success((this.className || '') + msg, title);
+    };
+
+    proto$0.info = function(msg, title) {
+        Message.info(this.className + msg, title);
+    };
+
+    static$0.info = function(msg, title) {
+        title = title || '消息';
+        toastr.info((this.className || '') + msg, title);
+    };
+
+    proto$0.warning = function(msg, title) {
+        Message.warning(this.className + msg, title);
+    };
+
+    static$0.warning = function(msg, title) {
+        title = title || '警告';
+        toastr.warning(msg, title);
+    };
+
+    proto$0.error = function(msg, title) {
+        Message.error(this.className + msg, title);
+    };
+
+    static$0.error = function(msg, title) {
+        title = title || '错误';
+        toastr.error(msg, title);
+    };
+MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
+
+var MessageProvider = (function(){"use strict";function MessageProvider() {}DP$0(MessageProvider,"prototype",{"configurable":false,"enumerable":false,"writable":false});var proto$0={};
+
+    proto$0.setPostion = function(v, h) {
+        toastr.options.positionClass = 'toast-' + v + '-' + h;
+    };
+
+    proto$0.$get = function() {
+        return Message;
+    };
+MIXIN$0(MessageProvider.prototype,proto$0);proto$0=void 0;return MessageProvider;})();
+
+/**
+ * 导出
+ */
+angular.module('admin.service')
+    .provider('msg', MessageProvider)
+    .provider('Message', function()  {
+        var result = {
+            setPosition: function(v, h) {
+                toastr.options.positionClass = 'toast-' + v + '-' + h;
+            },
+
+            $get: function() {
+                var Message = (function(){var static$0={},proto$0={};
+                    function Message(className) {
+                        this.className = className ? className + ': ' : '';
+                    }DP$0(Message,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                    proto$0.success = function(msg, title) {
+                        Message.success(this.className + msg, title);
+                    };
+
+                    static$0.success = function(msg, title) {
+                        title = title || '成功';
+                        toastr.success((this.className || '') + msg, title);
+                    };
+
+                    proto$0.info = function(msg, title) {
+                        Message.info(this.className + msg, title);
+                    };
+
+                    static$0.info = function(msg, title) {
+                        title = title || '消息';
+                        toastr.info((this.className || '') + msg, title);
+                    };
+
+                    proto$0.warning = function(msg, title) {
+                        Message.warning(this.className + msg, title);
+                    };
+
+                    static$0.warning = function(msg, title) {
+                        title = title || '警告';
+                        toastr.warning(msg, title);
+                    };
+
+                    proto$0.error = function(msg, title) {
+                        Message.error(this.className + msg, title);
+                    };
+
+                    static$0.error = function(msg, title) {
+                        title = title || '错误';
+                        toastr.error(msg, title);
+                    };
+                MIXIN$0(Message,static$0);MIXIN$0(Message.prototype,proto$0);static$0=proto$0=void 0;return Message;})();
+                return Message;
+            }
+        };
+        return result;
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4689,22 +4717,18 @@ angular.module('admin.component')
                     this.element = element;
                     this.attrs = attrs;
                     this.transclude = $transclude;
-                    this.init();
                 }if(super$0!==null)SP$0(UIContainer,super$0);UIContainer.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIContainer,"configurable":true,"writable":true}});DP$0(UIContainer,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
                 proto$0.init = function() {
-                    this.completeName = this.attrs.complete;
                     this.scope.$on('componentComplete', this.initHandler.bind(this));
-                    this.content = this.transclude(this.scope);
+                    this.content = this.transclude(this.scope.$parent);
                     this.element
                         .show()
                         .append(this.content);
-
-                    this.lazyInit();
                 };
 
-                proto$0.lazyInit = function() {var this$0 = this;
-                    var ctrl = this.attrs.controller;
+                proto$0.initController = function() {var this$0 = this;
+                    var ctrl = this.scope.controller;
                     $timeout(function()  {
                         // 全局定义
                         if (ctrl && window[ctrl]) {
@@ -4723,9 +4747,7 @@ angular.module('admin.component')
                         }
 
                         //
-                        if (this$0.scope[this$0.completeName]) {
-                            this$0.scope[this$0.completeName]();
-                        }
+                        this$0.scope.onComplete({});
                     });
                 };
 
@@ -4746,8 +4768,21 @@ angular.module('admin.component')
                 restrict: 'E',
                 replace: true,
                 transclude: true,
-                link: function (scope, element, attrs, ctrl, tranclude) {
-                    new UIContainer(scope, element, attrs, tranclude);
+                scope: {
+                    controller: '@',
+                    onComplete: '&'
+                },
+                compile: function () {
+                    var uiContainer = null;
+                    return {
+                        pre: function (scope, element, attrs, controller, transclude) {
+                            uiContainer = new UIContainer(scope, element, attrs, transclude);
+                            uiContainer.init();
+                        },
+                        post: function () {
+                            uiContainer.initController();
+                        }
+                    };
                 },
                 template: ("\
 \n                    <div></div>\
@@ -4957,7 +4992,9 @@ angular.module('admin.component')
 
             proto$0.initEvents = function() {var this$0 = this;
                 this.scope.$on('uitab.item.show', function(evt, info)  {
-                    this$0.scope.onChange({index: info.index});
+                    setTimeout(function()  {
+                        this$0.scope.onChange({index: info.index});
+                    }, 60);
                 });
                 this.scope.$on('uitab.item.remove', function(evt, index)  {
                     this$0.scope.onRemove({index: index});
@@ -4969,10 +5006,10 @@ angular.module('admin.component')
             };
 
             proto$0.addTab = function(head, content, active) {
-                this.addCustomTab((("<ui-tab-item head=\"" + head) + ("\">" + (content || '')) + "</ui-tab-item>"), active)
+                this.addCustomTab((("<ui-tab-item head=\"" + head) + ("\">" + (content || '')) + "</ui-tab-item>"), active);
             };
 
-            proto$0.addCustomTab = function(tpl, active){var this$0 = this;
+            proto$0.addCustomTab = function(tpl, active) {var this$0 = this;
                 var $h = $(tpl);
                 this.bodyElement.append($h);
                 $compile($h)(this.scope);
@@ -4984,11 +5021,17 @@ angular.module('admin.component')
             };
 
             proto$0.showAtIndex = function(index) {
-                index != undefined && this.scope.$broadcast('uitab.item.show', {index: index, lazy: this.isLazy});
+                index = parseInt(index);
+                if (index !== undefined && index >= 0) {
+                    this.scope.$broadcast('uitab.item.show', {index: index, lazy: this.isLazy});
+                }
             };
 
             proto$0.removeAtIndex = function(index) {
-                index != undefined && this.scope.$broadcast('uitab.item.remove', index);
+                index = parseInt(index);
+                if(index != undefined && index >= 0){
+                    this.scope.$broadcast('uitab.item.remove', index);
+                }
             };
         MIXIN$0(UITabControl.prototype,proto$0);proto$0=void 0;return UITabControl;})(ComponentEvent);
 
@@ -5543,42 +5586,6 @@ angular.module('admin.component')
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('tooltip', function () {
-        return {
-            restrict: 'A',
-            replace: false,
-            link: function (scope, element, attrs) {
-                var content = attrs.tooltip,
-                    title = attrs.title,
-                    placement = attrs.placement || (title ? 'right' : 'top');
-
-                //如果有标题有内容, 那么使用popup over
-                if (title) {
-                    element.popover({
-                        title: title,
-                        content: content,
-                        placement: placement,
-                        trigger: 'hover'
-                    });
-                }
-                //否则使用tooltip
-                else {
-                    element.tooltip({
-                        title: content,
-                        placement: placement
-                    });
-                }
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
 (function () {
 
     var requestMethod = 'post',
@@ -5974,6 +5981,42 @@ angular.module('admin.component')
 \n                    </div>\
 \n                </div>\
 \n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('tooltip', function () {
+        return {
+            restrict: 'A',
+            replace: false,
+            link: function (scope, element, attrs) {
+                var content = attrs.tooltip,
+                    title = attrs.title,
+                    placement = attrs.placement || (title ? 'right' : 'top');
+
+                //如果有标题有内容, 那么使用popup over
+                if (title) {
+                    element.popover({
+                        title: title,
+                        content: content,
+                        placement: placement,
+                        trigger: 'hover'
+                    });
+                }
+                //否则使用tooltip
+                else {
+                    element.tooltip({
+                        title: content,
+                        placement: placement
+                    });
+                }
+            }
         };
     });
 //-----------------------------------------------------------------------------------------------

@@ -31,7 +31,9 @@ angular.module('admin.component')
 
             initEvents() {
                 this.scope.$on('uitab.item.show', (evt, info) => {
-                    this.scope.onChange({index: info.index});
+                    setTimeout(() => {
+                        this.scope.onChange({index: info.index});
+                    }, 60);
                 });
                 this.scope.$on('uitab.item.remove', (evt, index) => {
                     this.scope.onRemove({index: index});
@@ -43,10 +45,10 @@ angular.module('admin.component')
             }
 
             addTab(head, content, active) {
-                this.addCustomTab(`<ui-tab-item head="${head}">${content || ''}</ui-tab-item>`, active)
+                this.addCustomTab(`<ui-tab-item head="${head}">${content || ''}</ui-tab-item>`, active);
             }
 
-            addCustomTab(tpl, active){
+            addCustomTab(tpl, active) {
                 var $h = $(tpl);
                 this.bodyElement.append($h);
                 $compile($h)(this.scope);
@@ -58,11 +60,17 @@ angular.module('admin.component')
             }
 
             showAtIndex(index) {
-                index != undefined && this.scope.$broadcast('uitab.item.show', {index, lazy: this.isLazy});
+                index = parseInt(index);
+                if (index !== undefined && index >= 0) {
+                    this.scope.$broadcast('uitab.item.show', {index, lazy: this.isLazy});
+                }
             }
 
             removeAtIndex(index) {
-                index != undefined && this.scope.$broadcast('uitab.item.remove', index);
+                index = parseInt(index);
+                if(index != undefined && index >= 0){
+                    this.scope.$broadcast('uitab.item.remove', index);
+                }
             }
         }
 
