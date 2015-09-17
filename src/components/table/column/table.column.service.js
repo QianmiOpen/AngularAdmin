@@ -60,14 +60,11 @@ angular.module('admin.component')
                 if (this.hasTransclude) {
                     return this.getTransclude(rowData);
                 }
+                else if (this.scope.onRender){
+                    return this.scope.onRender({rowData: rowData});
+                }
                 else {
-                    let custom = this.scope.onRender({rowData: rowData});
-                    if (custom != undefined) {
-                        return custom;
-                    }
-                    else {
-                        return this.getValue(rowData);
-                    }
+                    return this.getValue(rowData);
                 }
             }
 
