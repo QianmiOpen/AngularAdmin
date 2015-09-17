@@ -27910,7 +27910,8 @@ div.DTFC_LeftBodyWrapper tbody tr:first-child td, div.DTFC_LeftBodyWrapper tbody
     bottom: auto;
     right: auto;
     padding: 0;
-    margin-left: -25%;
+    min-width: 500px;
+    transform: translate(-50%, 0);
     background-color: #fff;
     border: 1px solid #999;
     border: 1px solid rgba(0, 0, 0, .2);

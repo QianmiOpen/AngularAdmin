@@ -40,10 +40,10 @@
 
         disable(isD) {
             if (this.scope.target) {
-                if(isD){
+                if (isD) {
                     Metronic.blockUI({target: this.scope.target});
                 }
-                else{
+                else {
                     Metronic.unblockUI(this.scope.target);
                 }
             }
@@ -67,9 +67,14 @@
                     let button = new UIStateButton(scope, element, attrs);
                     button.init();
                 },
-                template: `
-                    <button type="button" ng-transclude></button>
-                `
+                template: (element, attrs) => {
+                    if (attrs.link != undefined) {
+                        return '<a ng-transclude></a>';
+                    }
+                    else {
+                        return '<button type="button" ng-transclude></button>';
+                    }
+                }
             };
         });
 })();
