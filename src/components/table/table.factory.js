@@ -34,6 +34,7 @@
                 [10, 20, 30, 60],
                 [10, 20, 30, 60]
             ],
+            "iDisplayLength": 10,
             "bProcessing": true,
             "bServerSide": true
         },
@@ -73,6 +74,11 @@
                 setPageName(_pageSizeName, _pageNumberName) {
                     pageSizeName = _pageSizeName;
                     pageNumberName = _pageNumberName;
+                },
+
+                setPageSize(_size, firstSize) {
+                    defaultConfig.aLengthMenu = _size;
+                    defaultConfig.iDisplayLength = firstSize ? firstSize : _size[0];
                 },
 
                 $get: function (Ajax, Message, Util, AdminCDN) {
