@@ -193,7 +193,7 @@
                             data[idName] = id;
                             data[labelName] = name;
                             data[pidName] = pid;
-                            if (pid != undefined && this.instance) {
+                            if (pid !== undefined && this.instance) {
                                 let parent = this.instance.getNodeByParam(idName, pid, null);
                                 this.instance.addNodes(parent, data);
                             }

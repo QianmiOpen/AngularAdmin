@@ -25,7 +25,7 @@
                         .show()
                         .then(() => {
                             try {
-                                $controller(window[controller] || controller, {$scope})
+                                $controller(window[controller] || controller, {$scope});
                             }
                             catch (e) {
                             }

@@ -44,7 +44,7 @@ angular.module('admin.component')
                     }
                     if (r[item.name]) {
                         r[item.name] = _.isArray(r[item.name]) ? r[item.name] : [r[item.name]];
-                        r[item.name].push(item.value)
+                        r[item.name].push(item.value);
                     }
                     else {
                         r[item.name] = item.value;

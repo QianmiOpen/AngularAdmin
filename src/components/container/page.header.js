@@ -1,5 +1,39 @@
 angular.module('admin.component')
-    .directive('uiPageHeader', function () {
+    .directive('uiPageHeader', function (Ajax) {
+
+        class UIPageHeaderControl extends ComponentEvent {
+            constructor(scope, element, attrs) {
+                super();
+                this.scope = scope;
+                this.element = element;
+                this.init();
+            }
+
+            init() {
+                this.leftContainer = this.element.find('.hor-menu ul');
+                if (this.scope.leftMenuUrl) {
+                    this._getContent(this.scope.leftMenuUrl)
+                        .then((h) => {
+                            this.leftContent = $(h);
+                            this.leftContainer.append(this.leftContent);
+                        });
+                }
+                this.rightContainer = this.element.find('.top-menu ul');
+                if (this.scope.rightMenuUrl) {
+                    this._getContent(this.scope.rightMenuUrl)
+                        .then((h) => {
+                            this.leftContent = $(h);
+                            this.leftContainer.append(this.leftContent);
+                        });
+                }
+            }
+
+            _getContent(url) {
+                return Ajax.load(url);
+            }
+        }
+
+
         return {
             restrict: 'E',
             replace: true,
@@ -7,10 +41,17 @@ angular.module('admin.component')
             scope: {
                 logUrl: '@',
                 logImage: '@',
-                logoutUrl: '@'
+                logoutUrl: '@',
+
+                leftMenuUrl: '@',
+                rightMenuUrl: '@'
             },
             link: (s, e, a, c, t) => {
                 $(document.body).addClass('page-header-fixed');
+                if (s.leftMenuUrl) {
+                }
+                if (s.rightMenuUrl) {
+                }
             },
             template: `
                 <div class="page-header navbar navbar-fixed-top">
@@ -21,7 +62,7 @@ angular.module('admin.component')
                             </a>
                         </div>
                         <div class="hor-menu hor-menu-light hidden-sm hidden-xs">
-                            <ul class="nav navbar-nav">
+                            <ul class="nav navbar-nav" ng-transclude>
                             </ul>
                         </div>
                         <div class="top-menu">

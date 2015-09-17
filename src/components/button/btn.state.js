@@ -68,7 +68,7 @@
                     button.init();
                 },
                 template: (element, attrs) => {
-                    if (attrs.link != undefined) {
+                    if (attrs.link !== undefined) {
                         return '<a ng-transclude></a>';
                     }
                     else {

@@ -70,7 +70,7 @@ angular.module('admin.component')
 
             removeAtIndex(index) {
                 index = parseInt(index);
-                if(index != undefined && index >= 0){
+                if(index !== undefined && index >= 0){
                     this.scope.$broadcast('uitab.item.remove', index);
                 }
             }

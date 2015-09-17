@@ -11,7 +11,6 @@ angular.module('admin.component')
         return {
             restrict: 'E',
             replace: true,
-            scope: false,
             transclude: true,
             scope: {
                 action: '@'

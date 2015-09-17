@@ -24,7 +24,7 @@ angular.module('admin.component')
                     $dom = this._getFromTransclude(rowData, val);
                 }
                 else if (this.scope.map) {
-                    $dom = this._getFromMap(val)
+                    $dom = this._getFromMap(val);
                 }
                 return $dom;
             }
