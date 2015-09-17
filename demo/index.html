@@ -12,43 +12,52 @@
     </style>
 </head>
 <body style="background-color: #fff !important;padding: 10px;" ng-app="admin">
-<ui-container style="display: none" controller="CC">
+    <ui-page-header></ui-page-header>
 
-    <ui-breadcrumb datas="['A', 'B', 'C', 'D', 'E']"></ui-breadcrumb>
+    <ui-page-container>
 
-    <h4>输入表单</h4>
-    <ui-form>
-        <ui-form-date mode="datetime" label="日期:" placeholder="什么鬼" help="醉了" model="item.formDate" change="dateChangeHandler(val)"></ui-form-date>
-        <ui-form-date-range mode="datetime" label="日期范围:" help="醉了3" from-model="item.formRangeFromDate" to-model="item.formRangeToDate" change="dateRangeChangeHandler(startVal, endVal)"></ui-form-date-range>
-        <ui-form-input label="输入框:" help="醉了4" model="item.formInput" change="inputChangeHandler()"></ui-form-input>
-        <ui-form-select label="下拉框:" help="醉了5" model="item.formSelect" change="selectChangeHandler()">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-        </ui-form-select>
-        <ui-form-spinner label="计数器:" model="item.formSpinner" help="醉了6" value="1" min="0" max="100" step="5" change="spinnerChangeHandler(val)"></ui-form-spinner>
-        <ui-form-switch label="开关:" model="item.formSwitch" help="醉了6" on-text="男" off-text="女" change="switchChangeHandler(val)"></ui-form-switch>
-        <ui-form-tag label="多选:" model="item.formRemoteSelect" help="醉了7" url="/test/remote/select" change="tagChangeHandler(isAdd, val, item, vals, items)"></ui-form-tag>
-        <ui-form-region label="地域:" model="item.formRegion" help="醉了8" change="regionChangeHandler(mode, val, p, c, s)"></ui-form-region>
-        <ui-form-editor label="百度编辑器:" model="item.formEditor" help="醉了9" change="editorChangeHandler(val)"></ui-form-editor>
-        <ui-form-upload label="七牛上传:" model="item.formUpload" help="醉了10" change="uploadChangeHandler(val, name)" css="uploadImage"></ui-form-upload>
-    </ui-form>
+        <!-- -->
+        <ui-side-bar>
+        </ui-side-bar>
 
-    <h4>查询表单</h4>
-    <form action="#" class="form-inline">
-        <ui-search-date mode="datetime" class="input-medium" label="日期:" placeholder="什么鬼" model="item.formDate" change="dateChangeHandler()"></ui-search-date>
-        <ui-search-date-range mode="datetime" placeholder="什么鬼2" from-model="item.formRangeFromDate" to-model="item.formRangeToDate" change="dateRangeChangeHandler()"></ui-search-date-range>
-        <ui-search-input class="input-medium" label="输入框" model="item.formInput" change="inputChangeHandler()"></ui-search-input>
-        <ui-search-select class="input-medium" label="下拉框" model="item.formSelect" change="selectChangeHandler()">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-        </ui-search-select>
-        <ui-search-region label="区域"></ui-search-region>
-        <ui-search-tag class="input-large" label="多选:" url="/test/remote/select"></ui-search-tag>
-    </form>
+        <!-- -->
+        <ui-page-content>
+            <ui-container style="display: none" controller="CC">
+                <ui-breadcrumb datas="['A', 'B', 'C', 'D', 'E']"></ui-breadcrumb>
+                <h4>输入表单</h4>
+                <ui-form>
+                    <ui-form-date mode="datetime" label="日期:" placeholder="什么鬼" help="醉了" model="item.formDate" change="dateChangeHandler(val)"></ui-form-date>
+                    <ui-form-date-range mode="datetime" label="日期范围:" help="醉了3" from-model="item.formRangeFromDate" to-model="item.formRangeToDate" change="dateRangeChangeHandler(startVal, endVal)"></ui-form-date-range>
+                    <ui-form-input label="输入框:" help="醉了4" model="item.formInput" change="inputChangeHandler()"></ui-form-input>
+                    <ui-form-select label="下拉框:" help="醉了5" model="item.formSelect" change="selectChangeHandler()">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </ui-form-select>
+                    <ui-form-spinner label="计数器:" model="item.formSpinner" help="醉了6" value="1" min="0" max="100" step="5" change="spinnerChangeHandler(val)"></ui-form-spinner>
+                    <ui-form-switch label="开关:" model="item.formSwitch" help="醉了6" on-text="男" off-text="女" change="switchChangeHandler(val)"></ui-form-switch>
+                    <ui-form-tag label="多选:" model="item.formRemoteSelect" help="醉了7" url="/test/remote/select" change="tagChangeHandler(isAdd, val, item, vals, items)"></ui-form-tag>
+                    <ui-form-region label="地域:" model="item.formRegion" help="醉了8" change="regionChangeHandler(mode, val, p, c, s)"></ui-form-region>
+                    <ui-form-editor label="百度编辑器:" model="item.formEditor" help="醉了9" change="editorChangeHandler(val)"></ui-form-editor>
+                    <ui-form-upload label="七牛上传:" model="item.formUpload" help="醉了10" change="uploadChangeHandler(val, name)" css="uploadImage"></ui-form-upload>
+                </ui-form>
 
-</ui-container>
+                <h4>查询表单</h4>
+                <form action="#" class="form-inline">
+                    <ui-search-date mode="datetime" class="input-medium" label="日期:" placeholder="什么鬼" model="item.formDate" change="dateChangeHandler()"></ui-search-date>
+                    <ui-search-date-range mode="datetime" placeholder="什么鬼2" from-model="item.formRangeFromDate" to-model="item.formRangeToDate" change="dateRangeChangeHandler()"></ui-search-date-range>
+                    <ui-search-input class="input-medium" label="输入框" model="item.formInput" change="inputChangeHandler()"></ui-search-input>
+                    <ui-search-select class="input-medium" label="下拉框" model="item.formSelect" change="selectChangeHandler()">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </ui-search-select>
+                    <ui-search-region label="区域"></ui-search-region>
+                    <ui-search-tag class="input-large" label="多选:" url="/test/remote/select"></ui-search-tag>
+                </form>
+            </ui-container>
+        </ui-page-content>
+    </ui-page-container>
 </body>
 <script src="../output/js/lib.js"></script>
 <script src="../output/js/all.js"></script>

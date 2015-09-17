@@ -1084,42 +1084,6 @@ angular.module('admin.component')
         return this.optional(element) || reg.test(value);
     }, "密码由8-16位字母、数字和特殊字符组成，且至少有一个大写字母或者特殊字符！");
 })(jQuery);
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchForm', function (UISearchFormControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                onSearch: '&',
-                onReset: '&'
-            },
-            link: function (scope, element, attrs, controller, transclude) {
-                new UISearchFormControl(scope, element, attrs, transclude);
-            },
-            template: ("\
-\n                <form novalidate action=\"\" class=\"ui-search-form form-inline\">\
-\n                    <div class=\"row\">\
-\n                        <div class=\"col-md-{{lcol}}\"></div>\
-\n                        <div class=\"text-right col-md-{{rcol}}\">\
-\n                            <a title=\"回车键也可触发搜索\" class=\"btn blue-chambray btn-sm\" ng-click=\"component.search()\" style=\"width: 30px\"><i class=\"fa fa-search\"></i></button>\
-\n                            <a title=\"重置搜索选项\" class=\"btn default btn-sm\" ng-click=\"component.reset()\" style=\"width: 30px\"><i class=\"fa fa-undo font-blue-chambray\"></i></a>\
-\n                        </div>\
-\n                    </div>\
-\n                </form>\
-\n            ")
-        };
-    });
-
 /**
  * 表单控件
  */
@@ -2924,118 +2888,41 @@ angular.module('admin.component')
             return result;
         });
 })();
-//-----------------------------------------------------------------------------------------------
+//------------------------------------------------------
 //
 //
 //
 //
 //
-//-----------------------------------------------------------------------------------------------
+//------------------------------------------------------
 angular.module('admin.component')
-    .factory('UIPortletControl', function (Ajax, $compile) {
-
-        var UIPortletControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIPortletControl, super$0);var proto$0={};
-            function UIPortletControl(scope, element, attrs, transclude) {
-                super$0.call(this);
-                this.element = element;
-                this.scope = scope;
-                this.attrs = attrs;
-                this.transclude = transclude;
-                this.message = new Message('UIPortlet');
-                this.init();
-                this.initEvents();
-                this.render();
-            }if(super$0!==null)SP$0(UIPortletControl,super$0);UIPortletControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIPortletControl,"configurable":true,"writable":true}});DP$0(UIPortletControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                this.bodyElement = this.element.find('.portlet-body');
-                this.headElement = this.element.find('.portlet-title');
-                this.triggerComplete(this.scope, this.attrs.ref || '$portlet', this);
-            };
-
-            proto$0.initEvents = function() {
-            };
-
-            proto$0.render = function() {var this$0 = this;
-                this.transclude(this.scope.$parent, function($content)  {
-                    var $toolbar = $content.filter('.portlet-tool-bar');
-                    if ($toolbar.length === 0) {
-                        $.each($content, function(i, c)  {
-                            if (c.nodeName.indexOf('UI-PORTLET-ACTION') != -1) {
-                                $toolbar = $(c);
-                                return false;
-                            }
-                        });
-                    }
-                    this$0.bodyElement.append($content);
-                    if ($toolbar.length !== 0) {
-                        this$0.headElement.append($toolbar);
-                    }
-                    if (!this$0.scope.title) {
-                        this$0.headElement.hide();
-                    }
-                    this$0.load();
-                });
-            };
-
-            proto$0.load = function(params, url) {var this$0 = this;
-                url = url || this.scope.url;
-                if (url) {
-                    Ajax.get(url, params || {})
-                        .then(function(html)  {
-                            var $dom = $compile(html)(this$0.scope);
-                            this$0.bodyElement.append($dom);
-                        });
-                }
-            };
-
-            proto$0.setTitle = function(title) {
-                this.headElement.find('span').html(title);
-            };
-        MIXIN$0(UIPortletControl.prototype,proto$0);proto$0=void 0;return UIPortletControl;})(ComponentEvent);
-
-        return UIPortletControl;
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiPortlet', function (UIPortletControl) {
+    .directive('uiSearchForm', function (UISearchFormControl) {
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
             scope: {
-                captionClass: '@',
-                bodyClass: '@',
-                icon: '@',
-                url: '@',
-                title: '@'
+                lcol: '@',
+                rcol: '@',
+                onSearch: '&',
+                onReset: '&'
             },
-            link: function (scope, elemt, attrs, contrllor, transclude) {
-                new UIPortletControl(scope, elemt, attrs, transclude);
+            link: function (scope, element, attrs, controller, transclude) {
+                new UISearchFormControl(scope, element, attrs, transclude);
             },
             template: ("\
-\n                <div class=\"portlet\">\
-\n                    <div class=\"portlet-title tabbable-line\">\
-\n                        <div class=\"caption\">\
-\n                            <i ng-if=\"icon\" class=\"{{icon}}\"></i>\
-\n                            <span class=\"caption-subject {{captionClass}}\">{{title}}</span>\
+\n                <form novalidate action=\"\" class=\"ui-search-form form-inline\">\
+\n                    <div class=\"row\">\
+\n                        <div class=\"col-md-{{lcol}}\"></div>\
+\n                        <div class=\"text-right col-md-{{rcol}}\">\
+\n                            <a title=\"回车键也可触发搜索\" class=\"btn blue-chambray btn-sm\" ng-click=\"component.search()\" style=\"width: 30px\"><i class=\"fa fa-search\"></i></button>\
+\n                            <a title=\"重置搜索选项\" class=\"btn default btn-sm\" ng-click=\"component.reset()\" style=\"width: 30px\"><i class=\"fa fa-undo font-blue-chambray\"></i></a>\
 \n                        </div>\
 \n                    </div>\
-\n                    <div class=\"portlet-body {{bodyClass}}\">\
-\n                    </div>\
-\n                </div>\
+\n                </form>\
 \n            ")
         };
     });
-
-
-
 
 //------------------------------------------------------
 //
@@ -3189,6 +3076,119 @@ angular.module('admin.component')
 \n            ")
         };
     });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .factory('UIPortletControl', function (Ajax, $compile) {
+
+        var UIPortletControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIPortletControl, super$0);var proto$0={};
+            function UIPortletControl(scope, element, attrs, transclude) {
+                super$0.call(this);
+                this.element = element;
+                this.scope = scope;
+                this.attrs = attrs;
+                this.transclude = transclude;
+                this.message = new Message('UIPortlet');
+                this.init();
+                this.initEvents();
+                this.render();
+            }if(super$0!==null)SP$0(UIPortletControl,super$0);UIPortletControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIPortletControl,"configurable":true,"writable":true}});DP$0(UIPortletControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                this.bodyElement = this.element.find('.portlet-body');
+                this.headElement = this.element.find('.portlet-title');
+                this.triggerComplete(this.scope, this.attrs.ref || '$portlet', this);
+            };
+
+            proto$0.initEvents = function() {
+            };
+
+            proto$0.render = function() {var this$0 = this;
+                this.transclude(this.scope.$parent, function($content)  {
+                    var $toolbar = $content.filter('.portlet-tool-bar');
+                    if ($toolbar.length === 0) {
+                        $.each($content, function(i, c)  {
+                            if (c.nodeName.indexOf('UI-PORTLET-ACTION') != -1) {
+                                $toolbar = $(c);
+                                return false;
+                            }
+                        });
+                    }
+                    this$0.bodyElement.append($content);
+                    if ($toolbar.length !== 0) {
+                        this$0.headElement.append($toolbar);
+                    }
+                    if (!this$0.scope.title) {
+                        this$0.headElement.hide();
+                    }
+                    this$0.load();
+                });
+            };
+
+            proto$0.load = function(params, url) {var this$0 = this;
+                url = url || this.scope.url;
+                if (url) {
+                    Ajax.get(url, params || {})
+                        .then(function(html)  {
+                            var $dom = $compile(html)(this$0.scope);
+                            this$0.bodyElement.append($dom);
+                        });
+                }
+            };
+
+            proto$0.setTitle = function(title) {
+                this.headElement.find('span').html(title);
+            };
+        MIXIN$0(UIPortletControl.prototype,proto$0);proto$0=void 0;return UIPortletControl;})(ComponentEvent);
+
+        return UIPortletControl;
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiPortlet', function (UIPortletControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                captionClass: '@',
+                bodyClass: '@',
+                icon: '@',
+                url: '@',
+                title: '@'
+            },
+            link: function (scope, elemt, attrs, contrllor, transclude) {
+                new UIPortletControl(scope, elemt, attrs, transclude);
+            },
+            template: ("\
+\n                <div class=\"portlet\">\
+\n                    <div class=\"portlet-title tabbable-line\">\
+\n                        <div class=\"caption\">\
+\n                            <i ng-if=\"icon\" class=\"{{icon}}\"></i>\
+\n                            <span class=\"caption-subject {{captionClass}}\">{{title}}</span>\
+\n                        </div>\
+\n                    </div>\
+\n                    <div class=\"portlet-body {{bodyClass}}\">\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+
+
+
 
 //------------------------------------------------------
 //
@@ -4861,6 +4861,71 @@ angular.module('admin.component')
         });
 })();
 angular.module('admin.component')
+    .directive('uiPageContainer', function () {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            template: ("\
+\n                <div class=\"page-container\" ng-transclude></div>\
+\n            ")
+        };
+    });
+angular.module('admin.component')
+    .directive('uiPageContent', function () {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            template: ("\
+\n                <div class=\"page-content-wrapper\">\
+\n                    <div class=\"page-content\" ng-transclude>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+angular.module('admin.component')
+    .directive('uiPageHeader', function () {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                logUrl: '@',
+                logImage: '@',
+                logoutUrl: '@'
+            },
+            link: function(s, e, a, c, t)  {
+                $(document.body).addClass('page-header-fixed');
+            },
+            template: ("\
+\n                <div class=\"page-header navbar navbar-fixed-top\">\
+\n                    <div class=\"page-header-inner\">\
+\n                        <div class=\"page-logo\">\
+\n                            <a ng-href=\"{{logUrl}}\">\
+\n                                <img ng-src=\"{{logImage}}\" alt=\"logo\" class=\"logo-default\">\
+\n                            </a>\
+\n                        </div>\
+\n                        <div class=\"hor-menu hor-menu-light hidden-sm hidden-xs\">\
+\n                            <ul class=\"nav navbar-nav\">\
+\n                            </ul>\
+\n                        </div>\
+\n                        <div class=\"top-menu\">\
+\n                            <ul class=\"nav navbar-nav pull-right\">\
+\n                                <li>\
+\n                                    <a ng-href=\"{{logoutUrl}}\">\
+\n                                        <i class=\"icon-logout\"></i>\
+\n                                    </a>\
+\n                                </li>\
+\n                            </ul>\
+\n                        </div>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+angular.module('admin.component')
     .directive('uiRow', function () {
         return {
             restrict: 'E',
@@ -4871,6 +4936,28 @@ angular.module('admin.component')
             },
             template: ("\
 \n                <div class=\"row\"></div>\
+\n            ")
+        };
+    });
+angular.module('admin.component')
+    .directive('uiSideBar', function () {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                url: '@'
+            },
+            link: function(s, e, a, c, t)  {
+                $(document.body).addClass('page-sidebar-fixed');
+            },
+            template: ("\
+\n                <div class=\"page-sidebar-wrapper\">\
+\n                    <div class=\"page-sidebar navbar-collapse collapse\">\
+\n                        <ul class=\"page-sidebar-menu hidden-sm hidden-xs\" ng-transclude>\
+\n                        </ul>\
+\n                    </div>\
+\n                </div>\
 \n            ")
         };
     });
@@ -5539,6 +5626,42 @@ angular.module('admin.component')
         };
     });
 
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('tooltip', function () {
+        return {
+            restrict: 'A',
+            replace: false,
+            link: function (scope, element, attrs) {
+                var content = attrs.tooltip,
+                    title = attrs.title,
+                    placement = attrs.placement || (title ? 'right' : 'top');
+
+                //如果有标题有内容, 那么使用popup over
+                if (title) {
+                    element.popover({
+                        title: title,
+                        content: content,
+                        placement: placement,
+                        trigger: 'hover'
+                    });
+                }
+                //否则使用tooltip
+                else {
+                    element.tooltip({
+                        title: content,
+                        placement: placement
+                    });
+                }
+            }
+        };
+    });
 //------------------------------------------------------
 //
 //
@@ -5691,42 +5814,6 @@ angular.module('admin.component')
         };
     });
 
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('tooltip', function () {
-        return {
-            restrict: 'A',
-            replace: false,
-            link: function (scope, element, attrs) {
-                var content = attrs.tooltip,
-                    title = attrs.title,
-                    placement = attrs.placement || (title ? 'right' : 'top');
-
-                //如果有标题有内容, 那么使用popup over
-                if (title) {
-                    element.popover({
-                        title: title,
-                        content: content,
-                        placement: placement,
-                        trigger: 'hover'
-                    });
-                }
-                //否则使用tooltip
-                else {
-                    element.tooltip({
-                        title: content,
-                        placement: placement
-                    });
-                }
-            }
-        };
-    });
 //-----------------------------------------------------------------------------------------------
 //
 //
