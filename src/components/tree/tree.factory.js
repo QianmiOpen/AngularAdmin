@@ -138,6 +138,7 @@
                                 this.dataList = resData;
                                 this.setDataMap(resData);
                             }
+                            return this;
                         }
 
                         setDataMap(resData) {
@@ -145,6 +146,7 @@
                             for (var item of resData) {
                                 this.dataMap[item[idName]] = item;
                             }
+                            return this;
                         }
 
                         expand(arg) {
@@ -153,7 +155,17 @@
                                 this.expandAll(true);
                             }
                             else if (arg) {
+                                this.expandById(arg);
                             }
+                            return this;
+                        }
+
+                        expandById(id) {
+                            let node = this.getTreeNodeById(id);
+                            if (node && this.instance) {
+                                this.instance.expandNode(node, true);
+                            }
+                            return this;
                         }
 
                         expandAll(isExpand) {
@@ -181,7 +193,7 @@
                             }
                         }
 
-                        cleanChecked(){
+                        cleanChecked() {
                             $.each(this.selectItems, (i, selectItem) => {
                                 var node = this.instance.getNodeByParam(idName, selectItem.id, null);
                                 node && this.instance.checkNode(node, false, true);

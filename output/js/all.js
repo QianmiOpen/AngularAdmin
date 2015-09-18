@@ -4416,7 +4416,7 @@ angular.module('admin.component')
             replace: true,
             transclude: true,
             template: ("\
-\n                <div class=\"actions portlet-tool-bar\" ng-transclude>\
+\n                <div class=\"actions portlet-tool-bar tools\" ng-transclude>\
 \n                </div>\
 \n            ")
         };
@@ -5994,6 +5994,7 @@ angular.module('admin.component')
                                 this.dataList = resData;
                                 this.setDataMap(resData);
                             }
+                            return this;
                         };
 
                         proto$0.setDataMap = function(resData) {var S_ITER$0 = typeof Symbol!=='undefined'&&Symbol&&Symbol.iterator||'@@iterator';var S_MARK$0 = typeof Symbol!=='undefined'&&Symbol&&Symbol["__setObjectSetter__"];function GET_ITER$0(v){if(v){if(Array.isArray(v))return 0;var f;if(S_MARK$0)S_MARK$0(v);if(typeof v==='object'&&typeof (f=v[S_ITER$0])==='function'){if(S_MARK$0)S_MARK$0(void 0);return f.call(v);}if(S_MARK$0)S_MARK$0(void 0);if((v+'')==='[object Generator]')return v;}throw new Error(v+' is not iterable')};var $D$0;var $D$1;var $D$2;
@@ -6001,6 +6002,7 @@ angular.module('admin.component')
                             $D$0 = GET_ITER$0(resData);$D$2 = $D$0 === 0;$D$1 = ($D$2 ? resData.length : void 0);for (var item ;$D$2 ? ($D$0 < $D$1) : !($D$1 = $D$0["next"]())["done"];){item = ($D$2 ? resData[$D$0++] : $D$1["value"]);
                                 this.dataMap[item[idName]] = item;
                             };$D$0 = $D$1 = $D$2 = void 0;
+                            return this;
                         };
 
                         proto$0.expand = function(arg) {
@@ -6009,7 +6011,17 @@ angular.module('admin.component')
                                 this.expandAll(true);
                             }
                             else if (arg) {
+                                this.expandById(arg);
                             }
+                            return this;
+                        };
+
+                        proto$0.expandById = function(id) {
+                            var node = this.getTreeNodeById(id);
+                            if (node && this.instance) {
+                                this.instance.expandNode(node, true);
+                            }
+                            return this;
                         };
 
                         proto$0.expandAll = function(isExpand) {
@@ -6037,7 +6049,7 @@ angular.module('admin.component')
                             }
                         };
 
-                        proto$0.cleanChecked = function(){var this$0 = this;
+                        proto$0.cleanChecked = function() {var this$0 = this;
                             $.each(this.selectItems, function(i, selectItem)  {
                                 var node = this$0.instance.getNodeByParam(idName, selectItem.id, null);
                                 node && this$0.instance.checkNode(node, false, true);
