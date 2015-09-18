@@ -13,7 +13,8 @@ angular.module('admin.component')
             replace: true,
             transclude: true,
             scope: {
-                action: '@'
+                action: '@',
+                onSubmit: '&'
             },
             compile: function () {
                 var form = null;
