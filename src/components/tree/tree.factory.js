@@ -52,6 +52,7 @@
                         }
 
                         init() {
+                            this.scope.component = this;
                             this.selectItems = [];
                             this.selectValues = [];
                             this.treeElement.attr('id', 'uiTree' + new Date().getTime());
@@ -82,9 +83,9 @@
                                     }, 100);
                                 }
                             });
-                            this.scope.onAddHandler = (evt) => this._onAddHandler($(evt.target).parent().data('treeNode'));
-                            this.scope.onEditHandler = (evt) => this._onEditHandler($(evt.target).parent().data('treeNode'));
-                            this.scope.onRemoveHandler = (evt) => this._onRemoveHandler($(evt.target).parent().data('treeNode'));
+                            this.scope.onAddHandler = (evt) => this.scope.onAdd($(evt.target).parent().data('treeNode'));
+                            this.scope.onEditHandler = (evt) => this.scope.onEdit($(evt.target).parent().data('treeNode'));
+                            this.scope.onRemoveHandler = (evt) => this.scope.onRemove($(evt.target).parent().data('treeNode'));
                         }
 
                         build() {
@@ -138,6 +139,7 @@
                                 this.dataList = resData;
                                 this.setDataMap(resData);
                             }
+                            this.treeNodeBtnMap = [];
                             return this;
                         }
 
@@ -257,13 +259,13 @@
                                 this.treeNodeBtnMap[treeNode.id].show();
                             }
                             else {
-                                let scope = this.scope.$new(),
+                                let scope = this.scope.$parent.$new(),
                                     $dom = this.element.find('>span').clone(true);
                                 scope.treeNode = treeNode;
-                                this.transclude(scope.$parent, ($dom2) => {
+                                this.transclude(scope, ($dom2) => {
                                     $dom.data('treeNode', treeNode);
                                     $dom.append($dom2).show();
-                                    $dom.insertAfter($("#" + treeNode.tId + "_span"));
+                                    $("#" + treeNode.tId + "_span").append($dom);
                                     this.treeNodeBtnMap[treeNode.id] = $dom;
                                 });
                             }
@@ -273,18 +275,6 @@
                             if (this.treeNodeBtnMap[treeNode.id]) {
                                 this.treeNodeBtnMap[treeNode.id].hide();
                             }
-                        }
-
-                        _onAddHandler(treeNode) {
-                            this.message.success('点击了新增');
-                        }
-
-                        _onEditHandler(treeNode) {
-                            this.message.success('点击了新增');
-                        }
-
-                        _onRemoveHandler(treeNode) {
-                            this.message.success('点击了删除');
                         }
                     }
                     return UITreeControl;

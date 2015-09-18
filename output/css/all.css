@@ -12231,27 +12231,27 @@ h1 .label, h2 .label, h3 .label, h4 .label, h5 .label, h6 .label {
 }
 
 .text-default {
-    color: #c6c6c6
+    color: #c6c6c6 !important;
 }
 
 .text-primary {
-    color: #428bca
+    color: #428bca !important;
 }
 
 .text-success {
-    color: #45B6AF
+    color: #45B6AF !important;
 }
 
 .text-info {
-    color: #89C4F4
+    color: #89C4F4 !important;
 }
 
 .text-warning {
-    color: #dfba49
+    color: #dfba49 !important;
 }
 
 .text-danger {
-    color: #F3565D
+    color: #F3565D !important;
 }
 
 .list-group .list-group-item-success {
@@ -29166,7 +29166,6 @@ div.DTFC_LeftBodyWrapper tbody tr:first-child td, div.DTFC_LeftBodyWrapper tbody
     padding: 0;
     margin: 0;
     font-size: 12px;
-    font-family: Verdana, Arial, Helvetica, AppleGothic, sans-serif
 }
 
 .ztree {

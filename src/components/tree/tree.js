@@ -21,8 +21,8 @@ angular.module('admin.component')
 
                 onComplete: '&',
 
-                onAdd: '@',
-                onEdit: '@',
+                onAdd: '&',
+                onEdit: '&',
                 onRemove: '&',
 
                 checked: '=',
@@ -43,9 +43,9 @@ angular.module('admin.component')
                 <div class="ui-tree">
                     <ul class="ztree"></ul>
                     <span style="display:none">
-                        <span ng-if="onAdd" class="button add" ng-click="onAddHandler($event)"></span>
-                        <span ng-if="onEdit" class="button edit" ng-click="onEditHandler($event)"></span>
-                        <span ng-if="onRemove" class="button remove" ng-click="onRemoveHandler($event)"></span>
+                        <span ng-if="component.attrs.onAdd" class="button add" ng-click="onAddHandler($event)"></span>
+                        <span ng-if="component.attrs.onEdit" class="button edit" ng-click="onEditHandler($event)"></span>
+                        <span ng-if="component.attrs.onRemove" class="button remove" ng-click="onRemoveHandler($event)"></span>
                     </span>
                 </div>
             `

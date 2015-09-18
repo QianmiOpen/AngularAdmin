@@ -4012,6 +4012,43 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSwitch', function (UISwitchControl) {
+        return {
+            restrict: 'E',
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function(s, e, a)  {
+                new UISwitchControl(s, e, a);
+            },
+            template: ("\
+\n               <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
 //  针对input的封装
 //
 //
@@ -4054,43 +4091,6 @@ angular.module('admin.component')
 \n            ")
         };
     });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSwitch', function (UISwitchControl) {
-        return {
-            restrict: 'E',
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                placeholder: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function(s, e, a)  {
-                new UISwitchControl(s, e, a);
-            },
-            template: ("\
-\n               <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>\
-\n            ")
-        };
-    });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5908,6 +5908,7 @@ angular.module('admin.component')
                         }if(super$0!==null)SP$0(UITreeControl,super$0);UITreeControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITreeControl,"configurable":true,"writable":true}});DP$0(UITreeControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
                         proto$0.init = function() {var this$0 = this;
+                            this.scope.component = this;
                             this.selectItems = [];
                             this.selectValues = [];
                             this.treeElement.attr('id', 'uiTree' + new Date().getTime());
@@ -5938,9 +5939,9 @@ angular.module('admin.component')
                                     }, 100);
                                 }
                             });
-                            this.scope.onAddHandler = function(evt)  {return this$0._onAddHandler($(evt.target).parent().data('treeNode'))};
-                            this.scope.onEditHandler = function(evt)  {return this$0._onEditHandler($(evt.target).parent().data('treeNode'))};
-                            this.scope.onRemoveHandler = function(evt)  {return this$0._onRemoveHandler($(evt.target).parent().data('treeNode'))};
+                            this.scope.onAddHandler = function(evt)  {return this$0.scope.onAdd($(evt.target).parent().data('treeNode'))};
+                            this.scope.onEditHandler = function(evt)  {return this$0.scope.onEdit($(evt.target).parent().data('treeNode'))};
+                            this.scope.onRemoveHandler = function(evt)  {return this$0.scope.onRemove($(evt.target).parent().data('treeNode'))};
                         };
 
                         proto$0.build = function() {var this$0 = this;
@@ -5994,6 +5995,7 @@ angular.module('admin.component')
                                 this.dataList = resData;
                                 this.setDataMap(resData);
                             }
+                            this.treeNodeBtnMap = [];
                             return this;
                         };
 
@@ -6113,13 +6115,13 @@ angular.module('admin.component')
                                 this.treeNodeBtnMap[treeNode.id].show();
                             }
                             else {
-                                var scope = this.scope.$new(),
+                                var scope = this.scope.$parent.$new(),
                                     $dom = this.element.find('>span').clone(true);
                                 scope.treeNode = treeNode;
-                                this.transclude(scope.$parent, function($dom2)  {
+                                this.transclude(scope, function($dom2)  {
                                     $dom.data('treeNode', treeNode);
                                     $dom.append($dom2).show();
-                                    $dom.insertAfter($("#" + treeNode.tId + "_span"));
+                                    $("#" + treeNode.tId + "_span").append($dom);
                                     this$0.treeNodeBtnMap[treeNode.id] = $dom;
                                 });
                             }
@@ -6129,18 +6131,6 @@ angular.module('admin.component')
                             if (this.treeNodeBtnMap[treeNode.id]) {
                                 this.treeNodeBtnMap[treeNode.id].hide();
                             }
-                        };
-
-                        proto$0._onAddHandler = function(treeNode) {
-                            this.message.success('点击了新增');
-                        };
-
-                        proto$0._onEditHandler = function(treeNode) {
-                            this.message.success('点击了新增');
-                        };
-
-                        proto$0._onRemoveHandler = function(treeNode) {
-                            this.message.success('点击了删除');
                         };
                     MIXIN$0(UITreeControl.prototype,proto$0);proto$0=void 0;return UITreeControl;})(ComponentEvent);
                     return UITreeControl;
@@ -6172,8 +6162,8 @@ angular.module('admin.component')
 
                 onComplete: '&',
 
-                onAdd: '@',
-                onEdit: '@',
+                onAdd: '&',
+                onEdit: '&',
                 onRemove: '&',
 
                 checked: '=',
@@ -6194,9 +6184,9 @@ angular.module('admin.component')
 \n                <div class=\"ui-tree\">\
 \n                    <ul class=\"ztree\"></ul>\
 \n                    <span style=\"display:none\">\
-\n                        <span ng-if=\"onAdd\" class=\"button add\" ng-click=\"onAddHandler($event)\"></span>\
-\n                        <span ng-if=\"onEdit\" class=\"button edit\" ng-click=\"onEditHandler($event)\"></span>\
-\n                        <span ng-if=\"onRemove\" class=\"button remove\" ng-click=\"onRemoveHandler($event)\"></span>\
+\n                        <span ng-if=\"component.attrs.onAdd\" class=\"button add\" ng-click=\"onAddHandler($event)\"></span>\
+\n                        <span ng-if=\"component.attrs.onEdit\" class=\"button edit\" ng-click=\"onEditHandler($event)\"></span>\
+\n                        <span ng-if=\"component.attrs.onRemove\" class=\"button remove\" ng-click=\"onRemoveHandler($event)\"></span>\
 \n                    </span>\
 \n                </div>\
 \n            ")
