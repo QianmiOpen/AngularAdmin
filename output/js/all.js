@@ -90,7 +90,7 @@ angular.module('admin.service')
                                 success: function(resData)  {
                                     var success = successHandler(resData),
                                         error = failHandler(resData);
-                                    if (success !== undefined) {
+                                    if (success !== undefined && success !== null) {
                                         defer.resolve(success);
                                     }
                                     else {
