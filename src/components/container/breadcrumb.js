@@ -58,7 +58,7 @@
                     <div class="page-bar">
                         <ul class="page-breadcrumb">
                             <li ng-repeat="item in items">
-                                <a ng-if="isRoute" ng-sref="{{item.url}}" ng-bind="item.name"></a>
+                                <a ng-if="isRoute" ui-sref="{{item.url}}" ng-bind="item.name"></a>
                                 <a ng-if="!isRoute" ng-href="{{item.url}}" ng-bind="item.name"></a>
                                 <i ng-if="!$last" class="fa fa-angle-right"></i>
                             </li>

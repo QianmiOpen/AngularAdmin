@@ -13,7 +13,10 @@ angular.module('admin.component')
                 $attrs.$set(`${attrName}-bak`, src);
             }
             if ($scope.data && src) {
-                $element.prop(attrName.replace('ng-', ''), ValueService.get($scope, src.replace(/{|}/g, '')));
+                let val = (src || '').replace(/\{\{([^\}]+)\}\}/g, function($0, $1){
+                    return ValueService.get($scope, $1);
+                });
+                $element.prop(attrName.replace('ng-', ''), val);
             }
         };
     })

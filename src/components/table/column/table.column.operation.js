@@ -8,9 +8,9 @@
 angular.module('admin.component')
     .directive('uiTableOperationColumn', function (UITableColumnControl) {
         class UITableOperationColumnControl extends UITableColumnControl {
-            constructor(s, e, a) {
+            constructor(s, e, a, t) {
                 this.className = 'OperationColumn';
-                super(s, e, a);
+                super(s, e, a, t);
             }
 
             init() {

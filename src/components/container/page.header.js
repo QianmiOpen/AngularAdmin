@@ -41,6 +41,7 @@ angular.module('admin.component')
             scope: {
                 logUrl: '@',
                 logImage: '@',
+                logCss: '@',
                 logoutUrl: '@',
 
                 leftMenuUrl: '@',
@@ -58,10 +59,10 @@ angular.module('admin.component')
                     <div class="page-header-inner">
                         <div class="page-logo">
                             <a ng-href="{{logUrl}}">
-                                <img ng-src="{{logImage}}" alt="logo" class="logo-default">
+                                <img ng-src="{{logImage}}" class="{{logCss}}">
                             </a>
                         </div>
-                        <div class="hor-menu hor-menu-light hidden-sm hidden-xs">
+                        <div class="hor-menu hidden-sm hidden-xs">
                             <ul class="nav navbar-nav" ng-transclude>
                             </ul>
                         </div>

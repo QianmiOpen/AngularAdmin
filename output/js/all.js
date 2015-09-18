@@ -3362,7 +3362,10 @@ angular.module('admin.component')
                 $attrs.$set((("" + attrName) + "-bak"), src);
             }
             if ($scope.data && src) {
-                $element.prop(attrName.replace('ng-', ''), ValueService.get($scope, src.replace(/{|}/g, '')));
+                var val = (src || '').replace(/\{\{([^\}]+)\}\}/g, function($0, $1){
+                    return ValueService.get($scope, $1);
+                });
+                $element.prop(attrName.replace('ng-', ''), val);
             }
         };
     })
@@ -3417,9 +3420,9 @@ angular.module('admin.component')
 angular.module('admin.component')
     .directive('uiTableOperationColumn', function (UITableColumnControl) {
         var UITableOperationColumnControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableOperationColumnControl, super$0);var proto$0={};
-            function UITableOperationColumnControl(s, e, a) {
+            function UITableOperationColumnControl(s, e, a, t) {
                 this.className = 'OperationColumn';
-                super$0.call(this, s, e, a);
+                super$0.call(this, s, e, a, t);
             }if(super$0!==null)SP$0(UITableOperationColumnControl,super$0);UITableOperationColumnControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableOperationColumnControl,"configurable":true,"writable":true}});DP$0(UITableOperationColumnControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
             proto$0.init = function() {
@@ -4012,43 +4015,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSwitch', function (UISwitchControl) {
-        return {
-            restrict: 'E',
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                placeholder: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function(s, e, a)  {
-                new UISwitchControl(s, e, a);
-            },
-            template: ("\
-\n               <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>\
-\n            ")
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
 //  针对input的封装
 //
 //
@@ -4091,6 +4057,43 @@ angular.module('admin.component')
 \n            ")
         };
     });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSwitch', function (UISwitchControl) {
+        return {
+            restrict: 'E',
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function(s, e, a)  {
+                new UISwitchControl(s, e, a);
+            },
+            template: ("\
+\n               <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4738,7 +4741,7 @@ angular.module('admin.component')
 \n                    <div class=\"page-bar\">\
 \n                        <ul class=\"page-breadcrumb\">\
 \n                            <li ng-repeat=\"item in items\">\
-\n                                <a ng-if=\"isRoute\" ng-sref=\"{{item.url}}\" ng-bind=\"item.name\"></a>\
+\n                                <a ng-if=\"isRoute\" ui-sref=\"{{item.url}}\" ng-bind=\"item.name\"></a>\
 \n                                <a ng-if=\"!isRoute\" ng-href=\"{{item.url}}\" ng-bind=\"item.name\"></a>\
 \n                                <i ng-if=\"!$last\" class=\"fa fa-angle-right\"></i>\
 \n                            </li>\
@@ -4927,6 +4930,7 @@ angular.module('admin.component')
             scope: {
                 logUrl: '@',
                 logImage: '@',
+                logCss: '@',
                 logoutUrl: '@',
 
                 leftMenuUrl: '@',
@@ -4944,10 +4948,10 @@ angular.module('admin.component')
 \n                    <div class=\"page-header-inner\">\
 \n                        <div class=\"page-logo\">\
 \n                            <a ng-href=\"{{logUrl}}\">\
-\n                                <img ng-src=\"{{logImage}}\" alt=\"logo\" class=\"logo-default\">\
+\n                                <img ng-src=\"{{logImage}}\" class=\"{{logCss}}\">\
 \n                            </a>\
 \n                        </div>\
-\n                        <div class=\"hor-menu hor-menu-light hidden-sm hidden-xs\">\
+\n                        <div class=\"hor-menu hidden-sm hidden-xs\">\
 \n                            <ul class=\"nav navbar-nav\" ng-transclude>\
 \n                            </ul>\
 \n                        </div>\
