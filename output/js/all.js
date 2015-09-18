@@ -886,158 +886,6 @@ angular.module('admin.service')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component', []);
-//------------------------------------------------------
-//
-//
-// 依赖 qm.table.js
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('UITableToolBarControl', function ($state) {
-        var UITableToolBarControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableToolBarControl, super$0);var proto$0={};
-            function UITableToolBarControl(scope, element, attrs, transclude) {
-                super$0.call(this);
-                this.element = element;
-                this.scope = scope;
-                this.attrs = attrs;
-                this.transclude = transclude;
-                this.table = null;
-                this.isEdit = false;
-                this.message = new Message('UITableToolBar');
-                this.init();
-                this.initEvents();
-            }if(super$0!==null)SP$0(UITableToolBarControl,super$0);UITableToolBarControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableToolBarControl,"configurable":true,"writable":true}});DP$0(UITableToolBarControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {var this$0 = this;
-                this.transclude(this.scope, function(dom)  {
-                    this$0.element.find('.btn-group:eq(0)').append(dom);
-                });
-                this.scope.component = this;
-                this.scope.editText = '开启';
-                this.triggerComplete(this.scope, this.attrs.ref || '$tableToolbar', this);
-            };
-
-            proto$0.initEvents = function() {var this$0 = this;
-                this.scope.$parent.$on('uitable.complete', function(evt, uiTable)  {
-                    this$0.scope.table = uiTable;
-                });
-            };
-
-            proto$0.toggleEdit = function() {
-                this.isEdit = !this.isEdit;
-                this.scope.editText = this.isEdit ? '关闭' : '开启';
-                this.scope.$parent.$broadcast('uitable.column.edit', this.isEdit);
-            };
-
-            proto$0.doAddItem = function() {
-                if (this.scope[this.attrs.add]) {
-                    this.scope[this.attrs.add]();
-                }
-                else if (this.attrs.add && this.attrs.add.indexOf('/') != -1) {
-                    if (this.attrs.addDialog) {
-                        //TODO: 弹出框
-                    }
-                    else {
-                        $state.go(this.attrs.add);
-                    }
-                }
-                else {
-                    this.message.error('点击添加数据按钮，但是没有设置地址, 请在add="地址"');
-                }
-            };
-
-            proto$0.doDelItems = function() {
-                var table = this.scope.table,
-                    selectValues = table.selectValues;
-                if (this.scope[this.attrs.del]) {
-                    this.scope[this.attrs.del](selectValues);
-                }
-                else {
-                    if (this.attrs.del) {
-                        if (selectValues.length > 1) {
-                            ajax.remove(this.attrs.del, {ids: selectValues.join(',')}).then(function()  {
-                                table.refresh();
-                            });
-                        }
-                        else {
-                            ajax.remove(this.attrs.del + '/' + selectValues[0]).then(function()  {
-                                table.refresh();
-                            });
-                        }
-                    }
-                    else {
-                        this.message.error('点击删除数据按钮，但是没有设置地址, 请在del="地址"');
-                    }
-                }
-            };
-
-            proto$0.isShow = function(index, column) {
-                if (column.className == 'CheckColumn' || column.className == 'OperationColumn') {
-                    return false;
-                }
-                return true;
-            };
-
-            proto$0.toggleColumn = function(evt, column) {
-                column.bVisible = !column.bVisible;
-                this.scope.$parent.$broadcast('uitable.column.visable', column);
-            };
-        MIXIN$0(UITableToolBarControl.prototype,proto$0);proto$0=void 0;return UITableToolBarControl;})(ComponentEvent);
-        return UITableToolBarControl;
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiToolBarTable', function (UITableToolBarControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                editable: '@',
-                add: '@',
-                del: '@',
-                tip: '@'
-            },
-            controller: function($scope, $element, $attrs, $transclude)  {
-                new UITableToolBarControl($scope, $element, $attrs, $transclude);
-            },
-            template: ("\
-\n                <div class=\"ui-toolbar table-toolbar\">\
-\n                    <div class=\"btn-group pull-left\">\
-\n                        <button ng-if=\"editable\" type=\"button\" class=\"btn btn-sm btn-info\" ng-click=\"component.toggleEdit()\"><i class=\"fa fa-edit\"></i> <span ng-bind=\"editText\"></span>快速编辑</button>&nbsp;&nbsp;\
-\n                        <button ng-if=\"add\" type=\"button\" class=\"btn btn-sm btn-primary\" ng-click=\"component.doAddItem()\"><i class=\"fa fa-plus-circle\"></i> 新增{{tip}}</button>&nbsp;&nbsp;\
-\n                        <button ng-if=\"del\" type=\"button\" ng-class=\"{'btn-danger': table.selectItems.selectValues.length > 0}\" class=\"btn btn-sm\" ng-disabled=\"table.selectItems.length==0\" ng-click=\"component.doDelItem()\"><i class=\"fa fa-times-circle\"></i> 删除{{tip}}</button>&nbsp;&nbsp;\
-\n                    </div>\
-\n\
-\n                    <span ng-show=\"table.selectItems.length > 0\" class=\"table-toolbar-tip fadeInRight\">您已选择 <strong ng-bind=\"selectItems.length\"></strong> 个{{tip}}，支持翻页选择多个{{tip}}。</span>\
-\n\
-\n                    <div class=\"btn-group pull-right\">\
-\n                        <a class=\"btn default btn-sm\" href=\"#\" data-hover=\"dropdown\"><i class=\"fa fa-table\"></i></a>\
-\n                        <div class=\"dropdown-menu dropdown-checkboxes pull-right\">\
-\n                            <label ng-repeat=\"column in table.aoColumns\" ng-if=\"component.isShow($index, column)\" style=\"cursor:pointer\" >\
-\n                                <div class=\"checker\">\
-\n                                    <span ng-class=\"{checked: column.bVisible}\">\
-\n                                        <input type=\"checkbox\" ng-click=\"component.toggleColumn($event, column)\">\
-\n                                    </span>\
-\n                                </div>\
-\n                                <span ng-bind=\"column.mTitle\"/>\
-\n                            </label>\
-\n                         </div>\
-\n                    </div>\
-\n                    <div style=\"clear:both\"></div>\
-\n                </div>\
-\n            ")
-        };
-    });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4843,6 +4691,135 @@ angular.module('admin.component')
             };
         });
 })();
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+(function () {
+    angular.module('admin.component')
+        .factory('UIDialog', function (UIDialogControl, $controller, $q) {
+            return {
+                show: function(url, $scope, controller) {
+                    var defer = $q.defer(),
+                        dialog = new UIDialogControl($scope, url);
+                    //
+                    $scope.onShow = function()  {
+                        defer.resolve(dialog);
+                    };
+                    $scope.onHide = function()  {
+                        defer.reject(dialog);
+                    };
+
+                    //
+                    dialog
+                        .show()
+                        .then(function()  {
+                            try {
+                                $controller(window[controller] || controller, {$scope: $scope});
+                            }
+                            catch (e) {
+                            }
+                        });
+                    return defer.promise;
+                }
+            };
+        })
+        .factory('UIDialogControl', function (Util, Ajax, $compile, $controller, $q) {
+            var UIDialogControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDialogControl, super$0);var proto$0={};
+                function UIDialogControl(scope, url, urlParam, transclude) {
+                    super$0.call(this);
+                    this.scope = scope;
+                    this.scope.dialog = this;
+                    this.url = url;
+                    this.urlParams = urlParam;
+                    this.transclude = transclude;
+                    this.message = new Message('UIDialogHelper');
+                }if(super$0!==null)SP$0(UIDialogControl,super$0);UIDialogControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDialogControl,"configurable":true,"writable":true}});DP$0(UIDialogControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.show = function() {var this$0 = this;
+                    return this.getContent()
+                        .then(function()  {
+                            this$0.content.modal({
+                                "keyboard": true,
+                                "size": "large",
+                                "show": true
+                            });
+                            return this$0.content;
+                        });
+                };
+
+                proto$0.hide = function() {
+                    if (this.content) {
+                        this.content.modal('hide');
+                    }
+                };
+
+                proto$0.getContent = function() {var this$0 = this;
+                    if (this.content) {
+                        return Util.toPromise(this.content);
+                    }
+                    else if (this.url) {
+                        return Ajax.load(this.url, this.urlParams || {})
+                            .then(function(html)  {
+                                this$0.content = $compile(html)(this$0.scope);
+                                this$0._addEvents();
+                            });
+                    }
+                    else {
+                        this.content = this.transclude(this.scope).filter('.modal');
+                        this._addEvents();
+                        return Util.toPromise(this.content);
+                    }
+                };
+
+                proto$0.remove = function() {
+                    this.hide();
+                    this.content.unbind('shown.bs.modal');
+                    this.content.unbind('hidden.bs.modal');
+                    this.content.remove();
+                    super$0.prototype.remove.call(this);
+                };
+
+                proto$0.close = function() {
+                    this.remove();
+                };
+
+                proto$0._addEvents = function() {var this$0 = this;
+                    this.content.bind('shown.bs.modal', function()  {
+                        this$0.scope.onShow();
+                    });
+                    this.content.bind('hidden.bs.modal', function()  {
+                        this$0.scope.onHide();
+                    });
+                };
+            MIXIN$0(UIDialogControl.prototype,proto$0);proto$0=void 0;return UIDialogControl;})(ComponentEvent);
+            return UIDialogControl;
+        });
+})();
+angular.module('admin.component')
+    .directive('uiDialog', function (UIDialogControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                url: '@',
+                initParams: '=',
+                onShow: '&',
+                onHide: '&'
+            },
+            link: function (scope, element, attrs, controller, transclude) {
+                var control = new UIDialogControl(scope, scope.url, scope.initParams, transclude);
+                control.triggerComplete(scope, attrs.ref || '$dialog', control);
+            },
+            template: ("\
+\n                <div class=\"ui-dialog\"></div>\
+\n            ")
+        };
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5104,6 +5081,23 @@ angular.module('admin.component')
                 }
                 if (s.rightMenuUrl) {
                 }
+                var $s = $('<span class="selected"></span>'), $p;
+                e.find('.hor-menu li').click(function(evt)  {
+                    var $li = $(evt.target),
+                        $pli = $li.parents('li');
+                    if ($p) {
+                        $p.removeClass('active');
+                    }
+                    $pli.find('> a').append($s);
+                    $p = $pli.addClass('active');
+                });
+                e.find('.hor-menu li').each(function(i, li)  {
+                    $p = $(li);
+                    if ($p.html().indexOf(location.hash) != -1) {
+                        $p.find('> a').append($s);
+                        $p.addClass('active');
+                    }
+                });
             },
             template: ("\
 \n                <div class=\"page-header navbar navbar-fixed-top\">\
@@ -5164,135 +5158,6 @@ angular.module('admin.component')
 \n                        </ul>\
 \n                    </div>\
 \n                </div>\
-\n            ")
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-(function () {
-    angular.module('admin.component')
-        .factory('UIDialog', function (UIDialogControl, $controller, $q) {
-            return {
-                show: function(url, $scope, controller) {
-                    var defer = $q.defer(),
-                        dialog = new UIDialogControl($scope, url);
-                    //
-                    $scope.onShow = function()  {
-                        defer.resolve(dialog);
-                    };
-                    $scope.onHide = function()  {
-                        defer.reject(dialog);
-                    };
-
-                    //
-                    dialog
-                        .show()
-                        .then(function()  {
-                            try {
-                                $controller(window[controller] || controller, {$scope: $scope});
-                            }
-                            catch (e) {
-                            }
-                        });
-                    return defer.promise;
-                }
-            };
-        })
-        .factory('UIDialogControl', function (Util, Ajax, $compile, $controller, $q) {
-            var UIDialogControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDialogControl, super$0);var proto$0={};
-                function UIDialogControl(scope, url, urlParam, transclude) {
-                    super$0.call(this);
-                    this.scope = scope;
-                    this.scope.dialog = this;
-                    this.url = url;
-                    this.urlParams = urlParam;
-                    this.transclude = transclude;
-                    this.message = new Message('UIDialogHelper');
-                }if(super$0!==null)SP$0(UIDialogControl,super$0);UIDialogControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDialogControl,"configurable":true,"writable":true}});DP$0(UIDialogControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-                proto$0.show = function() {var this$0 = this;
-                    return this.getContent()
-                        .then(function()  {
-                            this$0.content.modal({
-                                "keyboard": true,
-                                "size": "large",
-                                "show": true
-                            });
-                            return this$0.content;
-                        });
-                };
-
-                proto$0.hide = function() {
-                    if (this.content) {
-                        this.content.modal('hide');
-                    }
-                };
-
-                proto$0.getContent = function() {var this$0 = this;
-                    if (this.content) {
-                        return Util.toPromise(this.content);
-                    }
-                    else if (this.url) {
-                        return Ajax.load(this.url, this.urlParams || {})
-                            .then(function(html)  {
-                                this$0.content = $compile(html)(this$0.scope);
-                                this$0._addEvents();
-                            });
-                    }
-                    else {
-                        this.content = this.transclude(this.scope).filter('.modal');
-                        this._addEvents();
-                        return Util.toPromise(this.content);
-                    }
-                };
-
-                proto$0.remove = function() {
-                    this.hide();
-                    this.content.unbind('shown.bs.modal');
-                    this.content.unbind('hidden.bs.modal');
-                    this.content.remove();
-                    super$0.prototype.remove.call(this);
-                };
-
-                proto$0.close = function() {
-                    this.remove();
-                };
-
-                proto$0._addEvents = function() {var this$0 = this;
-                    this.content.bind('shown.bs.modal', function()  {
-                        this$0.scope.onShow();
-                    });
-                    this.content.bind('hidden.bs.modal', function()  {
-                        this$0.scope.onHide();
-                    });
-                };
-            MIXIN$0(UIDialogControl.prototype,proto$0);proto$0=void 0;return UIDialogControl;})(ComponentEvent);
-            return UIDialogControl;
-        });
-})();
-angular.module('admin.component')
-    .directive('uiDialog', function (UIDialogControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                url: '@',
-                initParams: '=',
-                onShow: '&',
-                onHide: '&'
-            },
-            link: function (scope, element, attrs, controller, transclude) {
-                var control = new UIDialogControl(scope, scope.url, scope.initParams, transclude);
-                control.triggerComplete(scope, attrs.ref || '$dialog', control);
-            },
-            template: ("\
-\n                <div class=\"ui-dialog\"></div>\
 \n            ")
         };
     });
@@ -5828,6 +5693,158 @@ angular.module('admin.component')
 \n                        <tbody></tbody>\
 \n                    </table>\
 \n                </div>'\
+\n            ")
+        };
+    });
+
+//------------------------------------------------------
+//
+//
+// 依赖 qm.table.js
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .factory('UITableToolBarControl', function ($state) {
+        var UITableToolBarControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableToolBarControl, super$0);var proto$0={};
+            function UITableToolBarControl(scope, element, attrs, transclude) {
+                super$0.call(this);
+                this.element = element;
+                this.scope = scope;
+                this.attrs = attrs;
+                this.transclude = transclude;
+                this.table = null;
+                this.isEdit = false;
+                this.message = new Message('UITableToolBar');
+                this.init();
+                this.initEvents();
+            }if(super$0!==null)SP$0(UITableToolBarControl,super$0);UITableToolBarControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableToolBarControl,"configurable":true,"writable":true}});DP$0(UITableToolBarControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {var this$0 = this;
+                this.transclude(this.scope, function(dom)  {
+                    this$0.element.find('.btn-group:eq(0)').append(dom);
+                });
+                this.scope.component = this;
+                this.scope.editText = '开启';
+                this.triggerComplete(this.scope, this.attrs.ref || '$tableToolbar', this);
+            };
+
+            proto$0.initEvents = function() {var this$0 = this;
+                this.scope.$parent.$on('uitable.complete', function(evt, uiTable)  {
+                    this$0.scope.table = uiTable;
+                });
+            };
+
+            proto$0.toggleEdit = function() {
+                this.isEdit = !this.isEdit;
+                this.scope.editText = this.isEdit ? '关闭' : '开启';
+                this.scope.$parent.$broadcast('uitable.column.edit', this.isEdit);
+            };
+
+            proto$0.doAddItem = function() {
+                if (this.scope[this.attrs.add]) {
+                    this.scope[this.attrs.add]();
+                }
+                else if (this.attrs.add && this.attrs.add.indexOf('/') != -1) {
+                    if (this.attrs.addDialog) {
+                        //TODO: 弹出框
+                    }
+                    else {
+                        $state.go(this.attrs.add);
+                    }
+                }
+                else {
+                    this.message.error('点击添加数据按钮，但是没有设置地址, 请在add="地址"');
+                }
+            };
+
+            proto$0.doDelItems = function() {
+                var table = this.scope.table,
+                    selectValues = table.selectValues;
+                if (this.scope[this.attrs.del]) {
+                    this.scope[this.attrs.del](selectValues);
+                }
+                else {
+                    if (this.attrs.del) {
+                        if (selectValues.length > 1) {
+                            ajax.remove(this.attrs.del, {ids: selectValues.join(',')}).then(function()  {
+                                table.refresh();
+                            });
+                        }
+                        else {
+                            ajax.remove(this.attrs.del + '/' + selectValues[0]).then(function()  {
+                                table.refresh();
+                            });
+                        }
+                    }
+                    else {
+                        this.message.error('点击删除数据按钮，但是没有设置地址, 请在del="地址"');
+                    }
+                }
+            };
+
+            proto$0.isShow = function(index, column) {
+                if (column.className == 'CheckColumn' || column.className == 'OperationColumn') {
+                    return false;
+                }
+                return true;
+            };
+
+            proto$0.toggleColumn = function(evt, column) {
+                column.bVisible = !column.bVisible;
+                this.scope.$parent.$broadcast('uitable.column.visable', column);
+            };
+        MIXIN$0(UITableToolBarControl.prototype,proto$0);proto$0=void 0;return UITableToolBarControl;})(ComponentEvent);
+        return UITableToolBarControl;
+    });
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiToolBarTable', function (UITableToolBarControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                editable: '@',
+                add: '@',
+                del: '@',
+                tip: '@'
+            },
+            controller: function($scope, $element, $attrs, $transclude)  {
+                new UITableToolBarControl($scope, $element, $attrs, $transclude);
+            },
+            template: ("\
+\n                <div class=\"ui-toolbar table-toolbar\">\
+\n                    <div class=\"btn-group pull-left\">\
+\n                        <button ng-if=\"editable\" type=\"button\" class=\"btn btn-sm btn-info\" ng-click=\"component.toggleEdit()\"><i class=\"fa fa-edit\"></i> <span ng-bind=\"editText\"></span>快速编辑</button>&nbsp;&nbsp;\
+\n                        <button ng-if=\"add\" type=\"button\" class=\"btn btn-sm btn-primary\" ng-click=\"component.doAddItem()\"><i class=\"fa fa-plus-circle\"></i> 新增{{tip}}</button>&nbsp;&nbsp;\
+\n                        <button ng-if=\"del\" type=\"button\" ng-class=\"{'btn-danger': table.selectItems.selectValues.length > 0}\" class=\"btn btn-sm\" ng-disabled=\"table.selectItems.length==0\" ng-click=\"component.doDelItem()\"><i class=\"fa fa-times-circle\"></i> 删除{{tip}}</button>&nbsp;&nbsp;\
+\n                    </div>\
+\n\
+\n                    <span ng-show=\"table.selectItems.length > 0\" class=\"table-toolbar-tip fadeInRight\">您已选择 <strong ng-bind=\"selectItems.length\"></strong> 个{{tip}}，支持翻页选择多个{{tip}}。</span>\
+\n\
+\n                    <div class=\"btn-group pull-right\">\
+\n                        <a class=\"btn default btn-sm\" href=\"#\" data-hover=\"dropdown\"><i class=\"fa fa-table\"></i></a>\
+\n                        <div class=\"dropdown-menu dropdown-checkboxes pull-right\">\
+\n                            <label ng-repeat=\"column in table.aoColumns\" ng-if=\"component.isShow($index, column)\" style=\"cursor:pointer\" >\
+\n                                <div class=\"checker\">\
+\n                                    <span ng-class=\"{checked: column.bVisible}\">\
+\n                                        <input type=\"checkbox\" ng-click=\"component.toggleColumn($event, column)\">\
+\n                                    </span>\
+\n                                </div>\
+\n                                <span ng-bind=\"column.mTitle\"/>\
+\n                            </label>\
+\n                         </div>\
+\n                    </div>\
+\n                    <div style=\"clear:both\"></div>\
+\n                </div>\
 \n            ")
         };
     });

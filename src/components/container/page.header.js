@@ -53,6 +53,23 @@ angular.module('admin.component')
                 }
                 if (s.rightMenuUrl) {
                 }
+                let $s = $('<span class="selected"></span>'), $p;
+                e.find('.hor-menu li').click((evt) => {
+                    let $li = $(evt.target),
+                        $pli = $li.parents('li');
+                    if ($p) {
+                        $p.removeClass('active');
+                    }
+                    $pli.find('> a').append($s);
+                    $p = $pli.addClass('active');
+                });
+                e.find('.hor-menu li').each((i, li) => {
+                    $p = $(li);
+                    if ($p.html().indexOf(location.hash) != -1) {
+                        $p.find('> a').append($s);
+                        $p.addClass('active');
+                    }
+                });
             },
             template: `
                 <div class="page-header navbar navbar-fixed-top">
