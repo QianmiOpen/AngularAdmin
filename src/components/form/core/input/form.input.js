@@ -16,6 +16,7 @@ angular.module('admin.component')
                 label: '@',
                 css: '@',
                 placeholder: '@',
+                max: '@',
                 name: '@',
                 model: '=',
                 change: '&',
@@ -29,7 +30,7 @@ angular.module('admin.component')
                 <div class="form-group">
                    <label class="col-md-{{lcol || DefaultCol.l}} control-label">{{label}}</label>
                    <div class="col-md-{{rcol || DefaultCol.r}}">
-                       <input type="{{type || 'text'}}" class="form-control {{css}}" name="{{name}}" placeholder="{{placeholder}}" ng-change="change({val: model})" ng-model="model"/>
+                       <input type="{{type || 'text'}}" max-length="{{max}}" class="form-control {{css}}" name="{{name}}" placeholder="{{placeholder}}" ng-change="change({val: model})" ng-model="model"/>
                        <span ng-if="help" class="help-block">{{help}}</span>
                    </div>
                </div>'

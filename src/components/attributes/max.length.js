@@ -8,23 +8,28 @@
 (function () {
 
     angular.module('admin.component')
-        .directive('maxlength', function () {
+        .directive('maxLength', function () {
             return {
-                restrict: 'a',
+                restrict: 'A',
                 link: function (scope, element, attrs) {
-                    let length = attrs.maxlength;
-                    if (/^\d+$/g.test(length)) {
-                        $('input.className').maxlength({
-                            alwaysShow: true,
-                            threshold: Math.ceil(length / 2),
-                            warningClass: "label label-info",
-                            limitReachedClass: "label label-warning",
-                            placement: 'bottom ',
-                            preText: '已输入 ',
-                            postText: ' 个字符',
-                            separator: ' - '
-                        });
-                    }
+                    let listener = attrs.$observe('maxLength', (n) => {
+                        if(n && /^\d+$/g.test(n)){
+                            let input = element.find('input');
+                            if(!input.length){
+                                input = element;
+                            }
+                            setTimeout(() => {
+                                input.prop('maxlength', n).maxlength({
+                                    alwaysShow: true,
+                                    placement: 'bottom',
+                                    preText: '已输入 ',
+                                    postText: ' 个字符',
+                                    separator: ' - '
+                                });
+                            }, 500);
+                            listener();
+                        }
+                    });
                 },
                 template: ``
             };

@@ -3877,6 +3877,7 @@ angular.module('admin.component')
                 label: '@',
                 css: '@',
                 placeholder: '@',
+                max: '@',
                 name: '@',
                 model: '=',
                 change: '&',
@@ -3890,7 +3891,7 @@ angular.module('admin.component')
 \n                <div class=\"form-group\">\
 \n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
 \n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <input type=\"{{type || 'text'}}\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change({val: model})\" ng-model=\"model\"/>\
+\n                       <input type=\"{{type || 'text'}}\" max-length=\"{{max}}\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change({val: model})\" ng-model=\"model\"/>\
 \n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
 \n                   </div>\
 \n               </div>'\
@@ -4628,38 +4629,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 (function () {
 
-    angular.module('admin.component')
-        .directive('maxlength', function () {
-            return {
-                restrict: 'a',
-                link: function (scope, element, attrs) {
-                    var length = attrs.maxlength;
-                    if (/^\d+$/g.test(length)) {
-                        $('input.className').maxlength({
-                            alwaysShow: true,
-                            threshold: Math.ceil(length / 2),
-                            warningClass: "label label-info",
-                            limitReachedClass: "label label-warning",
-                            placement: 'bottom ',
-                            preText: '已输入 ',
-                            postText: ' 个字符',
-                            separator: ' - '
-                        });
-                    }
-                },
-                template: ("")
-            };
-        });
-})();
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-(function () {
-
     var UIStateButton = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIStateButton, super$0);var proto$0={};
         function UIStateButton(scope, element, attrs) {
             this.scope = scope;
@@ -4728,6 +4697,43 @@ angular.module('admin.component')
                         return '<button type="button" ng-transclude></button>';
                     }
                 }
+            };
+        });
+})();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+
+    angular.module('admin.component')
+        .directive('maxLength', function () {
+            return {
+                restrict: 'A',
+                link: function (scope, element, attrs) {
+                    var listener = attrs.$observe('maxLength', function(n)  {
+                        if(n && /^\d+$/g.test(n)){
+                            var input = element.find('input');
+                            if(!input.length){
+                                input = element;
+                            }
+                            setTimeout(function()  {
+                                input.prop('maxlength', n).maxlength({
+                                    alwaysShow: true,
+                                    placement: 'bottom',
+                                    preText: '已输入 ',
+                                    postText: ' 个字符',
+                                    separator: ' - '
+                                });
+                            }, 500);
+                            listener();
+                        }
+                    });
+                },
+                template: ("")
             };
         });
 })();
