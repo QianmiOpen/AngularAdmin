@@ -58,13 +58,21 @@
                             this.treeElement.attr('id', 'uiTree' + new Date().getTime());
                             this.callback = {
                                 beforeClick: (treeId, treeNode, treeNodeId) => this.scope.onBeforeClick({treeNode: treeNode}),
-                                onClick: (evt, treeId, treeNode, treeNodeId) => this.scope.onClick({treeNode: treeNode}),
+                                onClick: (evt, treeId, treeNode, treeNodeId) => {
+                                    if (this.attrs.checked == 'false') {
+                                        this.selectItems = [treeNode];
+                                        this.selectValues = [treeNode[idName]];
+                                        this.scope.model = this.selectValues[0];
+                                    }
+                                    else if (_.indexOf(this.selectItems, treeNode) == -1) {
+                                        this.selectItems.push(treeNode);
+                                        this.selectValues.push(treeNode[idName]);
+                                        this.scope.model = this.selectValues;
+                                    }
+                                    this.scope.onClick({treeNode: treeNode})
+                                },
                                 beforeCheck: (treeId, treeNode) => this.scope.onBeforeCheck({treeNode: treeNode}),
-                                onCheck: (evt, treeId, treeNode) => {
-                                    this.selectItems.push(treeNode);
-                                    this.selectValues.push(treeNode[idName]);
-                                    this.scope.onCheck({treeNode: treeNode});
-                                }
+                                onCheck: (evt, treeId, treeNode) => this.scope.onCheck({treeNode: treeNode})
                             };
                             this.view = {
                                 addHoverDom: (treeId, treeNode) => this._onMouseEnterTreeNode(treeNode),

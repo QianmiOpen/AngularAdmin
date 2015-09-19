@@ -4691,135 +4691,6 @@ angular.module('admin.component')
             };
         });
 })();
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-(function () {
-    angular.module('admin.component')
-        .factory('UIDialog', function (UIDialogControl, $controller, $q) {
-            return {
-                show: function(url, $scope, controller) {
-                    var defer = $q.defer(),
-                        dialog = new UIDialogControl($scope, url);
-                    //
-                    $scope.onShow = function()  {
-                        defer.resolve(dialog);
-                    };
-                    $scope.onHide = function()  {
-                        defer.reject(dialog);
-                    };
-
-                    //
-                    dialog
-                        .show()
-                        .then(function()  {
-                            try {
-                                $controller(window[controller] || controller, {$scope: $scope});
-                            }
-                            catch (e) {
-                            }
-                        });
-                    return defer.promise;
-                }
-            };
-        })
-        .factory('UIDialogControl', function (Util, Ajax, $compile, $controller, $q) {
-            var UIDialogControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDialogControl, super$0);var proto$0={};
-                function UIDialogControl(scope, url, urlParam, transclude) {
-                    super$0.call(this);
-                    this.scope = scope;
-                    this.scope.dialog = this;
-                    this.url = url;
-                    this.urlParams = urlParam;
-                    this.transclude = transclude;
-                    this.message = new Message('UIDialogHelper');
-                }if(super$0!==null)SP$0(UIDialogControl,super$0);UIDialogControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDialogControl,"configurable":true,"writable":true}});DP$0(UIDialogControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-                proto$0.show = function() {var this$0 = this;
-                    return this.getContent()
-                        .then(function()  {
-                            this$0.content.modal({
-                                "keyboard": true,
-                                "size": "large",
-                                "show": true
-                            });
-                            return this$0.content;
-                        });
-                };
-
-                proto$0.hide = function() {
-                    if (this.content) {
-                        this.content.modal('hide');
-                    }
-                };
-
-                proto$0.getContent = function() {var this$0 = this;
-                    if (this.content) {
-                        return Util.toPromise(this.content);
-                    }
-                    else if (this.url) {
-                        return Ajax.load(this.url, this.urlParams || {})
-                            .then(function(html)  {
-                                this$0.content = $compile(html)(this$0.scope);
-                                this$0._addEvents();
-                            });
-                    }
-                    else {
-                        this.content = this.transclude(this.scope).filter('.modal');
-                        this._addEvents();
-                        return Util.toPromise(this.content);
-                    }
-                };
-
-                proto$0.remove = function() {
-                    this.hide();
-                    this.content.unbind('shown.bs.modal');
-                    this.content.unbind('hidden.bs.modal');
-                    this.content.remove();
-                    super$0.prototype.remove.call(this);
-                };
-
-                proto$0.close = function() {
-                    this.remove();
-                };
-
-                proto$0._addEvents = function() {var this$0 = this;
-                    this.content.bind('shown.bs.modal', function()  {
-                        this$0.scope.onShow();
-                    });
-                    this.content.bind('hidden.bs.modal', function()  {
-                        this$0.scope.onHide();
-                    });
-                };
-            MIXIN$0(UIDialogControl.prototype,proto$0);proto$0=void 0;return UIDialogControl;})(ComponentEvent);
-            return UIDialogControl;
-        });
-})();
-angular.module('admin.component')
-    .directive('uiDialog', function (UIDialogControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                url: '@',
-                initParams: '=',
-                onShow: '&',
-                onHide: '&'
-            },
-            link: function (scope, element, attrs, controller, transclude) {
-                var control = new UIDialogControl(scope, scope.url, scope.initParams, transclude);
-                control.triggerComplete(scope, attrs.ref || '$dialog', control);
-            },
-            template: ("\
-\n                <div class=\"ui-dialog\"></div>\
-\n            ")
-        };
-    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5158,6 +5029,135 @@ angular.module('admin.component')
 \n                        </ul>\
 \n                    </div>\
 \n                </div>\
+\n            ")
+        };
+    });
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+(function () {
+    angular.module('admin.component')
+        .factory('UIDialog', function (UIDialogControl, $controller, $q) {
+            return {
+                show: function(url, $scope, controller) {
+                    var defer = $q.defer(),
+                        dialog = new UIDialogControl($scope, url);
+                    //
+                    $scope.onShow = function()  {
+                        defer.resolve(dialog);
+                    };
+                    $scope.onHide = function()  {
+                        defer.reject(dialog);
+                    };
+
+                    //
+                    dialog
+                        .show()
+                        .then(function()  {
+                            try {
+                                $controller(window[controller] || controller, {$scope: $scope});
+                            }
+                            catch (e) {
+                            }
+                        });
+                    return defer.promise;
+                }
+            };
+        })
+        .factory('UIDialogControl', function (Util, Ajax, $compile, $controller, $q) {
+            var UIDialogControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIDialogControl, super$0);var proto$0={};
+                function UIDialogControl(scope, url, urlParam, transclude) {
+                    super$0.call(this);
+                    this.scope = scope;
+                    this.scope.dialog = this;
+                    this.url = url;
+                    this.urlParams = urlParam;
+                    this.transclude = transclude;
+                    this.message = new Message('UIDialogHelper');
+                }if(super$0!==null)SP$0(UIDialogControl,super$0);UIDialogControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIDialogControl,"configurable":true,"writable":true}});DP$0(UIDialogControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                proto$0.show = function() {var this$0 = this;
+                    return this.getContent()
+                        .then(function()  {
+                            this$0.content.modal({
+                                "keyboard": true,
+                                "size": "large",
+                                "show": true
+                            });
+                            return this$0.content;
+                        });
+                };
+
+                proto$0.hide = function() {
+                    if (this.content) {
+                        this.content.modal('hide');
+                    }
+                };
+
+                proto$0.getContent = function() {var this$0 = this;
+                    if (this.content) {
+                        return Util.toPromise(this.content);
+                    }
+                    else if (this.url) {
+                        return Ajax.load(this.url, this.urlParams || {})
+                            .then(function(html)  {
+                                this$0.content = $compile(html)(this$0.scope);
+                                this$0._addEvents();
+                            });
+                    }
+                    else {
+                        this.content = this.transclude(this.scope).filter('.modal');
+                        this._addEvents();
+                        return Util.toPromise(this.content);
+                    }
+                };
+
+                proto$0.remove = function() {
+                    this.hide();
+                    this.content.unbind('shown.bs.modal');
+                    this.content.unbind('hidden.bs.modal');
+                    this.content.remove();
+                    super$0.prototype.remove.call(this);
+                };
+
+                proto$0.close = function() {
+                    this.remove();
+                };
+
+                proto$0._addEvents = function() {var this$0 = this;
+                    this.content.bind('shown.bs.modal', function()  {
+                        this$0.scope.onShow();
+                    });
+                    this.content.bind('hidden.bs.modal', function()  {
+                        this$0.scope.onHide();
+                    });
+                };
+            MIXIN$0(UIDialogControl.prototype,proto$0);proto$0=void 0;return UIDialogControl;})(ComponentEvent);
+            return UIDialogControl;
+        });
+})();
+angular.module('admin.component')
+    .directive('uiDialog', function (UIDialogControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                url: '@',
+                initParams: '=',
+                onShow: '&',
+                onHide: '&'
+            },
+            link: function (scope, element, attrs, controller, transclude) {
+                var control = new UIDialogControl(scope, scope.url, scope.initParams, transclude);
+                control.triggerComplete(scope, attrs.ref || '$dialog', control);
+            },
+            template: ("\
+\n                <div class=\"ui-dialog\"></div>\
 \n            ")
         };
     });
@@ -5945,13 +5945,21 @@ angular.module('admin.component')
                             this.treeElement.attr('id', 'uiTree' + new Date().getTime());
                             this.callback = {
                                 beforeClick: function(treeId, treeNode, treeNodeId)  {return this$0.scope.onBeforeClick({treeNode: treeNode})},
-                                onClick: function(evt, treeId, treeNode, treeNodeId)  {return this$0.scope.onClick({treeNode: treeNode})},
+                                onClick: function(evt, treeId, treeNode, treeNodeId)  {
+                                    if (this$0.attrs.checked == 'false') {
+                                        this$0.selectItems = [treeNode];
+                                        this$0.selectValues = [treeNode[idName]];
+                                        this$0.scope.model = this$0.selectValues[0];
+                                    }
+                                    else if (_.indexOf(this$0.selectItems, treeNode) == -1) {
+                                        this$0.selectItems.push(treeNode);
+                                        this$0.selectValues.push(treeNode[idName]);
+                                        this$0.scope.model = this$0.selectValues;
+                                    }
+                                    this$0.scope.onClick({treeNode: treeNode})
+                                },
                                 beforeCheck: function(treeId, treeNode)  {return this$0.scope.onBeforeCheck({treeNode: treeNode})},
-                                onCheck: function(evt, treeId, treeNode)  {
-                                    this$0.selectItems.push(treeNode);
-                                    this$0.selectValues.push(treeNode[idName]);
-                                    this$0.scope.onCheck({treeNode: treeNode});
-                                }
+                                onCheck: function(evt, treeId, treeNode)  {return this$0.scope.onCheck({treeNode: treeNode})}
                             };
                             this.view = {
                                 addHoverDom: function(treeId, treeNode)  {return this$0._onMouseEnterTreeNode(treeNode)},
@@ -6196,6 +6204,8 @@ angular.module('admin.component')
                 onAdd: '&',
                 onEdit: '&',
                 onRemove: '&',
+
+                model: '=',
 
                 checked: '=',
                 filter: '='

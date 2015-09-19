@@ -25,6 +25,8 @@ angular.module('admin.component')
                 onEdit: '&',
                 onRemove: '&',
 
+                model: '=',
+
                 checked: '=',
                 filter: '='
             },
