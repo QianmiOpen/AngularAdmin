@@ -27375,8 +27375,7 @@ div.DTFC_LeftBodyWrapper tbody tr:first-child td, div.DTFC_LeftBodyWrapper tbody
 .modal {
     outline: 0;
     position: absolute;
-    margin-top: 0;
-    top: 50%;
+    margin-top: 10px !important;
     overflow: visible
 }
 

@@ -32,7 +32,7 @@
             class UIFormControl extends UIFormItemControl {
 
                 constructor(s, e, a, formItems) {
-                    this.className = 'form';
+                    this.className = '';
                     this.formItems = formItems;
                     this.formControlMap = {};
                     this.formElement = e.find('form');
@@ -51,6 +51,32 @@
                 initEvents() {
                     super.initEvents();
                     this.formElement.submit((evt) => this._onSubmit(evt));
+                }
+
+                formData() {
+                    return this.formElement.serializeArray();
+                }
+
+                formParamData() {
+                    return this.formElement.serialize();
+                }
+
+                formJsonData() {
+                    let data = this.formData(),
+                        r = {};
+                    for (let item of data) {
+                        if (item.value === undefined) {
+                            continue;
+                        }
+                        if (r[item.name]) {
+                            r[item.name] = _.isArray(r[item.name]) ? r[item.name] : [r[item.name]];
+                            r[item.name].push(item.value);
+                        }
+                        else {
+                            r[item.name] = item.value;
+                        }
+                    }
+                    return r;
                 }
 
                 changeValidateRule(ruleName, ruleConfig) {
