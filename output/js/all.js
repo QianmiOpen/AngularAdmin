@@ -807,6 +807,19 @@ angular.module('admin.service')
             },
 
             /**
+             * 确认框
+             * @param msg
+             * @returns {promise}
+             */
+            prompt: function (msg) {
+                var def = $q.defer();
+                bootbox.prompt(msg, function (result) {
+                    result ? def.resolve(result) : def.reject();
+                });
+                return def.promise;
+            },
+
+            /**
              * 使用jquery validate验证json数据
              */
             checkValuesUseRules: function (jsonData, jsonRules) {
@@ -2933,119 +2946,6 @@ angular.module('admin.component')
             return result;
         });
 })();
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .factory('UIPortletControl', function (Ajax, $compile) {
-
-        var UIPortletControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIPortletControl, super$0);var proto$0={};
-            function UIPortletControl(scope, element, attrs, transclude) {
-                super$0.call(this);
-                this.element = element;
-                this.scope = scope;
-                this.attrs = attrs;
-                this.transclude = transclude;
-                this.message = new Message('UIPortlet');
-                this.init();
-                this.initEvents();
-                this.render();
-            }if(super$0!==null)SP$0(UIPortletControl,super$0);UIPortletControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIPortletControl,"configurable":true,"writable":true}});DP$0(UIPortletControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                this.bodyElement = this.element.find('.portlet-body');
-                this.headElement = this.element.find('.portlet-title');
-                this.triggerComplete(this.scope, this.attrs.ref || '$portlet', this);
-            };
-
-            proto$0.initEvents = function() {
-            };
-
-            proto$0.render = function() {var this$0 = this;
-                this.transclude(this.scope.$parent, function($content)  {
-                    var $toolbar = $content.filter('.portlet-tool-bar');
-                    if ($toolbar.length === 0) {
-                        $.each($content, function(i, c)  {
-                            if (c.nodeName.indexOf('UI-PORTLET-ACTION') != -1) {
-                                $toolbar = $(c);
-                                return false;
-                            }
-                        });
-                    }
-                    this$0.bodyElement.append($content);
-                    if ($toolbar.length !== 0) {
-                        this$0.headElement.append($toolbar);
-                    }
-                    if (!this$0.scope.title) {
-                        this$0.headElement.hide();
-                    }
-                    this$0.load();
-                });
-            };
-
-            proto$0.load = function(params, url) {var this$0 = this;
-                url = url || this.scope.url;
-                if (url) {
-                    Ajax.get(url, params || {})
-                        .then(function(html)  {
-                            var $dom = $compile(html)(this$0.scope);
-                            this$0.bodyElement.append($dom);
-                        });
-                }
-            };
-
-            proto$0.setTitle = function(title) {
-                this.headElement.find('span').html(title);
-            };
-        MIXIN$0(UIPortletControl.prototype,proto$0);proto$0=void 0;return UIPortletControl;})(ComponentEvent);
-
-        return UIPortletControl;
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiPortlet', function (UIPortletControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                captionClass: '@',
-                bodyClass: '@',
-                icon: '@',
-                url: '@',
-                title: '@'
-            },
-            link: function (scope, elemt, attrs, contrllor, transclude) {
-                new UIPortletControl(scope, elemt, attrs, transclude);
-            },
-            template: ("\
-\n                <div class=\"portlet\">\
-\n                    <div class=\"portlet-title tabbable-line\">\
-\n                        <div class=\"caption\">\
-\n                            <i ng-if=\"icon\" class=\"{{icon}}\"></i>\
-\n                            <span class=\"caption-subject {{captionClass}}\">{{title}}</span>\
-\n                        </div>\
-\n                    </div>\
-\n                    <div class=\"portlet-body {{bodyClass}}\">\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-
-
-
-
 //------------------------------------------------------
 //
 //
@@ -3183,13 +3083,14 @@ angular.module('admin.component')
             transclude: true,
             scope: {
                 head: '@',
+                title: '@',
                 url: '@'
             },
             link: function($scope, $element, $attrs, controller, $transclude)  {
                 new UITabItemControl($scope, $element, $attrs, $transclude);
             },
             template: ("\
-\n                <li ng-class=\"{'active': active}\">\
+\n                <li ng-class=\"{'active': active}\" title=\"{{title || head}}\">\
 \n                    <a href=\"javascript:;\" ng-click=\"component.clickHandler($event)\">\
 \n                        <span>{{head}}</span>\
 \n                        <i class=\"fa fa-times\" ng-click=\"component.removeHandler($event)\"></i>\
@@ -3198,6 +3099,119 @@ angular.module('admin.component')
 \n            ")
         };
     });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .factory('UIPortletControl', function (Ajax, $compile) {
+
+        var UIPortletControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIPortletControl, super$0);var proto$0={};
+            function UIPortletControl(scope, element, attrs, transclude) {
+                super$0.call(this);
+                this.element = element;
+                this.scope = scope;
+                this.attrs = attrs;
+                this.transclude = transclude;
+                this.message = new Message('UIPortlet');
+                this.init();
+                this.initEvents();
+                this.render();
+            }if(super$0!==null)SP$0(UIPortletControl,super$0);UIPortletControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIPortletControl,"configurable":true,"writable":true}});DP$0(UIPortletControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                this.bodyElement = this.element.find('.portlet-body');
+                this.headElement = this.element.find('.portlet-title');
+                this.triggerComplete(this.scope, this.attrs.ref || '$portlet', this);
+            };
+
+            proto$0.initEvents = function() {
+            };
+
+            proto$0.render = function() {var this$0 = this;
+                this.transclude(this.scope.$parent, function($content)  {
+                    var $toolbar = $content.filter('.portlet-tool-bar');
+                    if ($toolbar.length === 0) {
+                        $.each($content, function(i, c)  {
+                            if (c.nodeName.indexOf('UI-PORTLET-ACTION') != -1) {
+                                $toolbar = $(c);
+                                return false;
+                            }
+                        });
+                    }
+                    this$0.bodyElement.append($content);
+                    if ($toolbar.length !== 0) {
+                        this$0.headElement.append($toolbar);
+                    }
+                    if (!this$0.scope.title) {
+                        this$0.headElement.hide();
+                    }
+                    this$0.load();
+                });
+            };
+
+            proto$0.load = function(params, url) {var this$0 = this;
+                url = url || this.scope.url;
+                if (url) {
+                    Ajax.get(url, params || {})
+                        .then(function(html)  {
+                            var $dom = $compile(html)(this$0.scope);
+                            this$0.bodyElement.append($dom);
+                        });
+                }
+            };
+
+            proto$0.setTitle = function(title) {
+                this.headElement.find('span').html(title);
+            };
+        MIXIN$0(UIPortletControl.prototype,proto$0);proto$0=void 0;return UIPortletControl;})(ComponentEvent);
+
+        return UIPortletControl;
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiPortlet', function (UIPortletControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                captionClass: '@',
+                bodyClass: '@',
+                icon: '@',
+                url: '@',
+                title: '@'
+            },
+            link: function (scope, elemt, attrs, contrllor, transclude) {
+                new UIPortletControl(scope, elemt, attrs, transclude);
+            },
+            template: ("\
+\n                <div class=\"portlet\">\
+\n                    <div class=\"portlet-title tabbable-line\">\
+\n                        <div class=\"caption\">\
+\n                            <i ng-if=\"icon\" class=\"{{icon}}\"></i>\
+\n                            <span class=\"caption-subject {{captionClass}}\">{{title}}</span>\
+\n                        </div>\
+\n                    </div>\
+\n                    <div class=\"portlet-body {{bodyClass}}\">\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+
+
+
 
 //------------------------------------------------------
 //
@@ -6019,6 +6033,10 @@ angular.module('admin.component')
                             else {
                                 this.setData([]);
                             }
+                        };
+
+                        proto$0.refresh = function(){
+                            this.load();
                         };
 
                         proto$0.setData = function(resData, isFilter) {

@@ -134,6 +134,19 @@ angular.module('admin.service')
             },
 
             /**
+             * 确认框
+             * @param msg
+             * @returns {promise}
+             */
+            prompt: function (msg) {
+                var def = $q.defer();
+                bootbox.prompt(msg, function (result) {
+                    result ? def.resolve(result) : def.reject();
+                });
+                return def.promise;
+            },
+
+            /**
              * 使用jquery validate验证json数据
              */
             checkValuesUseRules: function (jsonData, jsonRules) {

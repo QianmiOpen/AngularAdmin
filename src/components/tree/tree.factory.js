@@ -134,6 +134,10 @@
                             }
                         }
 
+                        refresh(){
+                            this.load();
+                        }
+
                         setData(resData, isFilter) {
                             resData = resData || [];
                             if (this.instance) {
