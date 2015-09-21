@@ -151,7 +151,7 @@
                         $.each(rs, (i, r) => {
                             var isC = false;
                             if (o.init) { //初始化, 那么只会根据
-                                isC = this.attrs.multi ? o.term.indexOf(this._formatId(r)) != -1 : this._formatId(r) == o.term;
+                                isC = o.term.indexOf(this._formatId(r)) != -1;
                             }
                             else { //根据属性过滤
                                 if (sfs.length === 0 || sfs[0] === '') {
