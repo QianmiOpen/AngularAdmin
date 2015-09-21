@@ -2821,7 +2821,7 @@ angular.module('admin.component')
                 proto$0.val = function(vals) {
                     if (vals) {
                         this.inputElement.select2('val', vals);
-                        if (this.attrs.multi) {
+                        if (_.isArray(vals)) {
                             this.selectValues = vals;
                         }
                         else {
@@ -4629,6 +4629,43 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 (function () {
 
+    angular.module('admin.component')
+        .directive('maxLength', function () {
+            return {
+                restrict: 'A',
+                link: function (scope, element, attrs) {
+                    var listener = attrs.$observe('maxLength', function(n)  {
+                        if(n && /^\d+$/g.test(n)){
+                            var input = element.find('input');
+                            if(!input.length){
+                                input = element;
+                            }
+                            setTimeout(function()  {
+                                input.prop('maxlength', n).maxlength({
+                                    alwaysShow: true,
+                                    placement: 'bottom',
+                                    preText: '已输入 ',
+                                    postText: ' 个字符',
+                                    separator: ' - '
+                                });
+                            }, 500);
+                            listener();
+                        }
+                    });
+                },
+                template: ("")
+            };
+        });
+})();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+
     var UIStateButton = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIStateButton, super$0);var proto$0={};
         function UIStateButton(scope, element, attrs) {
             this.scope = scope;
@@ -4697,43 +4734,6 @@ angular.module('admin.component')
                         return '<button type="button" ng-transclude></button>';
                     }
                 }
-            };
-        });
-})();
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-(function () {
-
-    angular.module('admin.component')
-        .directive('maxLength', function () {
-            return {
-                restrict: 'A',
-                link: function (scope, element, attrs) {
-                    var listener = attrs.$observe('maxLength', function(n)  {
-                        if(n && /^\d+$/g.test(n)){
-                            var input = element.find('input');
-                            if(!input.length){
-                                input = element;
-                            }
-                            setTimeout(function()  {
-                                input.prop('maxlength', n).maxlength({
-                                    alwaysShow: true,
-                                    placement: 'bottom',
-                                    preText: '已输入 ',
-                                    postText: ' 个字符',
-                                    separator: ' - '
-                                });
-                            }, 500);
-                            listener();
-                        }
-                    });
-                },
-                template: ("")
             };
         });
 })();
