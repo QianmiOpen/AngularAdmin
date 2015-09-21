@@ -27393,7 +27393,7 @@ div.DTFC_LeftBodyWrapper tbody tr:first-child td, div.DTFC_LeftBodyWrapper tbody
 
 .modal-body {
     max-height: 700px;
-    overflow: visible
+    overflow: auto
 }
 
 .modal.modal-absolute {
