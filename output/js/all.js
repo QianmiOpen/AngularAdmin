@@ -2760,7 +2760,7 @@ angular.module('admin.component')
                         $.each(rs, function(i, r)  {
                             var isC = false;
                             if (o.init) { //初始化, 那么只会根据
-                                isC = this$0.attrs.multi ? o.term.indexOf(this$0._formatId(r)) != -1 : this$0._formatId(r) == o.term;
+                                isC = o.term.indexOf(this$0._formatId(r)) != -1;
                             }
                             else { //根据属性过滤
                                 if (sfs.length === 0 || sfs[0] === '') {
@@ -4201,44 +4201,6 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchRegion', function (UIRegionControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                model: '=',
-                change: '&',
-                label: '@',
-                name: '@',
-                mode: '@'
-            },
-            link: function(s, e, a)  {
-                if (a.mode === undefined || a.mode == 'a') { //区域查询不支持详细地址
-                    a.mode = 's';
-                }
-                new UIRegionControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"input-inline ui-search-item\">\
-\n                    <div class=\"input-group ui-search-region\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}:</div>\
-\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-1px\" name=\"city\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-2px\" name=\"area\"/>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
     .directive('uiSearchDate', function (UIDateControl) {
         return {
             restrict: 'E',
@@ -4382,6 +4344,44 @@ angular.module('admin.component')
             template: function (element, attrs) {
                 return componentHelper.getTemplate('tpl.searchform.input.select', attrs);
             }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchRegion', function (UIRegionControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                mode: '@'
+            },
+            link: function(s, e, a)  {
+                if (a.mode === undefined || a.mode == 'a') { //区域查询不支持详细地址
+                    a.mode = 's';
+                }
+                new UIRegionControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"input-inline ui-search-item\">\
+\n                    <div class=\"input-group ui-search-region\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}:</div>\
+\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-1px\" name=\"city\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-2px\" name=\"area\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
         };
     });
 //-----------------------------------------------------------------------------------------------
