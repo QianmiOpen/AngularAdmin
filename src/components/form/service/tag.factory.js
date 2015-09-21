@@ -212,7 +212,7 @@
                 val(vals) {
                     if (vals) {
                         this.inputElement.select2('val', vals);
-                        if (this.attrs.multi) {
+                        if (_.isArray(vals)) {
                             this.selectValues = vals;
                         }
                         else {
