@@ -145,13 +145,14 @@
 
                 _filterData(o) {
                     var sfs = (this.attrs.search || '').toLowerCase().split(','),
-                        keyword = o.term.toLowerCase();
+                        keyword = o.term.toLowerCase(),
+                        keyword2 = `,${keyword},`
                     this.loadData().then((rs) => {
                         var os = [];
                         $.each(rs, (i, r) => {
                             var isC = false;
                             if (o.init) { //初始化, 那么只会根据
-                                isC = o.term.indexOf(this._formatId(r)) != -1;
+                                isC = keyword2.indexOf(`,${this._formatId(r)},`) != -1;
                             }
                             else { //根据属性过滤
                                 if (sfs.length === 0 || sfs[0] === '') {

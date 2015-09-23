@@ -27,7 +27,7 @@
                 <ui-breadcrumb datas="['A', 'B', 'C', 'D', 'E']"></ui-breadcrumb>
                 <h4>输入表单</h4>
                 <ui-form>
-                    <ui-form-date mode="datetime" label="日期:" placeholder="什么鬼" help="醉了" model="item.formDate" change="dateChangeHandler(val)"></ui-form-date>
+                    <ui-form-date mode="date" label="日期:" placeholder="什么鬼" help="醉了" model="item.formDate" change="dateChangeHandler(val)"></ui-form-date>
                     <ui-form-date-range mode="datetime" label="日期范围:" help="醉了3" from-model="item.formRangeFromDate" to-model="item.formRangeToDate" change="dateRangeChangeHandler(startVal, endVal)"></ui-form-date-range>
                     <ui-form-input label="输入框:" help="醉了4" model="item.formInput" change="inputChangeHandler()"></ui-form-input>
                     <ui-form-select label="下拉框:" help="醉了5" model="item.formSelect" change="selectChangeHandler()">
@@ -116,13 +116,13 @@
         }
 
         //双向绑定测试
-        $scope.item = {};
-        $scope.item.formDate = moment().format('YYYY-MM-DD HH:mm:ss');
-        $scope.item.formRangeFromDate = moment().format('YYYY-MM-DD HH:mm:ss');
-        $scope.item.formRangeToDate = moment().add(3, 'h').format('YYYY-MM-DD HH:mm:ss');
-        $scope.item.formInput = '我是输入框';
-        $scope.item.formSpinner = 1000;
-        $scope.item.formSwitch = 1;
+//        $scope.item = {};
+//        $scope.item.formDate = moment().format('YYYY-MM-DD HH:mm:ss');
+//        $scope.item.formRangeFromDate = moment().format('YYYY-MM-DD HH:mm:ss');
+//        $scope.item.formRangeToDate = moment().add(3, 'h').format('YYYY-MM-DD HH:mm:ss');
+//        $scope.item.formInput = '我是输入框';
+//        $scope.item.formSpinner = 1000;
+//        $scope.item.formSwitch = 1;
     }
 </script>
 </html>
