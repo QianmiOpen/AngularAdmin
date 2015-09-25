@@ -69,7 +69,8 @@
                                         this.selectValues.push(treeNode[idName]);
                                         this.scope.model = this.selectValues;
                                     }
-                                    this.scope.onClick({treeNode: treeNode})
+                                    this.scope.onClick({treeNode: treeNode});
+                                    this.scope.$apply();
                                 },
                                 beforeCheck: (treeId, treeNode) => this.scope.onBeforeCheck({treeNode: treeNode}),
                                 onCheck: (evt, treeId, treeNode) => this.scope.onCheck({treeNode: treeNode})

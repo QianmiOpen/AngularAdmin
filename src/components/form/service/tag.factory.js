@@ -146,7 +146,7 @@
                 _filterData(o) {
                     var sfs = (this.attrs.search || '').toLowerCase().split(','),
                         keyword = o.term.toLowerCase(),
-                        keyword2 = `,${keyword},`
+                        keyword2 = `,${keyword},`;
                     this.loadData().then((rs) => {
                         var os = [];
                         $.each(rs, (i, r) => {
