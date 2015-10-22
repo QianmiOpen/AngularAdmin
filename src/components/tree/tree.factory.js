@@ -135,7 +135,7 @@
                             }
                         }
 
-                        refresh(){
+                        refresh() {
                             this.load();
                         }
 
@@ -213,6 +213,17 @@
                                 var node = this.instance.getNodeByParam(idName, selectItem.id, null);
                                 node && this.instance.checkNode(node, false, true);
                             });
+                        }
+
+                        checkItems(items, isAppend) {
+                            $.each(items, (i, selectItem) => {
+                                var node = this.instance.getNodeByParam(idName, selectItem.id, null);
+                                node && this.instance.checkNode(node, true, true);
+                            });
+                            if (isAppend)
+                                this.selectItems = (this.selectItems || []).concat(items);
+                            else
+                                this.selectItems = items;
                         }
 
                         appendData(id, name, pid) {
