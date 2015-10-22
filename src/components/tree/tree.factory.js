@@ -79,7 +79,7 @@
                                 addHoverDom: (treeId, treeNode) => this._onMouseEnterTreeNode(treeNode),
                                 removeHoverDom: (treeId, treeNode) => this._onMouseOverTreeNode(treeNode)
                             };
-                            this.check = {enabled: this.attrs.checked != 'false'};
+                            this.check = {enable: this.attrs.checked != 'false'};
                             this.triggerComplete(this.scope, this.attrs.ref || '$tree', this);
                         }
 
