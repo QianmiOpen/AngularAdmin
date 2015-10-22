@@ -6069,7 +6069,7 @@ angular.module('admin.component')
                             }
                         };
 
-                        proto$0.refresh = function(){
+                        proto$0.refresh = function() {
                             this.load();
                         };
 
@@ -6149,6 +6149,17 @@ angular.module('admin.component')
                             });
                         };
 
+                        proto$0.checkItems = function(items, isAppend) {var this$0 = this;
+                            $.each(items, function(i, selectItem)  {
+                                var node = this$0.instance.getNodeByParam(idName, selectItem.id, null);
+                                node && this$0.instance.checkNode(node, true, true);
+                            });
+                            if (isAppend)
+                                this.selectItems = (this.selectItems || []).concat(items);
+                            else
+                                this.selectItems = items;
+                        };
+
                         proto$0.appendData = function(id, name, pid) {
                             var data = {};
                             data[idName] = id;
@@ -6187,7 +6198,7 @@ angular.module('admin.component')
                                         searchList = searchList.concat(this$0.getHierarchyData(data));
                                     }
                                 });
-                                searchList = searchList.filter(function(item)  {
+                                searchList = searchList.filter(function(item)  { 
                                     if (!m[item[idName]]) {
                                         m[item[idName]] = 1;
                                         return true;
