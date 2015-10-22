@@ -59,13 +59,13 @@
                             this.callback = {
                                 beforeClick: (treeId, treeNode, treeNodeId) => this.scope.onBeforeClick({treeNode: treeNode}),
                                 onClick: (evt, treeId, treeNode, treeNodeId) => {
-                                    this._onClickOrCheckHandler(treeNode, true);
+                                    this._onClickOrCheckHandler(treeNode, false);
                                     this.scope.onClick({treeNode: treeNode});
                                     this.scope.$apply();
                                 },
                                 beforeCheck: (treeId, treeNode) => this.scope.onBeforeCheck({treeNode: treeNode}),
                                 onCheck: (evt, treeId, treeNode) => {
-                                    this._onClickOrCheckHandler(treeNode, false);
+                                    this._onClickOrCheckHandler(treeNode, true);
                                     this.scope.onCheck({treeNode: treeNode});
                                     this.scope.$apply()
                                 }

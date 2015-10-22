@@ -4067,6 +4067,43 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSwitch', function (UISwitchControl) {
+        return {
+            restrict: 'E',
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function(s, e, a)  {
+                new UISwitchControl(s, e, a);
+            },
+            template: ("\
+\n               <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
+        };
+    });
+
+//-----------------------------------------------------------------------------------------------
+//
+//
 //  针对input的封装
 //
 //
@@ -4109,43 +4146,6 @@ angular.module('admin.component')
 \n            ")
         };
     });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSwitch', function (UISwitchControl) {
-        return {
-            restrict: 'E',
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                placeholder: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function(s, e, a)  {
-                new UISwitchControl(s, e, a);
-            },
-            template: ("\
-\n               <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                        <input type=\"checkbox\" class=\"form-control {{css}}\" name=\"{{name}}\" />\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>\
-\n            ")
-        };
-    });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5993,13 +5993,13 @@ angular.module('admin.component')
                             this.callback = {
                                 beforeClick: function(treeId, treeNode, treeNodeId)  {return this$0.scope.onBeforeClick({treeNode: treeNode})},
                                 onClick: function(evt, treeId, treeNode, treeNodeId)  {
-                                    this$0._onClickOrCheckHandler(treeNode, true);
+                                    this$0._onClickOrCheckHandler(treeNode, false);
                                     this$0.scope.onClick({treeNode: treeNode});
                                     this$0.scope.$apply();
                                 },
                                 beforeCheck: function(treeId, treeNode)  {return this$0.scope.onBeforeCheck({treeNode: treeNode})},
                                 onCheck: function(evt, treeId, treeNode)  {
-                                    this$0._onClickOrCheckHandler(treeNode, false);
+                                    this$0._onClickOrCheckHandler(treeNode, true);
                                     this$0.scope.onCheck({treeNode: treeNode});
                                     this$0.scope.$apply()
                                 }
