@@ -59,21 +59,16 @@
                             this.callback = {
                                 beforeClick: (treeId, treeNode, treeNodeId) => this.scope.onBeforeClick({treeNode: treeNode}),
                                 onClick: (evt, treeId, treeNode, treeNodeId) => {
-                                    if (this.attrs.checked == 'false') {
-                                        this.selectItems = [treeNode];
-                                        this.selectValues = [treeNode[idName]];
-                                        this.scope.model = this.selectValues[0];
-                                    }
-                                    else if (_.indexOf(this.selectItems, treeNode) == -1) {
-                                        this.selectItems.push(treeNode);
-                                        this.selectValues.push(treeNode[idName]);
-                                        this.scope.model = this.selectValues;
-                                    }
+                                    this._onClickOrCheckHandler(treeNode, true);
                                     this.scope.onClick({treeNode: treeNode});
                                     this.scope.$apply();
                                 },
                                 beforeCheck: (treeId, treeNode) => this.scope.onBeforeCheck({treeNode: treeNode}),
-                                onCheck: (evt, treeId, treeNode) => this.scope.onCheck({treeNode: treeNode})
+                                onCheck: (evt, treeId, treeNode) => {
+                                    this._onClickOrCheckHandler(treeNode, false);
+                                    this.scope.onCheck({treeNode: treeNode});
+                                    this.scope.$apply()
+                                }
                             };
                             this.view = {
                                 addHoverDom: (treeId, treeNode) => this._onMouseEnterTreeNode(treeNode),
@@ -250,6 +245,16 @@
                                     this.instance.selectNode(node, isAll);
                                 }
                             }
+                        }
+
+                        _onClickOrCheckHandler(treeNode, isCheckHandle) {
+                            if (isCheckHandle)
+                                this.selectItems = this.instance.getSelectedNodes();
+                            else
+                                this.selectItems = [treeNode];
+                            this.selectValues = this.selectItems.map((item) => {
+                                return item[idName];
+                            });
                         }
 
                         _filter(filterText) {
