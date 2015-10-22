@@ -249,7 +249,7 @@
 
                         _onClickOrCheckHandler(treeNode, isCheckHandle) {
                             if (isCheckHandle)
-                                this.selectItems = this.instance.getSelectedNodes();
+                                this.selectItems = this.instance.getCheckedNodes(true);
                             else
                                 this.selectItems = [treeNode];
                             this.selectValues = this.selectItems.map((item) => {
