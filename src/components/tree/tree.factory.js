@@ -255,6 +255,7 @@
                             this.selectValues = this.selectItems.map((item) => {
                                 return item[idName];
                             });
+                            this.scope.model = this.selectValues;
                         }
 
                         _filter(filterText) {
