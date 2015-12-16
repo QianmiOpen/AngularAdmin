@@ -36,7 +36,7 @@
                         val = this.val();
                     val = val !== undefined ? parseInt(val) : this.attrs.value;
                     if (isNaN(val)){
-                        val = 1;
+                        val = 0;
                     }
                     val = val + (step * ( isAdd ? 1 : -1));
                     val = this._checkValue(val);

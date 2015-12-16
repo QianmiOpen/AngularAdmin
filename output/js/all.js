@@ -68,101 +68,6 @@ angular.module('admin.service', []);
 //
 //
 //-----------------------------------------------------------------------------------------------
-angular.module('admin.service')
-    .provider('Ajax', function()  {
-        var successHandler,
-            failHandler,
-            result = {
-                setSuccessHandler: function(handler) {
-                    successHandler = handler;
-                },
-
-                setFailHandler: function(handler) {
-                    failHandler = handler;
-                },
-
-                $get: function($q, Util, Message) {
-                    var _msg = new Message('Ajax'),
-                        _execute = function(method, url, data)  {
-                            var defer = $q.defer();
-                            $.ajax({
-                                url: url, cache: false, data: data, type: method, dataType: 'json',
-                                success: function(resData)  {
-                                    var success = successHandler(resData),
-                                        error = failHandler(resData);
-                                    if (success !== undefined && success !== null) {
-                                        defer.resolve(success);
-                                    }
-                                    else {
-                                        defer.reject(error);
-                                    }
-                                },
-                                error: function(xhr, status)  {
-                                    var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
-                                    _msg.error(errMsg || '服务器出现了问题,请稍后重试');
-                                }
-                            });
-                            return defer.promise;
-                        };
-                    return {
-
-                        get: function(url, data) {
-                            return _execute('GET', url, data);
-                        },
-
-                        post: function(url, data) {
-                            return _execute('POST', url, data);
-                        },
-
-                        message: function(url, data, successMsg, failMsg) {
-                            return this.post(url, data)
-                                .then(function()  {return _msg.success(successMsg)})
-                                .catch(function()  {return _msg.error(failMsg)});
-                        },
-
-                        add: function(url, data) {
-                            return this.message(url, data, '添加数据成功', '添加数据失败');
-                        },
-
-                        update: function(url, data) {
-                            return this.message(url, data, '更新数据成功', '更新数据失败');
-                        },
-
-                        remove: function(url, data, options) {var this$0 = this;
-                            options = options || {};
-                            return Util.confirm((("您确认删除该" + (options.label || '数据')) + "吗?"))
-                                .then(function()  {return this$0[options.method ? options.method : 'get'](url, data, options)});
-                        },
-
-                        load: function(url) {
-                            var $dom = $('<div/>').hide().appendTo(document.body),
-                                defer = $q.defer();
-                            $dom.load(url, function(html)  {
-                                $dom.remove();
-                                defer.resolve(html);
-                            });
-                            return defer.promise;
-                        },
-
-                        getScript: function(url) {
-                            return $.ajax({
-                                url: url,
-                                dataType: "script",
-                                cache: true
-                            });
-                        }
-                    };
-                }
-            };
-        return result;
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
 var c = window.console;
 var Logger = (function(){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var static$0={},proto$0={};
 
@@ -340,6 +245,101 @@ angular.module('admin.service')
                 return Message;
             }
         };
+        return result;
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.service')
+    .provider('Ajax', function()  {
+        var successHandler,
+            failHandler,
+            result = {
+                setSuccessHandler: function(handler) {
+                    successHandler = handler;
+                },
+
+                setFailHandler: function(handler) {
+                    failHandler = handler;
+                },
+
+                $get: function($q, Util, Message) {
+                    var _msg = new Message('Ajax'),
+                        _execute = function(method, url, data)  {
+                            var defer = $q.defer();
+                            $.ajax({
+                                url: url, cache: false, data: data, type: method, dataType: 'json',
+                                success: function(resData)  {
+                                    var success = successHandler(resData),
+                                        error = failHandler(resData);
+                                    if (success !== undefined && success !== null) {
+                                        defer.resolve(success);
+                                    }
+                                    else {
+                                        defer.reject(error);
+                                    }
+                                },
+                                error: function(xhr, status)  {
+                                    var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
+                                    _msg.error(errMsg || '服务器出现了问题,请稍后重试');
+                                }
+                            });
+                            return defer.promise;
+                        };
+                    return {
+
+                        get: function(url, data) {
+                            return _execute('GET', url, data);
+                        },
+
+                        post: function(url, data) {
+                            return _execute('POST', url, data);
+                        },
+
+                        message: function(url, data, successMsg, failMsg) {
+                            return this.post(url, data)
+                                .then(function()  {return _msg.success(successMsg)})
+                                .catch(function()  {return _msg.error(failMsg)});
+                        },
+
+                        add: function(url, data) {
+                            return this.message(url, data, '添加数据成功', '添加数据失败');
+                        },
+
+                        update: function(url, data) {
+                            return this.message(url, data, '更新数据成功', '更新数据失败');
+                        },
+
+                        remove: function(url, data, options) {var this$0 = this;
+                            options = options || {};
+                            return Util.confirm((("您确认删除该" + (options.label || '数据')) + "吗?"))
+                                .then(function()  {return this$0[options.method ? options.method : 'get'](url, data, options)});
+                        },
+
+                        load: function(url) {
+                            var $dom = $('<div/>').hide().appendTo(document.body),
+                                defer = $q.defer();
+                            $dom.load(url, function(html)  {
+                                $dom.remove();
+                                defer.resolve(html);
+                            });
+                            return defer.promise;
+                        },
+
+                        getScript: function(url) {
+                            return $.ajax({
+                                url: url,
+                                dataType: "script",
+                                cache: true
+                            });
+                        }
+                    };
+                }
+            };
         return result;
     });
 //-----------------------------------------------------------------------------------------------
@@ -899,42 +899,6 @@ angular.module('admin.service')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component', []);
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchForm', function (UISearchFormControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                onSearch: '&',
-                onReset: '&'
-            },
-            link: function (scope, element, attrs, controller, transclude) {
-                new UISearchFormControl(scope, element, attrs, transclude);
-            },
-            template: ("\
-\n                <form novalidate action=\"\" class=\"ui-search-form form-inline\">\
-\n                    <div class=\"row\">\
-\n                        <div class=\"col-md-{{lcol}}\"></div>\
-\n                        <div class=\"text-right col-md-{{rcol}}\">\
-\n                            <a title=\"回车键也可触发搜索\" class=\"btn blue-chambray btn-sm\" ng-click=\"component.search()\" style=\"width: 30px\"><i class=\"fa fa-search\"></i></button>\
-\n                            <a title=\"重置搜索选项\" class=\"btn default btn-sm\" ng-click=\"component.reset()\" style=\"width: 30px\"><i class=\"fa fa-undo font-blue-chambray\"></i></a>\
-\n                        </div>\
-\n                    </div>\
-\n                </form>\
-\n            ")
-        };
-    });
-
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -1133,6 +1097,42 @@ angular.module('admin.component')
         return this.optional(element) || reg.test(value);
     }, "密码由8-16位字母、数字和特殊字符组成，且至少有一个大写字母或者特殊字符！");
 })(jQuery);
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchForm', function (UISearchFormControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                onSearch: '&',
+                onReset: '&'
+            },
+            link: function (scope, element, attrs, controller, transclude) {
+                new UISearchFormControl(scope, element, attrs, transclude);
+            },
+            template: ("\
+\n                <form novalidate action=\"\" class=\"ui-search-form form-inline\">\
+\n                    <div class=\"row\">\
+\n                        <div class=\"col-md-{{lcol}}\"></div>\
+\n                        <div class=\"text-right col-md-{{rcol}}\">\
+\n                            <a title=\"回车键也可触发搜索\" class=\"btn blue-chambray btn-sm\" ng-click=\"component.search()\" style=\"width: 30px\"><i class=\"fa fa-search\"></i></button>\
+\n                            <a title=\"重置搜索选项\" class=\"btn default btn-sm\" ng-click=\"component.reset()\" style=\"width: 30px\"><i class=\"fa fa-undo font-blue-chambray\"></i></a>\
+\n                        </div>\
+\n                    </div>\
+\n                </form>\
+\n            ")
+        };
+    });
+
 /**
  * 表单控件
  */
@@ -2506,7 +2506,7 @@ angular.module('admin.component')
                         val = this.val();
                     val = val !== undefined ? parseInt(val) : this.attrs.value;
                     if (isNaN(val)){
-                        val = 1;
+                        val = 0;
                     }
                     val = val + (step * ( isAdd ? 1 : -1));
                     val = this._checkValue(val);
@@ -3755,269 +3755,6 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchDate', function (UIDateControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                model: '=',
-                change: '&',
-                label: '@',
-                name: '@',
-                css: '@',
-                placeholder: '@'
-            },
-            link: function (s, e, a) {
-                new UIDateControl(s, e, a);
-            },
-            template: ("\
-\n                 <div class=\"input-inline ui-search-item\">\
-\n                    <div class=\"input-group\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\" readonly=\"true\"/>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchDateRange', function (UIDateRangeControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: function (s, e, a) {
-                new UIDateRangeControl(s, e, a);
-            },
-            scope: {
-                css: '@',
-                name: '@',
-                fromModel: '=',
-                fromName: '@',
-                toModel: '=',
-                toName: '@',
-                change: '&',
-                label: '@'
-            },
-            template: ("\
-\n                 <div class=\"input-inline ui-search-item ui-search-date-range input-xlarge {{css}}\">\
-\n                    <div class=\"input-group\">\
-\n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{fromName}}\" ng-model=\"fromModel\"/>\
-\n                        <span class=\"input-group-addon\">{{label || '到'}}</span>\
-\n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{toName}}\" ng-model=\"toModel\"/>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchInput', function (UIInputControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                model: '=',
-                change: '&',
-                label: '@',
-                name: '@',
-                css: '@',
-                placeholder: '@'
-            },
-            link: function (s, e, a) {
-                new UIInputControl(s, e, a);
-            },
-            template: ("\
-\n                 <div class=\"input-inline ui-search-item\">\
-\n                    <div class=\"input-group\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\"/>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchInputSelect', function (uiSelectFactory, uiInputFactory, componentHelper, msg) {
-        var m = new msg('SearchInputSelect');
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: function (scope, element, attrs) {
-
-                //
-                var hasName = attrs.selectName && attrs.inputName,
-                    input = new uiInputFactory(scope, element, attrs),
-                    select = new uiSelectFactory(scope, element, attrs);
-
-                //
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchInputSelect', {
-                    select: select,
-                    input: input
-                });
-
-                //
-                if (hasName) { //没有设置name, 那么当select的值变动的时候, 自动设置input的name为select的value
-                }
-                else if (!!!attrs.selectName && !!!attrs.inputName) {
-                    select.change(function () {
-                        input.attr('name', select.val());
-                    });
-                    input.attr('name', select.val());
-                }
-                else {
-                    m.error('必须同时设置select-name和input-name, 要么不设置, 要么全设置');
-                }
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    select.reset();
-                    input.reset();
-                });
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.input.select', attrs);
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchRegion', function (UIRegionControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                model: '=',
-                change: '&',
-                label: '@',
-                name: '@',
-                mode: '@'
-            },
-            link: function(s, e, a)  {
-                if (a.mode === undefined || a.mode == 'a') { //区域查询不支持详细地址
-                    a.mode = 's';
-                }
-                new UIRegionControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"input-inline ui-search-item\">\
-\n                    <div class=\"input-group ui-search-region\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}:</div>\
-\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-1px\" name=\"city\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-2px\" name=\"area\"/>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchSelect', function (UISelectControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                label: '@',
-                placeholder: '@',
-                name: '@',
-                css: '@',
-                model: '=',
-                change: '&',
-                multiple: '@',
-                render: '&',
-                labelName: '@',
-                valueName: '@',
-                buttonClass: '@',
-                onRender: '&'
-            },
-            link: function (s, e, a) {
-                new UISelectControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"input-inline ui-search-item\">\
-\n                    <div ng-class=\"{'input-group': label}\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <select class=\"form-control show-tick\" data-container=\"body\" data-live-search=\"true\" name=\"{{name}}\" ng-transclude></select>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchTag', function (UITagControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                label: '@',
-                name: '@',
-                model: '=',
-                placeholder: '@',
-                change: '&'
-            },
-            link: function (scope, element, attrs) {
-                new UITagControl(scope, element, attrs);
-            },
-            template: ("\
-\n                <div class=\"input-large ui-search-item\">\
-\n                    <div class=\"input-group\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <input class=\"form-control\" name=\"{{name}}\" />\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
     .directive('uiFormEditor', function (UIEditorControl) {
         return {
             restrict: 'E',
@@ -4460,6 +4197,269 @@ angular.module('admin.component')
 \n            ")
         };
     });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchDate', function (UIDateControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                css: '@',
+                placeholder: '@'
+            },
+            link: function (s, e, a) {
+                new UIDateControl(s, e, a);
+            },
+            template: ("\
+\n                 <div class=\"input-inline ui-search-item\">\
+\n                    <div class=\"input-group\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
+\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\" readonly=\"true\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchDateRange', function (UIDateRangeControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: function (s, e, a) {
+                new UIDateRangeControl(s, e, a);
+            },
+            scope: {
+                css: '@',
+                name: '@',
+                fromModel: '=',
+                fromName: '@',
+                toModel: '=',
+                toName: '@',
+                change: '&',
+                label: '@'
+            },
+            template: ("\
+\n                 <div class=\"input-inline ui-search-item ui-search-date-range input-xlarge {{css}}\">\
+\n                    <div class=\"input-group\">\
+\n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{fromName}}\" ng-model=\"fromModel\"/>\
+\n                        <span class=\"input-group-addon\">{{label || '到'}}</span>\
+\n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{toName}}\" ng-model=\"toModel\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchInput', function (UIInputControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                css: '@',
+                placeholder: '@'
+            },
+            link: function (s, e, a) {
+                new UIInputControl(s, e, a);
+            },
+            template: ("\
+\n                 <div class=\"input-inline ui-search-item\">\
+\n                    <div class=\"input-group\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
+\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchInputSelect', function (uiSelectFactory, uiInputFactory, componentHelper, msg) {
+        var m = new msg('SearchInputSelect');
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: function (scope, element, attrs) {
+
+                //
+                var hasName = attrs.selectName && attrs.inputName,
+                    input = new uiInputFactory(scope, element, attrs),
+                    select = new uiSelectFactory(scope, element, attrs);
+
+                //
+                componentHelper.tiggerComplete(scope, attrs.ref || '$searchInputSelect', {
+                    select: select,
+                    input: input
+                });
+
+                //
+                if (hasName) { //没有设置name, 那么当select的值变动的时候, 自动设置input的name为select的value
+                }
+                else if (!!!attrs.selectName && !!!attrs.inputName) {
+                    select.change(function () {
+                        input.attr('name', select.val());
+                    });
+                    input.attr('name', select.val());
+                }
+                else {
+                    m.error('必须同时设置select-name和input-name, 要么不设置, 要么全设置');
+                }
+
+                //
+                scope.$on('uisearchform.reset', function () {
+                    select.reset();
+                    input.reset();
+                });
+            },
+            template: function (element, attrs) {
+                return componentHelper.getTemplate('tpl.searchform.input.select', attrs);
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchRegion', function (UIRegionControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                mode: '@'
+            },
+            link: function(s, e, a)  {
+                if (a.mode === undefined || a.mode == 'a') { //区域查询不支持详细地址
+                    a.mode = 's';
+                }
+                new UIRegionControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"input-inline ui-search-item\">\
+\n                    <div class=\"input-group ui-search-region\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}:</div>\
+\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-1px\" name=\"city\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-2px\" name=\"area\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchSelect', function (UISelectControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                label: '@',
+                placeholder: '@',
+                name: '@',
+                css: '@',
+                model: '=',
+                change: '&',
+                multiple: '@',
+                render: '&',
+                labelName: '@',
+                valueName: '@',
+                buttonClass: '@',
+                onRender: '&'
+            },
+            link: function (s, e, a) {
+                new UISelectControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"input-inline ui-search-item\">\
+\n                    <div ng-class=\"{'input-group': label}\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
+\n                        <select class=\"form-control show-tick\" data-container=\"body\" data-live-search=\"true\" name=\"{{name}}\" ng-transclude></select>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchTag', function (UITagControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                label: '@',
+                name: '@',
+                model: '=',
+                placeholder: '@',
+                change: '&'
+            },
+            link: function (scope, element, attrs) {
+                new UITagControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"input-large ui-search-item\">\
+\n                    <div class=\"input-group\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
+\n                        <input class=\"form-control\" name=\"{{name}}\" />\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
