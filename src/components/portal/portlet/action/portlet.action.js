@@ -12,7 +12,7 @@ angular.module('admin.component')
             replace: true,
             transclude: true,
             template: `
-                <div class="actions portlet-tool-bar tools" ng-transclude>
+                <div class="actions portlet-tool-bar"  ng-transclude>
                 </div>
             `
         };
