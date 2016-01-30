@@ -3643,7 +3643,7 @@ angular.module('admin.component')
             };
 
             proto$0.getTransclude = function(rowData) {
-                var s = this.scope.$new();
+                var s = this.scope.$parent.$new(); //修复获取不到顶层controller的方法
                 s.data = rowData;
                 var $dom;
                 this.transclude(s, function(dom)  {
@@ -3747,6 +3747,196 @@ angular.module('admin.component')
         };
     })
 ;
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormEditor', function (UIEditorControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function (scope, element, attrs) {
+                new UIEditorControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <script name=\"{{name}}\" type=\"text/plain\"></script>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormDate', function (UIDateControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function (scope, element, attrs) {
+                new UIDateControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change({val: model})\" ng-model=\"model\" readonly=\"true\"/>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormDateRange', function (UIDateRangeControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: function (s, e, a) {
+                new UIDateRangeControl(s, e, a);
+            },
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                fromModel: '=',
+                toModel: '=',
+                change: '&',
+                help: '@'
+            },
+            template: ("\
+\n               <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol}}\">\
+\n                       <div class=\"input-date-range input-inline\">\
+\n                           <div class=\"input-group\">\
+\n                               <input type=\"text\" class=\"form-control\" name=\"{{fromName}}\" ng-model=\"fromModel\" value=\"{{fromValue}}\" readonly>\
+\n                               <span class=\"input-group-addon\">至</span>\
+\n                               <input type=\"text\" class=\"form-control\" name=\"{{toName}}\" ng-model=\"toModel\" value=\"{{toValue}}\" readonly>\
+\n                           </div>\
+\n                       </div>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormInput', function (UIInputControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                max: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@',
+                type: '@'
+            },
+            link: function (scope, element, attrs) {
+                new UIInputControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <input type=\"{{type || 'text'}}\" max-length=\"{{max}}\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change({val: model})\" ng-model=\"model\"/>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormTextarea', function (componentHelper, defaultCol) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: function (scope, element, attrs, ctrl, transclude) {
+                //
+                var $textarea = element.find('textarea');
+                scope.$on('uiform.reset', function () {
+                    $textarea.val('');
+                });
+
+                //
+                $textarea.html(transclude().text());
+
+                //
+                element.removeAttr('name').removeAttr('model').removeAttr('rows').removeAttr('cols');
+            },
+            template: function (element, attrs) {
+                var cc = (attrs.col || defaultCol).split(':');
+                return componentHelper.getTemplate('tpl.form.textarea', $.extend({
+                    leftCol: cc[0],
+                    rightCol: cc[1]
+                }, attrs));
+            }
+        };
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -3885,7 +4075,7 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiFormEditor', function (UIEditorControl) {
+    .directive('uiFormSpinner', function (UISpinnerControl) {
         return {
             restrict: 'E',
             replace: true,
@@ -3894,22 +4084,31 @@ angular.module('admin.component')
                 rcol: '@',
                 label: '@',
                 css: '@',
+                placeholder: '@',
                 name: '@',
                 model: '=',
                 change: '&',
                 help: '@'
             },
-            link: function (scope, element, attrs) {
-                new UIEditorControl(scope, element, attrs);
+            link: function(s, e, a)  {
+                new UISpinnerControl(s, e, a);
             },
             template: ("\
 \n                <div class=\"form-group\">\
 \n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
 \n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <script name=\"{{name}}\" type=\"text/plain\"></script>\
-\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>'\
+\n                       <div class=\"input-group\" style=\"width:150px;\">\
+\n                           <div class=\"spinner-buttons input-group-btn\">\
+\n                               <button type=\"button\" class=\"btn spinner-up blue\"><i class=\"fa fa-plus\"></i></button>\
+\n                           </div>\
+\n                           <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" readonly=\"true\"/>\
+\n                           <div class=\"spinner-buttons input-group-btn\">\
+\n                               <button type=\"button\" class=\"btn spinner-down red\"><i class=\"fa fa-minus\"></i></button>\
+\n                           </div>\
+\n                       </div>\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                    </div>\
+\n               </div>\
 \n            ")
         };
     });
@@ -3950,51 +4149,6 @@ angular.module('admin.component')
         };
     });
 
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSpinner', function (UISpinnerControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                placeholder: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function(s, e, a)  {
-                new UISpinnerControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <div class=\"input-group\" style=\"width:150px;\">\
-\n                           <div class=\"spinner-buttons input-group-btn\">\
-\n                               <button type=\"button\" class=\"btn spinner-up blue\"><i class=\"fa fa-plus\"></i></button>\
-\n                           </div>\
-\n                           <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" readonly=\"true\"/>\
-\n                           <div class=\"spinner-buttons input-group-btn\">\
-\n                               <button type=\"button\" class=\"btn spinner-down red\"><i class=\"fa fa-minus\"></i></button>\
-\n                           </div>\
-\n                       </div>\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                    </div>\
-\n               </div>\
-\n            ")
-        };
-    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4051,6 +4205,159 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
+    .directive('uiSearchDate', function (UIDateControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                css: '@',
+                placeholder: '@'
+            },
+            link: function (s, e, a) {
+                new UIDateControl(s, e, a);
+            },
+            template: ("\
+\n                 <div class=\"input-inline ui-search-item\">\
+\n                    <div class=\"input-group\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
+\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\" readonly=\"true\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchDateRange', function (UIDateRangeControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: function (s, e, a) {
+                new UIDateRangeControl(s, e, a);
+            },
+            scope: {
+                css: '@',
+                name: '@',
+                fromModel: '=',
+                fromName: '@',
+                toModel: '=',
+                toName: '@',
+                change: '&',
+                label: '@'
+            },
+            template: ("\
+\n                 <div class=\"input-inline ui-search-item ui-search-date-range input-xlarge {{css}}\">\
+\n                    <div class=\"input-group\">\
+\n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{fromName}}\" ng-model=\"fromModel\"/>\
+\n                        <span class=\"input-group-addon\">{{label || '到'}}</span>\
+\n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{toName}}\" ng-model=\"toModel\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchInput', function (UIInputControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                css: '@',
+                placeholder: '@'
+            },
+            link: function (s, e, a) {
+                new UIInputControl(s, e, a);
+            },
+            template: ("\
+\n                 <div class=\"input-inline ui-search-item\">\
+\n                    <div class=\"input-group\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
+\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchInputSelect', function (uiSelectFactory, uiInputFactory, componentHelper, msg) {
+        var m = new msg('SearchInputSelect');
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: function (scope, element, attrs) {
+
+                //
+                var hasName = attrs.selectName && attrs.inputName,
+                    input = new uiInputFactory(scope, element, attrs),
+                    select = new uiSelectFactory(scope, element, attrs);
+
+                //
+                componentHelper.tiggerComplete(scope, attrs.ref || '$searchInputSelect', {
+                    select: select,
+                    input: input
+                });
+
+                //
+                if (hasName) { //没有设置name, 那么当select的值变动的时候, 自动设置input的name为select的value
+                }
+                else if (!!!attrs.selectName && !!!attrs.inputName) {
+                    select.change(function () {
+                        input.attr('name', select.val());
+                    });
+                    input.attr('name', select.val());
+                }
+                else {
+                    m.error('必须同时设置select-name和input-name, 要么不设置, 要么全设置');
+                }
+
+                //
+                scope.$on('uisearchform.reset', function () {
+                    select.reset();
+                    input.reset();
+                });
+            },
+            template: function (element, attrs) {
+                return componentHelper.getTemplate('tpl.searchform.input.select', attrs);
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
     .directive('uiSearchRegion', function (UIRegionControl) {
         return {
             restrict: 'E',
@@ -4081,6 +4388,78 @@ angular.module('admin.component')
 \n            ")
         };
     });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchSelect', function (UISelectControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                label: '@',
+                placeholder: '@',
+                name: '@',
+                css: '@',
+                model: '=',
+                change: '&',
+                multiple: '@',
+                render: '&',
+                labelName: '@',
+                valueName: '@',
+                buttonClass: '@',
+                onRender: '&'
+            },
+            link: function (s, e, a) {
+                new UISelectControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"input-inline ui-search-item\">\
+\n                    <div ng-class=\"{'input-group': label}\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
+\n                        <select class=\"form-control show-tick\" data-container=\"body\" data-live-search=\"true\" name=\"{{name}}\" ng-transclude></select>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchTag', function (UITagControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                label: '@',
+                name: '@',
+                model: '=',
+                placeholder: '@',
+                change: '&'
+            },
+            link: function (scope, element, attrs) {
+                new UITagControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"input-large ui-search-item\">\
+\n                    <div class=\"input-group\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
+\n                        <input class=\"form-control\" name=\"{{name}}\" />\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4245,385 +4624,6 @@ angular.module('admin.component')
 
 
 
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchSelect', function (UISelectControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                label: '@',
-                placeholder: '@',
-                name: '@',
-                css: '@',
-                model: '=',
-                change: '&',
-                multiple: '@',
-                render: '&',
-                labelName: '@',
-                valueName: '@',
-                buttonClass: '@',
-                onRender: '&'
-            },
-            link: function (s, e, a) {
-                new UISelectControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"input-inline ui-search-item\">\
-\n                    <div ng-class=\"{'input-group': label}\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <select class=\"form-control show-tick\" data-container=\"body\" data-live-search=\"true\" name=\"{{name}}\" ng-transclude></select>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchTag', function (UITagControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                label: '@',
-                name: '@',
-                model: '=',
-                placeholder: '@',
-                change: '&'
-            },
-            link: function (scope, element, attrs) {
-                new UITagControl(scope, element, attrs);
-            },
-            template: ("\
-\n                <div class=\"input-large ui-search-item\">\
-\n                    <div class=\"input-group\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <input class=\"form-control\" name=\"{{name}}\" />\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchDate', function (UIDateControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                model: '=',
-                change: '&',
-                label: '@',
-                name: '@',
-                css: '@',
-                placeholder: '@'
-            },
-            link: function (s, e, a) {
-                new UIDateControl(s, e, a);
-            },
-            template: ("\
-\n                 <div class=\"input-inline ui-search-item\">\
-\n                    <div class=\"input-group\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\" readonly=\"true\"/>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchDateRange', function (UIDateRangeControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: function (s, e, a) {
-                new UIDateRangeControl(s, e, a);
-            },
-            scope: {
-                css: '@',
-                name: '@',
-                fromModel: '=',
-                fromName: '@',
-                toModel: '=',
-                toName: '@',
-                change: '&',
-                label: '@'
-            },
-            template: ("\
-\n                 <div class=\"input-inline ui-search-item ui-search-date-range input-xlarge {{css}}\">\
-\n                    <div class=\"input-group\">\
-\n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{fromName}}\" ng-model=\"fromModel\"/>\
-\n                        <span class=\"input-group-addon\">{{label || '到'}}</span>\
-\n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{toName}}\" ng-model=\"toModel\"/>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchInput', function (UIInputControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                model: '=',
-                change: '&',
-                label: '@',
-                name: '@',
-                css: '@',
-                placeholder: '@'
-            },
-            link: function (s, e, a) {
-                new UIInputControl(s, e, a);
-            },
-            template: ("\
-\n                 <div class=\"input-inline ui-search-item\">\
-\n                    <div class=\"input-group\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\"/>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchInputSelect', function (uiSelectFactory, uiInputFactory, componentHelper, msg) {
-        var m = new msg('SearchInputSelect');
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: function (scope, element, attrs) {
-
-                //
-                var hasName = attrs.selectName && attrs.inputName,
-                    input = new uiInputFactory(scope, element, attrs),
-                    select = new uiSelectFactory(scope, element, attrs);
-
-                //
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchInputSelect', {
-                    select: select,
-                    input: input
-                });
-
-                //
-                if (hasName) { //没有设置name, 那么当select的值变动的时候, 自动设置input的name为select的value
-                }
-                else if (!!!attrs.selectName && !!!attrs.inputName) {
-                    select.change(function () {
-                        input.attr('name', select.val());
-                    });
-                    input.attr('name', select.val());
-                }
-                else {
-                    m.error('必须同时设置select-name和input-name, 要么不设置, 要么全设置');
-                }
-
-                //
-                scope.$on('uisearchform.reset', function () {
-                    select.reset();
-                    input.reset();
-                });
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.input.select', attrs);
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormDate', function (UIDateControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                placeholder: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function (scope, element, attrs) {
-                new UIDateControl(scope, element, attrs);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change({val: model})\" ng-model=\"model\" readonly=\"true\"/>\
-\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormDateRange', function (UIDateRangeControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: function (s, e, a) {
-                new UIDateRangeControl(s, e, a);
-            },
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                name: '@',
-                fromModel: '=',
-                toModel: '=',
-                change: '&',
-                help: '@'
-            },
-            template: ("\
-\n               <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol}}\">\
-\n                       <div class=\"input-date-range input-inline\">\
-\n                           <div class=\"input-group\">\
-\n                               <input type=\"text\" class=\"form-control\" name=\"{{fromName}}\" ng-model=\"fromModel\" value=\"{{fromValue}}\" readonly>\
-\n                               <span class=\"input-group-addon\">至</span>\
-\n                               <input type=\"text\" class=\"form-control\" name=\"{{toName}}\" ng-model=\"toModel\" value=\"{{toValue}}\" readonly>\
-\n                           </div>\
-\n                       </div>\
-\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormInput', function (UIInputControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                placeholder: '@',
-                max: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@',
-                type: '@'
-            },
-            link: function (scope, element, attrs) {
-                new UIInputControl(scope, element, attrs);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <input type=\"{{type || 'text'}}\" max-length=\"{{max}}\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-change=\"change({val: model})\" ng-model=\"model\"/>\
-\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>'\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormTextarea', function (componentHelper, defaultCol) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            link: function (scope, element, attrs, ctrl, transclude) {
-                //
-                var $textarea = element.find('textarea');
-                scope.$on('uiform.reset', function () {
-                    $textarea.val('');
-                });
-
-                //
-                $textarea.html(transclude().text());
-
-                //
-                element.removeAttr('name').removeAttr('model').removeAttr('rows').removeAttr('cols');
-            },
-            template: function (element, attrs) {
-                var cc = (attrs.col || defaultCol).split(':');
-                return componentHelper.getTemplate('tpl.form.textarea', $.extend({
-                    leftCol: cc[0],
-                    rightCol: cc[1]
-                }, attrs));
-            }
-        };
-    });
 //-----------------------------------------------------------------------------------------------
 //
 //

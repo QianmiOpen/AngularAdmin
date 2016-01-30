@@ -84,7 +84,7 @@ angular.module('admin.component')
             }
 
             getTransclude(rowData) {
-                let s = this.scope.$new();
+                let s = this.scope.$parent.$new(); //修复获取不到顶层controller的方法
                 s.data = rowData;
                 let $dom;
                 this.transclude(s, (dom) => {
