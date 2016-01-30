@@ -60,7 +60,7 @@ angular.module('admin.component')
                 if (this.hasTransclude) {
                     return this.getTransclude(rowData);
                 }
-                else if (this.scope.onRender){
+                else if (this.scope.onRender && this.attrs.onRender){ //修复属性没有onRender也会进来
                     return this.scope.onRender({rowData: rowData});
                 }
                 else {
