@@ -9,6 +9,7 @@ angular.module('admin.component')
     .directive('uiFormSwitch', function (UISwitchControl) {
         return {
             restrict: 'E',
+            replace: true,
             scope: {
                 lcol: '@',
                 rcol: '@',
