@@ -1566,7 +1566,7 @@ angular.module('admin.component')
 
                 proto$0._onSubmit = function(evt) {
                     if (this.attrs.onSubmit) {
-                        this.scope.onSubmit({data: this.formElemnt.serializeArray()});
+                        this.scope.onSubmit({data: this.formElement.serializeArray()});
                         evt.preventDefault();
                     }
                 };

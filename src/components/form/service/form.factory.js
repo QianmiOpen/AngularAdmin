@@ -97,7 +97,7 @@
 
                 _onSubmit(evt) {
                     if (this.attrs.onSubmit) {
-                        this.scope.onSubmit({data: this.formElemnt.serializeArray()});
+                        this.scope.onSubmit({data: this.formElement.serializeArray()});
                         evt.preventDefault();
                     }
                 }
