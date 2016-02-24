@@ -119,6 +119,9 @@
                     if (this.datas) {
                         defer.resolve(this.datas);
                     }
+                    else if (this.attrs.noData){
+                        defer.resolve([]);
+                    }
                     else {
                         Ajax.get(this.attrs.url, this.useParams()).then((r) => {
                             this.datas = r ? r.aaData || r : [];

@@ -899,6 +899,58 @@ angular.module('admin.service')
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.component', []);
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormItem', function () {
+
+        var UIFormControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIFormControl, super$0);var proto$0={};
+            function UIFormControl(s, e, a, t) {
+                this.transclude = t;
+                super$0.call(this, s, e, a);
+            }if(super$0!==null)SP$0(UIFormControl,super$0);UIFormControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIFormControl,"configurable":true,"writable":true}});DP$0(UIFormControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {
+                super$0.prototype.init.call(this);
+                this.content = this.transclude(this.scope.$parent);
+            };
+
+            proto$0.render = function() {
+                this.element.find('.ui-form-item-body').append(this.content);
+            };
+        MIXIN$0(UIFormControl.prototype,proto$0);proto$0=void 0;return UIFormControl;})(UIFormItemControl);
+
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                help: '@'
+            },
+            link: function (scope, element, attrs, controller, tranclude) {
+                new UIFormControl(scope, element, attrs, tranclude);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <div class=\"ui-form-item-body\"></div>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
+        };
+    });
 //------------------------------------------------------
 //
 //
@@ -907,7 +959,50 @@ angular.module('admin.component', []);
 //
 //------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchForm', function (UISearchFormControl) {
+    .constant('defaultCol', '2:10')
+    .directive('uiForm', function (UIFormControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                action: '@',
+                onSubmit: '&'
+            },
+            compile: function () {
+                var form = null;
+                return {
+                    pre: function (scope, element, attrs, controller, transclude) {
+                        form = new UIFormControl(scope, element, attrs, transclude(scope.$parent));
+                    },
+                    post: function () {
+                        form.layout();
+                    }
+                };
+            },
+            template: ("\
+\n                <div class=\"form\">\
+\n                    <form action=\"{{action}}\" class=\"form-horizontal form-bordered form-row-stripped\">\
+\n                        <div class=\"form-body\">\
+\n                        </div>\
+\n                    </form>\
+\n                </div>\
+\n\
+\n            ")
+        };
+    });
+
+
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormText', function () {
         return {
             restrict: 'E',
             replace: true,
@@ -915,26 +1010,93 @@ angular.module('admin.component')
             scope: {
                 lcol: '@',
                 rcol: '@',
-                onSearch: '&',
-                onReset: '&'
+                label: '@',
+                model: '=',
+                css: '@',
+                placeholder: '@',
+                help: '@'
             },
-            link: function (scope, element, attrs, controller, transclude) {
-                new UISearchFormControl(scope, element, attrs, transclude);
+            link: function (scope, element, attrs, controller, tranclude) {
+                scope.lcol = scope.lcol !== undefined ? scope.lcol : 2;
+                scope.rcol = scope.rcol !== undefined ? scope.rcol : 10;
+                element.find('p').append(tranclude(scope.$parent));
             },
             template: ("\
-\n                <form novalidate action=\"\" class=\"ui-search-form form-inline\">\
-\n                    <div class=\"row\">\
-\n                        <div class=\"col-md-{{lcol}}\"></div>\
-\n                        <div class=\"text-right col-md-{{rcol}}\">\
-\n                            <a title=\"回车键也可触发搜索\" class=\"btn blue-chambray btn-sm\" ng-click=\"component.search()\" style=\"width: 30px\"><i class=\"fa fa-search\"></i></button>\
-\n                            <a title=\"重置搜索选项\" class=\"btn default btn-sm\" ng-click=\"component.reset()\" style=\"width: 30px\"><i class=\"fa fa-undo font-blue-chambray\"></i></a>\
-\n                        </div>\
-\n                    </div>\
-\n                </form>\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <p class=\"form-control-static\" ng-bind=\"model\"></p>\
+\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
 \n            ")
         };
     });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+    if (!jQuery.validator) {
+        return;
+    }
 
+    jQuery.validator.addMethod("url", function (value, element) {
+        var reg = /^(http|https):\/\//;
+        return this.optional(element) || (reg.test(value));
+    }, "链接地址必须以http://或者https://开头！");
+
+//新增广告时间
+    jQuery.validator.addMethod("dateRange", function (value, element, params) {
+        var formDate = moment(value),
+            toDate = moment($(this.currentForm).find('[name="terminatetime"]').val());
+        return formDate.isBefore(toDate);
+    }, '时间范围不正确');
+
+    jQuery.validator.addMethod("maxlength", function (value, element, param) {
+        var maxlength = 0;
+        if (param && param > 0) {
+            maxlength = param;
+        }
+        return this.optional(element) || value.replace(/[^\x00-\xff]/gi, "--").length <= maxlength;
+    }, "请输入一个长度最多是 {0} 的字符串（中文文字按照2个字符计算）");
+
+    jQuery.validator.addMethod("minlength", function (value, element, param) {
+        var minLength = 0;
+        if (param && param > 0) {
+            minLength = param;
+        }
+        return this.optional(element) || value.replace(/[^\x00-\xff]/gi, "--").length >= minLength;
+    }, "请输入一个长度最少是 {0} 的字符串（中文文字按照2个字符计算）");
+
+
+    jQuery.validator.addMethod("rangelength", function (value, element, params) {
+        var minLength = 0;
+        var maxLength = 0;
+        if (params && params[0] > 0) {
+            minLength = params[0];
+        }
+        if (params && params[1] > 0) {
+            maxLength = params[1];
+        }
+        var length = value.replace(/[^\x00-\xff]/gi, "--").length;
+        return length <= maxLength && length >= minLength;
+    }, "请输入一个长度介于 {0} 和 {1} 之间的字符串（中文文字按照2个字符计算）");
+
+    jQuery.validator.addMethod("mobile", function (value, element) {
+        var length = value.length;
+        var tel = /^(((13[0-9]{1})|(15[0-9]{1})|(17[0-9]{1})|(14[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+        return this.optional(element) || (length == 11 && tel.test(value));
+    }, "手机号码不正确");
+// 密码
+    jQuery.validator.addMethod("pwdRule", function (value, element) {
+        var reg = /^(?![0-9]+$)(?![a-z]+$)(?![0-9a-z]+$)(?![\~\)\!@#\$%^&\*\(\)_\+\-=\{\}\[\]|:;<>\?,\.\/]+$)[0-9A-Za-z\~\)\!@#\$%^&\*\(\)_\+\-=\{\}\[\]|:;<>\?,\.\/]{8,16}$/;
+        return this.optional(element) || reg.test(value);
+    }, "密码由8-16位字母、数字和特殊字符组成，且至少有一个大写字母或者特殊字符！");
+})(jQuery);
 /**
  * 表单控件
  */
@@ -2534,6 +2696,9 @@ angular.module('admin.component')
                     if (this.datas) {
                         defer.resolve(this.datas);
                     }
+                    else if (this.attrs.noData){
+                        defer.resolve([]);
+                    }
                     else {
                         Ajax.get(this.attrs.url, this.useParams()).then(function(r)  {
                             this$0.datas = r ? r.aaData || r : [];
@@ -2782,204 +2947,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormItem', function () {
-
-        var UIFormControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIFormControl, super$0);var proto$0={};
-            function UIFormControl(s, e, a, t) {
-                this.transclude = t;
-                super$0.call(this, s, e, a);
-            }if(super$0!==null)SP$0(UIFormControl,super$0);UIFormControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIFormControl,"configurable":true,"writable":true}});DP$0(UIFormControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                super$0.prototype.init.call(this);
-                this.content = this.transclude(this.scope.$parent);
-            };
-
-            proto$0.render = function() {
-                this.element.find('.ui-form-item-body').append(this.content);
-            };
-        MIXIN$0(UIFormControl.prototype,proto$0);proto$0=void 0;return UIFormControl;})(UIFormItemControl);
-
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                placeholder: '@',
-                help: '@'
-            },
-            link: function (scope, element, attrs, controller, tranclude) {
-                new UIFormControl(scope, element, attrs, tranclude);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <div class=\"ui-form-item-body\"></div>\
-\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>'\
-\n            ")
-        };
-    });
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .constant('defaultCol', '2:10')
-    .directive('uiForm', function (UIFormControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                action: '@',
-                onSubmit: '&'
-            },
-            compile: function () {
-                var form = null;
-                return {
-                    pre: function (scope, element, attrs, controller, transclude) {
-                        form = new UIFormControl(scope, element, attrs, transclude(scope.$parent));
-                    },
-                    post: function () {
-                        form.layout();
-                    }
-                };
-            },
-            template: ("\
-\n                <div class=\"form\">\
-\n                    <form action=\"{{action}}\" class=\"form-horizontal form-bordered form-row-stripped\">\
-\n                        <div class=\"form-body\">\
-\n                        </div>\
-\n                    </form>\
-\n                </div>\
-\n\
-\n            ")
-        };
-    });
-
-
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormText', function () {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                model: '=',
-                css: '@',
-                placeholder: '@',
-                help: '@'
-            },
-            link: function (scope, element, attrs, controller, tranclude) {
-                scope.lcol = scope.lcol !== undefined ? scope.lcol : 2;
-                scope.rcol = scope.rcol !== undefined ? scope.rcol : 10;
-                element.find('p').append(tranclude(scope.$parent));
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <p class=\"form-control-static\" ng-bind=\"model\"></p>\
-\n                       <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>'\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-(function () {
-    if (!jQuery.validator) {
-        return;
-    }
-
-    jQuery.validator.addMethod("url", function (value, element) {
-        var reg = /^(http|https):\/\//;
-        return this.optional(element) || (reg.test(value));
-    }, "链接地址必须以http://或者https://开头！");
-
-//新增广告时间
-    jQuery.validator.addMethod("dateRange", function (value, element, params) {
-        var formDate = moment(value),
-            toDate = moment($(this.currentForm).find('[name="terminatetime"]').val());
-        return formDate.isBefore(toDate);
-    }, '时间范围不正确');
-
-    jQuery.validator.addMethod("maxlength", function (value, element, param) {
-        var maxlength = 0;
-        if (param && param > 0) {
-            maxlength = param;
-        }
-        return this.optional(element) || value.replace(/[^\x00-\xff]/gi, "--").length <= maxlength;
-    }, "请输入一个长度最多是 {0} 的字符串（中文文字按照2个字符计算）");
-
-    jQuery.validator.addMethod("minlength", function (value, element, param) {
-        var minLength = 0;
-        if (param && param > 0) {
-            minLength = param;
-        }
-        return this.optional(element) || value.replace(/[^\x00-\xff]/gi, "--").length >= minLength;
-    }, "请输入一个长度最少是 {0} 的字符串（中文文字按照2个字符计算）");
-
-
-    jQuery.validator.addMethod("rangelength", function (value, element, params) {
-        var minLength = 0;
-        var maxLength = 0;
-        if (params && params[0] > 0) {
-            minLength = params[0];
-        }
-        if (params && params[1] > 0) {
-            maxLength = params[1];
-        }
-        var length = value.replace(/[^\x00-\xff]/gi, "--").length;
-        return length <= maxLength && length >= minLength;
-    }, "请输入一个长度介于 {0} 和 {1} 之间的字符串（中文文字按照2个字符计算）");
-
-    jQuery.validator.addMethod("mobile", function (value, element) {
-        var length = value.length;
-        var tel = /^(((13[0-9]{1})|(15[0-9]{1})|(17[0-9]{1})|(14[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
-        return this.optional(element) || (length == 11 && tel.test(value));
-    }, "手机号码不正确");
-// 密码
-    jQuery.validator.addMethod("pwdRule", function (value, element) {
-        var reg = /^(?![0-9]+$)(?![a-z]+$)(?![0-9a-z]+$)(?![\~\)\!@#\$%^&\*\(\)_\+\-=\{\}\[\]|:;<>\?,\.\/]+$)[0-9A-Za-z\~\)\!@#\$%^&\*\(\)_\+\-=\{\}\[\]|:;<>\?,\.\/]{8,16}$/;
-        return this.optional(element) || reg.test(value);
-    }, "密码由8-16位字母、数字和特殊字符组成，且至少有一个大写字母或者特殊字符！");
-})(jQuery);
-//-----------------------------------------------------------------------------------------------
-//
-//
 //
 //
 //
@@ -3089,160 +3056,6 @@ angular.module('admin.component')
 
 
 
-
-//------------------------------------------------------
-//
-//
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('UITabItemControl', function (Ajax, Util, $compile) {
-        var UITabItemControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabItemControl, super$0);var proto$0={};
-            function UITabItemControl(scope, element, attrs, transclude) {
-                super$0.call(this);
-                this.element = element;
-                this.scope = scope;
-                this.attrs = attrs;
-                this.transclude = transclude;
-                this.message = new Message('UITabItem');
-                this.init();
-                this.initEvents();
-            }if(super$0!==null)SP$0(UITabItemControl,super$0);UITabItemControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabItemControl,"configurable":true,"writable":true}});DP$0(UITabItemControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {
-                this.scope.component = this;
-                this.scope.$emit('uitab.item.complete', this);
-            };
-
-            proto$0.initEvents = function() {var this$0 = this;
-                this.scope.$on('uitab.item.remove', function(evt, index)  {
-                    if (index == this$0.element.index()) {
-                        this$0.remove();
-                    }
-                });
-                this.scope.$on('uitab.item.show', function(evt, o)  {
-                    var index = o.index,
-                        isLazy = o.lazy;
-                    if (index == this$0.element.index()) {
-                        this$0._show();
-                    }
-                    else if (this$0.content) {
-                        this$0._hide();
-                    }
-                    else if (!isLazy) {
-                        this$0.getContent().then(function()  {
-                            this$0.getContainer().append(this$0.content);
-                            this$0.content.hide();
-                        });
-                    }
-                });
-            };
-
-            proto$0.setTitle = function(title) {
-                this.scope.head = title;
-            };
-
-            proto$0.clickHandler = function(evt) {
-                this.scope.$parent.$broadcast('uitab.item.show', {index: this.element.index()});
-                evt.stopPropagation();
-            };
-
-            proto$0.removeHandler = function(evt) {
-                this.scope.$parent.$broadcast('uitab.item.remove', this.element.index());
-                evt.stopPropagation();
-            };
-
-            proto$0.getContainer = function() {
-                if (!this.bodyElement) {
-                    this.bodyElement = this.element.parents('.ui-tab').find('.tab-content');
-                    if (this.bodyElement.length === 0) {
-                        this.bodyElement = this.element.parents('.portlet').find('.portlet-body');
-                    }
-                }
-                return this.bodyElement;
-            };
-
-            proto$0.getContent = function() {var this$0 = this;
-                if (this.content) {
-                    return Util.toPromise(this.wrapperContent(html));
-                }
-                else if (this.scope.url) {
-                    return Ajax.load(this.scope.url)
-                        .then(function(html)  {
-                            this$0.content = this$0.wrapperContent(html);
-                            return this$0.content;
-                        });
-                }
-                else {
-                    this.transclude(this.scope.$parent.$parent, function(dom)  {
-                        this$0.content = dom;
-                    });
-                    return Util.toPromise(this.content);
-                }
-            };
-
-            proto$0.wrapperContent = function(html) {
-                return $compile(html)(this.scope.$parent.$parent);
-            };
-
-            proto$0._show = function() {var this$0 = this;
-                if (this.content) {
-                    this.content.show();
-                }
-                else {
-                    this.getContent()
-                        .then(function()  {
-                            this$0.getContainer().append(this$0.content);
-                            this$0.content.show();
-                        });
-                }
-                this.scope.active = true;
-            };
-
-            proto$0._hide = function() {
-                if (this.content) {
-                    this.content.hide();
-                }
-                this.scope.active = false;
-            };
-
-            proto$0.remove = function() {var this$0 = this;
-                setTimeout(function() {
-                    this$0.element.remove();
-                    this$0.content && this$0.content.remove();
-                    this$0.scope.$destroy();
-                }, 100);
-            };
-        MIXIN$0(UITabItemControl.prototype,proto$0);proto$0=void 0;return UITabItemControl;})(ComponentEvent);
-
-        return UITabItemControl;
-    });
-angular.module('admin.component')
-    .directive('uiTabItem', function (UITabItemControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                head: '@',
-                title: '@',
-                url: '@'
-            },
-            link: function($scope, $element, $attrs, controller, $transclude)  {
-                new UITabItemControl($scope, $element, $attrs, $transclude);
-            },
-            template: ("\
-\n                <li ng-class=\"{'active': active}\" title=\"{{title || head}}\">\
-\n                    <a href=\"javascript:;\" ng-click=\"component.clickHandler($event)\">\
-\n                        <span>{{head}}</span>\
-\n                        <i class=\"fa fa-times\" ng-click=\"component.removeHandler($event)\"></i>\
-\n                    </a>\
-\n                </li>\
-\n            ")
-        };
-    });
 
 //------------------------------------------------------
 //
@@ -3748,265 +3561,192 @@ angular.module('admin.component')
         };
     })
 ;
-//-----------------------------------------------------------------------------------------------
+//------------------------------------------------------
 //
 //
-//  针对input的封装
 //
 //
-//-----------------------------------------------------------------------------------------------
+//
+//------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchDate', function (UIDateControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                model: '=',
-                change: '&',
-                label: '@',
-                name: '@',
-                css: '@',
-                placeholder: '@'
-            },
-            link: function (s, e, a) {
-                new UIDateControl(s, e, a);
-            },
-            template: ("\
-\n                 <div class=\"input-inline ui-search-item\">\
-\n                    <div class=\"input-group\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\" readonly=\"true\"/>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchDateRange', function (UIDateRangeControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            link: function (s, e, a) {
-                new UIDateRangeControl(s, e, a);
-            },
-            scope: {
-                css: '@',
-                name: '@',
-                fromModel: '=',
-                fromName: '@',
-                toModel: '=',
-                toName: '@',
-                change: '&',
-                label: '@'
-            },
-            template: ("\
-\n                 <div class=\"input-inline ui-search-item ui-search-date-range input-xlarge {{css}}\">\
-\n                    <div class=\"input-group\">\
-\n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{fromName}}\" ng-model=\"fromModel\"/>\
-\n                        <span class=\"input-group-addon\">{{label || '到'}}</span>\
-\n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{toName}}\" ng-model=\"toModel\"/>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchInput', function (UIInputControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                model: '=',
-                change: '&',
-                label: '@',
-                name: '@',
-                css: '@',
-                placeholder: '@'
-            },
-            link: function (s, e, a) {
-                new UIInputControl(s, e, a);
-            },
-            template: ("\
-\n                 <div class=\"input-inline ui-search-item\">\
-\n                    <div class=\"input-group\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\"/>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchInputSelect', function (uiSelectFactory, uiInputFactory, componentHelper, msg) {
-        var m = new msg('SearchInputSelect');
+    .directive('uiSearchForm', function (UISearchFormControl) {
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
-            link: function (scope, element, attrs) {
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                onSearch: '&',
+                onReset: '&'
+            },
+            link: function (scope, element, attrs, controller, transclude) {
+                new UISearchFormControl(scope, element, attrs, transclude);
+            },
+            template: ("\
+\n                <form novalidate action=\"\" class=\"ui-search-form form-inline\">\
+\n                    <div class=\"row\">\
+\n                        <div class=\"col-md-{{lcol}}\"></div>\
+\n                        <div class=\"text-right col-md-{{rcol}}\">\
+\n                            <a title=\"回车键也可触发搜索\" class=\"btn blue-chambray btn-sm\" ng-click=\"component.search()\" style=\"width: 30px\"><i class=\"fa fa-search\"></i></button>\
+\n                            <a title=\"重置搜索选项\" class=\"btn default btn-sm\" ng-click=\"component.reset()\" style=\"width: 30px\"><i class=\"fa fa-undo font-blue-chambray\"></i></a>\
+\n                        </div>\
+\n                    </div>\
+\n                </form>\
+\n            ")
+        };
+    });
 
-                //
-                var hasName = attrs.selectName && attrs.inputName,
-                    input = new uiInputFactory(scope, element, attrs),
-                    select = new uiSelectFactory(scope, element, attrs);
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .factory('UITabItemControl', function (Ajax, Util, $compile) {
+        var UITabItemControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabItemControl, super$0);var proto$0={};
+            function UITabItemControl(scope, element, attrs, transclude) {
+                super$0.call(this);
+                this.element = element;
+                this.scope = scope;
+                this.attrs = attrs;
+                this.transclude = transclude;
+                this.message = new Message('UITabItem');
+                this.init();
+                this.initEvents();
+            }if(super$0!==null)SP$0(UITabItemControl,super$0);UITabItemControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabItemControl,"configurable":true,"writable":true}});DP$0(UITabItemControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
 
-                //
-                componentHelper.tiggerComplete(scope, attrs.ref || '$searchInputSelect', {
-                    select: select,
-                    input: input
+            proto$0.init = function() {
+                this.scope.component = this;
+                this.scope.$emit('uitab.item.complete', this);
+            };
+
+            proto$0.initEvents = function() {var this$0 = this;
+                this.scope.$on('uitab.item.remove', function(evt, index)  {
+                    if (index == this$0.element.index()) {
+                        this$0.remove();
+                    }
                 });
+                this.scope.$on('uitab.item.show', function(evt, o)  {
+                    var index = o.index,
+                        isLazy = o.lazy;
+                    if (index == this$0.element.index()) {
+                        this$0._show();
+                    }
+                    else if (this$0.content) {
+                        this$0._hide();
+                    }
+                    else if (!isLazy) {
+                        this$0.getContent().then(function()  {
+                            this$0.getContainer().append(this$0.content);
+                            this$0.content.hide();
+                        });
+                    }
+                });
+            };
 
-                //
-                if (hasName) { //没有设置name, 那么当select的值变动的时候, 自动设置input的name为select的value
+            proto$0.setTitle = function(title) {
+                this.scope.head = title;
+            };
+
+            proto$0.clickHandler = function(evt) {
+                this.scope.$parent.$broadcast('uitab.item.show', {index: this.element.index()});
+                evt.stopPropagation();
+            };
+
+            proto$0.removeHandler = function(evt) {
+                this.scope.$parent.$broadcast('uitab.item.remove', this.element.index());
+                evt.stopPropagation();
+            };
+
+            proto$0.getContainer = function() {
+                if (!this.bodyElement) {
+                    this.bodyElement = this.element.parents('.ui-tab').find('.tab-content');
+                    if (this.bodyElement.length === 0) {
+                        this.bodyElement = this.element.parents('.portlet').find('.portlet-body');
+                    }
                 }
-                else if (!!!attrs.selectName && !!!attrs.inputName) {
-                    select.change(function () {
-                        input.attr('name', select.val());
-                    });
-                    input.attr('name', select.val());
+                return this.bodyElement;
+            };
+
+            proto$0.getContent = function() {var this$0 = this;
+                if (this.content) {
+                    return Util.toPromise(this.wrapperContent(html));
+                }
+                else if (this.scope.url) {
+                    return Ajax.load(this.scope.url)
+                        .then(function(html)  {
+                            this$0.content = this$0.wrapperContent(html);
+                            return this$0.content;
+                        });
                 }
                 else {
-                    m.error('必须同时设置select-name和input-name, 要么不设置, 要么全设置');
+                    this.transclude(this.scope.$parent.$parent, function(dom)  {
+                        this$0.content = dom;
+                    });
+                    return Util.toPromise(this.content);
                 }
+            };
 
-                //
-                scope.$on('uisearchform.reset', function () {
-                    select.reset();
-                    input.reset();
-                });
-            },
-            template: function (element, attrs) {
-                return componentHelper.getTemplate('tpl.searchform.input.select', attrs);
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchRegion', function (UIRegionControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                model: '=',
-                change: '&',
-                label: '@',
-                name: '@',
-                mode: '@'
-            },
-            link: function(s, e, a)  {
-                if (a.mode === undefined || a.mode == 'a') { //区域查询不支持详细地址
-                    a.mode = 's';
+            proto$0.wrapperContent = function(html) {
+                return $compile(html)(this.scope.$parent.$parent);
+            };
+
+            proto$0._show = function() {var this$0 = this;
+                if (this.content) {
+                    this.content.show();
                 }
-                new UIRegionControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"input-inline ui-search-item\">\
-\n                    <div class=\"input-group ui-search-region\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}:</div>\
-\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-1px\" name=\"city\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-2px\" name=\"area\"/>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
+                else {
+                    this.getContent()
+                        .then(function()  {
+                            this$0.getContainer().append(this$0.content);
+                            this$0.content.show();
+                        });
+                }
+                this.scope.active = true;
+            };
+
+            proto$0._hide = function() {
+                if (this.content) {
+                    this.content.hide();
+                }
+                this.scope.active = false;
+            };
+
+            proto$0.remove = function() {var this$0 = this;
+                setTimeout(function() {
+                    this$0.element.remove();
+                    this$0.content && this$0.content.remove();
+                    this$0.scope.$destroy();
+                }, 100);
+            };
+        MIXIN$0(UITabItemControl.prototype,proto$0);proto$0=void 0;return UITabItemControl;})(ComponentEvent);
+
+        return UITabItemControl;
     });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
 angular.module('admin.component')
-    .directive('uiSearchSelect', function (UISelectControl) {
+    .directive('uiTabItem', function (UITabItemControl) {
         return {
             restrict: 'E',
             replace: true,
             transclude: true,
             scope: {
-                label: '@',
-                placeholder: '@',
-                name: '@',
-                css: '@',
-                model: '=',
-                change: '&',
-                multiple: '@',
-                render: '&',
-                labelName: '@',
-                valueName: '@',
-                buttonClass: '@',
-                onRender: '&'
+                head: '@',
+                title: '@',
+                url: '@'
             },
-            link: function (s, e, a) {
-                new UISelectControl(s, e, a);
+            link: function($scope, $element, $attrs, controller, $transclude)  {
+                new UITabItemControl($scope, $element, $attrs, $transclude);
             },
             template: ("\
-\n                <div class=\"input-inline ui-search-item\">\
-\n                    <div ng-class=\"{'input-group': label}\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <select class=\"form-control show-tick\" data-container=\"body\" data-live-search=\"true\" name=\"{{name}}\" ng-transclude></select>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  针对select的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiSearchTag', function (UITagControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                label: '@',
-                name: '@',
-                model: '=',
-                placeholder: '@',
-                change: '&'
-            },
-            link: function (scope, element, attrs) {
-                new UITagControl(scope, element, attrs);
-            },
-            template: ("\
-\n                <div class=\"ui-search-item\">\
-\n                    <div class=\"input-group\">\
-\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
-\n                        <input class=\"form-control\" name=\"{{name}}\" />\
-\n                    </div>\
-\n                </div>\
+\n                <li ng-class=\"{'active': active}\" title=\"{{title || head}}\">\
+\n                    <a href=\"javascript:;\" ng-click=\"component.clickHandler($event)\">\
+\n                        <span>{{head}}</span>\
+\n                        <i class=\"fa fa-times\" ng-click=\"component.removeHandler($event)\"></i>\
+\n                    </a>\
+\n                </li>\
 \n            ")
         };
     });
@@ -4625,6 +4365,269 @@ angular.module('admin.component')
 
 
 
+
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchDate', function (UIDateControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                css: '@',
+                placeholder: '@'
+            },
+            link: function (s, e, a) {
+                new UIDateControl(s, e, a);
+            },
+            template: ("\
+\n                 <div class=\"input-inline ui-search-item\">\
+\n                    <div class=\"input-group\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
+\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\" readonly=\"true\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchDateRange', function (UIDateRangeControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            link: function (s, e, a) {
+                new UIDateRangeControl(s, e, a);
+            },
+            scope: {
+                css: '@',
+                name: '@',
+                fromModel: '=',
+                fromName: '@',
+                toModel: '=',
+                toName: '@',
+                change: '&',
+                label: '@'
+            },
+            template: ("\
+\n                 <div class=\"input-inline ui-search-item ui-search-date-range input-xlarge {{css}}\">\
+\n                    <div class=\"input-group\">\
+\n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{fromName}}\" ng-model=\"fromModel\"/>\
+\n                        <span class=\"input-group-addon\">{{label || '到'}}</span>\
+\n                        <input type=\"text\" readonly class=\"form-control\" name=\"{{toName}}\" ng-model=\"toModel\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchInput', function (UIInputControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                css: '@',
+                placeholder: '@'
+            },
+            link: function (s, e, a) {
+                new UIInputControl(s, e, a);
+            },
+            template: ("\
+\n                 <div class=\"input-inline ui-search-item\">\
+\n                    <div class=\"input-group\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
+\n                        <input class=\"form-control\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" ng-change=\"change({val: model})\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchInputSelect', function (uiSelectFactory, uiInputFactory, componentHelper, msg) {
+        var m = new msg('SearchInputSelect');
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            link: function (scope, element, attrs) {
+
+                //
+                var hasName = attrs.selectName && attrs.inputName,
+                    input = new uiInputFactory(scope, element, attrs),
+                    select = new uiSelectFactory(scope, element, attrs);
+
+                //
+                componentHelper.tiggerComplete(scope, attrs.ref || '$searchInputSelect', {
+                    select: select,
+                    input: input
+                });
+
+                //
+                if (hasName) { //没有设置name, 那么当select的值变动的时候, 自动设置input的name为select的value
+                }
+                else if (!!!attrs.selectName && !!!attrs.inputName) {
+                    select.change(function () {
+                        input.attr('name', select.val());
+                    });
+                    input.attr('name', select.val());
+                }
+                else {
+                    m.error('必须同时设置select-name和input-name, 要么不设置, 要么全设置');
+                }
+
+                //
+                scope.$on('uisearchform.reset', function () {
+                    select.reset();
+                    input.reset();
+                });
+            },
+            template: function (element, attrs) {
+                return componentHelper.getTemplate('tpl.searchform.input.select', attrs);
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchRegion', function (UIRegionControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                model: '=',
+                change: '&',
+                label: '@',
+                name: '@',
+                mode: '@'
+            },
+            link: function(s, e, a)  {
+                if (a.mode === undefined || a.mode == 'a') { //区域查询不支持详细地址
+                    a.mode = 's';
+                }
+                new UIRegionControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"input-inline ui-search-item\">\
+\n                    <div class=\"input-group ui-search-region\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}:</div>\
+\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-1px\" name=\"city\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" style=\"left:-2px\" name=\"area\"/>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchSelect', function (UISelectControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                label: '@',
+                placeholder: '@',
+                name: '@',
+                css: '@',
+                model: '=',
+                change: '&',
+                multiple: '@',
+                render: '&',
+                labelName: '@',
+                valueName: '@',
+                buttonClass: '@',
+                onRender: '&'
+            },
+            link: function (s, e, a) {
+                new UISelectControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"input-inline ui-search-item\">\
+\n                    <div ng-class=\"{'input-group': label}\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
+\n                        <select class=\"form-control show-tick\" data-container=\"body\" data-live-search=\"true\" name=\"{{name}}\" ng-transclude></select>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对select的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiSearchTag', function (UITagControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                label: '@',
+                name: '@',
+                model: '=',
+                placeholder: '@',
+                change: '&'
+            },
+            link: function (scope, element, attrs) {
+                new UITagControl(scope, element, attrs);
+            },
+            template: ("\
+\n                <div class=\"ui-search-item\">\
+\n                    <div class=\"input-group\">\
+\n                        <div ng-if=\"label\" class=\"input-group-addon\">{{label}}</div>\
+\n                        <input class=\"form-control\" name=\"{{name}}\" />\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
 
 //-----------------------------------------------------------------------------------------------
 //
@@ -5276,482 +5279,6 @@ angular.module('admin.component')
 //------------------------------------------------------
 //
 //
-//
-//
-//
-//------------------------------------------------------
-angular.module('admin.component')
-    .factory('UITabControl', function ($compile) {
-        var UITabControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabControl, super$0);var proto$0={};
-            function UITabControl(scope, element, attrs, transclude) {
-                super$0.call(this);
-                this.element = element;
-                this.scope = scope;
-                this.attrs = attrs;
-                this.transclude = transclude;
-                this.message = new Message('UITab');
-                this.init();
-                this.initEvents();
-            }if(super$0!==null)SP$0(UITabControl,super$0);UITabControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabControl,"configurable":true,"writable":true}});DP$0(UITabControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.init = function() {var this$0 = this;
-                this.tabItems = [];
-                this.scope.component = this;
-                this.bodyElement = this.element.find('ul');
-                this.isLazy = this.scope.lazy != 'false';
-                this.transclude(this.scope, function(dom)  {
-                    this$0.element.find('ul').append(dom);
-                });
-                this.triggerComplete(this.scope, this.attrs.ref || '$tab', this);
-            };
-
-            proto$0.initEvents = function() {var this$0 = this;
-                this.scope.$on('uitab.item.show', function(evt, info)  {
-                    setTimeout(function()  {
-                        this$0.scope.onChange({index: info.index, tabItem: this$0.tabItems[info.index]});
-                    }, 60);
-                });
-                this.scope.$on('uitab.item.remove', function(evt, index)  {
-                    this$0.scope.onRemove({index: index});
-                });
-                this.scope.$on('uitab.item.complete', function(evt, item)  {
-                    this$0.tabItems.push(item);
-                });
-            };
-
-            proto$0.build = function() {
-                this.showAtIndex(this.scope.default || '0');
-            };
-
-            proto$0.addTab = function(head, content, active) {
-                this.addCustomTab((("<ui-tab-item head=\"" + head) + ("\">" + (content || '')) + "</ui-tab-item>"), active);
-            };
-
-            proto$0.addCustomTab = function(tpl, active) {
-                var $h = $(tpl);
-                this.bodyElement.append($h);
-                $compile($h)(this.scope);
-                if (active) {
-                    this.showAtIndex(this.bodyElement.find('li').length - 1);
-                }
-            };
-
-            proto$0.showAtIndex = function(index) {
-                index = parseInt(index);
-                if (index !== undefined && index >= 0) {
-                    this.scope.$broadcast('uitab.item.show', {index: index, lazy: this.isLazy});
-                }
-            };
-
-            proto$0.removeAtIndex = function(index) {
-                index = parseInt(index);
-                if(index !== undefined && index >= 0){
-                    this.scope.$broadcast('uitab.item.remove', index);
-                }
-            };
-        MIXIN$0(UITabControl.prototype,proto$0);proto$0=void 0;return UITabControl;})(ComponentEvent);
-
-        return UITabControl;
-    });
-angular.module('admin.component')
-    .directive('uiTab', function (UITabControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                close: '@',
-                default: '@',
-                lazy: '@',
-                url: '@',
-                onRemove: '&',
-                onChange: '&'
-            },
-            compile: function () {
-                var tab = null;
-                return {
-                    pre: function (scope, element, attrs, controller, transclude) {
-                        tab = new UITabControl(scope, element, attrs, transclude);
-                    },
-                    post: function () {
-                        tab.build();
-                    }
-                };
-            },
-            template: ("\
-\n                <div class=\"ui-tab tabbable-custom\" ng-class=\"{'tabbable-close': close}\">\
-\n                    <ul class=\"nav nav-tabs\">\
-\n                    </ul>\
-\n                    <div class=\"tab-content\" style=\"min-height: 100px;\">\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
-
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-(function () {
-
-    var defaultConfig = {
-            "bDestroy": true,
-            "sDom": "<'table-scrollable't><'row ui-table-footer'<'col-md-3 col-sm-12'li>r<'col-md-7 col-sm-12'p>>",
-            "bLengthChange": true,
-            "bFilter": false,
-            "bSort": true,
-            "bAutoWidth": false,
-            "bStateSave": true,
-            "oLanguage": {
-                "sProcessing": '<img src="http://7xi8np.com1.z0.glb.clouddn.com/assets/img/loading-spinner-grey.gif"/><span>&nbsp;&nbsp;正在查询.. .</span>',
-                "sLengthMenu": "每页显示 _MENU_ 条",
-                "sZeroRecords": "请选择条件后，点击搜索按钮开始搜索",
-                "sInfo": "<label>当前第 _START_ - _END_ 条　共计 _TOTAL_ 条</label>",
-                "sInfoEmpty": "没有符合条件的记录",
-                "sInfoFiltered": "(从 _MAX_ 条记录中过滤)",
-                "sSearch": "查询",
-                "oPaginate": {
-                    "sFirst": "首页",
-                    "sPrevious": "上一页",
-                    "sNext": "下一页",
-                    "sLast": "尾页"
-                }
-            },
-            "sPaginationType": "bootstrap_full_number",
-            "aLengthMenu": [
-                [10, 20, 30, 60],
-                [10, 20, 30, 60]
-            ],
-            "iDisplayLength": 10,
-            "bProcessing": true,
-            "bServerSide": true
-        },
-        jumpTpl = ("\
-\n            <div class=\"col-md-2\">\
-\n                <div class=\"input-group\">\
-\n                    <input type=\"text\" class=\"form-control\" placeholder=\"跳转页数\">\
-\n                    <span class=\"input-group-btn\">\
-\n                        <a href=\"javascript:;\" class=\"btn green\" style=\"font-size: 12px;\">Go</a>\
-\n                    </span>\
-\n                </div>\
-\n            </div>\
-\n        "),
-        dataName = 'aaData',
-        totalName = 'iTotalRecords',
-        requestMethod = 'post',
-        pageSizeName = 'pageSize',
-        pageNumberName = 'pageNo';
-
-    angular.module('admin.component')
-        .provider('UITableControl', function () {
-            return {
-
-                setConfig: function(_config) {
-                    defaultConfig = $.extend(true, defaultConfig, _config);
-                },
-
-                setResultName: function(_dataName, _totalName) {
-                    dataName = _dataName;
-                    totalName = _totalName;
-                },
-
-                setRequestMethod: function(_requestMethod) {
-                    requestMethod = _requestMethod;
-                },
-
-                setPageName: function(_pageSizeName, _pageNumberName) {
-                    pageSizeName = _pageSizeName;
-                    pageNumberName = _pageNumberName;
-                },
-
-                setPageSize: function(_size, firstSize) {
-                    defaultConfig.aLengthMenu = _size;
-                    defaultConfig.iDisplayLength = firstSize ? firstSize : _size[0];
-                },
-
-                $get: function (Ajax, Message, Util, AdminCDN) {
-                    var UITableControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableControl, super$0);var proto$0={};
-                        function UITableControl(scope, element, attrs) {
-                            super$0.call(this);
-                            this.element = element;
-                            this.scope = scope;
-                            this.attrs = attrs;
-                            this.message = new Message('UITable');
-                        }if(super$0!==null)SP$0(UITableControl,super$0);UITableControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableControl,"configurable":true,"writable":true}});DP$0(UITableControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-                        proto$0.init = function() {var this$0 = this;
-                            //
-                            this.aoColumns = [];
-                            this.bPaginate = this.attrs.nopage === undefined;
-                            this.bInfo = this.bPaginate;
-                            this.aaSorting = Util.toJSON(this.attrs.sort || '[]');
-                            this.fnInitComplete = function()  {
-                                this$0._buildJumpDom();
-                            };
-                            this.fnServerData = function(sSource, aoData, fnCallback)  {
-                                setTimeout(function()  {
-                                    this$0._fetchData(sSource, aoData, fnCallback);
-                                }, 100);
-                            };
-
-                            //
-                            this.idName = this.attrs.idName;
-                            this.pageResult = {};
-                            this.pageResultData = [];
-                            this.selectValues = [];
-                            this.selectItems = [];
-                            this.instance = null;
-                            this.searchParams = [];
-                            this.pageSelectNum = [];
-                            this.triggerComplete(this.scope, this.attrs.ref || '$table', this);
-                        };
-
-                        proto$0.initEvents = function() {var this$0 = this;
-                            this.scope.$on('uitable.column.complete', function(evt, column)  {
-                                this$0.aoColumns.push(column);
-                            });
-                            this.scope.$on('uitable.column.idname', function(evt, idName)  {
-                                this$0.idName = idName;
-                            });
-                            this.scope.$on('uitable.column.selectall', function(evt, isAll)  {
-                                if (isAll) {
-                                    this$0.selectItems = this$0.pageResultData;
-                                    this$0.selectValues = this$0.selectItems.map(function(item)  {return item[this$0.idName]});
-                                }
-                                else {
-                                    this$0.selectItems = [];
-                                    this$0.selectValues = [];
-                                }
-                            });
-                            this.scope.$on('uitable.column.selectone', function(evt, obj)  {
-                                if (obj.isCheck) {
-                                    this$0.selectItems.push(obj.rowData);
-                                    this$0.selectValues.push(obj.value);
-                                }
-                                else {
-                                    var ii = _.indexOf(this$0.selectItems, obj.rowData);
-                                    if (ii >= 0) {
-                                        this$0.selectItems.splice(ii, 1);
-                                        this$0.selectValues.splice(ii, 1);
-                                    }
-                                }
-                            });
-                            this.scope.$on('uitable.column.visable', function(evt, column)  {
-                                var i = _.indexOf(this$0.aoColumns, column);
-                                this$0.instance.fnSetColumnVis(i, column.bVisible, false);
-                            });
-                            this.scope.$on('uitable.search', function(evt, params)  {
-                                this$0.refresh(params);
-                            });
-                        };
-
-                        proto$0.build = function() {var this$0 = this;
-                            if ($.fn.dataTable) {
-                                this._build();
-                            }
-                            else {
-                                Ajax.getScript((("" + AdminCDN) + "/assets/js/jquery.dataTables.min.js"))
-                                    .then(function()  {return this$0._build()});
-                            }
-                        };
-
-                        proto$0.jumpTo = function(page) {
-                            if (/^\d+$/.test(page)) {
-                                page = parseInt(page) - 1;
-                            }
-                            else if (page === undefined) {
-                                page = this.getCurrentPage() - 1;
-                            }
-                            this.instance.fnPageChange(page !== undefined ? Math.abs(page) : "first");
-                            return this;
-                        };
-
-                        proto$0.refresh = function(params, url) {
-                            this.searchParams = params || this.searchParams;
-                            this.url = url || this.url;
-                            this.instance.fnPageChange(this.getCurrentPage() - 1);
-                            return this;
-                        };
-
-                        proto$0.search = function(params, url) {
-                            this.selectItems = [];
-                            this.selectValues = [];
-                            this.searchParams = params || this.searchParams;
-                            this.url = url || this.url;
-                            this.jumpTo(1);
-                        };
-
-                        proto$0.getCurrentPage = function() {
-                            var setting = this.instance.fnSettings();
-                            return Math.ceil(setting._iDisplayStart / setting._iDisplayLength) + 1;
-                        };
-
-                        proto$0.selectAll = function(isSelected) {
-                            this.scope.$broadcast('uitable.column.selectall', isSelected);
-                        };
-
-                        proto$0._build = function() {
-                            this.instance = this.element.find('table').dataTable($.extend({}, defaultConfig, this));
-                            this.scope.$emit('uitable.complete', this);
-                        };
-
-                        proto$0._fetchData = function(sSource, aoData, fnCallback) {var this$0 = this;
-                            if ((!this.attrs.url && !this.url) || this.attrs.manual !== undefined) {
-                                delete this.attrs.manual;
-                                fnCallback({aaData: [], iTotalRecords: 0, iTotalDisplayRecords: 0});
-                            }
-                            else {
-                                var url = this.url || this.attrs.url;
-                                this._buildPageParam(aoData);
-                                Ajax[requestMethod](url, aoData)
-                                    .then(function(data)  {
-                                        var result = this$0._buildPageResult(data);
-                                        this$0._beforeDataHandler(result);
-                                        fnCallback(result);
-                                        this$0._afterDataHandler(result);
-                                    })
-                                    .catch(function(data)  {
-                                        this$0._errorDataHandler(data);
-                                    })
-                                    .finally(function()  {
-                                    });
-                            }
-                        };
-
-                        proto$0._beforeDataHandler = function(result) {
-                            this.pageResult = result;
-                            this.pageResultData = result.aaData;
-                            if (this.bPaginate) {
-                                this.selectItems = [];
-                                this.selectValues = [];
-                            }
-                            this.scope.onDataSuccess({result: result});
-                        };
-
-                        proto$0._afterDataHandler = function(result) {
-                            this.element.find('input[type=checkbox]').uniform();
-                        };
-
-                        proto$0._errorDataHandler = function(result) {
-                            this.scope.onDateFail({result: result});
-                        };
-
-                        proto$0._buildPageResult = function(data) {
-                            var result = {};
-                            if ($.isArray(data)) {
-                                result = {
-                                    aaData: data,
-                                    iTotalDisplayRecords: data.length,
-                                    iTotalRecords: data.length
-                                };
-                            }
-                            else {
-                                result = {
-                                    aaData: data[dataName],
-                                    iTotalDisplayRecords: data[totalName],
-                                    iTotalRecords: data[totalName]
-                                };
-                            }
-                            return result;
-                        };
-
-                        proto$0._buildPageParam = function(searchParams) {
-                            $.each(this.scope.initParams || {}, function(name, value)  {
-                                searchParams.push({name: name, value: value});
-                            });
-                            $.each(this.searchParams || {}, function(name, value)  {
-                                searchParams.push({name: name, value: value});
-                            });
-                            var start = 0, size = 0;
-                            $.each(searchParams || [], function(index, kv)  {
-                                if (kv.name == 'iDisplayStart') {
-                                    start = kv.value;
-                                }
-                                else if (kv.name == 'iDisplayLength') {
-                                    size = kv.value;
-                                }
-                            });
-                            searchParams.push({name: pageNumberName, value: start / size});
-                            searchParams.push({name: pageSizeName, value: size});
-                        };
-
-                        proto$0._buildJumpDom = function() {var this$0 = this;
-                            if (!this.bPaginate) {
-                                return;
-                            }
-                            var $div = this.element.find('.ui-table-footer'),
-                                $form = $(jumpTpl),
-                                $btn = $form.find('a'),
-                                $input = $form.find('input');
-                            $div.append($form);
-                            $btn.click(function()  {
-                                this$0.jumpTo($input.val());
-                            });
-                            $(document).keydown(function(evt)  {
-                                if (evt.keyCode == 13) {
-                                    this$0.refresh();
-                                }
-                            });
-                        };
-                    MIXIN$0(UITableControl.prototype,proto$0);proto$0=void 0;return UITableControl;})(ComponentEvent);
-
-                    return UITableControl;
-                }
-            };
-        });
-})();
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTable', function (UITableControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                change: '&',  //选中的数据变动了
-                jumpTo: '&', //点击跳转或者刷新
-                onDataSuccess: '&', //数据获取成功
-                onDateFail: '&', //数据获取失败
-                initParams: '=' //查询参数
-            },
-            compile: function () {
-                var uiTable = null;
-                return {
-                    pre: function (scope, element, attrs) {
-                        uiTable = new UITableControl(scope, element, attrs);
-                        uiTable.init();
-                        uiTable.initEvents();
-                    },
-                    post: function () {
-                        uiTable.build();
-                    }
-                };
-            },
-            template: ("\
-\n                <div class=\"ui-table\">\
-\n                    <table class=\"table table-striped table-bordered table-hover\">\
-\n                        <thead>\
-\n                            <tr role=\"row\" class=\"heading\" ng-transclude>\
-\n                            </tr>\
-\n                        </thead>\
-\n                        <tbody></tbody>\
-\n                    </table>\
-\n                </div>'\
-\n            ")
-        };
-    });
-
-//------------------------------------------------------
-//
-//
 // 依赖 qm.table.js
 //
 //
@@ -6375,6 +5902,482 @@ angular.module('admin.component')
 \n            ")
         };
     });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+
+    var defaultConfig = {
+            "bDestroy": true,
+            "sDom": "<'table-scrollable't><'row ui-table-footer'<'col-md-3 col-sm-12'li>r<'col-md-7 col-sm-12'p>>",
+            "bLengthChange": true,
+            "bFilter": false,
+            "bSort": true,
+            "bAutoWidth": false,
+            "bStateSave": true,
+            "oLanguage": {
+                "sProcessing": '<img src="http://7xi8np.com1.z0.glb.clouddn.com/assets/img/loading-spinner-grey.gif"/><span>&nbsp;&nbsp;正在查询.. .</span>',
+                "sLengthMenu": "每页显示 _MENU_ 条",
+                "sZeroRecords": "请选择条件后，点击搜索按钮开始搜索",
+                "sInfo": "<label>当前第 _START_ - _END_ 条　共计 _TOTAL_ 条</label>",
+                "sInfoEmpty": "没有符合条件的记录",
+                "sInfoFiltered": "(从 _MAX_ 条记录中过滤)",
+                "sSearch": "查询",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上一页",
+                    "sNext": "下一页",
+                    "sLast": "尾页"
+                }
+            },
+            "sPaginationType": "bootstrap_full_number",
+            "aLengthMenu": [
+                [10, 20, 30, 60],
+                [10, 20, 30, 60]
+            ],
+            "iDisplayLength": 10,
+            "bProcessing": true,
+            "bServerSide": true
+        },
+        jumpTpl = ("\
+\n            <div class=\"col-md-2\">\
+\n                <div class=\"input-group\">\
+\n                    <input type=\"text\" class=\"form-control\" placeholder=\"跳转页数\">\
+\n                    <span class=\"input-group-btn\">\
+\n                        <a href=\"javascript:;\" class=\"btn green\" style=\"font-size: 12px;\">Go</a>\
+\n                    </span>\
+\n                </div>\
+\n            </div>\
+\n        "),
+        dataName = 'aaData',
+        totalName = 'iTotalRecords',
+        requestMethod = 'post',
+        pageSizeName = 'pageSize',
+        pageNumberName = 'pageNo';
+
+    angular.module('admin.component')
+        .provider('UITableControl', function () {
+            return {
+
+                setConfig: function(_config) {
+                    defaultConfig = $.extend(true, defaultConfig, _config);
+                },
+
+                setResultName: function(_dataName, _totalName) {
+                    dataName = _dataName;
+                    totalName = _totalName;
+                },
+
+                setRequestMethod: function(_requestMethod) {
+                    requestMethod = _requestMethod;
+                },
+
+                setPageName: function(_pageSizeName, _pageNumberName) {
+                    pageSizeName = _pageSizeName;
+                    pageNumberName = _pageNumberName;
+                },
+
+                setPageSize: function(_size, firstSize) {
+                    defaultConfig.aLengthMenu = _size;
+                    defaultConfig.iDisplayLength = firstSize ? firstSize : _size[0];
+                },
+
+                $get: function (Ajax, Message, Util, AdminCDN) {
+                    var UITableControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITableControl, super$0);var proto$0={};
+                        function UITableControl(scope, element, attrs) {
+                            super$0.call(this);
+                            this.element = element;
+                            this.scope = scope;
+                            this.attrs = attrs;
+                            this.message = new Message('UITable');
+                        }if(super$0!==null)SP$0(UITableControl,super$0);UITableControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITableControl,"configurable":true,"writable":true}});DP$0(UITableControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                        proto$0.init = function() {var this$0 = this;
+                            //
+                            this.aoColumns = [];
+                            this.bPaginate = this.attrs.nopage === undefined;
+                            this.bInfo = this.bPaginate;
+                            this.aaSorting = Util.toJSON(this.attrs.sort || '[]');
+                            this.fnInitComplete = function()  {
+                                this$0._buildJumpDom();
+                            };
+                            this.fnServerData = function(sSource, aoData, fnCallback)  {
+                                setTimeout(function()  {
+                                    this$0._fetchData(sSource, aoData, fnCallback);
+                                }, 100);
+                            };
+
+                            //
+                            this.idName = this.attrs.idName;
+                            this.pageResult = {};
+                            this.pageResultData = [];
+                            this.selectValues = [];
+                            this.selectItems = [];
+                            this.instance = null;
+                            this.searchParams = [];
+                            this.pageSelectNum = [];
+                            this.triggerComplete(this.scope, this.attrs.ref || '$table', this);
+                        };
+
+                        proto$0.initEvents = function() {var this$0 = this;
+                            this.scope.$on('uitable.column.complete', function(evt, column)  {
+                                this$0.aoColumns.push(column);
+                            });
+                            this.scope.$on('uitable.column.idname', function(evt, idName)  {
+                                this$0.idName = idName;
+                            });
+                            this.scope.$on('uitable.column.selectall', function(evt, isAll)  {
+                                if (isAll) {
+                                    this$0.selectItems = this$0.pageResultData;
+                                    this$0.selectValues = this$0.selectItems.map(function(item)  {return item[this$0.idName]});
+                                }
+                                else {
+                                    this$0.selectItems = [];
+                                    this$0.selectValues = [];
+                                }
+                            });
+                            this.scope.$on('uitable.column.selectone', function(evt, obj)  {
+                                if (obj.isCheck) {
+                                    this$0.selectItems.push(obj.rowData);
+                                    this$0.selectValues.push(obj.value);
+                                }
+                                else {
+                                    var ii = _.indexOf(this$0.selectItems, obj.rowData);
+                                    if (ii >= 0) {
+                                        this$0.selectItems.splice(ii, 1);
+                                        this$0.selectValues.splice(ii, 1);
+                                    }
+                                }
+                            });
+                            this.scope.$on('uitable.column.visable', function(evt, column)  {
+                                var i = _.indexOf(this$0.aoColumns, column);
+                                this$0.instance.fnSetColumnVis(i, column.bVisible, false);
+                            });
+                            this.scope.$on('uitable.search', function(evt, params)  {
+                                this$0.refresh(params);
+                            });
+                        };
+
+                        proto$0.build = function() {var this$0 = this;
+                            if ($.fn.dataTable) {
+                                this._build();
+                            }
+                            else {
+                                Ajax.getScript((("" + AdminCDN) + "/assets/js/jquery.dataTables.min.js"))
+                                    .then(function()  {return this$0._build()});
+                            }
+                        };
+
+                        proto$0.jumpTo = function(page) {
+                            if (/^\d+$/.test(page)) {
+                                page = parseInt(page) - 1;
+                            }
+                            else if (page === undefined) {
+                                page = this.getCurrentPage() - 1;
+                            }
+                            this.instance.fnPageChange(page !== undefined ? Math.abs(page) : "first");
+                            return this;
+                        };
+
+                        proto$0.refresh = function(params, url) {
+                            this.searchParams = params || this.searchParams;
+                            this.url = url || this.url;
+                            this.instance.fnPageChange(this.getCurrentPage() - 1);
+                            return this;
+                        };
+
+                        proto$0.search = function(params, url) {
+                            this.selectItems = [];
+                            this.selectValues = [];
+                            this.searchParams = params || this.searchParams;
+                            this.url = url || this.url;
+                            this.jumpTo(1);
+                        };
+
+                        proto$0.getCurrentPage = function() {
+                            var setting = this.instance.fnSettings();
+                            return Math.ceil(setting._iDisplayStart / setting._iDisplayLength) + 1;
+                        };
+
+                        proto$0.selectAll = function(isSelected) {
+                            this.scope.$broadcast('uitable.column.selectall', isSelected);
+                        };
+
+                        proto$0._build = function() {
+                            this.instance = this.element.find('table').dataTable($.extend({}, defaultConfig, this));
+                            this.scope.$emit('uitable.complete', this);
+                        };
+
+                        proto$0._fetchData = function(sSource, aoData, fnCallback) {var this$0 = this;
+                            if ((!this.attrs.url && !this.url) || this.attrs.manual !== undefined) {
+                                delete this.attrs.manual;
+                                fnCallback({aaData: [], iTotalRecords: 0, iTotalDisplayRecords: 0});
+                            }
+                            else {
+                                var url = this.url || this.attrs.url;
+                                this._buildPageParam(aoData);
+                                Ajax[requestMethod](url, aoData)
+                                    .then(function(data)  {
+                                        var result = this$0._buildPageResult(data);
+                                        this$0._beforeDataHandler(result);
+                                        fnCallback(result);
+                                        this$0._afterDataHandler(result);
+                                    })
+                                    .catch(function(data)  {
+                                        this$0._errorDataHandler(data);
+                                    })
+                                    .finally(function()  {
+                                    });
+                            }
+                        };
+
+                        proto$0._beforeDataHandler = function(result) {
+                            this.pageResult = result;
+                            this.pageResultData = result.aaData;
+                            if (this.bPaginate) {
+                                this.selectItems = [];
+                                this.selectValues = [];
+                            }
+                            this.scope.onDataSuccess({result: result});
+                        };
+
+                        proto$0._afterDataHandler = function(result) {
+                            this.element.find('input[type=checkbox]').uniform();
+                        };
+
+                        proto$0._errorDataHandler = function(result) {
+                            this.scope.onDateFail({result: result});
+                        };
+
+                        proto$0._buildPageResult = function(data) {
+                            var result = {};
+                            if ($.isArray(data)) {
+                                result = {
+                                    aaData: data,
+                                    iTotalDisplayRecords: data.length,
+                                    iTotalRecords: data.length
+                                };
+                            }
+                            else {
+                                result = {
+                                    aaData: data[dataName],
+                                    iTotalDisplayRecords: data[totalName],
+                                    iTotalRecords: data[totalName]
+                                };
+                            }
+                            return result;
+                        };
+
+                        proto$0._buildPageParam = function(searchParams) {
+                            $.each(this.scope.initParams || {}, function(name, value)  {
+                                searchParams.push({name: name, value: value});
+                            });
+                            $.each(this.searchParams || {}, function(name, value)  {
+                                searchParams.push({name: name, value: value});
+                            });
+                            var start = 0, size = 0;
+                            $.each(searchParams || [], function(index, kv)  {
+                                if (kv.name == 'iDisplayStart') {
+                                    start = kv.value;
+                                }
+                                else if (kv.name == 'iDisplayLength') {
+                                    size = kv.value;
+                                }
+                            });
+                            searchParams.push({name: pageNumberName, value: start / size});
+                            searchParams.push({name: pageSizeName, value: size});
+                        };
+
+                        proto$0._buildJumpDom = function() {var this$0 = this;
+                            if (!this.bPaginate) {
+                                return;
+                            }
+                            var $div = this.element.find('.ui-table-footer'),
+                                $form = $(jumpTpl),
+                                $btn = $form.find('a'),
+                                $input = $form.find('input');
+                            $div.append($form);
+                            $btn.click(function()  {
+                                this$0.jumpTo($input.val());
+                            });
+                            $(document).keydown(function(evt)  {
+                                if (evt.keyCode == 13) {
+                                    this$0.refresh();
+                                }
+                            });
+                        };
+                    MIXIN$0(UITableControl.prototype,proto$0);proto$0=void 0;return UITableControl;})(ComponentEvent);
+
+                    return UITableControl;
+                }
+            };
+        });
+})();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiTable', function (UITableControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                change: '&',  //选中的数据变动了
+                jumpTo: '&', //点击跳转或者刷新
+                onDataSuccess: '&', //数据获取成功
+                onDateFail: '&', //数据获取失败
+                initParams: '=' //查询参数
+            },
+            compile: function () {
+                var uiTable = null;
+                return {
+                    pre: function (scope, element, attrs) {
+                        uiTable = new UITableControl(scope, element, attrs);
+                        uiTable.init();
+                        uiTable.initEvents();
+                    },
+                    post: function () {
+                        uiTable.build();
+                    }
+                };
+            },
+            template: ("\
+\n                <div class=\"ui-table\">\
+\n                    <table class=\"table table-striped table-bordered table-hover\">\
+\n                        <thead>\
+\n                            <tr role=\"row\" class=\"heading\" ng-transclude>\
+\n                            </tr>\
+\n                        </thead>\
+\n                        <tbody></tbody>\
+\n                    </table>\
+\n                </div>'\
+\n            ")
+        };
+    });
+
+//------------------------------------------------------
+//
+//
+//
+//
+//
+//------------------------------------------------------
+angular.module('admin.component')
+    .factory('UITabControl', function ($compile) {
+        var UITabControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITabControl, super$0);var proto$0={};
+            function UITabControl(scope, element, attrs, transclude) {
+                super$0.call(this);
+                this.element = element;
+                this.scope = scope;
+                this.attrs = attrs;
+                this.transclude = transclude;
+                this.message = new Message('UITab');
+                this.init();
+                this.initEvents();
+            }if(super$0!==null)SP$0(UITabControl,super$0);UITabControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITabControl,"configurable":true,"writable":true}});DP$0(UITabControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.init = function() {var this$0 = this;
+                this.tabItems = [];
+                this.scope.component = this;
+                this.bodyElement = this.element.find('ul');
+                this.isLazy = this.scope.lazy != 'false';
+                this.transclude(this.scope, function(dom)  {
+                    this$0.element.find('ul').append(dom);
+                });
+                this.triggerComplete(this.scope, this.attrs.ref || '$tab', this);
+            };
+
+            proto$0.initEvents = function() {var this$0 = this;
+                this.scope.$on('uitab.item.show', function(evt, info)  {
+                    setTimeout(function()  {
+                        this$0.scope.onChange({index: info.index, tabItem: this$0.tabItems[info.index]});
+                    }, 60);
+                });
+                this.scope.$on('uitab.item.remove', function(evt, index)  {
+                    this$0.scope.onRemove({index: index});
+                });
+                this.scope.$on('uitab.item.complete', function(evt, item)  {
+                    this$0.tabItems.push(item);
+                });
+            };
+
+            proto$0.build = function() {
+                this.showAtIndex(this.scope.default || '0');
+            };
+
+            proto$0.addTab = function(head, content, active) {
+                this.addCustomTab((("<ui-tab-item head=\"" + head) + ("\">" + (content || '')) + "</ui-tab-item>"), active);
+            };
+
+            proto$0.addCustomTab = function(tpl, active) {
+                var $h = $(tpl);
+                this.bodyElement.append($h);
+                $compile($h)(this.scope);
+                if (active) {
+                    this.showAtIndex(this.bodyElement.find('li').length - 1);
+                }
+            };
+
+            proto$0.showAtIndex = function(index) {
+                index = parseInt(index);
+                if (index !== undefined && index >= 0) {
+                    this.scope.$broadcast('uitab.item.show', {index: index, lazy: this.isLazy});
+                }
+            };
+
+            proto$0.removeAtIndex = function(index) {
+                index = parseInt(index);
+                if(index !== undefined && index >= 0){
+                    this.scope.$broadcast('uitab.item.remove', index);
+                }
+            };
+        MIXIN$0(UITabControl.prototype,proto$0);proto$0=void 0;return UITabControl;})(ComponentEvent);
+
+        return UITabControl;
+    });
+angular.module('admin.component')
+    .directive('uiTab', function (UITabControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                close: '@',
+                default: '@',
+                lazy: '@',
+                url: '@',
+                onRemove: '&',
+                onChange: '&'
+            },
+            compile: function () {
+                var tab = null;
+                return {
+                    pre: function (scope, element, attrs, controller, transclude) {
+                        tab = new UITabControl(scope, element, attrs, transclude);
+                    },
+                    post: function () {
+                        tab.build();
+                    }
+                };
+            },
+            template: ("\
+\n                <div class=\"ui-tab tabbable-custom\" ng-class=\"{'tabbable-close': close}\">\
+\n                    <ul class=\"nav nav-tabs\">\
+\n                    </ul>\
+\n                    <div class=\"tab-content\" style=\"min-height: 100px;\">\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+
 //-----------------------------------------------------------------------------------------------
 //
 //
