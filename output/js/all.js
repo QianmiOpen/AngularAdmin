@@ -69,93 +69,98 @@ angular.module('admin.service', []);
 //
 //-----------------------------------------------------------------------------------------------
 angular.module('admin.service')
-    .provider('Ajax', function()  {
-        var successHandler,
-            failHandler,
-            result = {
-                setSuccessHandler: function(handler) {
-                    successHandler = handler;
-                },
+       .provider('Ajax', function()  {
+         var successHandler,
+           failHandler,
+           host = '',
+           result = {
+             setSuccessHandler: function(handler) {
+               successHandler = handler;
+             },
 
-                setFailHandler: function(handler) {
-                    failHandler = handler;
-                },
+             setFailHandler: function(handler) {
+               failHandler = handler;
+             },
 
-                $get: function($q, Util, Message) {
-                    var _msg = new Message('Ajax'),
-                        _execute = function(method, url, data)  {
-                            var defer = $q.defer();
-                            $.ajax({
-                                url: url, cache: false, data: data, type: method, dataType: 'json',
-                                success: function(resData)  {
-                                    var success = successHandler(resData),
-                                        error = failHandler(resData);
-                                    if (success !== undefined && success !== null) {
-                                        defer.resolve(success);
-                                    }
-                                    else {
-                                        defer.reject(error);
-                                    }
-                                },
-                                error: function(xhr, status)  {
-                                    var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
-                                    _msg.error(errMsg || '服务器出现了问题,请稍后重试');
-                                }
-                            });
-                            return defer.promise;
-                        };
-                    return {
+             setHost: function(h) {
+               host = h;
+             },
 
-                        get: function(url, data) {
-                            return _execute('GET', url, data);
-                        },
+             $get: function($q, Util, Message) {
+               var _msg = new Message('Ajax'),
+                 _execute = function(method, url, data)  {
+                   var defer = $q.defer();
+                   $.ajax({
+                     url: host + url, cache: false, data: data, type: method, dataType: 'json',
+                     success: function(resData)  {
+                       var success = successHandler(resData),
+                         error = failHandler(resData);
+                       if (success !== undefined && success !== null) {
+                         defer.resolve(success);
+                       }
+                       else {
+                         defer.reject(error);
+                       }
+                     },
+                     error: function(xhr, status)  {
+                       var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
+                       _msg.error(errMsg || '服务器出现了问题,请稍后重试');
+                     }
+                   });
+                   return defer.promise;
+                 };
+               return {
 
-                        post: function(url, data) {
-                            return _execute('POST', url, data);
-                        },
+                 get: function(url, data) {
+                   return _execute('GET', url, data);
+                 },
 
-                        message: function(url, data, successMsg, failMsg) {
-                            return this.post(url, data)
-                                .then(function()  {return _msg.success(successMsg)})
-                                .catch(function()  {return _msg.error(failMsg)});
-                        },
+                 post: function(url, data) {
+                   return _execute('POST', url, data);
+                 },
 
-                        add: function(url, data) {
-                            return this.message(url, data, '添加数据成功', '添加数据失败');
-                        },
+                 message: function(url, data, successMsg, failMsg) {
+                   return this.post(url, data)
+                              .then(function()  {return _msg.success(successMsg)})
+                              .catch(function()  {return _msg.error(failMsg)});
+                 },
 
-                        update: function(url, data) {
-                            return this.message(url, data, '更新数据成功', '更新数据失败');
-                        },
+                 add: function(url, data) {
+                   return this.message(url, data, '添加数据成功', '添加数据失败');
+                 },
 
-                        remove: function(url, data, options) {var this$0 = this;
-                            options = options || {};
-                            return Util.confirm((("您确认删除该" + (options.label || '数据')) + "吗?"))
-                                .then(function()  {return this$0[options.method ? options.method : 'get'](url, data, options)});
-                        },
+                 update: function(url, data) {
+                   return this.message(url, data, '更新数据成功', '更新数据失败');
+                 },
 
-                        load: function(url) {
-                            var $dom = $('<div/>').hide().appendTo(document.body),
-                                defer = $q.defer();
-                            $dom.load(url, function(html)  {
-                                $dom.remove();
-                                defer.resolve(html);
-                            });
-                            return defer.promise;
-                        },
+                 remove: function(url, data, options) {var this$0 = this;
+                   options = options || {};
+                   return Util.confirm((("您确认删除该" + (options.label || '数据')) + "吗?"))
+                              .then(function()  {return this$0[options.method ? options.method : 'get'](url, data, options)});
+                 },
 
-                        getScript: function(url) {
-                            return $.ajax({
-                                url: url,
-                                dataType: "script",
-                                cache: true
-                            });
-                        }
-                    };
-                }
-            };
-        return result;
-    });
+                 load: function(url) {
+                   var $dom = $('<div/>').hide().appendTo(document.body),
+                     defer = $q.defer();
+                   $dom.load(url, function(html)  {
+                     $dom.remove();
+                     defer.resolve(html);
+                   });
+                   return defer.promise;
+                 },
+
+                 getScript: function(url) {
+                   return $.ajax({
+                     url: url,
+                     dataType: "script",
+                     cache: true
+                   });
+                 }
+               };
+             }
+           };
+         return result;
+       });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -4292,51 +4297,6 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
-//  针对input的封装
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormSpinner', function (UISpinnerControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                placeholder: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@'
-            },
-            link: function(s, e, a)  {
-                new UISpinnerControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
-\n                       <div class=\"input-group\" style=\"width:150px;\">\
-\n                           <div class=\"spinner-buttons input-group-btn\">\
-\n                               <button type=\"button\" class=\"btn spinner-up blue\"><i class=\"fa fa-plus\"></i></button>\
-\n                           </div>\
-\n                           <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" readonly=\"true\"/>\
-\n                           <div class=\"spinner-buttons input-group-btn\">\
-\n                               <button type=\"button\" class=\"btn spinner-down red\"><i class=\"fa fa-minus\"></i></button>\
-\n                           </div>\
-\n                       </div>\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                    </div>\
-\n               </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
 //  针对select的封装
 //
 //
@@ -4411,6 +4371,51 @@ angular.module('admin.component')
         };
     });
 
+//-----------------------------------------------------------------------------------------------
+//
+//
+//  针对input的封装
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormSpinner', function (UISpinnerControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                placeholder: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@'
+            },
+            link: function(s, e, a)  {
+                new UISpinnerControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}}\">\
+\n                       <div class=\"input-group\" style=\"width:150px;\">\
+\n                           <div class=\"spinner-buttons input-group-btn\">\
+\n                               <button type=\"button\" class=\"btn spinner-up blue\"><i class=\"fa fa-plus\"></i></button>\
+\n                           </div>\
+\n                           <input type=\"text\" class=\"form-control {{css}}\" name=\"{{name}}\" placeholder=\"{{placeholder}}\" ng-model=\"model\" readonly=\"true\"/>\
+\n                           <div class=\"spinner-buttons input-group-btn\">\
+\n                               <button type=\"button\" class=\"btn spinner-down red\"><i class=\"fa fa-minus\"></i></button>\
+\n                           </div>\
+\n                       </div>\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                    </div>\
+\n               </div>\
+\n            ")
+        };
+    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -6418,45 +6423,46 @@ angular.module('admin.component')
 //
 //-----------------------------------------------------------------------------------------------
 (function () {
-    angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'ui.router'])
-        .constant('AdminCDN', 'http://7xllk7.com1.z0.glb.clouddn.com')
-        .config(function(AdminCDN, AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider, UITreeControlProvider)  {
+  angular.module('admin', ['admin.service', 'admin.filter', 'admin.component', 'ui.router'])
+         .constant('AdminCDN', 'http://7xllk7.com1.z0.glb.clouddn.com')
+         .config(function(AdminCDN, AjaxProvider, MessageProvider, UIEditorControlProvider, UIUploadControlProvider, UITableControlProvider, UITreeControlProvider)  {
 
-            //
-            // ajax 默认返回处理
-            //
-            AjaxProvider.setSuccessHandler(function(result)  {return result.type == 1 ? result.data : null});
-            AjaxProvider.setFailHandler(function(result)  {return result.type != 1 ? result.data : null});
+           //
+           // ajax 默认返回处理
+           //
+           AjaxProvider.setHost('');
+           AjaxProvider.setSuccessHandler(function(result)  {return result.type == 1 ? result.data : null});
+           AjaxProvider.setFailHandler(function(result)  {return result.type != 1 ? result.data : null});
 
-            //
-            // 通知位置
-            //
-            MessageProvider.setPosition('bottom', 'right');
+           //
+           // 通知位置
+           //
+           MessageProvider.setPosition('bottom', 'right');
 
-            //
-            // 百度编辑器的库地址
-            //
-            UIEditorControlProvider.setUrl((("" + AdminCDN) + "/assets/js/ueditor/ueditor.config.js"), (("" + AdminCDN) + "/assets/js/ueditor/ueditor.all.js"));
+           //
+           // 百度编辑器的库地址
+           //
+           UIEditorControlProvider.setUrl((("" + AdminCDN) + "/assets/js/ueditor/ueditor.config.js"), (("" + AdminCDN) + "/assets/js/ueditor/ueditor.all.js"));
 
-            //
-            // 上传空间的配置
-            //
-            UIUploadControlProvider.setDomain('七牛域名');
-            UIUploadControlProvider.setTokenUrl('七牛每次上传会调用这个URL, 返回算好的token, 然后才能上传');
-            UIUploadControlProvider.setMaxSize('1mb');
+           //
+           // 上传空间的配置
+           //
+           UIUploadControlProvider.setDomain('七牛域名');
+           UIUploadControlProvider.setTokenUrl('七牛每次上传会调用这个URL, 返回算好的token, 然后才能上传');
+           UIUploadControlProvider.setMaxSize('1mb');
 
-            //
-            // 表格配置项
-            //
-            UITableControlProvider.setRequestMethod('post');
-            UITableControlProvider.setResultName('aaData', 'iTotalRecords');
-            UITableControlProvider.setPageName('pageSize', 'pageNo');
-            UITableControlProvider.setConfig({});
+           //
+           // 表格配置项
+           //
+           UITableControlProvider.setRequestMethod('post');
+           UITableControlProvider.setResultName('aaData', 'iTotalRecords');
+           UITableControlProvider.setPageName('pageSize', 'pageNo');
+           UITableControlProvider.setConfig({});
 
-            //
-            // 树配置项
-            //
-            UITreeControlProvider.setDataName('id', 'name', 'pid');
-            UITreeControlProvider.setRequestMethod('post');
-        });
+           //
+           // 树配置项
+           //
+           UITreeControlProvider.setDataName('id', 'name', 'pid');
+           UITreeControlProvider.setRequestMethod('post');
+         });
 })();
