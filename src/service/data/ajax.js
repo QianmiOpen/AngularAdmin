@@ -62,7 +62,7 @@ angular.module('admin.service')
                    }
 
                    //
-                   $.ajax(ops);
+                   $.ajax(opts);
                    return defer.promise;
                  };
                return {
