@@ -9,6 +9,7 @@ angular.module('admin.service')
        .provider('Ajax', () => {
          let successHandler,
            failHandler,
+           errorHandler,
            host = '',
            hook = () => {
 
@@ -20,6 +21,10 @@ angular.module('admin.service')
 
              setFailHandler(handler) {
                failHandler = handler;
+             },
+
+             setErrorHandler(h) {
+               errorHandler = h;
              },
 
              setHost(h) {
@@ -49,6 +54,9 @@ angular.module('admin.service')
                        error: (xhr, status) => {
                          var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
                          _msg.error(errMsg || '服务器出现了问题,请稍后重试');
+                         if (errorHandler){
+                           errorHandler(xhr, status);
+                         }
                        }
                      };
 
