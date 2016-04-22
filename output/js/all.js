@@ -73,6 +73,9 @@ angular.module('admin.service')
          var successHandler,
            failHandler,
            host = '',
+           hook = function()  {
+
+           },
            result = {
              setSuccessHandler: function(handler) {
                successHandler = handler;
@@ -86,27 +89,43 @@ angular.module('admin.service')
                host = h;
              },
 
+             setHook: function(h) {
+               hook = h;
+             },
+
              $get: function($q, Util, Message) {
                var _msg = new Message('Ajax'),
                  _execute = function(method, url, data)  {
-                   var defer = $q.defer();
-                   $.ajax({
-                     url: host + url, cache: false, data: data, type: method, dataType: 'json',
-                     success: function(resData)  {
-                       var success = successHandler(resData),
-                         error = failHandler(resData);
-                       if (success !== undefined && success !== null) {
-                         defer.resolve(success);
+                   var defer = $q.defer(),
+                     ops = {
+                       url: host + url, cache: false, data: data, type: method, dataType: 'json',
+                       success: function(resData)  {
+                         var success = successHandler(resData),
+                           error = failHandler(resData);
+                         if (success !== undefined && success !== null) {
+                           defer.resolve(success);
+                         }
+                         else {
+                           defer.reject(error);
+                         }
+                       },
+                       error: function(xhr, status)  {
+                         var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
+                         _msg.error(errMsg || '服务器出现了问题,请稍后重试');
                        }
-                       else {
-                         defer.reject(error);
-                       }
-                     },
-                     error: function(xhr, status)  {
-                       var errMsg = {403: '没有权限', 404: '请求的地址不存在', 500: '服务器出现了问题,请稍后重试'}[status];
-                       _msg.error(errMsg || '服务器出现了问题,请稍后重试');
+                     };
+
+                   //
+                   if (hook) {
+                     var isIntercept = hook(opts);
+                     if (isIntercept) {
+                       defer.reject()
+                       return
                      }
-                   });
+                   }
+
+                   //
+                   $.ajax(ops);
                    return defer.promise;
                  };
                return {
