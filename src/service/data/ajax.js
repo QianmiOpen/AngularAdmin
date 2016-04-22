@@ -34,7 +34,7 @@ angular.module('admin.service')
                let _msg = new Message('Ajax'),
                  _execute = (method, url, data) => {
                    var defer = $q.defer(),
-                     ops = {
+                     opts = {
                        url: host + url, cache: false, data: data, type: method, dataType: 'json',
                        success: (resData) => {
                          var success = successHandler(resData),
