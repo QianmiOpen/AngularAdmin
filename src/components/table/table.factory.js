@@ -237,7 +237,6 @@
                                 this.selectItems = [];
                                 this.selectValues = [];
                             }
-                            this.scope.onDataSuccess({result: result});
                         }
 
                         _afterDataHandler(result) {
@@ -249,6 +248,7 @@
                         }
 
                         _buildPageResult(data) {
+                            this.scope.onDataSuccess({result: data});
                             let result = {};
                             if ($.isArray(data)) {
                                 result = {
