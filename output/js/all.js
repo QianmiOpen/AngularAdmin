@@ -4273,6 +4273,59 @@ angular.module('admin.component')
 //-----------------------------------------------------------------------------------------------
 //
 //
+//  参数
+//      p -- 省, 开关, 默认开, 可不填
+//      c -- 市, 开关, 默认开, 可不填
+//      s -- 区, 开关, 默认开, 可不填
+//      a -- 地址, 开关, 默认关
+//
+//      s-name -- 区域的name
+//      a-name -- 详细地址的name
+//
+//
+//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
+//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
+//      s-value -- 区域默认值
+//      a-value -- 地址值
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiFormRegion', function (UIRegionControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                lcol: '@',
+                rcol: '@',
+                label: '@',
+                css: '@',
+                name: '@',
+                model: '=',
+                change: '&',
+                help: '@',
+                type: '@',
+                mode: '@'
+            },
+            link: function(s, e, a)  {
+                new UIRegionControl(s, e, a);
+            },
+            template: ("\
+\n                <div class=\"form-group\">\
+\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
+\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-region\">\
+\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"city\"/>\
+\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"area\"/>\
+\n                        <input type=\"text\" class=\"input-medium form-control input-inline\" name=\"address\" ng-value=\"{{aValue}}\" placeholder=\"请输入详细地址\" />\
+\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
+\n                   </div>\
+\n               </div>'\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
 //  针对select的封装
 //
 //
@@ -4349,59 +4402,6 @@ angular.module('admin.component')
         };
     });
 
-//-----------------------------------------------------------------------------------------------
-//
-//
-//  参数
-//      p -- 省, 开关, 默认开, 可不填
-//      c -- 市, 开关, 默认开, 可不填
-//      s -- 区, 开关, 默认开, 可不填
-//      a -- 地址, 开关, 默认关
-//
-//      s-name -- 区域的name
-//      a-name -- 详细地址的name
-//
-//
-//      p-value -- 省(当只要显示省的时候, 那就必须要填了)
-//      c-value -- 市(当只要显示省和市区的时候, 那就必须要填了)
-//      s-value -- 区域默认值
-//      a-value -- 地址值
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiFormRegion', function (UIRegionControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            scope: {
-                lcol: '@',
-                rcol: '@',
-                label: '@',
-                css: '@',
-                name: '@',
-                model: '=',
-                change: '&',
-                help: '@',
-                type: '@',
-                mode: '@'
-            },
-            link: function(s, e, a)  {
-                new UIRegionControl(s, e, a);
-            },
-            template: ("\
-\n                <div class=\"form-group\">\
-\n                   <label class=\"col-md-{{lcol || DefaultCol.l}} control-label\">{{label}}</label>\
-\n                   <div class=\"col-md-{{rcol || DefaultCol.r}} ui-form-region\">\
-\n                        <input type=\"hidden\" name=\"{{name}}\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"province\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"city\"/>\
-\n                        <input type=\"text\" class=\"input-small form-control input-inline\" name=\"area\"/>\
-\n                        <input type=\"text\" class=\"input-medium form-control input-inline\" name=\"address\" ng-value=\"{{aValue}}\" placeholder=\"请输入详细地址\" />\
-\n                        <span ng-if=\"help\" class=\"help-block\">{{help}}</span>\
-\n                   </div>\
-\n               </div>'\
-\n            ")
-        };
-    });
 //-----------------------------------------------------------------------------------------------
 //
 //
@@ -5465,6 +5465,480 @@ angular.module('admin.component')
 //
 //
 //
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('tooltip', function () {
+        return {
+            restrict: 'A',
+            replace: false,
+            link: function (scope, element, attrs) {
+                var content = attrs.tooltip,
+                    title = attrs.title,
+                    placement = attrs.placement || (title ? 'right' : 'top');
+
+                //如果有标题有内容, 那么使用popup over
+                if (title) {
+                    element.popover({
+                        title: title,
+                        content: content,
+                        placement: placement,
+                        trigger: 'hover'
+                    });
+                }
+                //否则使用tooltip
+                else {
+                    element.tooltip({
+                        title: content,
+                        placement: placement
+                    });
+                }
+            }
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+(function () {
+
+    var requestMethod = 'post',
+        idName = 'id',
+        pidName = 'pid',
+        labelName = 'name',
+        defaultConfig = {
+            check: {enable: true},
+            edit: {enable: false},
+            data: {
+                key: {name: "name", childs: "childs", title: "name"},
+                simpleData: {enable: true, idKey: "id", pIdKey: "pid", rootPId: "0"}
+            }
+        };
+
+    angular.module('admin.component')
+        .provider('UITreeControl', function () {
+            var result = {
+
+                setDataName: function(_idName, _labelName, _pidName) {
+                    defaultConfig.data.simpleData.idKey = idName = _idName;
+                    defaultConfig.data.simpleData.pIdKey = pidName = _pidName;
+                    defaultConfig.data.key.name = labelName = _labelName;
+                },
+
+                setRequestMethod: function(_requestMethod) {
+                    requestMethod = _requestMethod;
+                },
+
+                $get: function(AdminCDN, Ajax, $compile) {
+                    var UITreeControl = (function(super$0){var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITreeControl, super$0);var proto$0={};
+                        function UITreeControl(scope, element, attrs, transclude) {
+                            super$0.call(this);
+                            this.element = element;
+                            this.treeElement = element.find('ul');
+                            this.scope = scope;
+                            this.attrs = attrs;
+                            this.treeNodeBtnMap = {};
+                            this.dataMap = {};
+                            this.transclude = transclude;
+                            this.message = new Message('UITree');
+                            this.initAfters = [];
+                            this.init();
+                            this.initEvents();
+                        }if(super$0!==null)SP$0(UITreeControl,super$0);UITreeControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITreeControl,"configurable":true,"writable":true}});DP$0(UITreeControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+                        proto$0.init = function() {var this$0 = this;
+                            this.scope.component = this;
+                            this.selectItems = [];
+                            this.selectValues = [];
+                            this.treeElement.attr('id', 'uiTree' + new Date().getTime());
+                            this.callback = {
+                                beforeClick: function(treeId, treeNode, treeNodeId)  {return this$0.scope.onBeforeClick({treeNode: treeNode})},
+                                onClick: function(evt, treeId, treeNode, treeNodeId)  {
+                                    this$0._onClickOrCheckHandler(treeNode, false);
+                                    this$0.scope.onClick({treeNode: treeNode});
+                                    this$0.scope.$apply();
+                                },
+                                beforeCheck: function(treeId, treeNode)  {return this$0.scope.onBeforeCheck({treeNode: treeNode})},
+                                onCheck: function(evt, treeId, treeNode)  {
+                                    this$0._onClickOrCheckHandler(treeNode, true);
+                                    this$0.scope.onCheck({treeNode: treeNode});
+                                    this$0.scope.$apply()
+                                }
+                            };
+                            this.view = {
+                                addHoverDom: function(treeId, treeNode)  {return this$0._onMouseEnterTreeNode(treeNode)},
+                                removeHoverDom: function(treeId, treeNode)  {return this$0._onMouseOverTreeNode(treeNode)}
+                            };
+                            this.check = {enable: this.attrs.checked != 'false'};
+                            this.triggerComplete(this.scope, this.attrs.ref || '$tree', this);
+                        };
+
+                        proto$0.initEvents = function() {var this$0 = this;
+                            this.scope.$watch('filter', function(val)  {
+                                if ($.fn.zTree) {
+                                    clearTimeout(this$0.timeout);
+                                    this$0.timeout = setTimeout(function()  {
+                                        this$0._filter(val);
+                                    }, 100);
+                                }
+                            });
+                            this.scope.onAddHandler = function(evt)  {return this$0.scope.onAdd($(evt.target).parent().data('treeNode'))};
+                            this.scope.onEditHandler = function(evt)  {return this$0.scope.onEdit($(evt.target).parent().data('treeNode'))};
+                            this.scope.onRemoveHandler = function(evt)  {return this$0.scope.onRemove($(evt.target).parent().data('treeNode'))};
+                        };
+
+                        proto$0.build = function() {var this$0 = this;
+                            if ($.fn.ztree) {
+                                this.load();
+                                this.scope.onComplete();
+                            }
+                            else {
+                                Ajax.getScript((("" + AdminCDN) + "/assets/js/zTree_v3/js/jquery.ztree.all-3.5.min.js"))
+                                    .then(function()  {
+                                        this$0.load();
+                                        this$0.scope.onComplete();
+                                    });
+                            }
+                        };
+
+                        proto$0.load = function(params, url) {var this$0 = this;
+                            url = url || this.attrs.url;
+                            if (url) {
+                                return Ajax[requestMethod](url, params || {})
+                                    .then(function(r)  {
+                                        this$0.scope.onDataSuccess({result: r});
+                                        this$0.setData(r);
+                                    })
+                                    .catch(function(r)  {
+                                        this$0.scope.onDataFail({result: r});
+                                        this$0.setData(r);
+                                    });
+                            }
+                            else if (this.dataList) {
+                                this.setData(this.dataList);
+                            }
+                            else if (!this.attrs.manual) {
+                                this.message.error('未设置url, 无法请求');
+                            }
+                            else {
+                                this.setData([]);
+                            }
+                        };
+
+                        proto$0.refresh = function() {
+                            this.load();
+                        };
+
+                        proto$0.setData = function(resData, isFilter) {
+                            resData = resData || [];
+                            if (this.instance) {
+                                this.instance.destroy();
+                            }
+                            if ($.fn.zTree) {
+                                this.instance = $.fn.zTree.init(this.treeElement, $.extend({}, defaultConfig, this), resData);
+                                this.expand();
+                            }
+                            if (!isFilter) {
+                                this.dataList = resData;
+                                this.setDataMap(resData);
+                            }
+                            this.treeNodeBtnMap = [];
+                            return this;
+                        };
+
+                        proto$0.setDataMap = function(resData) {var S_ITER$0 = typeof Symbol!=='undefined'&&Symbol&&Symbol.iterator||'@@iterator';var S_MARK$0 = typeof Symbol!=='undefined'&&Symbol&&Symbol["__setObjectSetter__"];function GET_ITER$0(v){if(v){if(Array.isArray(v))return 0;var f;if(S_MARK$0)S_MARK$0(v);if(typeof v==='object'&&typeof (f=v[S_ITER$0])==='function'){if(S_MARK$0)S_MARK$0(void 0);return f.call(v);}if(S_MARK$0)S_MARK$0(void 0);if((v+'')==='[object Generator]')return v;}throw new Error(v+' is not iterable')};var $D$0;var $D$1;var $D$2;
+                            this.dataMap = {};
+                            $D$0 = GET_ITER$0(resData);$D$2 = $D$0 === 0;$D$1 = ($D$2 ? resData.length : void 0);for (var item ;$D$2 ? ($D$0 < $D$1) : !($D$1 = $D$0["next"]())["done"];){item = ($D$2 ? resData[$D$0++] : $D$1["value"]);
+                                this.dataMap[item[idName]] = item;
+                            };$D$0 = $D$1 = $D$2 = void 0;
+                            return this;
+                        };
+
+                        proto$0.expand = function(arg) {
+                            arg = arg || this.attrs.expand;
+                            if (arg == 'all') {
+                                this.expandAll(true);
+                            }
+                            else if (arg) {
+                                this.expandById(arg);
+                            }
+                            return this;
+                        };
+
+                        proto$0.expandById = function(id) {
+                            var node = this.getTreeNodeById(id);
+                            if (node && this.instance) {
+                                this.instance.expandNode(node, true);
+                            }
+                            return this;
+                        };
+
+                        proto$0.expandAll = function(isExpand) {
+                            this.instance.expandAll(isExpand);
+                        };
+
+                        proto$0.getHierarchyData = function(data) {
+                            var r = [];
+                            if (data) {
+                                r.push(data);
+                                while (data = this.getParentData(data)) {
+                                    r.unshift(data);
+                                }
+                            }
+                            return r;
+                        };
+
+                        proto$0.getParentData = function(data) {
+                            return this.dataMap[data[pidName]];
+                        };
+
+                        proto$0.getTreeNodeById = function(id) {
+                            if (this.instance) {
+                                return this.instance.getNodeByParam(idName, id, null);
+                            }
+                        };
+
+                        proto$0.cleanChecked = function() {var this$0 = this;
+                            $.each(this.selectItems, function(i, selectItem)  {
+                                var node = this$0.instance.getNodeByParam(idName, selectItem.id, null);
+                                node && this$0.instance.checkNode(node, false, true);
+                            });
+                        };
+
+                        proto$0.checkItems = function(items, isAppend) {var this$0 = this;
+                            $.each(items, function(i, selectItem)  {
+                                var node = this$0.instance.getNodeByParam(idName, selectItem.id, null);
+                                node && this$0.instance.checkNode(node, true, true);
+                            });
+                            if (isAppend)
+                                this.selectItems = (this.selectItems || []).concat(items);
+                            else
+                                this.selectItems = items;
+                        };
+
+                        proto$0.appendData = function(id, name, pid) {
+                            var data = {};
+                            data[idName] = id;
+                            data[labelName] = name;
+                            data[pidName] = pid;
+                            if (pid !== undefined && this.instance) {
+                                var parent = this.instance.getNodeByParam(idName, pid, null);
+                                this.instance.addNodes(parent, data);
+                            }
+                            else if (this.instance) {
+                                this.instance.addNodes(null, data);
+                            }
+                            this.dataList = this.dataList || [];
+                            this.dataList.push(data);
+                            this.dataMap[id] = data;
+                        };
+
+                        proto$0.clickItemById = function(id, isAll) {
+                            if (this.instance) {
+                                var node = this.instance.getNodeByParam(idName, id, null);
+                                if (node) {
+                                    this.instance.selectNode(node, isAll);
+                                }
+                            }
+                        };
+
+                        proto$0._onClickOrCheckHandler = function(treeNode, isCheckHandle) {
+                            if (isCheckHandle)
+                                this.selectItems = this.instance.getCheckedNodes(true);
+                            else
+                                this.selectItems = [treeNode];
+                            this.selectValues = this.selectItems.map(function(item)  {
+                                return item[idName];
+                            });
+                            this.scope.model = this.selectValues;
+                        };
+
+                        proto$0._filter = function(filterText) {var this$0 = this;
+                            if (!this.dataList)
+                                return;
+                            var searchList = this.dataList, m = {};
+                            if (filterText) {
+                                filterText = filterText.toLowerCase();
+                                searchList = [];
+                                $.each(this.dataList, function(dataIndex, data)  {
+                                    if (data[labelName] && data[labelName].toLowerCase().indexOf(filterText) != -1) {
+                                        searchList = searchList.concat(this$0.getHierarchyData(data));
+                                    }
+                                });
+                                searchList = searchList.filter(function(item)  {
+                                    if (!m[item[idName]]) {
+                                        m[item[idName]] = 1;
+                                        return true;
+                                    }
+                                    else {
+                                        return false;
+                                    }
+                                });
+                            }
+                            this.setData(searchList, true);
+                            this.expandAll(true);
+                        };
+
+                        proto$0._onMouseEnterTreeNode = function(treeNode) {var this$0 = this;
+                            if (this.treeNodeBtnMap[treeNode.id]) {
+                                this.treeNodeBtnMap[treeNode.id].show();
+                            }
+                            else {
+                                var scope = this.scope.$parent.$new(),
+                                    $dom = this.element.find('>span').clone(true);
+                                scope.treeNode = treeNode;
+                                this.transclude(scope, function($dom2)  {
+                                    $dom.data('treeNode', treeNode);
+                                    $dom.append($dom2).show();
+                                    $("#" + treeNode.tId + "_span").append($dom);
+                                    this$0.treeNodeBtnMap[treeNode.id] = $dom;
+                                });
+                            }
+                        };
+
+                        proto$0._onMouseOverTreeNode = function(treeNode) {
+                            if (this.treeNodeBtnMap[treeNode.id]) {
+                                this.treeNodeBtnMap[treeNode.id].hide();
+                            }
+                        };
+                    MIXIN$0(UITreeControl.prototype,proto$0);proto$0=void 0;return UITreeControl;})(ComponentEvent);
+                    return UITreeControl;
+                }
+            };
+            return result;
+        });
+})();
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiTree', function (UITreeControl) {
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                onBeforeClick: '&',
+                onClick: '&',
+                onBeforeCheck: '&',
+                onDataSuccess: '&',
+                onDataFail: '&',
+                onCheck: '&',
+
+                onComplete: '&',
+
+                onAdd: '&',
+                onEdit: '&',
+                onRemove: '&',
+
+                model: '=',
+
+                checked: '=',
+                filter: '='
+            },
+            compile: function () {
+                var uiTree = null;
+                return {
+                    pre: function (s, e, a, c, t) {
+                        uiTree = new UITreeControl(s, e, a, t);
+                    },
+                    post: function () {
+                        uiTree.build();
+                    }
+                };
+            },
+            template: ("\
+\n                <div class=\"ui-tree\">\
+\n                    <ul class=\"ztree\"></ul>\
+\n                    <span style=\"display:none\">\
+\n                        <span ng-if=\"component.attrs.onAdd\" class=\"button add\" ng-click=\"onAddHandler($event)\"></span>\
+\n                        <span ng-if=\"component.attrs.onEdit\" class=\"button edit\" ng-click=\"onEditHandler($event)\"></span>\
+\n                        <span ng-if=\"component.attrs.onRemove\" class=\"button remove\" ng-click=\"onRemoveHandler($event)\"></span>\
+\n                    </span>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//-----------------------------------------------------------------------------------------------
+angular.module('admin.component')
+    .directive('uiRegionTree', function (UITreeControl, uiRegionHelper) {
+
+        var UIRegionTreeControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIRegionTreeControl, super$0);var proto$0={};
+            function UIRegionTreeControl(s, e, a, t) {
+                super$0.call(this, s, e, a, t);
+            }if(super$0!==null)SP$0(UIRegionTreeControl,super$0);UIRegionTreeControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIRegionTreeControl,"configurable":true,"writable":true}});DP$0(UIRegionTreeControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
+
+            proto$0.load = function() {var this$0 = this;
+                uiRegionHelper.getDataList(this.attrs.mode || 's')
+                    .then(function(data)  {return this$0.setData(data)});
+            };
+        MIXIN$0(UIRegionTreeControl.prototype,proto$0);proto$0=void 0;return UIRegionTreeControl;})(UITreeControl);
+
+
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            scope: {
+                onBeforeClick: '&',
+                onClick: '&',
+                onBeforeCheck: '&',
+                onDataSuccess: '&',
+                onDataFail: '&',
+                onCheck: '&',
+
+                onComplete: '&',
+
+                onAdd: '@',
+                onEdit: '@',
+                onRemove: '&',
+
+                checked: '=',
+                filter: '='
+            },
+            compile: function () {
+                var uiTree = null;
+                return {
+                    pre: function (s, e, a, c, t) {
+                        uiTree = new UIRegionTreeControl(s, e, a, t);
+                        uiTree.init();
+                        uiTree.initEvents();
+                    },
+                    post: function () {
+                        uiTree.build();
+                    }
+                };
+            },
+            template: ("\
+\n                <div>\
+\n                    <ul class=\"ztree ui-tree\"></ul>\
+\n                    <div style=\"display:none\">\
+\n                        <span ng-if=\"onAdd\" class=\"button add\" ng-click=\"onAddHandler(treeNode)\"></span>\
+\n                        <span ng-if=\"onEdit\" class=\"button edit\" ng-click=\"onEditHandler(treeNode)\"></span>\
+\n                        <span ng-if=\"onRemove\" class=\"button remove\" ng-click=\"onRemoveHandler(treeNode)\"></span>\
+\n                    </div>\
+\n                </div>\
+\n            ")
+        };
+    });
+//-----------------------------------------------------------------------------------------------
+//
+//
+//
+//
 //-----------------------------------------------------------------------------------------------
 (function () {
 
@@ -5972,480 +6446,6 @@ angular.module('admin.component')
         };
     });
 
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('tooltip', function () {
-        return {
-            restrict: 'A',
-            replace: false,
-            link: function (scope, element, attrs) {
-                var content = attrs.tooltip,
-                    title = attrs.title,
-                    placement = attrs.placement || (title ? 'right' : 'top');
-
-                //如果有标题有内容, 那么使用popup over
-                if (title) {
-                    element.popover({
-                        title: title,
-                        content: content,
-                        placement: placement,
-                        trigger: 'hover'
-                    });
-                }
-                //否则使用tooltip
-                else {
-                    element.tooltip({
-                        title: content,
-                        placement: placement
-                    });
-                }
-            }
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-(function () {
-
-    var requestMethod = 'post',
-        idName = 'id',
-        pidName = 'pid',
-        labelName = 'name',
-        defaultConfig = {
-            check: {enable: true},
-            edit: {enable: false},
-            data: {
-                key: {name: "name", childs: "childs", title: "name"},
-                simpleData: {enable: true, idKey: "id", pIdKey: "pid", rootPId: "0"}
-            }
-        };
-
-    angular.module('admin.component')
-        .provider('UITreeControl', function () {
-            var result = {
-
-                setDataName: function(_idName, _labelName, _pidName) {
-                    defaultConfig.data.simpleData.idKey = idName = _idName;
-                    defaultConfig.data.simpleData.pIdKey = pidName = _pidName;
-                    defaultConfig.data.key.name = labelName = _labelName;
-                },
-
-                setRequestMethod: function(_requestMethod) {
-                    requestMethod = _requestMethod;
-                },
-
-                $get: function(AdminCDN, Ajax, $compile) {
-                    var UITreeControl = (function(super$0){var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UITreeControl, super$0);var proto$0={};
-                        function UITreeControl(scope, element, attrs, transclude) {
-                            super$0.call(this);
-                            this.element = element;
-                            this.treeElement = element.find('ul');
-                            this.scope = scope;
-                            this.attrs = attrs;
-                            this.treeNodeBtnMap = {};
-                            this.dataMap = {};
-                            this.transclude = transclude;
-                            this.message = new Message('UITree');
-                            this.initAfters = [];
-                            this.init();
-                            this.initEvents();
-                        }if(super$0!==null)SP$0(UITreeControl,super$0);UITreeControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UITreeControl,"configurable":true,"writable":true}});DP$0(UITreeControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-                        proto$0.init = function() {var this$0 = this;
-                            this.scope.component = this;
-                            this.selectItems = [];
-                            this.selectValues = [];
-                            this.treeElement.attr('id', 'uiTree' + new Date().getTime());
-                            this.callback = {
-                                beforeClick: function(treeId, treeNode, treeNodeId)  {return this$0.scope.onBeforeClick({treeNode: treeNode})},
-                                onClick: function(evt, treeId, treeNode, treeNodeId)  {
-                                    this$0._onClickOrCheckHandler(treeNode, false);
-                                    this$0.scope.onClick({treeNode: treeNode});
-                                    this$0.scope.$apply();
-                                },
-                                beforeCheck: function(treeId, treeNode)  {return this$0.scope.onBeforeCheck({treeNode: treeNode})},
-                                onCheck: function(evt, treeId, treeNode)  {
-                                    this$0._onClickOrCheckHandler(treeNode, true);
-                                    this$0.scope.onCheck({treeNode: treeNode});
-                                    this$0.scope.$apply()
-                                }
-                            };
-                            this.view = {
-                                addHoverDom: function(treeId, treeNode)  {return this$0._onMouseEnterTreeNode(treeNode)},
-                                removeHoverDom: function(treeId, treeNode)  {return this$0._onMouseOverTreeNode(treeNode)}
-                            };
-                            this.check = {enable: this.attrs.checked != 'false'};
-                            this.triggerComplete(this.scope, this.attrs.ref || '$tree', this);
-                        };
-
-                        proto$0.initEvents = function() {var this$0 = this;
-                            this.scope.$watch('filter', function(val)  {
-                                if ($.fn.zTree) {
-                                    clearTimeout(this$0.timeout);
-                                    this$0.timeout = setTimeout(function()  {
-                                        this$0._filter(val);
-                                    }, 100);
-                                }
-                            });
-                            this.scope.onAddHandler = function(evt)  {return this$0.scope.onAdd($(evt.target).parent().data('treeNode'))};
-                            this.scope.onEditHandler = function(evt)  {return this$0.scope.onEdit($(evt.target).parent().data('treeNode'))};
-                            this.scope.onRemoveHandler = function(evt)  {return this$0.scope.onRemove($(evt.target).parent().data('treeNode'))};
-                        };
-
-                        proto$0.build = function() {var this$0 = this;
-                            if ($.fn.ztree) {
-                                this.load();
-                                this.scope.onComplete();
-                            }
-                            else {
-                                Ajax.getScript((("" + AdminCDN) + "/assets/js/zTree_v3/js/jquery.ztree.all-3.5.min.js"))
-                                    .then(function()  {
-                                        this$0.load();
-                                        this$0.scope.onComplete();
-                                    });
-                            }
-                        };
-
-                        proto$0.load = function(params, url) {var this$0 = this;
-                            url = url || this.attrs.url;
-                            if (url) {
-                                return Ajax[requestMethod](url, params || {})
-                                    .then(function(r)  {
-                                        this$0.scope.onDataSuccess({result: r});
-                                        this$0.setData(r);
-                                    })
-                                    .catch(function(r)  {
-                                        this$0.scope.onDataFail({result: r});
-                                        this$0.setData(r);
-                                    });
-                            }
-                            else if (this.dataList) {
-                                this.setData(this.dataList);
-                            }
-                            else if (!this.attrs.manual) {
-                                this.message.error('未设置url, 无法请求');
-                            }
-                            else {
-                                this.setData([]);
-                            }
-                        };
-
-                        proto$0.refresh = function() {
-                            this.load();
-                        };
-
-                        proto$0.setData = function(resData, isFilter) {
-                            resData = resData || [];
-                            if (this.instance) {
-                                this.instance.destroy();
-                            }
-                            if ($.fn.zTree) {
-                                this.instance = $.fn.zTree.init(this.treeElement, $.extend({}, defaultConfig, this), resData);
-                                this.expand();
-                            }
-                            if (!isFilter) {
-                                this.dataList = resData;
-                                this.setDataMap(resData);
-                            }
-                            this.treeNodeBtnMap = [];
-                            return this;
-                        };
-
-                        proto$0.setDataMap = function(resData) {var S_ITER$0 = typeof Symbol!=='undefined'&&Symbol&&Symbol.iterator||'@@iterator';var S_MARK$0 = typeof Symbol!=='undefined'&&Symbol&&Symbol["__setObjectSetter__"];function GET_ITER$0(v){if(v){if(Array.isArray(v))return 0;var f;if(S_MARK$0)S_MARK$0(v);if(typeof v==='object'&&typeof (f=v[S_ITER$0])==='function'){if(S_MARK$0)S_MARK$0(void 0);return f.call(v);}if(S_MARK$0)S_MARK$0(void 0);if((v+'')==='[object Generator]')return v;}throw new Error(v+' is not iterable')};var $D$0;var $D$1;var $D$2;
-                            this.dataMap = {};
-                            $D$0 = GET_ITER$0(resData);$D$2 = $D$0 === 0;$D$1 = ($D$2 ? resData.length : void 0);for (var item ;$D$2 ? ($D$0 < $D$1) : !($D$1 = $D$0["next"]())["done"];){item = ($D$2 ? resData[$D$0++] : $D$1["value"]);
-                                this.dataMap[item[idName]] = item;
-                            };$D$0 = $D$1 = $D$2 = void 0;
-                            return this;
-                        };
-
-                        proto$0.expand = function(arg) {
-                            arg = arg || this.attrs.expand;
-                            if (arg == 'all') {
-                                this.expandAll(true);
-                            }
-                            else if (arg) {
-                                this.expandById(arg);
-                            }
-                            return this;
-                        };
-
-                        proto$0.expandById = function(id) {
-                            var node = this.getTreeNodeById(id);
-                            if (node && this.instance) {
-                                this.instance.expandNode(node, true);
-                            }
-                            return this;
-                        };
-
-                        proto$0.expandAll = function(isExpand) {
-                            this.instance.expandAll(isExpand);
-                        };
-
-                        proto$0.getHierarchyData = function(data) {
-                            var r = [];
-                            if (data) {
-                                r.push(data);
-                                while (data = this.getParentData(data)) {
-                                    r.unshift(data);
-                                }
-                            }
-                            return r;
-                        };
-
-                        proto$0.getParentData = function(data) {
-                            return this.dataMap[data[pidName]];
-                        };
-
-                        proto$0.getTreeNodeById = function(id) {
-                            if (this.instance) {
-                                return this.instance.getNodeByParam(idName, id, null);
-                            }
-                        };
-
-                        proto$0.cleanChecked = function() {var this$0 = this;
-                            $.each(this.selectItems, function(i, selectItem)  {
-                                var node = this$0.instance.getNodeByParam(idName, selectItem.id, null);
-                                node && this$0.instance.checkNode(node, false, true);
-                            });
-                        };
-
-                        proto$0.checkItems = function(items, isAppend) {var this$0 = this;
-                            $.each(items, function(i, selectItem)  {
-                                var node = this$0.instance.getNodeByParam(idName, selectItem.id, null);
-                                node && this$0.instance.checkNode(node, true, true);
-                            });
-                            if (isAppend)
-                                this.selectItems = (this.selectItems || []).concat(items);
-                            else
-                                this.selectItems = items;
-                        };
-
-                        proto$0.appendData = function(id, name, pid) {
-                            var data = {};
-                            data[idName] = id;
-                            data[labelName] = name;
-                            data[pidName] = pid;
-                            if (pid !== undefined && this.instance) {
-                                var parent = this.instance.getNodeByParam(idName, pid, null);
-                                this.instance.addNodes(parent, data);
-                            }
-                            else if (this.instance) {
-                                this.instance.addNodes(null, data);
-                            }
-                            this.dataList = this.dataList || [];
-                            this.dataList.push(data);
-                            this.dataMap[id] = data;
-                        };
-
-                        proto$0.clickItemById = function(id, isAll) {
-                            if (this.instance) {
-                                var node = this.instance.getNodeByParam(idName, id, null);
-                                if (node) {
-                                    this.instance.selectNode(node, isAll);
-                                }
-                            }
-                        };
-
-                        proto$0._onClickOrCheckHandler = function(treeNode, isCheckHandle) {
-                            if (isCheckHandle)
-                                this.selectItems = this.instance.getCheckedNodes(true);
-                            else
-                                this.selectItems = [treeNode];
-                            this.selectValues = this.selectItems.map(function(item)  {
-                                return item[idName];
-                            });
-                            this.scope.model = this.selectValues;
-                        };
-
-                        proto$0._filter = function(filterText) {var this$0 = this;
-                            if (!this.dataList)
-                                return;
-                            var searchList = this.dataList, m = {};
-                            if (filterText) {
-                                filterText = filterText.toLowerCase();
-                                searchList = [];
-                                $.each(this.dataList, function(dataIndex, data)  {
-                                    if (data[labelName] && data[labelName].toLowerCase().indexOf(filterText) != -1) {
-                                        searchList = searchList.concat(this$0.getHierarchyData(data));
-                                    }
-                                });
-                                searchList = searchList.filter(function(item)  {
-                                    if (!m[item[idName]]) {
-                                        m[item[idName]] = 1;
-                                        return true;
-                                    }
-                                    else {
-                                        return false;
-                                    }
-                                });
-                            }
-                            this.setData(searchList, true);
-                            this.expandAll(true);
-                        };
-
-                        proto$0._onMouseEnterTreeNode = function(treeNode) {var this$0 = this;
-                            if (this.treeNodeBtnMap[treeNode.id]) {
-                                this.treeNodeBtnMap[treeNode.id].show();
-                            }
-                            else {
-                                var scope = this.scope.$parent.$new(),
-                                    $dom = this.element.find('>span').clone(true);
-                                scope.treeNode = treeNode;
-                                this.transclude(scope, function($dom2)  {
-                                    $dom.data('treeNode', treeNode);
-                                    $dom.append($dom2).show();
-                                    $("#" + treeNode.tId + "_span").append($dom);
-                                    this$0.treeNodeBtnMap[treeNode.id] = $dom;
-                                });
-                            }
-                        };
-
-                        proto$0._onMouseOverTreeNode = function(treeNode) {
-                            if (this.treeNodeBtnMap[treeNode.id]) {
-                                this.treeNodeBtnMap[treeNode.id].hide();
-                            }
-                        };
-                    MIXIN$0(UITreeControl.prototype,proto$0);proto$0=void 0;return UITreeControl;})(ComponentEvent);
-                    return UITreeControl;
-                }
-            };
-            return result;
-        });
-})();
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiTree', function (UITreeControl) {
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                onBeforeClick: '&',
-                onClick: '&',
-                onBeforeCheck: '&',
-                onDataSuccess: '&',
-                onDataFail: '&',
-                onCheck: '&',
-
-                onComplete: '&',
-
-                onAdd: '&',
-                onEdit: '&',
-                onRemove: '&',
-
-                model: '=',
-
-                checked: '=',
-                filter: '='
-            },
-            compile: function () {
-                var uiTree = null;
-                return {
-                    pre: function (s, e, a, c, t) {
-                        uiTree = new UITreeControl(s, e, a, t);
-                    },
-                    post: function () {
-                        uiTree.build();
-                    }
-                };
-            },
-            template: ("\
-\n                <div class=\"ui-tree\">\
-\n                    <ul class=\"ztree\"></ul>\
-\n                    <span style=\"display:none\">\
-\n                        <span ng-if=\"component.attrs.onAdd\" class=\"button add\" ng-click=\"onAddHandler($event)\"></span>\
-\n                        <span ng-if=\"component.attrs.onEdit\" class=\"button edit\" ng-click=\"onEditHandler($event)\"></span>\
-\n                        <span ng-if=\"component.attrs.onRemove\" class=\"button remove\" ng-click=\"onRemoveHandler($event)\"></span>\
-\n                    </span>\
-\n                </div>\
-\n            ")
-        };
-    });
-//-----------------------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//-----------------------------------------------------------------------------------------------
-angular.module('admin.component')
-    .directive('uiRegionTree', function (UITreeControl, uiRegionHelper) {
-
-        var UIRegionTreeControl = (function(super$0){"use strict";var PRS$0 = (function(o,t){o["__proto__"]={"a":t};return o["a"]===t})({},{});var DP$0 = Object.defineProperty;var GOPD$0 = Object.getOwnPropertyDescriptor;var MIXIN$0 = function(t,s){for(var p in s){if(s.hasOwnProperty(p)){DP$0(t,p,GOPD$0(s,p));}}return t};var SP$0 = Object.setPrototypeOf||function(o,p){if(PRS$0){o["__proto__"]=p;}else {DP$0(o,"__proto__",{"value":p,"configurable":true,"enumerable":false,"writable":true});}return o};var OC$0 = Object.create;if(!PRS$0)MIXIN$0(UIRegionTreeControl, super$0);var proto$0={};
-            function UIRegionTreeControl(s, e, a, t) {
-                super$0.call(this, s, e, a, t);
-            }if(super$0!==null)SP$0(UIRegionTreeControl,super$0);UIRegionTreeControl.prototype = OC$0(super$0!==null?super$0.prototype:null,{"constructor":{"value":UIRegionTreeControl,"configurable":true,"writable":true}});DP$0(UIRegionTreeControl,"prototype",{"configurable":false,"enumerable":false,"writable":false});
-
-            proto$0.load = function() {var this$0 = this;
-                uiRegionHelper.getDataList(this.attrs.mode || 's')
-                    .then(function(data)  {return this$0.setData(data)});
-            };
-        MIXIN$0(UIRegionTreeControl.prototype,proto$0);proto$0=void 0;return UIRegionTreeControl;})(UITreeControl);
-
-
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            scope: {
-                onBeforeClick: '&',
-                onClick: '&',
-                onBeforeCheck: '&',
-                onDataSuccess: '&',
-                onDataFail: '&',
-                onCheck: '&',
-
-                onComplete: '&',
-
-                onAdd: '@',
-                onEdit: '@',
-                onRemove: '&',
-
-                checked: '=',
-                filter: '='
-            },
-            compile: function () {
-                var uiTree = null;
-                return {
-                    pre: function (s, e, a, c, t) {
-                        uiTree = new UIRegionTreeControl(s, e, a, t);
-                        uiTree.init();
-                        uiTree.initEvents();
-                    },
-                    post: function () {
-                        uiTree.build();
-                    }
-                };
-            },
-            template: ("\
-\n                <div>\
-\n                    <ul class=\"ztree ui-tree\"></ul>\
-\n                    <div style=\"display:none\">\
-\n                        <span ng-if=\"onAdd\" class=\"button add\" ng-click=\"onAddHandler(treeNode)\"></span>\
-\n                        <span ng-if=\"onEdit\" class=\"button edit\" ng-click=\"onEditHandler(treeNode)\"></span>\
-\n                        <span ng-if=\"onRemove\" class=\"button remove\" ng-click=\"onRemoveHandler(treeNode)\"></span>\
-\n                    </div>\
-\n                </div>\
-\n            ")
-        };
-    });
 //-----------------------------------------------------------------------------------------------
 //
 //
